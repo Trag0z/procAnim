@@ -1,8 +1,8 @@
 #pragma once
 #include "Components.h"
 #include "Shader.h"
-#include <sdl/SDL.h>
 #include <array>
+#include <sdl/SDL.h>
 
 struct Game {
     bool running = false;
@@ -12,6 +12,7 @@ struct Game {
     SDL_Renderer *renderer;
     SDL_GLContext gContext;
     Shader shader;
+    Texture tex;
 
     GameConfig gameConfig;
     MouseKeyboardInput mouseKeyboardInput;

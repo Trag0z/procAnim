@@ -121,7 +121,7 @@ inline void pollInputs(MouseKeyboardInput &mkb,
 };
 
 inline void render(SDL_Window *window, Transform transform,
-                   FlatRenderer flatRenderer) {
+                   SpriteRenderer spriteRenderer, FlatRenderer flatRenderer) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -131,8 +131,12 @@ inline void render(SDL_Window *window, Transform transform,
 
     glBindVertexArray(flatRenderer.vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    // Unbind for error safety
-    // glBindVertexArray(0);
+
+    // Render sprite
+    spriteRenderer.shader->use();
+    glBindTexture(GL_TEXTURE_2D, spriteRenderer.tex->id);
+    glBindVertexArray(spriteRenderer.vao);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     // mat4 projection = ortho(0.0f, 1920.0f, 1080.0f, 0.0f, -1.0f, 1.0f);
 

@@ -4,7 +4,7 @@
 
 struct Texture {
     GLuint id;
-    GLuint width, height;
+    GLuint w, h;
 };
 
-void loadTexture(Texture &out, const char *path);
+Texture loadTexture(const char *path);

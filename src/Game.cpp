@@ -87,6 +87,11 @@ void Game::init() {
 
         loadAndCompileShaderFromFile(shader, "../src/default.vert",
                                      "../src/default.frag");
+        tex = loadTexture("../assets/testTex.png");
+
+        spriteRenderer = createSpriteRenderer();
+        spriteRenderer.shader = &shader;
+        spriteRenderer.tex = &tex;
 
         Shader flatShader;
         loadAndCompileShaderFromFile(flatShader, "../src/flat.vert",
@@ -98,7 +103,6 @@ void Game::init() {
 
         flatRenderer = createFlatRenderer();
         flatRenderer.color = {1.0f, 0.0f, 0.0f, 1.0f};
-        FlatRenderer::setColor(flatRenderer.color);
 
         // OpenGL configuration
         glViewport(0, 0, gameConfig.windowSize.x, gameConfig.windowSize.y);
@@ -116,7 +120,7 @@ bool Game::run() {
 
         pollInputs(mouseKeyboardInput, gamepadInputs);
 
-        render(window, transform, flatRenderer);
+        render(window, transform, spriteRenderer, flatRenderer);
 
         // Wait for next frame
         U32 frameTime = SDL_GetTicks() - frameStart;
