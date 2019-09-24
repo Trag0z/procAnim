@@ -2,12 +2,15 @@
 #include "Game.h"
 //#include "pch.h"
 #include "ComponentUtil.h"
+#include "DebugCallback.h"
 #include "Systems.h"
-#include <gl/GLU.h>
+// #include <gl/GLU.h>
 #include <gl/glew.h>
 #include <iostream>
 #include <sdl/SDL_image.h>
 #include <sdl/SDL_ttf.h>
+
+#define DEBUG_MODE true
 
 void Game::init() {
     // Initialize SDL
@@ -65,6 +68,9 @@ void Game::init() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
                         SDL_GL_CONTEXT_PROFILE_CORE);
 
+    if (DEBUG_MODE)
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+
     // Create context
     gContext = SDL_GL_CreateContext(window);
     if (gContext == NULL) {
@@ -109,6 +115,14 @@ void Game::init() {
         // glEnable(GL_CULL_FACE);
         // glEnable(GL_BLEND);
         // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        if (DEBUG_MODE) {
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(handleGLDebugOutput, nullptr);
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0,
+                                  nullptr, GL_TRUE);
+        }
     }
 
     running = true;

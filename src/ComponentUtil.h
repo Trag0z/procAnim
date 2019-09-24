@@ -6,10 +6,10 @@ SpriteRenderer createSpriteRenderer() {
     SpriteRenderer ret;
 
     GLfloat vertices[] = {// vec3 pos, vec3 color, vec2 uvCoords
-                          0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+                          0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
                           0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-                          -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-                          -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f};
+                          -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+                          -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
 
     uint indices[] = {0, 1, 3, 1, 2, 3};
 
@@ -40,7 +40,6 @@ SpriteRenderer createSpriteRenderer() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
                           (GLvoid *)(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(2);
-
 
     // Reset vertex array binding for error safety
     // glBindVertexArray(0);

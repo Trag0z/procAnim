@@ -1,1 +1,6 @@
 .vs/procAnim/v15/
+*.pdb
+*.idb
+*.tlog
+*.ilk
+bin/Game.obj

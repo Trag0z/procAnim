@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Components.h" />
     <ClInclude Include="..\src\ComponentUtil.h" />
+    <ClInclude Include="..\src\DebugOutput.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Shader.h" />
     <ClInclude Include="..\src\Systems.h" />
