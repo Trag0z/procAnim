@@ -122,13 +122,17 @@ inline void pollInputs(MouseKeyboardInput &mkb,
 
 inline void render(SDL_Window *window, Transform transform,
                    FlatRenderer flatRenderer) {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // Render flat renderers
     glUseProgram(FlatRenderer::shaderID);
     FlatRenderer::setColor(flatRenderer.color);
-    // TODO: enable correct vertex  array
+
+    glBindVertexArray(flatRenderer.vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    // Unbind for error safety
+    // glBindVertexArray(0);
 
     // mat4 projection = ortho(0.0f, 1920.0f, 1080.0f, 0.0f, -1.0f, 1.0f);
 

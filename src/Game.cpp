@@ -1,6 +1,7 @@
 #pragma once
 #include "Game.h"
 //#include "pch.h"
+#include "ComponentUtil.h"
 #include "Systems.h"
 #include <gl/GLU.h>
 #include <gl/glew.h>
@@ -24,7 +25,7 @@ void Game::init() {
     }
     printf("SDL initialized\n");
 
-    window = SDL_CreateWindow("RelDepr", SDL_WINDOWPOS_CENTERED, 0,
+    window = SDL_CreateWindow("procAnim", SDL_WINDOWPOS_CENTERED, 0,
                               gameConfig.windowSize.x, gameConfig.windowSize.y,
                               gameConfig.windowFlags);
     if (!window) {
@@ -93,13 +94,17 @@ void Game::init() {
 
         FlatRenderer::shaderID = flatShader.id;
         FlatRenderer::colorLocation =
-            glGetUniformLocation(flatShader.id, "color");
+            glGetUniformLocation(flatShader.id, "outcolor");
+
+        flatRenderer = createFlatRenderer();
+        flatRenderer.color = {1.0f, 0.0f, 0.0f, 1.0f};
+        FlatRenderer::setColor(flatRenderer.color);
 
         // OpenGL configuration
         glViewport(0, 0, gameConfig.windowSize.x, gameConfig.windowSize.y);
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        // glEnable(GL_CULL_FACE);
+        // glEnable(GL_BLEND);
+        // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     running = true;

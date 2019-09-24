@@ -28,8 +28,8 @@ struct FlatRenderer {
 
     static GLuint shaderID;
     static GLint colorLocation;
-    static void setColor(vec4 color){
-
+    static void setColor(vec4 color) {
+        glUniform4f(colorLocation, color.r, color.g, color.b, color.a);
     };
 };
 
