@@ -1,6 +1,6 @@
 #pragma once
+#include "pch.h"
 #include "Components.h"
-#include <glm/glm.hpp>
 
 struct Entity {
 	Transform transform;

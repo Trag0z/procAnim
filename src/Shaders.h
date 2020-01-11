@@ -1,5 +1,5 @@
 #pragma once
-#include <gl/glew.h>
+#include "pch.h"
 
 
 static bool checkCompileErrors(GLuint object, bool program);

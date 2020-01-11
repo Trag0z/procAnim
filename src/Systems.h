@@ -1,7 +1,6 @@
 #pragma once
 #include "Components.h"
-#include <glm/ext.hpp>
-#include <glm/glm.hpp>
+#include "pch.h"
 
 inline void pollInputs(MouseKeyboardInput& mkb,
                        std::array<GamepadInput, 4>& pads) {

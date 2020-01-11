@@ -1,13 +1,9 @@
 #pragma once
+#include "pch.h"
 #include "Game.h"
-//#include "pch.h"
 #include "DebugCallback.h"
 #include "Systems.h"
-// #include <gl/GLU.h>
-#include <gl/glew.h>
-#include <iostream>
-#include <sdl/SDL_image.h>
-#include <sdl/SDL_ttf.h>
+
 
 constexpr bool DEBUG_MODE = true;
 

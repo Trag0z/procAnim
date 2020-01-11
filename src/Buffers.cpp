@@ -1,7 +1,6 @@
 #pragma once
+#include "pch.h"
 #include "Buffers.h"
-#include <gl/glew.h>
-#include <sdl/SDL_assert.h>
 
 VertexBuffer::VertexBuffer(const void* data, uint size) {
     glGenBuffers(1, &m_id);

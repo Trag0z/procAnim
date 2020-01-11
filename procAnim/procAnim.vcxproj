@@ -94,6 +94,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;</AdditionalLibraryDirectories>
@@ -139,6 +141,9 @@
     <ClCompile Include="..\src\Components.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\src\Shaders.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
   </ItemGroup>
@@ -148,6 +153,7 @@
     <ClInclude Include="..\src\DebugCallback.h" />
     <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\Game.h" />
+    <ClInclude Include="..\src\pch.h" />
     <ClInclude Include="..\src\Shaders.h" />
     <ClInclude Include="..\src\Systems.h" />
     <ClInclude Include="..\src\Texture.h" />

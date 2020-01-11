@@ -1,6 +1,5 @@
 #pragma once
-#include <gl/glew.h>
-#include <iostream>
+#include "pch.h"
 
 void GLAPIENTRY handleGLDebugOutput(GLenum source, GLenum type, GLuint id,
                                     GLenum severity, GLsizei length,

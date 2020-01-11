@@ -1,6 +1,5 @@
 #pragma once
-#include <cstdint>
-#include <glm/glm.hpp>
+#include "pch.h"
 
 typedef int32_t S32;
 typedef int64_t S64;

@@ -1,8 +1,7 @@
 #pragma once
+#include "pch.h"
 #include "Components.h"
 #include "Entity.h"
-#include <array>
-#include <sdl/SDL.h>
 
 struct Game {
     bool running = false;

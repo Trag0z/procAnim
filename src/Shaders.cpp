@@ -1,11 +1,6 @@
 #pragma once
+#include "pch.h"
 #include "Shaders.h"
-#include <fstream>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-#include <sdl/SDL_assert.h>
-#include <sstream>
 
 static bool checkCompileErrors(GLuint object, bool program) {
 	GLint success;

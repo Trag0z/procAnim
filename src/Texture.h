@@ -1,7 +1,5 @@
 #pragma once
-#include <gl/glew.h>
-#include <glm/glm.hpp>
-#include <sdl/SDL_image.h>
+#include "pch.h"
 
 struct Texture {
     GLuint id;

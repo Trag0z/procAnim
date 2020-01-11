@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "Texture.h"
 
 Texture loadTexture(const char *path) {

@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "Components.h"
 
 GLuint SpriteRenderer::shaderID;

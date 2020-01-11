@@ -1,16 +1,23 @@
 #pragma once
 
 // #define SDL_MAIN_HANDLED
-// #include "../include/SDL_image.h"
-// #include "../include/SDL_ttf.h"
 
-// #include "Rect.h"
-// #include "Types.h"
-// #include "Util.h"
-// #include "Vector.h"
+#include <array>
+#include <iostream>
+#include <vector>
+#include <cstdint>
+#include <sstream>
+#include <fstream>
 
-// #include <iostream>
-// #include <vector>
+#include <GL/glew.h>
+#include <gl/glew.h>
+#include <glm/ext.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <sdl/SDL.h>
+#include <sdl/SDL_image.h>
+#include <sdl/SDL_ttf.h>
 
 // #include <ctype.h>
 // #include <float.h>

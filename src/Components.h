@@ -1,14 +1,9 @@
 #pragma once
-//#include "pch.h"
+#include "pch.h"
 #include "Shaders.h"
 #include "Texture.h"
 #include "Types.h"
 #include "Util.h"
-#include <GL/glew.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <sdl/SDL.h>
-#include <vector>
 
 struct Transform {
     glm::vec2 pos;
