@@ -97,7 +97,7 @@ void Game::init() {
 
     // Initialize entity
     Transform t;
-    t.pos = {0.0f, 0.0f};
+    t.pos = {1920.0f / 2.0f, 1080.0f / 2.0f };
     t.rot = 0.0f;
     t.scale = {1.0f, 1.0f};
 

@@ -12,10 +12,10 @@ GLint FlatRenderer::colorLocation;
 U32 GamepadInput::numGamepads = 0;
 
 void Mesh::init() {
-    Mesh m = Mesh::create({{{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
-                                    {{-1.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
-                                    {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
-                                    {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f}}},
+    Mesh m = Mesh::create({{{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},
+                                    {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f}},
+                                    {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},
+                                    {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f}}},
                                    {0, 1, 2, 0, 3, 1});
     simpleMesh.vao = m.vao;
     simpleMesh.numIndices = m.numIndices;
@@ -62,7 +62,7 @@ void SpriteRenderer::init(GLuint _shaderID) {
     SpriteRenderer::shaderID = _shaderID;
     SpriteRenderer::modelMatrixLocation =
         glGetUniformLocation(_shaderID, "model");
-    SpriteRenderer::modelMatrixLocation =
+    SpriteRenderer::projectionMatrixLocation =
         glGetUniformLocation(_shaderID, "projection");
 }
 

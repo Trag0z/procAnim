@@ -45,7 +45,9 @@ inline void pollInputs(MouseKeyboardInput& mkb,
     }
 
     // Update gamepads
-    for (size_t padIndex = 0; padIndex < static_cast<size_t>(GamepadInput::numGamepads); ++padIndex) {
+    for (size_t padIndex = 0;
+         padIndex < static_cast<size_t>(GamepadInput::numGamepads);
+         ++padIndex) {
         GamepadInput pad = pads[padIndex];
 
         // Check if gamepad is still valid
@@ -97,7 +99,7 @@ inline void pollInputs(MouseKeyboardInput& mkb,
         }
 
         // Poll all the buttons on this pad
-		for (U32 i = 0; i < GamepadInput::numButtons; ++i) {
+        for (U32 i = 0; i < GamepadInput::numButtons; ++i) {
             if (SDL_GameControllerGetButton(
                     pad.sdlPtr, static_cast<SDL_GameControllerButton>(i))) {
                 if (!pad.button(i)) {
@@ -121,43 +123,25 @@ inline void render(SDL_Window* window, const Entity& entity) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Render flat renderers
-    // glUseProgram(FlatRenderer::getShaderID());
-    // FlatRenderer::setColor(flatRenderer.color);
+using namespace glm;
 
-    // glBindVertexArray(flatRenderer.vao);
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
+	mat4 projection = ortho(0.0f, 1920.0f, 1080.0f, 0.0f, -1.0f, 1.0f);
 
-    // Render sprite
-    // spriteRenderer.shader->use();
-    // glBindTexture(GL_TEXTURE_2D, spriteRenderer.tex->id);
-    // glBindVertexArray(spriteRenderer.vao);
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-	using namespace glm;
-
-    // Move this into shader memory as it rarely changes
-	mat4 projection(1.0f); // = ortho(0.0f, 1920.0f, 1080.0f, 0.0f, 0.0f, 1.0f);
 
     mat4 model(1.0f);
 
+	// Entity transformations first to multiply from the left to spriteRenderer transfotmation
+    model = scale(model, vec3(entity.transform.scale, 1.0f));
+    model = rotate(model, entity.transform.rot, vec3(0.0f, 0.0f, 1.0f));
+    model = translate(model, vec3(entity.transform.pos, 0.0f));
+
+    // Move the center of the texture to the spriteRenderers position
+    model = scale(model, vec3(entity.spriteRenderer.tex.dimensions, 1.0f));
     model = translate(model, vec3(entity.spriteRenderer.pos, 0.0f));
 
-    // Translate so (0,0) is in the middle of the object, then rotate, then
-    // translate back
-    model = translate(model, vec3(-0.5f * entity.transform.scale *
-                                      entity.spriteRenderer.tex.dimensions,
-                                  0.0f));
-    model = rotate(model, entity.transform.rot, vec3(0.0f, 0.0f, 1.0f));
-    model = translate(model, vec3(0.5f * entity.transform.scale *
-                                      entity.spriteRenderer.tex.dimensions,
-                                  0.0f));
-
-    model = scale(model, vec3(entity.transform.scale, 1.0f));
-
     glUseProgram(SpriteRenderer::getShaderID());
-    
-	SpriteRenderer::setModelMatrix(model);
+
+    SpriteRenderer::setModelMatrix(model);
     SpriteRenderer::setProjectionMatrix(projection);
 
     glBindVertexArray(entity.mesh.vao);

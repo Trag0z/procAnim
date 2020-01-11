@@ -1,0 +1,8 @@
+TODO:
+- create camera projection and move it into gpu memory
+
+- Entity needs to be restructured, have pointers or something
+- disable vsync
+
+NOTES:
+- glVertexAttribPointer() binds curretn buffer to VAO, so the buffer does not ohave to be bound before using it
