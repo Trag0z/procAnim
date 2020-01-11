@@ -1,34 +1,69 @@
 #pragma once
 //#include "pch.h"
-#include "Shader.h"
+#include "Shaders.h"
 #include "Texture.h"
 #include "Types.h"
 #include "Util.h"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <sdl/SDL.h>
-
-using namespace glm;
+#include <vector>
 
 struct Transform {
-    vec2 pos;
-    vec2 scale;
+    glm::vec2 pos;
+    glm::vec2 scale;
     GLfloat rot;
 };
 
-struct SpriteRenderer {
+struct Mesh {
     GLuint vao;
-    Texture *tex;
-    Shader *shader;
+    GLuint numIndices;
+
+  private:
+    static struct {
+        GLuint vao;
+        GLuint numIndices;
+    } simpleMesh;
+
+  public:
+    static void init();
+    static Mesh create(std::vector<Vertex> vertices, std::vector<uint> indices);
+    static Mesh simple();
+};
+
+struct SpriteRenderer {
+    glm::vec2 pos;
+    Texture tex;
+
+  private:
+    static GLuint shaderID;
+    static GLuint modelMatrixLocation;
+    static GLuint projectionMatrixLocation;
+
+  public:
+    static void init(GLuint shaderID);
+    inline static GLuint getShaderID() { return shaderID; };
+    inline static void setModelMatrix(const glm::mat4& m) {
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(m));
+    };
+    inline static void setProjectionMatrix(const glm::mat4& m) {
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(m));
+    };
 };
 
 struct FlatRenderer {
     GLuint vao;
-    vec4 color;
+    glm::vec4 color;
 
+  private:
     static GLuint shaderID;
     static GLint colorLocation;
-    static void setColor(vec4 color) {
+
+  public:
+    static void init(GLuint shaderID);
+    inline static GLuint getShaderID() { return shaderID; };
+    inline static void setColor(glm::vec4 color) {
         glUniform4f(colorLocation, color.r, color.g, color.b, color.a);
     };
 };
@@ -41,7 +76,7 @@ struct GamepadInput {
 
     static U32 numGamepads;
 
-    SDL_GameController *sdlPtr = nullptr;
+    SDL_GameController* sdlPtr = nullptr;
 
     float axis[numAxes];
     Uint32 buttonMap, buttonDownMap, buttonUpMap;
@@ -59,16 +94,16 @@ struct GamepadInput {
 
 struct MouseKeyboardInput {
     const static uint numMouseButtons = 3;
-    const Uint8 *sdlKeyboard;
+    const Uint8* sdlKeyboard;
     int numKeys;
 
     bool *key, *keyUp, *keyDown;
     uint mouseButtonMap, mouseButtonDownMap, mouseButtonUpMap;
-    ivec2 mousePos;
+    glm::ivec2 mousePos;
 
     void init() {
         sdlKeyboard = SDL_GetKeyboardState(&numKeys);
-        key = (bool *)malloc(sizeof(bool) * (numKeys * 3));
+        key = (bool*)malloc(sizeof(bool) * (numKeys * 3));
         keyDown = key + numKeys;
         keyUp = keyDown + numKeys;
     };
@@ -80,7 +115,5 @@ struct GameConfig {
     const U32 windowFlags =
         SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
 
-    const GLclampf bgColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-
-    Ivec2 windowSize = {1920, 1080};
+    glm::ivec2 windowSize = {1920, 1080};
 };

@@ -3,10 +3,8 @@
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
-using namespace glm;
-
-inline void pollInputs(MouseKeyboardInput &mkb,
-                       std::array<GamepadInput, 4> &pads) {
+inline void pollInputs(MouseKeyboardInput& mkb,
+                       std::array<GamepadInput, 4>& pads) {
     SDL_PumpEvents();
 
     // Update mouse
@@ -48,8 +46,8 @@ inline void pollInputs(MouseKeyboardInput &mkb,
     }
 
     // Update gamepads
-    for (U32 i = 0; i < GamepadInput::numGamepads; ++i) {
-        GamepadInput pad = pads[i];
+    for (size_t padIndex = 0; padIndex < static_cast<size_t>(GamepadInput::numGamepads); ++padIndex) {
+        GamepadInput pad = pads[padIndex];
 
         // Check if gamepad is still valid
         SDL_assert(pad.sdlPtr);
@@ -100,7 +98,7 @@ inline void pollInputs(MouseKeyboardInput &mkb,
         }
 
         // Poll all the buttons on this pad
-        for (U32 i = 0; i < GamepadInput::numButtons; ++i) {
+        for (size_t i = 0; i < static_cast<size_t>(GamepadInput::numButtons); ++i) {
             if (SDL_GameControllerGetButton(
                     pad.sdlPtr, static_cast<SDL_GameControllerButton>(i))) {
                 if (!pad.button(i)) {
@@ -120,40 +118,58 @@ inline void pollInputs(MouseKeyboardInput &mkb,
     }
 };
 
-inline void render(SDL_Window *window, Transform transform,
-                   SpriteRenderer spriteRenderer, FlatRenderer flatRenderer) {
+inline void render(SDL_Window* window, const Entity& entity) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Render flat renderers
-    glUseProgram(FlatRenderer::shaderID);
-    FlatRenderer::setColor(flatRenderer.color);
+    // glUseProgram(FlatRenderer::getShaderID());
+    // FlatRenderer::setColor(flatRenderer.color);
 
-    glBindVertexArray(flatRenderer.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // glBindVertexArray(flatRenderer.vao);
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
 
     // Render sprite
-    spriteRenderer.shader->use();
-    glBindTexture(GL_TEXTURE_2D, spriteRenderer.tex->id);
-    glBindVertexArray(spriteRenderer.vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // spriteRenderer.shader->use();
+    // glBindTexture(GL_TEXTURE_2D, spriteRenderer.tex->id);
+    // glBindVertexArray(spriteRenderer.vao);
+    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-    // mat4 projection = ortho(0.0f, 1920.0f, 1080.0f, 0.0f, -1.0f, 1.0f);
+	using namespace glm;
 
-    // mat4 model;
-    // model = translate(model, vec3(transform.pos, 0.0f));
+    // Move this into shader memory as it rarely changes
+	mat4 projection(1.0f); // = ortho(0.0f, 1920.0f, 1080.0f, 0.0f, 0.0f, 1.0f);
 
-    // // Translate so (0,0) is in the middle of the object, then rotate,
-    // then
-    // // translate back
-    // model = translate(
-    //     model, vec3(0.5f * transform.scale.x, 0.5f * transform.scale.y,
-    //     0.0f));
-    // model = rotate(model, transform.rot, vec3(0.0f, 0.0f, 1.0f));
-    // model = translate(model, vec3(-0.5f * transform.scale.x,
-    //                               -0.5f * transform.scale.y, 0.0f));
+    mat4 model(1.0f);
 
-    // model = glm::scale(model, vec3(transform.scale, 1.0f));
+    model = translate(model, vec3(entity.spriteRenderer.pos, 0.0f));
+
+    // Translate so (0,0) is in the middle of the object, then rotate, then
+    // translate back
+    model = translate(model, vec3(-0.5f * entity.transform.scale *
+                                      entity.spriteRenderer.tex.dimensions,
+                                  0.0f));
+    model = rotate(model, entity.transform.rot, vec3(0.0f, 0.0f, 1.0f));
+    model = translate(model, vec3(0.5f * entity.transform.scale *
+                                      entity.spriteRenderer.tex.dimensions,
+                                  0.0f));
+
+    model = scale(model, vec3(entity.transform.scale, 1.0f));
+
+    glUseProgram(SpriteRenderer::getShaderID());
+    
+	SpriteRenderer::setModelMatrix(model);
+    SpriteRenderer::setProjectionMatrix(projection);
+
+    glBindVertexArray(entity.mesh.vao);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, entity.spriteRenderer.tex.id);
+
+    glDrawElements(GL_TRIANGLES, entity.mesh.numIndices, GL_UNSIGNED_INT, 0);
+
+    // unbind vao for error safety
+    glBindVertexArray(0);
 
     SDL_GL_SwapWindow(window);
 };

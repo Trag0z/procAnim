@@ -1,6 +1,6 @@
 #pragma once
 #include "Components.h"
-#include "Shader.h"
+#include "Entity.h"
 #include <array>
 #include <sdl/SDL.h>
 
@@ -8,10 +8,9 @@ struct Game {
     bool running = false;
     U32 frameStart;
 
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    SDL_GLContext gContext;
-    Shader shader;
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    SDL_GLContext glContext;
     Texture tex;
 
     GameConfig gameConfig;
@@ -19,9 +18,7 @@ struct Game {
 
     std::array<GamepadInput, 4> gamepadInputs;
 
-    Transform transform;
-    SpriteRenderer spriteRenderer;
-    FlatRenderer flatRenderer;
+    Entity entity;
 
     void init();
     bool run();

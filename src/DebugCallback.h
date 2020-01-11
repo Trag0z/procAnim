@@ -82,4 +82,6 @@ void GLAPIENTRY handleGLDebugOutput(GLenum source, GLenum type, GLuint id,
     }
     std::cout << std::endl;
     std::cout << std::endl;
+
+	SDL_assert(false);
 };

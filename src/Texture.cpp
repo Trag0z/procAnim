@@ -9,6 +9,8 @@ Texture loadTexture(const char *path) {
     ret.w = img->w;
     ret.h = img->h;
 
+    ret.dimensions = {static_cast<float>(ret.w), static_cast<float>(ret.h)};
+
     glGenTextures(1, &ret.id);
     glBindTexture(GL_TEXTURE_2D, ret.id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ret.w, ret.h, 0, GL_RGBA,

@@ -1,7 +1,6 @@
 #pragma once
 #include "Game.h"
 //#include "pch.h"
-#include "ComponentUtil.h"
 #include "DebugCallback.h"
 #include "Systems.h"
 // #include <gl/GLU.h>
@@ -10,37 +9,24 @@
 #include <sdl/SDL_image.h>
 #include <sdl/SDL_ttf.h>
 
-#define DEBUG_MODE true
+constexpr bool DEBUG_MODE = true;
 
 void Game::init() {
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        printf("[SDL_Init] %s\n", SDL_GetError());
-        SDL_assert(false);
-    }
-    if (!IMG_Init(IMG_INIT_PNG)) {
-        printf("[IMG_Init] %s\n", SDL_GetError());
-        SDL_assert(false);
-    }
-    if (TTF_Init() < 0) {
-        printf("[TTF_Init] %s\n", SDL_GetError());
-        SDL_assert(false);
-    }
+    SDL_assert_always(SDL_Init(SDL_INIT_EVERYTHING) == 0);
+    SDL_assert_always(IMG_Init(IMG_INIT_PNG) != 0);
+    SDL_assert_always(TTF_Init() == 0);
     printf("SDL initialized\n");
 
     window = SDL_CreateWindow("procAnim", SDL_WINDOWPOS_CENTERED, 0,
                               gameConfig.windowSize.x, gameConfig.windowSize.y,
                               gameConfig.windowFlags);
-    if (!window) {
-        printf("Failed to create window. SDL Error: %s\n", SDL_GetError());
-        SDL_assert(false);
-    } else {
-        printf("Window created\n");
-    }
+    SDL_assert_always(window);
+    printf("Window created\n");
 
     renderer = SDL_CreateRenderer(window, -1, 0);
 
-    int numJoysticks = SDL_NumJoysticks();
+    const int numJoysticks = SDL_NumJoysticks();
     for (int i = 0; i < numJoysticks; ++i) {
         if (!SDL_IsGameController(i)) {
             printf("[Input] Joystick%d is not a supported GameController!\n",
@@ -48,18 +34,6 @@ void Game::init() {
             continue;
         }
         ++GamepadInput::numGamepads;
-    }
-
-    // Initialize Components
-    mouseKeyboardInput.init();
-
-    // Open gamepads
-    for (U32 i = 0; i < GamepadInput::numGamepads; ++i) {
-        gamepadInputs[i].sdlPtr = SDL_GameControllerOpen(i);
-        if (!gamepadInputs[i].sdlPtr) {
-            printf("[Input] Error opening gamepad%I32d: %s\n", i,
-                   SDL_GetError());
-        }
     }
 
     // Use OpenGL 3.1 core
@@ -72,58 +46,72 @@ void Game::init() {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
     // Create context
-    gContext = SDL_GL_CreateContext(window);
-    if (gContext == NULL) {
+    glContext = SDL_GL_CreateContext(window);
+    if (glContext == NULL) {
         printf("OpenGL context could not be created! SDL Error: %s\n",
                SDL_GetError());
-    } else {
-        // Initialize GLEW
-        glewExperimental = GL_TRUE;
-        GLenum glewError = glewInit();
-        if (glewError != GLEW_OK) {
-            printf("Error initializing GLEW! %s\n",
-                   glewGetErrorString(glewError));
-        }
+        SDL_assert(false);
+    }
+    // Initialize GLEW
+    glewExperimental = GL_TRUE;
+    GLenum glewError = glewInit();
+    if (glewError != GLEW_OK) {
+        printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
+    }
 
-        // Use Vsync
-        if (SDL_GL_SetSwapInterval(1) < 0) {
-            printf("Warning: Unable to set VSync! SDL Error: %s\n",
+    // Use Vsync
+    if (SDL_GL_SetSwapInterval(1) < 0) {
+        printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
+    }
+
+    // OpenGL configuration
+    glViewport(0, 0, gameConfig.windowSize.x, gameConfig.windowSize.y);
+    // glEnable(GL_CULL_FACE);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (DEBUG_MODE) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(handleGLDebugOutput, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0,
+                              nullptr, GL_TRUE);
+    }
+
+    // Initialize components
+	Mesh::init();
+
+    SpriteRenderer::init(loadAndCompileShaderFromFile(
+        "../src/shaders/default.vert", "../src/shaders/default.frag"));
+
+    FlatRenderer::init(loadAndCompileShaderFromFile(
+        "../src/shaders/flat.vert", "../src/shaders/flat.frag"));
+
+
+    mouseKeyboardInput.init();
+
+    // Open gamepads
+    for (U32 i = 0; i < GamepadInput::numGamepads; ++i) {
+        gamepadInputs[i].sdlPtr = SDL_GameControllerOpen(i);
+        if (!gamepadInputs[i].sdlPtr) {
+            printf("[Input] Error opening gamepad%I32d: %s\n", i,
                    SDL_GetError());
         }
-
-        loadAndCompileShaderFromFile(shader, "../src/default.vert",
-                                     "../src/default.frag");
-        tex = loadTexture("../assets/testTex.png");
-
-        spriteRenderer = createSpriteRenderer();
-        spriteRenderer.shader = &shader;
-        spriteRenderer.tex = &tex;
-
-        Shader flatShader;
-        loadAndCompileShaderFromFile(flatShader, "../src/flat.vert",
-                                     "../src/flat.frag");
-
-        FlatRenderer::shaderID = flatShader.id;
-        FlatRenderer::colorLocation =
-            glGetUniformLocation(flatShader.id, "outcolor");
-
-        flatRenderer = createFlatRenderer();
-        flatRenderer.color = {1.0f, 0.0f, 0.0f, 1.0f};
-
-        // OpenGL configuration
-        glViewport(0, 0, gameConfig.windowSize.x, gameConfig.windowSize.y);
-        // glEnable(GL_CULL_FACE);
-        // glEnable(GL_BLEND);
-        // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        if (DEBUG_MODE) {
-            glEnable(GL_DEBUG_OUTPUT);
-            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-            glDebugMessageCallback(handleGLDebugOutput, nullptr);
-            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0,
-                                  nullptr, GL_TRUE);
-        }
     }
+
+    // Initialize entity
+    Transform t;
+    t.pos = {0.0f, 0.0f};
+    t.rot = 0.0f;
+    t.scale = {1.0f, 1.0f};
+
+    SpriteRenderer s;
+    s.pos = {0.0f, 0.0f};
+    s.tex = loadTexture("../assets/testTex.png");
+
+    entity.transform = t;
+    entity.mesh = Mesh::simple();
+    entity.spriteRenderer = s;
 
     running = true;
 };
@@ -134,7 +122,13 @@ bool Game::run() {
 
         pollInputs(mouseKeyboardInput, gamepadInputs);
 
-        render(window, transform, spriteRenderer, flatRenderer);
+        render(window, entity);
+
+        // Check for errors and clear error queue
+        while (GLenum error = glGetError()) {
+            printf("[OpenGL Error] %d\n", error);
+            SDL_assert(!error);
+        }
 
         // Wait for next frame
         U32 frameTime = SDL_GetTicks() - frameStart;
