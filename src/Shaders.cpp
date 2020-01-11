@@ -58,13 +58,13 @@ GLuint loadAndCompileShaderFromFile(const char* vShaderPath,
 	glShaderSource(vShader, 1, &vShaderSource, NULL);
 	glCompileShader(vShader);
 	if (!checkCompileErrors(vShader, false))
-		return -1;
+		SDL_assert_always(false);
 
 	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fShader, 1, &fShaderSource, NULL);
 	glCompileShader(fShader);
 	if (!checkCompileErrors(fShader, false))
-		return -1;
+		SDL_assert_always(false);
 
 	GLuint id = glCreateProgram();
 
@@ -73,7 +73,7 @@ GLuint loadAndCompileShaderFromFile(const char* vShaderPath,
 
 	glLinkProgram(id);
 	if (!checkCompileErrors(id, true))
-		return -1;
+		SDL_assert_always(false);
 
 	glDeleteShader(vShader);
 	glDeleteShader(fShader);

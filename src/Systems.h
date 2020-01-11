@@ -97,7 +97,7 @@ inline void pollInputs(MouseKeyboardInput& mkb,
         }
 
         // Poll all the buttons on this pad
-        for (size_t i = 0; i < static_cast<size_t>(GamepadInput::numButtons); ++i) {
+		for (U32 i = 0; i < GamepadInput::numButtons; ++i) {
             if (SDL_GameControllerGetButton(
                     pad.sdlPtr, static_cast<SDL_GameControllerButton>(i))) {
                 if (!pad.button(i)) {

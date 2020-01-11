@@ -14,7 +14,7 @@ void VertexBuffer::bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_id); }
 void VertexBuffer::unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
 IndexBuffer::IndexBuffer(const uint* data, uint count) : m_count(count) {
-    SDL_assert(sizeof(uint) == sizeof(GLuint));
+    // SDL_assert(sizeof(uint) == sizeof(GLuint));
 
     glGenBuffers(1, &m_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);

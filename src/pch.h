@@ -1,6 +1,5 @@
 #pragma once
-
-// #define SDL_MAIN_HANDLED
+#pragma warning(push, 0)
 
 #include <array>
 #include <iostream>
@@ -19,6 +18,9 @@
 #include <sdl/SDL_image.h>
 #include <sdl/SDL_ttf.h>
 
+#pragma warning(pop)
+
+// #define SDL_MAIN_HANDLED
 // #include <ctype.h>
 // #include <float.h>
 // #include <limits.h>

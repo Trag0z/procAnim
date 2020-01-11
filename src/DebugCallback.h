@@ -1,6 +1,8 @@
 #pragma once
 #include "pch.h"
 
+#pragma warning(push, 0)
+
 void GLAPIENTRY handleGLDebugOutput(GLenum source, GLenum type, GLuint id,
                                     GLenum severity, GLsizei length,
                                     const GLchar *message,
@@ -84,3 +86,5 @@ void GLAPIENTRY handleGLDebugOutput(GLenum source, GLenum type, GLuint id,
 
 	SDL_assert(false);
 };
+
+#pragma warning(pop)

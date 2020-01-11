@@ -43,7 +43,8 @@ struct SpriteRenderer {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(m));
     };
     inline static void setProjectionMatrix(const glm::mat4& m) {
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(m));
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE,
+                           glm::value_ptr(m));
     };
 };
 
