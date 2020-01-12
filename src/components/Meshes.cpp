@@ -2,6 +2,14 @@
 #include "pch.h"
 #include "Meshes.h"
 
+Bone::Bone(aiBone& b) : name(b.mName.C_Str()) {
+    memcpy(&offsetMatrix, &b.mOffsetMatrix, sizeof(float) * 4 * 4);
+    offsetMatrix = glm::transpose(offsetMatrix);
+    for (size_t i = 0; i < b.mNumWeights; ++i) {
+        weights.push_back({b.mWeights[i].mVertexId, b.mWeights[i].mWeight});
+    }
+}
+
 void Mesh::init() {
     Mesh m = Mesh({{{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},
                    {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f}},
@@ -12,20 +20,51 @@ void Mesh::init() {
     simpleMesh.numIndices = m.numIndices;
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint> indices)
-    : Mesh(vertices, indices, GL_STATIC_DRAW) {}
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint> indices) {
+    numIndices = static_cast<GLuint>(indices.size());
+    createVao(vertices, indices, GL_STATIC_DRAW);
+}
 
-Mesh::Mesh(const char* file) : Mesh(file, GL_STATIC_DRAW) {}
+Mesh::Mesh(const char* file) {
+    Assimp::Importer importer;
 
-Mesh::Mesh(const char* file, GLenum usage)
-    : Mesh(loadDataFromFile(file), usage) {}
+    const aiScene* scene = importer.ReadFile(
+        file, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
 
-Mesh::Mesh(init_data_t initData, GLenum usage)
-    : Mesh(initData.first, initData.second, usage) {}
+    if (!scene) {
+        printf("[ASSIMP] Error loading asset from %s: %s\n", file,
+               importer.GetErrorString());
+        SDL_assert(false);
+    }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint> indices,
-           GLuint usage)
-    : numIndices(static_cast<GLuint>(indices.size())) {
+    SDL_assert(scene->HasMeshes());
+
+    aiMesh& meshData = *scene->mMeshes[0];
+
+    std::vector<Vertex> vertices;
+    vertices.reserve(meshData.mNumVertices);
+    aiVector3D* vertData = meshData.mVertices;
+    for (size_t i = 0; i < meshData.mNumVertices; ++i) {
+        vertices.push_back(
+            {{vertData[i].x, vertData[i].y, 0.0f}, {0.0f, 0.0f}});
+    }
+
+    std::vector<uint> indices;
+    indices.reserve(static_cast<size_t>(meshData.mNumFaces) * 3);
+    for (size_t i = 0; i < meshData.mNumFaces; ++i) {
+        aiFace& face = meshData.mFaces[i];
+        indices.push_back(face.mIndices[0]);
+        indices.push_back(face.mIndices[1]);
+        indices.push_back(face.mIndices[2]);
+    }
+
+    Mesh(vertices, indices);
+}
+
+Mesh Mesh::simple() { return {simpleMesh.vao, simpleMesh.numIndices}; }
+
+void Mesh::createVao(const std::vector<Vertex>& vertices,
+                     const std::vector<uint>& indices, GLuint usage) {
     GLuint vbo, ebo;
 
     glGenVertexArrays(1, &vao);
@@ -55,32 +94,14 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint> indices,
     glBindVertexArray(0);
 }
 
-Mesh Mesh::simple() { return {simpleMesh.vao, simpleMesh.numIndices}; }
-
-MutableMesh::MutableMesh(std::vector<Vertex> vertices,
-                         std::vector<uint> indices)
-    : Mesh(vertices, indices, GL_DYNAMIC_DRAW), vertices(std::move(vertices)) {}
-
-MutableMesh::MutableMesh(const char* file)
-    : MutableMesh(loadDataFromFile(file)) {}
-
-MutableMesh::MutableMesh(init_data_t initData)
-    : Mesh(initData, GL_DYNAMIC_DRAW), vertices(initData.first) {}
-
-void MutableMesh::update() const {
-    glBindVertexArray(vao);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(),
-                 vertices.data(), GL_DYNAMIC_DRAW);
-}
-
-Mesh::init_data_t Mesh::loadDataFromFile(const char* file) {
+MutableMesh::MutableMesh(const char* file) {
     Assimp::Importer importer;
 
     const aiScene* scene = importer.ReadFile(
         file, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
 
     if (!scene) {
-        printf("[ASSIMP] Error loading asset from %s: %s", file,
+        printf("[ASSIMP] Error loading asset from %s: %s\n", file,
                importer.GetErrorString());
         SDL_assert(false);
     }
@@ -89,7 +110,6 @@ Mesh::init_data_t Mesh::loadDataFromFile(const char* file) {
 
     aiMesh& meshData = *scene->mMeshes[0];
 
-    std::vector<Vertex> vertices;
     vertices.reserve(meshData.mNumVertices);
     aiVector3D* vertData = meshData.mVertices;
     for (size_t i = 0; i < meshData.mNumVertices; ++i) {
@@ -106,5 +126,17 @@ Mesh::init_data_t Mesh::loadDataFromFile(const char* file) {
         indices.push_back(face.mIndices[2]);
     }
 
-    return {vertices, indices};
+    bones.reserve(static_cast<size_t>(meshData.mNumBones));
+    for (size_t i = 0; i < meshData.mNumBones; ++i) {
+        bones.push_back(*meshData.mBones[i]);
+    }
+
+    numIndices = static_cast<GLuint>(indices.size());
+    createVao(vertices, indices, GL_DYNAMIC_DRAW);
+}
+
+void MutableMesh::update() const {
+    glBindVertexArray(vao);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(),
+                 vertices.data(), GL_DYNAMIC_DRAW);
 }

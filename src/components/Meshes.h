@@ -2,22 +2,33 @@
 #include "../pch.h"
 #include "../Types.h"
 
+struct Bone {
+    struct VertexWeight {
+        uint vertexId;
+        float weight;
+    };
+
+    std::string name;
+    glm::mat4 offsetMatrix;
+    std::vector<VertexWeight> weights;
+
+    Bone(){};
+    Bone(aiBone& b);
+};
+
 struct Mesh {
     GLuint vao;
     GLuint numIndices;
 
     Mesh() : vao(0), numIndices(0) {}
-    Mesh(std::vector<Vertex> vertices, std::vector<uint> indices);
     Mesh(const char* file);
     static void init();
     static Mesh simple();
 
   protected:
-    using init_data_t = std::pair<std::vector<Vertex>, std::vector<uint>>;
-    Mesh(std::vector<Vertex> vertices, std::vector<uint> indices, GLenum usage);
-    Mesh(init_data_t initData, GLenum usage);
-    Mesh(const char* file, GLenum usage);
-    init_data_t loadDataFromFile(const char* file);
+    Mesh(std::vector<Vertex> vertices, std::vector<uint> indices);
+    void createVao(const std::vector<Vertex>& vertices,
+                   const std::vector<uint>& indices, GLenum usage);
 
   private:
     static struct {
@@ -30,13 +41,10 @@ struct Mesh {
 
 struct MutableMesh : Mesh {
     std::vector<Vertex> vertices;
+    std::vector<Bone> bones;
 
-    MutableMesh() : Mesh(), vertices(0) {}
-    MutableMesh(std::vector<Vertex> vertices, std::vector<uint> indices);
+    MutableMesh() : Mesh(), vertices(0), bones(0) {}
     MutableMesh(const char* file);
 
     void update() const;
-
-  private:
-    MutableMesh(init_data_t initData);
 };

@@ -101,7 +101,7 @@ void Game::init() {
     s.tex = loadTexture("../assets/red100x100.png");
 
     entity.transform = t;
-    entity.mesh = MutableMesh("../assets/guy.blend");
+    entity.mesh = MutableMesh("../assets/guy.dae");
     entity.spriteRenderer = s;
     entity.gamepadInput = &gamepadInputs[0];
 
