@@ -3,7 +3,9 @@
 #include "Components.h"
 
 struct Entity {
-	Transform transform;
-	Mesh mesh;
-	SpriteRenderer spriteRenderer;
+    Transform transform;
+    MutableMesh mesh;
+    SpriteRenderer spriteRenderer;
+    PlayerController playerController;
+    GamepadInput* gamepadInput;
 };

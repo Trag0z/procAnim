@@ -48,7 +48,7 @@ inline void pollInputs(MouseKeyboardInput& mkb,
     for (size_t padIndex = 0;
          padIndex < static_cast<size_t>(GamepadInput::numGamepads);
          ++padIndex) {
-        GamepadInput pad = pads[padIndex];
+        GamepadInput& pad = pads[padIndex];
 
         // Check if gamepad is still valid
         SDL_assert(pad.sdlPtr);
@@ -119,13 +119,23 @@ inline void pollInputs(MouseKeyboardInput& mkb,
     }
 };
 
+inline void updatePlayer(Entity& entity) {
+    constexpr float sensitivity = 0.1f;
+    entity.mesh.vertices[PlayerController::LEFT_HAND].position += glm::vec3(
+        entity.gamepadInput->axis[SDL_CONTROLLER_AXIS_RIGHTX] * sensitivity,
+        entity.gamepadInput->axis[SDL_CONTROLLER_AXIS_RIGHTY] * sensitivity,
+        0.0f);
+
+    entity.mesh.update();
+}
+
 inline void render(SDL_Window* window, const Entity& entity) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     using namespace glm;
 
-    mat4 projection = ortho(0.0f, 1920.0f,  0.0f, 1080.0f, -1.0f, 1.0f);
+    mat4 projection = ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
 
     mat4 model(1.0f);
 

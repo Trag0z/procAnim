@@ -104,8 +104,9 @@ void Game::init() {
     s.tex = loadTexture("../assets/red100x100.png");
 
     entity.transform = t;
-    entity.mesh = Mesh::loadFromFile("../assets/guy.blend");
+    entity.mesh = MutableMesh("../assets/guy.blend");
     entity.spriteRenderer = s;
+    entity.gamepadInput = &gamepadInputs[0];
 
     running = true;
 };
@@ -115,6 +116,8 @@ bool Game::run() {
         frameStart = SDL_GetTicks();
 
         pollInputs(mouseKeyboardInput, gamepadInputs);
+
+        updatePlayer(entity);
 
         render(window, entity);
 

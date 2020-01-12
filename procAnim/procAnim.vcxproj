@@ -139,6 +139,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Buffers.cpp" />
     <ClCompile Include="..\src\Components.cpp" />
+    <ClCompile Include="..\src\components\Meshes.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\pch.cpp">
@@ -150,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Buffers.h" />
     <ClInclude Include="..\src\Components.h" />
+    <ClInclude Include="..\src\components\Meshes.h" />
     <ClInclude Include="..\src\DebugCallback.h" />
     <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\Game.h" />
