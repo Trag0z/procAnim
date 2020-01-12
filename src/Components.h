@@ -15,17 +15,31 @@ struct Mesh {
     GLuint vao;
     GLuint numIndices;
 
+    Mesh(){};
+    Mesh(std::vector<Vertex> vertices, std::vector<uint> indices);
+    static void init();
+    static Mesh simple();
+    static Mesh loadFromFile(const char* path);
+
+  protected:
+    Mesh(std::vector<Vertex> vertices, std::vector<uint> indices, GLenum usage);
+
   private:
     static struct {
         GLuint vao;
         GLuint numIndices;
     } simpleMesh;
 
+    Mesh(GLuint vao, GLuint numIndeces) : vao(vao), numIndices(numIndeces) {}
+};
+
+struct MutableMesh : Mesh {
+  private:
+    std::vector<uint> mutableIndices;
+
   public:
-    static void init();
-    static Mesh create(std::vector<Vertex> vertices, std::vector<uint> indices);
-    static Mesh simple();
-    static Mesh loadFromFile(const char* path);
+    MutableMesh(std::vector<Vertex> vertices, std::vector<uint> indices,
+                std::vector<uint> mutableIndices);
 };
 
 struct SpriteRenderer {

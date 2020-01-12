@@ -12,29 +12,32 @@ GLint FlatRenderer::colorLocation;
 U32 GamepadInput::numGamepads = 0;
 
 void Mesh::init() {
-    Mesh m = Mesh::create({{{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},
-                           {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f}},
-                           {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},
-                           {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f}}},
-                          {0, 1, 2, 0, 3, 1});
+    Mesh m = Mesh({{{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},
+                   {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f}},
+                   {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},
+                   {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f}}},
+                  {0, 1, 2, 0, 3, 1});
     simpleMesh.vao = m.vao;
     simpleMesh.numIndices = m.numIndices;
 }
 
-Mesh Mesh::create(std::vector<Vertex> vertices, std::vector<uint> indices) {
-    Mesh result;
-    result.numIndices = static_cast<GLuint>(indices.size());
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint> indices)
+    : Mesh(vertices, indices, GL_STATIC_DRAW) {}
+
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint> indices,
+           GLuint usage)
+    : numIndices(static_cast<GLuint>(indices.size())) {
     GLuint vbo, ebo;
 
-    glGenVertexArrays(1, &result.vao);
+    glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
 
-    glBindVertexArray(result.vao);
+    glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(),
-                 vertices.data(), GL_STATIC_DRAW);
+                 vertices.data(), usage);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indices.size(),
@@ -51,8 +54,6 @@ Mesh Mesh::create(std::vector<Vertex> vertices, std::vector<uint> indices) {
 
     // Reset vertex array binding for error safety
     glBindVertexArray(0);
-
-    return result;
 }
 
 Mesh Mesh::simple() { return {simpleMesh.vao, simpleMesh.numIndices}; }
@@ -63,11 +64,11 @@ Mesh Mesh::loadFromFile(const char* path) {
     const aiScene* scene = importer.ReadFile(
         path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
 
-	if (!scene) {
-		printf("[ASSIMP] Error loading asset from %s: %s", path,
-			importer.GetErrorString());
-		SDL_assert(false);
-	}
+    if (!scene) {
+        printf("[ASSIMP] Error loading asset from %s: %s", path,
+               importer.GetErrorString());
+        SDL_assert(false);
+    }
 
     SDL_assert(scene->HasMeshes());
 
@@ -77,7 +78,8 @@ Mesh Mesh::loadFromFile(const char* path) {
     vertices.reserve(meshData.mNumVertices);
     aiVector3D* vertData = meshData.mVertices;
     for (size_t i = 0; i < meshData.mNumVertices; ++i) {
-		vertices.push_back({ {vertData[i].x, vertData[i].y, 0.0f}, {0.0f, 0.0f} });
+        vertices.push_back(
+            {{vertData[i].x, vertData[i].y, 0.0f}, {0.0f, 0.0f}});
     }
 
     std::vector<uint> indices;
@@ -85,11 +87,17 @@ Mesh Mesh::loadFromFile(const char* path) {
     for (size_t i = 0; i < meshData.mNumFaces; ++i) {
         aiFace& face = meshData.mFaces[i];
         indices.push_back(face.mIndices[0]);
-		indices.push_back(face.mIndices[1]);
+        indices.push_back(face.mIndices[1]);
         indices.push_back(face.mIndices[2]);
     }
 
-    return Mesh::create(vertices, indices);
+    return Mesh(vertices, indices);
+}
+
+MutableMesh::MutableMesh(std::vector<Vertex> vertices,
+                         std::vector<uint> indices,
+                         std::vector<uint> mutableIndices)
+    : mutableIndices(mutableIndices), Mesh(vertices, indices, GL_DYNAMIC_DRAW) {
 }
 
 void SpriteRenderer::init(GLuint _shaderID) {
