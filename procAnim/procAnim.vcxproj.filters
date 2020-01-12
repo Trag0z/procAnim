@@ -88,12 +88,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\shaders\flat.frag">
-      <Filter>Source Files\shaders</Filter>
-    </None>
-    <None Include="..\src\shaders\flat.vert">
-      <Filter>Source Files\shaders</Filter>
-    </None>
     <None Include="..\src\shaders\default.frag">
       <Filter>Source Files\shaders</Filter>
     </None>

@@ -37,22 +37,6 @@ struct SpriteRenderer {
     };
 };
 
-struct FlatRenderer {
-    GLuint vao;
-    glm::vec4 color;
-
-  private:
-    static GLuint shaderID;
-    static GLint colorLocation;
-
-  public:
-    static void init(GLuint shaderID);
-    inline static GLuint getShaderID() { return shaderID; };
-    inline static void setColor(glm::vec4 color) {
-        glUniform4f(colorLocation, color.r, color.g, color.b, color.a);
-    };
-};
-
 struct GamepadInput {
     static const U32 numAxes = SDL_CONTROLLER_AXIS_MAX;
     static const U32 numButtons = SDL_CONTROLLER_BUTTON_MAX;

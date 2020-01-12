@@ -79,9 +79,6 @@ void Game::init() {
     SpriteRenderer::init(loadAndCompileShaderFromFile(
         "../src/shaders/default.vert", "../src/shaders/default.frag"));
 
-    FlatRenderer::init(loadAndCompileShaderFromFile(
-        "../src/shaders/flat.vert", "../src/shaders/flat.frag"));
-
     mouseKeyboardInput.init();
 
     // Open gamepads
