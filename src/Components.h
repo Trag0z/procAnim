@@ -25,6 +25,7 @@ struct Mesh {
     static void init();
     static Mesh create(std::vector<Vertex> vertices, std::vector<uint> indices);
     static Mesh simple();
+    static Mesh loadFromFile(const char* path);
 };
 
 struct SpriteRenderer {

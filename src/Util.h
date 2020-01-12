@@ -10,4 +10,6 @@ inline void setNthBitTo(unsigned int& bitField, unsigned int n, int value) {
 struct Vertex {
     glm::vec3 position;
     glm::vec2 uvCoord;
+
+    Vertex(glm::vec3&& position, glm::vec2&& uvCoord) : position(position), uvCoord(uvCoord) {}
 };

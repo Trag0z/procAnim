@@ -2,5 +2,6 @@
     "C_Cpp.default.includePath": [
         "${workspaceRoot}/src",
         "${workspaceRoot}/include",
-    ]
+    ],
+    "C_Cpp.clang_format_sortIncludes": false
 }

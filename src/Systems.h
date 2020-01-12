@@ -1,6 +1,6 @@
 #pragma once
-#include "Components.h"
 #include "pch.h"
+#include "Components.h"
 
 inline void pollInputs(MouseKeyboardInput& mkb,
                        std::array<GamepadInput, 4>& pads) {
@@ -123,14 +123,14 @@ inline void render(SDL_Window* window, const Entity& entity) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-using namespace glm;
+    using namespace glm;
 
-	mat4 projection = ortho(0.0f, 1920.0f, 1080.0f, 0.0f, -1.0f, 1.0f);
-
+    mat4 projection = ortho(0.0f, 1920.0f,  0.0f, 1080.0f, -1.0f, 1.0f);
 
     mat4 model(1.0f);
 
-	// Entity transformations first to multiply from the left to spriteRenderer transfotmation
+    // Entity transformations first to multiply from the left to spriteRenderer
+    // transfotmation
     model = scale(model, vec3(entity.transform.scale, 1.0f));
     model = rotate(model, entity.transform.rot, vec3(0.0f, 0.0f, 1.0f));
     model = translate(model, vec3(entity.transform.pos, 0.0f));

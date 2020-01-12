@@ -2,11 +2,11 @@
 #pragma warning(push, 0)
 
 #include <array>
-#include <iostream>
-#include <vector>
 #include <cstdint>
-#include <sstream>
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 #include <GL/glew.h>
 #include <gl/glew.h>
@@ -17,6 +17,10 @@
 #include <sdl/SDL.h>
 #include <sdl/SDL_image.h>
 #include <sdl/SDL_ttf.h>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #pragma warning(pop)
 

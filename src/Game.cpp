@@ -4,7 +4,6 @@
 #include "DebugCallback.h"
 #include "Systems.h"
 
-
 constexpr bool DEBUG_MODE = true;
 
 void Game::init() {
@@ -75,14 +74,13 @@ void Game::init() {
     }
 
     // Initialize components
-	Mesh::init();
+    Mesh::init();
 
     SpriteRenderer::init(loadAndCompileShaderFromFile(
         "../src/shaders/default.vert", "../src/shaders/default.frag"));
 
     FlatRenderer::init(loadAndCompileShaderFromFile(
         "../src/shaders/flat.vert", "../src/shaders/flat.frag"));
-
 
     mouseKeyboardInput.init();
 
@@ -97,16 +95,16 @@ void Game::init() {
 
     // Initialize entity
     Transform t;
-    t.pos = {1920.0f / 2.0f, 1080.0f / 2.0f };
+    t.pos = {1920.0f / 2.0f, 1080.0f / 2.0f};
     t.rot = 0.0f;
     t.scale = {1.0f, 1.0f};
 
     SpriteRenderer s;
     s.pos = {0.0f, 0.0f};
-    s.tex = loadTexture("../assets/testTex.png");
+    s.tex = loadTexture("../assets/red100x100.png");
 
     entity.transform = t;
-    entity.mesh = Mesh::simple();
+    entity.mesh = Mesh::loadFromFile("../assets/guy.blend");
     entity.spriteRenderer = s;
 
     running = true;

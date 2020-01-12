@@ -1,6 +1,4 @@
 TODO:
-- create camera projection and move it into gpu memory
-
 - Entity needs to be restructured, have pointers or something
 - disable vsync
 
