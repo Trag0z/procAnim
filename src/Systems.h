@@ -153,8 +153,7 @@ inline void render(SDL_Window* window, RenderData renderData,
     model = scale(model, vec3(entity.spriteRenderer.tex.dimensions, 1.0f));
     model = translate(model, vec3(entity.spriteRenderer.pos, 0.0f));
 
-    model = entity.riggedMesh.globalInverseTransform * model;
-
+#ifndef SHADER_DEBUG
     glUseProgram(renderData.riggedShader.id);
 
     glUniformMatrix4fv(renderData.riggedShader.modelMatrix, 1, GL_FALSE,
@@ -172,6 +171,51 @@ inline void render(SDL_Window* window, RenderData renderData,
 
     glDrawElements(GL_TRIANGLES, entity.riggedMesh.numIndices, GL_UNSIGNED_INT,
                    0);
+#else
+    static_cast<RenderData>(renderData);
+
+    RiggedMesh& rm = const_cast<RiggedMesh&>(entity.riggedMesh);
+    for (size_t i = 0; i < rm.vertices.size(); ++i) {
+        Vertex v = rm.vertices[i];
+        rm.debugVertices[i].uvCoord = v.uvCoord;
+
+        mat4 boneTransform = rm.boneOffsets[v.boneIndex[0]] * v.boneWeight[0];
+        printGlm("Bone1", boneTransform);
+        mat4 boneTransform2 = rm.boneOffsets[v.boneIndex[1]] * v.boneWeight[1];
+        printGlm("Bone2", boneTransform2);
+
+        boneTransform += boneTransform2;
+        printGlm("BoneTransform", boneTransform);
+
+        printGlm("globalInverse", entity.riggedMesh.globalInverseTransform);
+        printGlm("Model", model);
+        printGlm("Projection", projection);
+
+        printf("\n");
+
+        rm.debugVertices[i].pos = projection * model *
+                                  // entity.riggedMesh.globalInverseTransform *
+                                  boneTransform * vec4(v.position, 1.0f);
+        printGlm<glm::vec4>("Final position", rm.debugVertices[i].pos);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, rm.vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0,
+                    sizeof(RiggedMesh::DebugVertex) * rm.vertices.size(),
+                    rm.debugVertices);
+
+    // glNamedBufferSubData(rm.vbo, 0,
+    //                      sizeof(RiggedMesh::DebugVertex) *
+    //                      rm.vertices.size(), rm.debugVertices);
+
+	glBindVertexArray(entity.riggedMesh.vao);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, entity.spriteRenderer.tex.id);
+
+	glDrawElements(GL_TRIANGLES, entity.riggedMesh.numIndices, GL_UNSIGNED_INT,
+		0);
+#endif
 
     // unbind vao for error safety
     glBindVertexArray(0);

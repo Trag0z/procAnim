@@ -78,8 +78,14 @@ void Game::init() {
 
     renderData.init(loadAndCompileShaderFromFile("../src/shaders/simple.vert",
                                                  "../src/shaders/simple.frag"),
+#ifdef SHADER_DEBUG
+                    loadAndCompileShaderFromFile("../src/shaders/debug.vert",
+                                                 "../src/shaders/rigged.frag")
+#else
                     loadAndCompileShaderFromFile("../src/shaders/rigged.vert",
-                                                 "../src/shaders/rigged.frag"));
+                                                 "../src/shaders/rigged.frag")
+#endif
+    );
 
     mouseKeyboardInput.init();
 

@@ -146,6 +146,7 @@
     </ClCompile>
     <ClCompile Include="..\src\Shaders.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
+    <ClCompile Include="..\src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Components.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="..\src\Util.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\src\shaders\debug.vert" />
     <None Include="..\src\shaders\rigged.frag" />
     <None Include="..\src\shaders\rigged.vert" />
     <None Include="..\src\shaders\simple.frag" />

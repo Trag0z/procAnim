@@ -45,6 +45,9 @@
     <ClCompile Include="..\src\components\Mesh.cpp">
       <Filter>Source Files\components</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Components.h">
@@ -92,6 +95,9 @@
       <Filter>Source Files\shaders</Filter>
     </None>
     <None Include="..\src\shaders\simple.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\debug.vert">
       <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>

@@ -1,4 +1,7 @@
 #pragma once
+
+#define SHADER_DEBUG
+
 #pragma warning(push, 0)
 
 #include <array>

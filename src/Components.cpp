@@ -11,9 +11,11 @@ void RenderData::init(GLuint simpleShaderId, GLuint riggedShaderId) {
     simpleShader.projectionMatrix =
         glGetUniformLocation(simpleShaderId, "projection");
 
+#ifndef SHADER_DEBUG
     riggedShader.id = riggedShaderId;
     riggedShader.modelMatrix = glGetUniformLocation(riggedShaderId, "model");
     riggedShader.projectionMatrix =
         glGetUniformLocation(riggedShaderId, "projection");
     riggedShader.bones = glGetUniformLocation(riggedShaderId, "bones");
+#endif
 }

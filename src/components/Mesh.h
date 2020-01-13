@@ -12,7 +12,7 @@ struct BasicVertex {
 struct Vertex {
     glm::vec3 position;
     glm::vec2 uvCoord;
-    float boneIndex[2];
+    GLuint boneIndex[2];
     float boneWeight[2];
 };
 
@@ -53,4 +53,15 @@ struct RiggedMesh {
 
     RiggedMesh() : vao(0), numIndices(0) {}
     RiggedMesh(const char* file);
+
+#ifdef SHADER_DEBUG
+    GLuint vbo;
+    std::vector<Vertex> vertices;
+
+    struct DebugVertex {
+        glm::vec4 pos;
+        glm::vec2 uvCoord;
+    };
+    DebugVertex* debugVertices;
+#endif
 };
