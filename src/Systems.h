@@ -121,15 +121,19 @@ inline void pollInputs(MouseKeyboardInput& mkb,
 
 inline void updatePlayer(Entity& entity) {
     constexpr float sensitivity = 0.1f;
-    entity.mesh.vertices[PlayerController::LEFT_HAND].position += glm::vec3(
-        entity.gamepadInput->axis[SDL_CONTROLLER_AXIS_RIGHTX] * sensitivity,
-        entity.gamepadInput->axis[SDL_CONTROLLER_AXIS_RIGHTY] * sensitivity,
-        0.0f);
+    static_cast<Entity>(entity);
+    // entity.riggedMesh.vertices[PlayerController::LEFT_HAND].position +=
+    //     glm::vec3(
+    //         entity.gamepadInput->axis[SDL_CONTROLLER_AXIS_RIGHTX] *
+    //         sensitivity,
+    //         entity.gamepadInput->axis[SDL_CONTROLLER_AXIS_RIGHTY] *
+    //         sensitivity, 0.0f);
 
-    entity.mesh.update();
+    // entity.riggedMesh.update();
 }
 
-inline void render(SDL_Window* window, const Entity& entity) {
+inline void render(SDL_Window* window, RenderData renderData,
+                   const Entity& entity) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -149,17 +153,25 @@ inline void render(SDL_Window* window, const Entity& entity) {
     model = scale(model, vec3(entity.spriteRenderer.tex.dimensions, 1.0f));
     model = translate(model, vec3(entity.spriteRenderer.pos, 0.0f));
 
-    glUseProgram(SpriteRenderer::getShaderID());
+    model = entity.riggedMesh.globalInverseTransform * model;
 
-    SpriteRenderer::setModelMatrix(model);
-    SpriteRenderer::setProjectionMatrix(projection);
+    glUseProgram(renderData.riggedShader.id);
 
-    glBindVertexArray(entity.mesh.vao);
+    glUniformMatrix4fv(renderData.riggedShader.modelMatrix, 1, GL_FALSE,
+                       value_ptr(model));
+    glUniformMatrix4fv(renderData.riggedShader.projectionMatrix, 1, GL_FALSE,
+                       value_ptr(projection));
+
+    glUniformMatrix4fv(renderData.riggedShader.bones, 10, GL_TRUE,
+                       value_ptr(entity.riggedMesh.boneOffsets[0]));
+
+    glBindVertexArray(entity.riggedMesh.vao);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, entity.spriteRenderer.tex.id);
 
-    glDrawElements(GL_TRIANGLES, entity.mesh.numIndices, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, entity.riggedMesh.numIndices, GL_UNSIGNED_INT,
+                   0);
 
     // unbind vao for error safety
     glBindVertexArray(0);

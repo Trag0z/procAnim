@@ -76,8 +76,10 @@ void Game::init() {
     // Initialize components
     Mesh::init();
 
-    SpriteRenderer::init(loadAndCompileShaderFromFile(
-        "../src/shaders/default.vert", "../src/shaders/default.frag"));
+    renderData.init(loadAndCompileShaderFromFile("../src/shaders/simple.vert",
+                                                 "../src/shaders/simple.frag"),
+                    loadAndCompileShaderFromFile("../src/shaders/rigged.vert",
+                                                 "../src/shaders/rigged.frag"));
 
     mouseKeyboardInput.init();
 
@@ -101,7 +103,7 @@ void Game::init() {
     s.tex = loadTexture("../assets/red100x100.png");
 
     entity.transform = t;
-    entity.mesh = MutableMesh("../assets/guy.dae");
+    entity.riggedMesh = RiggedMesh("../assets/guy.dae");
     entity.spriteRenderer = s;
     entity.gamepadInput = &gamepadInputs[0];
 
@@ -116,7 +118,7 @@ bool Game::run() {
 
         updatePlayer(entity);
 
-        render(window, entity);
+        render(window, renderData, entity);
 
         // Check for errors and clear error queue
         while (GLenum error = glGetError()) {

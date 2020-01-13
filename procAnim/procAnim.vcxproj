@@ -137,9 +137,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Buffers.cpp" />
     <ClCompile Include="..\src\Components.cpp" />
-    <ClCompile Include="..\src\components\Meshes.cpp" />
+    <ClCompile Include="..\src\components\Mesh.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\pch.cpp">
@@ -149,9 +148,8 @@
     <ClCompile Include="..\src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Buffers.h" />
     <ClInclude Include="..\src\Components.h" />
-    <ClInclude Include="..\src\components\Meshes.h" />
+    <ClInclude Include="..\src\components\Mesh.h" />
     <ClInclude Include="..\src\DebugCallback.h" />
     <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\Game.h" />
@@ -163,8 +161,10 @@
     <ClInclude Include="..\src\Util.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\shaders\default.frag" />
-    <None Include="..\src\shaders\default.vert" />
+    <None Include="..\src\shaders\rigged.frag" />
+    <None Include="..\src\shaders\rigged.vert" />
+    <None Include="..\src\shaders\simple.frag" />
+    <None Include="..\src\shaders\simple.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

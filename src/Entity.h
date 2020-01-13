@@ -4,7 +4,7 @@
 
 struct Entity {
     Transform transform;
-    MutableMesh mesh;
+    RiggedMesh riggedMesh;
     SpriteRenderer spriteRenderer;
     PlayerController playerController;
     GamepadInput* gamepadInput;

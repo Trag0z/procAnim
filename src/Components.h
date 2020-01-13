@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "components/Meshes.h"
+#include "components/Mesh.h"
 #include "Shaders.h"
 #include "Texture.h"
 #include "Types.h"
@@ -19,22 +19,6 @@ struct PlayerController {
 struct SpriteRenderer {
     glm::vec2 pos;
     Texture tex;
-
-  private:
-    static GLuint shaderID;
-    static GLuint modelMatrixLocation;
-    static GLuint projectionMatrixLocation;
-
-  public:
-    static void init(GLuint shaderID);
-    inline static GLuint getShaderID() { return shaderID; };
-    inline static void setModelMatrix(const glm::mat4& m) {
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(m));
-    };
-    inline static void setProjectionMatrix(const glm::mat4& m) {
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE,
-                           glm::value_ptr(m));
-    };
 };
 
 struct GamepadInput {
@@ -85,4 +69,16 @@ struct GameConfig {
         SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
 
     glm::ivec2 windowSize = {1920, 1080};
+};
+
+struct RenderData {
+    struct {
+        GLuint id, modelMatrix, projectionMatrix;
+    } simpleShader;
+
+    struct {
+        GLuint id, modelMatrix, projectionMatrix, bones;
+    } riggedShader;
+
+    void init(GLuint simpleShaderId, GLuint riggedShaderId);
 };

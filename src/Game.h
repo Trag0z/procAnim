@@ -14,6 +14,7 @@ struct Game {
 
     GameConfig gameConfig;
     MouseKeyboardInput mouseKeyboardInput;
+    RenderData renderData;
 
     std::array<GamepadInput, 4> gamepadInputs;
 

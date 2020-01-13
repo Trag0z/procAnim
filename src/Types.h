@@ -7,11 +7,3 @@ typedef uint32_t U32;
 typedef uint64_t U64;
 
 typedef unsigned int uint;
-
-typedef glm::ivec2 Ivec2;
-typedef glm::vec2 Vec2;
-
-struct Vertex {
-    glm::vec3 position;
-    glm::vec2 uvCoord;
-};
