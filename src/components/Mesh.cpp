@@ -97,14 +97,6 @@ RiggedMesh::RiggedMesh(const char* file) {
         SDL_assert(false);
     }
 
-    auto convertMatrix = [](glm::mat4& out, aiMatrix4x4& in) {
-        memcpy(&out, &in, sizeof(float) * 4 * 4);
-        out = glm::transpose(out);
-    };
-
-    convertMatrix(globalInverseTransform,
-                  scene->mRootNode->mTransformation.Inverse());
-
     SDL_assert(scene->HasMeshes());
 
     aiMesh& meshData = *scene->mMeshes[0];
@@ -135,9 +127,12 @@ RiggedMesh::RiggedMesh(const char* file) {
     numIndices = static_cast<GLuint>(indices.size());
 
     // Parse bones and sort weights/indices into vertex data
+
+    // Create unity bone
     const uint availableBones = maxBones - 1;
-    boneNames[availableBones] = "unity";
-    boneOffsets[availableBones] = glm::mat4(1.0f);
+    bones.name[availableBones] = "unity";
+    bones.inverseTransform[availableBones] = glm::mat4(1.0f);
+    bones.rotation[availableBones] = glm::mat4(1.0f);
     SDL_assert(static_cast<size_t>(meshData.mNumBones) <= availableBones);
 
     struct WeightData {
@@ -146,16 +141,23 @@ RiggedMesh::RiggedMesh(const char* file) {
     };
     std::vector<WeightData> weightData;
 
+    // TODO: Maybe remove later
+    auto convertMatrix = [](glm::mat4& out, aiMatrix4x4& in) {
+        memcpy(&out, &in, sizeof(float) * 4 * 4);
+        out = glm::transpose(out);
+    };
+
     for (uint i = 0; i < availableBones; ++i) {
+        bones.rotation[i] = glm::mat4(1.0f);
         if (i >= meshData.mNumBones) {
-            boneNames[i] = "null";
-            boneOffsets[i] = glm::mat4(1.0f);
+            bones.name[i] = "null";
+            bones.inverseTransform[i] = glm::mat4(1.0f);
             continue;
         }
         aiBone& b = *meshData.mBones[i];
 
-        boneNames[i] = b.mName.C_Str();
-        convertMatrix(boneOffsets[i], b.mOffsetMatrix);
+        bones.name[i] = b.mName.C_Str();
+        convertMatrix(bones.inverseTransform[i], b.mOffsetMatrix);
 
         for (uint j = 0; j < b.mNumWeights; ++j) {
             weightData.push_back(

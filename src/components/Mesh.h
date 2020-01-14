@@ -48,8 +48,11 @@ struct RiggedMesh {
     glm::mat4 globalInverseTransform;
 
     static const uint maxBones = 11;
-    std::string boneNames[maxBones];
-    glm::mat4 boneOffsets[maxBones];
+    struct {
+        std::string name[maxBones];
+        glm::mat4 inverseTransform[maxBones];
+        glm::mat4 rotation[maxBones];
+    } bones;
 
     RiggedMesh() : vao(0), numIndices(0) {}
     RiggedMesh(const char* file);

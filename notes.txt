@@ -3,4 +3,4 @@ TODO:
 - disable vsync
 
 NOTES:
-- glVertexAttribPointer() binds curretn buffer to VAO, so the buffer does not ohave to be bound before using it
+- scene->mRootNode->mTransformation changes coordinate system to have z as -y and y as +z

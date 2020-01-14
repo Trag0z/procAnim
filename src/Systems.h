@@ -165,12 +165,6 @@ inline void render(SDL_Window* window, RenderData renderData,
                        value_ptr(entity.riggedMesh.boneOffsets[0]));
 
     glBindVertexArray(entity.riggedMesh.vao);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, entity.spriteRenderer.tex.id);
-
-    glDrawElements(GL_TRIANGLES, entity.riggedMesh.numIndices, GL_UNSIGNED_INT,
-                   0);
 #else
     static_cast<RenderData>(renderData);
 
@@ -179,43 +173,44 @@ inline void render(SDL_Window* window, RenderData renderData,
         Vertex v = rm.vertices[i];
         rm.debugVertices[i].uvCoord = v.uvCoord;
 
-        mat4 boneTransform = rm.boneOffsets[v.boneIndex[0]] * v.boneWeight[0];
-        printGlm("Bone1", boneTransform);
-        mat4 boneTransform2 = rm.boneOffsets[v.boneIndex[1]] * v.boneWeight[1];
-        printGlm("Bone2", boneTransform2);
+        mat4* boneInverse[2];
+        boneInverse[0] = &rm.bones.inverseTransform[v.boneIndex[0]];
+        boneInverse[1] = &rm.bones.inverseTransform[v.boneIndex[1]];
+        mat4 boneTransform =
+            (inverse(*boneInverse[0]) * rm.bones.rotation[v.boneIndex[0]] *
+             *boneInverse[0]) *
+            v.boneWeight[0];
+        boneTransform += (inverse(*boneInverse[1]) *
+                          rm.bones.rotation[v.boneIndex[1]] * *boneInverse[1]) *
+                         v.boneWeight[1];
 
-        boneTransform += boneTransform2;
-        printGlm("BoneTransform", boneTransform);
+        printGlm("Bone", boneTransform);
 
-        printGlm("globalInverse", entity.riggedMesh.globalInverseTransform);
-        printGlm("Model", model);
-        printGlm("Projection", projection);
+        // boneTransform += boneTransform2;
+        // printGlm("BoneTransform", boneTransform);
 
-        printf("\n");
+        // printGlm("Model", model);
+        // printGlm("Projection", projection);
 
-        rm.debugVertices[i].pos = projection * model *
-                                  // entity.riggedMesh.globalInverseTransform *
-                                  boneTransform * vec4(v.position, 1.0f);
+        printGlm<glm::vec4>("Vertex before", vec4(v.position, 1.0f));
+        rm.debugVertices[i].pos =
+            projection * model * boneTransform * vec4(v.position, 1.0f);
         printGlm<glm::vec4>("Final position", rm.debugVertices[i].pos);
+        printf("\n");
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, rm.vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0,
-                    sizeof(RiggedMesh::DebugVertex) * rm.vertices.size(),
-                    rm.debugVertices);
+    glNamedBufferSubData(rm.vbo, 0,
+                         sizeof(RiggedMesh::DebugVertex) * rm.vertices.size(),
+                         rm.debugVertices);
 
-    // glNamedBufferSubData(rm.vbo, 0,
-    //                      sizeof(RiggedMesh::DebugVertex) *
-    //                      rm.vertices.size(), rm.debugVertices);
-
-	glBindVertexArray(entity.riggedMesh.vao);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, entity.spriteRenderer.tex.id);
-
-	glDrawElements(GL_TRIANGLES, entity.riggedMesh.numIndices, GL_UNSIGNED_INT,
-		0);
+    glBindVertexArray(entity.riggedMesh.vao);
 #endif
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, entity.spriteRenderer.tex.id);
+
+    glDrawElements(GL_TRIANGLES, entity.riggedMesh.numIndices, GL_UNSIGNED_INT,
+                   0);
 
     // unbind vao for error safety
     glBindVertexArray(0);

@@ -3,5 +3,22 @@
         "${workspaceRoot}/src",
         "${workspaceRoot}/include",
     ],
-    "C_Cpp.clang_format_sortIncludes": false
+    "C_Cpp.clang_format_sortIncludes": false,
+    "files.associations": {
+        "iosfwd": "cpp",
+        "iterator": "cpp",
+        "streambuf": "cpp",
+        "vector": "cpp",
+        "xlocale": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "algorithm": "cpp",
+        "fstream": "cpp",
+        "locale": "cpp",
+        "memory": "cpp",
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "xhash": "cpp",
+        "xlocinfo": "cpp"
+    }
 }
