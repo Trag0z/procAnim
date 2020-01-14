@@ -17,5 +17,5 @@ void main()
     mat4 boneTransform = bones[boneIndex.x] * boneWeight.x;
     boneTransform += bones[boneIndex.y] * boneWeight.y;
 
-    gl_Position = projection * model * (boneTransform * vec4(pos.xyz, 1.0f)); 
+    gl_Position = projection * model * boneTransform * vec4(pos.xyz, 1.0f); 
 }

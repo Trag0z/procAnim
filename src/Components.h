@@ -73,11 +73,11 @@ struct GameConfig {
 
 struct RenderData {
     struct {
-        GLuint id, modelMatrix, projectionMatrix;
+        GLuint id, modelMatrixLoc, projectionMatrixLoc;
     } simpleShader;
 
     struct {
-        GLuint id, modelMatrix, projectionMatrix, bones;
+        GLuint id, modelMatrixLoc, projectionMatrixLoc, bonesLoc;
     } riggedShader;
 
     void init(GLuint simpleShaderId, GLuint riggedShaderId);

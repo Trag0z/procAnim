@@ -114,7 +114,10 @@ RiggedMesh::RiggedMesh(const char* file) {
              {1.0f, 0.0f}}); // Or 0.5f, 0.5f?
     }
 
-    debugVertices = new DebugVertex[vertices.size()];
+#ifdef  SHADER_DEBUG
+    debugVertices = new DebugVertex[meshData.mNumVertices];
+#endif //  SHADER_DEBUG
+
 
     std::vector<uint> indices;
     indices.reserve(static_cast<size_t>(meshData.mNumFaces) * 3);
@@ -233,4 +236,14 @@ RiggedMesh::RiggedMesh(const char* file) {
 
     // Reset vertex array binding for error safety
     glBindVertexArray(0);
+}
+
+uint RiggedMesh::Bones::getIndex(const char* n) {
+    for (uint i = 0; i < maxBones; ++i) {
+        if (name[i].compare(n) == 0) {
+            return i;
+        }
+    }
+    SDL_assert(false);
+    return maxBones - 1;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#define SHADER_DEBUG
+// #define SHADER_DEBUG
 
 #pragma warning(push, 0)
 

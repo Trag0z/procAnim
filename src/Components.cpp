@@ -7,15 +7,15 @@ U32 GamepadInput::numGamepads = 0;
 void RenderData::init(GLuint simpleShaderId, GLuint riggedShaderId) {
     SDL_assert_always(simpleShaderId != -1 && riggedShaderId != -1);
     simpleShader.id = simpleShaderId;
-    simpleShader.modelMatrix = glGetUniformLocation(simpleShaderId, "model");
-    simpleShader.projectionMatrix =
+    simpleShader.modelMatrixLoc = glGetUniformLocation(simpleShaderId, "model");
+    simpleShader.projectionMatrixLoc =
         glGetUniformLocation(simpleShaderId, "projection");
 
 #ifndef SHADER_DEBUG
     riggedShader.id = riggedShaderId;
-    riggedShader.modelMatrix = glGetUniformLocation(riggedShaderId, "model");
-    riggedShader.projectionMatrix =
+    riggedShader.modelMatrixLoc = glGetUniformLocation(riggedShaderId, "model");
+    riggedShader.projectionMatrixLoc =
         glGetUniformLocation(riggedShaderId, "projection");
-    riggedShader.bones = glGetUniformLocation(riggedShaderId, "bones");
+    riggedShader.bonesLoc = glGetUniformLocation(riggedShaderId, "bones");
 #endif
 }
