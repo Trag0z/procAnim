@@ -1,4 +1,5 @@
 TODO:
+- check if world has y = up
 - Entity needs to be restructured, have pointers or something
 - disable vsync
 

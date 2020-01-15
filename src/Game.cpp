@@ -98,7 +98,8 @@ void Game::init() {
         }
     }
 
-    // Initialize entity
+    // Initialize entities
+    // Player
     Transform t;
     t.pos = {1920.0f / 2.0f, 1080.0f / 2.0f};
     t.rot = 0.0f;
@@ -108,10 +109,29 @@ void Game::init() {
     s.pos = {0.0f, 0.0f};
     s.tex = loadTexture("../assets/red100x100.png");
 
-    entity.transform = t;
-    entity.riggedMesh = RiggedMesh("../assets/guy.dae");
-    entity.spriteRenderer = s;
-    entity.gamepadInput = &gamepadInputs[0];
+    playerController.velocity = glm::vec2(0.0f);
+    playerController.halfExt = {0.5f, 3.0f};
+    playerController.grounded = false;
+
+    Entity player;
+    player.transform = transforms.add(t);
+    player.riggedMesh =
+        riggedMeshes.add(RiggedMesh::loadFromFile("../assets/guy.dae"));
+    player.spriteRenderer = spriteRenderers.add(s);
+    player.gamepadInput = &gamepadInputs[0];
+    player.playerController = &playerController;
+
+    entities.push_back(player);
+
+    // Ground
+    Entity ground;
+    t.pos.y -= 500.0f;
+    ground.transform = transforms.add(t);
+    ground.riggedMesh =
+        riggedMeshes.add(RiggedMesh::loadFromFile("../assets/ground.dae"));
+    ground.spriteRenderer = spriteRenderers.add(s);
+
+    entities.push_back(ground);
 
     running = true;
 };
@@ -122,9 +142,9 @@ bool Game::run() {
 
         pollInputs(mouseKeyboardInput, gamepadInputs);
 
-        updatePlayer(entity);
+        updatePlayer(entities[0], colliders);
 
-        render(window, renderData, entity);
+        render(window, renderData, entities);
 
         // Check for errors and clear error queue
         while (GLenum error = glGetError()) {

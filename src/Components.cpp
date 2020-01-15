@@ -19,3 +19,10 @@ void RenderData::init(GLuint simpleShaderId, GLuint riggedShaderId) {
     riggedShader.bonesLoc = glGetUniformLocation(riggedShaderId, "bones");
 #endif
 }
+
+glm::vec2 IHasPosition::worldPos() const { return transform->pos + pos; }
+
+float BoxCollider::top() const { return pos.y - halfExt.y; }
+float BoxCollider::bot() const { return pos.y + halfExt.y; }
+glm::vec2 BoxCollider::topRight() const { return worldPos() - halfExt; }
+glm::vec2 BoxCollider::botLeft() const { return worldPos() + halfExt; }

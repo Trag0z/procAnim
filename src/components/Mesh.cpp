@@ -84,7 +84,8 @@ Mesh::Mesh(const char* file) {
 
 Mesh Mesh::simple() { return {simpleMesh.vao, simpleMesh.numIndices}; }
 
-RiggedMesh::RiggedMesh(const char* file) {
+RiggedMesh RiggedMesh::loadFromFile(const char* file) {
+    RiggedMesh result;
     // Load data from file
     Assimp::Importer importer;
 
@@ -114,10 +115,9 @@ RiggedMesh::RiggedMesh(const char* file) {
              {1.0f, 0.0f}}); // Or 0.5f, 0.5f?
     }
 
-#ifdef  SHADER_DEBUG
+#ifdef SHADER_DEBUG
     debugVertices = new DebugVertex[meshData.mNumVertices];
 #endif //  SHADER_DEBUG
-
 
     std::vector<uint> indices;
     indices.reserve(static_cast<size_t>(meshData.mNumFaces) * 3);
@@ -127,15 +127,15 @@ RiggedMesh::RiggedMesh(const char* file) {
         indices.push_back(face.mIndices[1]);
         indices.push_back(face.mIndices[2]);
     }
-    numIndices = static_cast<GLuint>(indices.size());
+    result.numIndices = static_cast<GLuint>(indices.size());
 
     // Parse bones and sort weights/indices into vertex data
 
     // Create unity bone
     const uint availableBones = maxBones - 1;
-    bones.name[availableBones] = "unity";
-    bones.inverseTransform[availableBones] = glm::mat4(1.0f);
-    bones.rotation[availableBones] = glm::mat4(1.0f);
+    result.bones.name[availableBones] = "unity";
+    result.bones.inverseTransform[availableBones] = glm::mat4(1.0f);
+    result.bones.rotation[availableBones] = glm::mat4(1.0f);
     SDL_assert(static_cast<size_t>(meshData.mNumBones) <= availableBones);
 
     struct WeightData {
@@ -151,16 +151,16 @@ RiggedMesh::RiggedMesh(const char* file) {
     };
 
     for (uint i = 0; i < availableBones; ++i) {
-        bones.rotation[i] = glm::mat4(1.0f);
+        result.bones.rotation[i] = glm::mat4(1.0f);
         if (i >= meshData.mNumBones) {
-            bones.name[i] = "null";
-            bones.inverseTransform[i] = glm::mat4(1.0f);
+            result.bones.name[i] = "null";
+            result.bones.inverseTransform[i] = glm::mat4(1.0f);
             continue;
         }
         aiBone& b = *meshData.mBones[i];
 
-        bones.name[i] = b.mName.C_Str();
-        convertMatrix(bones.inverseTransform[i], b.mOffsetMatrix);
+        result.bones.name[i] = b.mName.C_Str();
+        convertMatrix(result.bones.inverseTransform[i], b.mOffsetMatrix);
 
         for (uint j = 0; j < b.mNumWeights; ++j) {
             weightData.push_back(
@@ -181,8 +181,8 @@ RiggedMesh::RiggedMesh(const char* file) {
     delete[] vertexBoneCounts;
 
     // Upload data to GPU
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    glGenVertexArrays(1, &result.vao);
+    glBindVertexArray(result.vao);
 
     GLuint ebo;
     glGenBuffers(1, &ebo);
@@ -236,6 +236,8 @@ RiggedMesh::RiggedMesh(const char* file) {
 
     // Reset vertex array binding for error safety
     glBindVertexArray(0);
+
+	return result;
 }
 
 uint RiggedMesh::Bones::getIndex(const char* n) {

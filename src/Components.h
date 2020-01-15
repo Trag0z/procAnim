@@ -13,12 +13,32 @@ struct Transform {
 };
 
 struct PlayerController {
-    enum MovePoint { LEFT_HAND = 6 };
+    glm::vec2 velocity;
+    glm::vec2 halfExt;
+    bool grounded;
+
+    const float walkSpeed = 0.2f;
 };
 
-struct SpriteRenderer {
+struct IHasPosition {
     glm::vec2 pos;
+    glm::vec2 worldPos() const;
+
+  private:
+    Transform* transform;
+};
+
+struct SpriteRenderer : IHasPosition {
     Texture tex;
+};
+
+struct BoxCollider : IHasPosition {
+    glm::vec2 halfExt;
+
+    float top() const;
+    float bot() const;
+    glm::vec2 topRight() const;
+    glm::vec2 botLeft() const;
 };
 
 struct GamepadInput {

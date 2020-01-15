@@ -3,9 +3,9 @@
 #include "Components.h"
 
 struct Entity {
-    Transform transform;
-    RiggedMesh riggedMesh;
-    SpriteRenderer spriteRenderer;
-    PlayerController playerController;
-    GamepadInput* gamepadInput;
+    Transform* transform = nullptr;
+    RiggedMesh* riggedMesh = nullptr;
+    SpriteRenderer* spriteRenderer = nullptr;
+    PlayerController* playerController = nullptr;
+    GamepadInput* gamepadInput = nullptr;
 };

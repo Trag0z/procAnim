@@ -45,8 +45,6 @@ struct RiggedMesh {
     GLuint vao;
     GLuint numIndices;
 
-    glm::mat4 globalInverseTransform;
-
     static const uint maxBones = 11;
     struct Bones {
         std::string name[maxBones];
@@ -56,8 +54,7 @@ struct RiggedMesh {
     };
     Bones bones;
 
-    RiggedMesh() : vao(0), numIndices(0) {}
-    RiggedMesh(const char* file);
+    static RiggedMesh loadFromFile(const char* file);
 
 #ifdef SHADER_DEBUG
     GLuint vbo;

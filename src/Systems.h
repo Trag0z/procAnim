@@ -117,92 +117,130 @@ inline void pollInputs(MouseKeyboardInput& mkb,
             }
         }
     }
-};
+}
 
-inline void updatePlayer(Entity& entity) {
+inline void updatePlayer(Entity& player,
+                         ComponentContainer<BoxCollider>& colliders) {
+    auto& pContr = *player.playerController;
+    auto& pPos = player.transform->pos;
+    auto& pVelo = pContr.velocity;
+    auto& pHe = pContr.halfExt;
+
+    // Gravity
+    constexpr float gravity = 0.1f;
+    pVelo.y += gravity;
+
+    pVelo.x =
+        pContr.walkSpeed * player.gamepadInput->axis[SDL_CONTROLLER_AXIS_LEFTX];
+
+    // Collision check
+    BoxCollider* groundCandidate = nullptr;
+
+    // Find closest ground object
+    for (auto& c : colliders) {
+        auto topRight = c.topRight();
+        auto botLeft = c.botLeft();
+        if (((topRight.y < pPos.y + pHe.y) && (botLeft.y > pPos.y - pHe.y)) &&
+            (topRight.x < pPos.x && botLeft.x > pPos.x)) {
+            // c is inside the player from below
+            if (!groundCandidate || groundCandidate->top() > topRight.y) {
+                groundCandidate = &c;
+            }
+        }
+    }
+
+    if (groundCandidate) {
+        pPos.y -= groundCandidate->top() - pPos.y + pHe.y;
+        pContr.grounded = true;
+    } else {
+        pContr.grounded = false;
+    }
+
+    // Arm control
     constexpr float sensitivity = 0.4f;
-    auto& bones = entity.riggedMesh.bones;
+    auto& bones = player.riggedMesh->bones;
     uint boneIndex = bones.getIndex("B_Arm_L");
     bones.rotation[boneIndex] = glm::rotate(
         bones.rotation[boneIndex],
         degToRad(-sensitivity *
-                 entity.gamepadInput->axis[SDL_CONTROLLER_AXIS_LEFTY]),
+                 player.gamepadInput->axis[SDL_CONTROLLER_AXIS_RIGHTY]),
         glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 inline void render(SDL_Window* window, RenderData renderData,
-                   const Entity& entity) {
+                   const std::vector<Entity>& entities) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     using namespace glm;
 
-    mat4 projection = ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
-
-    mat4 model(1.0f);
-
-    // Entity transformations first to multiply from the left to spriteRenderer
-    // transfotmation
-    model = scale(model, vec3(entity.transform.scale, 1.0f));
-    model = rotate(model, entity.transform.rot, vec3(0.0f, 0.0f, 1.0f));
-    model = translate(model, vec3(entity.transform.pos, 0.0f));
-
-    // Move the center of the texture to the spriteRenderers position
-    model = scale(model, vec3(entity.spriteRenderer.tex.dimensions, 1.0f));
-    model = translate(model, vec3(entity.spriteRenderer.pos, 0.0f));
-
     const auto& rs = renderData.riggedShader;
     glUseProgram(rs.id);
-
-#ifndef SHADER_DEBUG
-    glUniformMatrix4fv(rs.modelMatrixLoc, 1, GL_FALSE, value_ptr(model));
+    mat4 projection = ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
     glUniformMatrix4fv(rs.projectionMatrixLoc, 1, GL_FALSE,
                        value_ptr(projection));
 
-    RiggedMesh& rm = const_cast<RiggedMesh&>(entity.riggedMesh);
-    mat4 boneTransforms[rm.maxBones];
-    for (size_t i = 0; i < rm.maxBones; ++i) {
-        mat4& boneInverse = rm.bones.inverseTransform[i];
-        boneTransforms[i] =
-            (inverse(boneInverse) * rm.bones.rotation[i] * boneInverse);
-    }
-    glUniformMatrix4fv(rs.bonesLoc, rm.maxBones, GL_FALSE,
-                       value_ptr(boneTransforms[0]));
+    for (auto& e : entities) {
+        if (e.riggedMesh == nullptr || e.spriteRenderer == nullptr)
+            continue;
+
+        mat4 model(1.0f);
+        // Entity transformations first to multiply from the left to
+        // spriteRenderer transfotmation
+        model = scale(model, vec3(e.transform->scale, 1.0f));
+        model = rotate(model, e.transform->rot, vec3(0.0f, 0.0f, 1.0f));
+        model = translate(model, vec3(e.transform->pos, 0.0f));
+
+        // Move the center of the texture to the spriteRenderers position
+        model = scale(model, vec3(e.spriteRenderer->tex.dimensions, 1.0f));
+        model = translate(model, vec3(e.spriteRenderer->pos, 0.0f));
+        glUniformMatrix4fv(rs.modelMatrixLoc, 1, GL_FALSE, value_ptr(model));
+#ifndef SHADER_DEBUG
+        RiggedMesh& rm = const_cast<RiggedMesh&>(*e.riggedMesh);
+        mat4 boneTransforms[rm.maxBones];
+        for (size_t i = 0; i < rm.maxBones; ++i) {
+            mat4& boneInverse = rm.bones.inverseTransform[i];
+            boneTransforms[i] =
+                (inverse(boneInverse) * rm.bones.rotation[i] * boneInverse);
+        }
+        glUniformMatrix4fv(rs.bonesLoc, rm.maxBones, GL_FALSE,
+                           value_ptr(boneTransforms[0]));
 #else
-    static_cast<RenderData>(renderData);
+        static_cast<RenderData>(renderData);
 
-    RiggedMesh& rm = const_cast<RiggedMesh&>(entity.riggedMesh);
-    for (size_t i = 0; i < rm.vertices.size(); ++i) {
-        Vertex v = rm.vertices[i];
-        rm.debugVertices[i].uvCoord = v.uvCoord;
+        RiggedMesh& rm = const_cast<RiggedMesh&>(e.riggedMesh);
+        for (size_t i = 0; i < rm.vertices.size(); ++i) {
+            Vertex v = rm.vertices[i];
+            rm.debugVertices[i].uvCoord = v.uvCoord;
 
-        mat4* boneInverse[2];
-        boneInverse[0] = &rm.bones.inverseTransform[v.boneIndex[0]];
-        boneInverse[1] = &rm.bones.inverseTransform[v.boneIndex[1]];
-        mat4 boneTransform =
-            (inverse(*boneInverse[0]) * rm.bones.rotation[v.boneIndex[0]] *
-             *boneInverse[0]) *
-            v.boneWeight[0];
-        boneTransform += (inverse(*boneInverse[1]) *
-                          rm.bones.rotation[v.boneIndex[1]] * *boneInverse[1]) *
-                         v.boneWeight[1];
+            mat4* boneInverse[2];
+            boneInverse[0] = &rm.bones.inverseTransform[v.boneIndex[0]];
+            boneInverse[1] = &rm.bones.inverseTransform[v.boneIndex[1]];
+            mat4 boneTransform =
+                (inverse(*boneInverse[0]) * rm.bones.rotation[v.boneIndex[0]] *
+                 *boneInverse[0]) *
+                v.boneWeight[0];
+            boneTransform +=
+                (inverse(*boneInverse[1]) * rm.bones.rotation[v.boneIndex[1]] *
+                 *boneInverse[1]) *
+                v.boneWeight[1];
 
-        rm.debugVertices[i].pos =
-            projection * model * boneTransform * vec4(v.position, 1.0f);
-    }
+            rm.debugVertices[i].pos =
+                projection * model * boneTransform * vec4(v.position, 1.0f);
+        }
 
-    glNamedBufferSubData(rm.vbo, 0,
-                         sizeof(RiggedMesh::DebugVertex) * rm.vertices.size(),
-                         rm.debugVertices);
-
+        glNamedBufferSubData(
+            rm.vbo, 0, sizeof(RiggedMesh::DebugVertex) * rm.vertices.size(),
+            rm.debugVertices);
 #endif
-    glBindVertexArray(entity.riggedMesh.vao);
+        glBindVertexArray(e.riggedMesh->vao);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, entity.spriteRenderer.tex.id);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, e.spriteRenderer->tex.id);
 
-    glDrawElements(GL_TRIANGLES, entity.riggedMesh.numIndices, GL_UNSIGNED_INT,
-                   0);
+        glDrawElements(GL_TRIANGLES, e.riggedMesh->numIndices, GL_UNSIGNED_INT,
+                       0);
+    }
 
     // Unbind vao for error safety
     glBindVertexArray(0);
