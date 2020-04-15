@@ -2,8 +2,8 @@
 #include "pch.h"
 #include "Texture.h"
 
-Texture loadTexture(const char *path) {
-    SDL_Surface *img = IMG_Load(path);
+Texture Texture::load_from_file(const char* path) {
+    SDL_Surface* img = IMG_Load(path);
     SDL_assert(img);
 
     Texture ret;

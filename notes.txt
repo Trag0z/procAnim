@@ -1,7 +1,2 @@
 TODO:
-- check if world has y = up
-- Entity needs to be restructured, have pointers or something
-- disable vsync
-
-NOTES:
-- scene->mRootNode->mTransformation changes coordinate system to have z as -y and y as +z
+- add second layer of bones

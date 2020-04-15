@@ -4,7 +4,7 @@
 
 #pragma warning(push, 0)
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     Game game;
     game.init();
     return game.run();

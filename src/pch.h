@@ -1,6 +1,6 @@
 #pragma once
 
-// #define SHADER_DEBUG
+#define CPU_RENDERING
 
 #pragma warning(push, 0)
 

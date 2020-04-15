@@ -11,11 +11,11 @@ void Mesh::init() {
                    {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f}}},
                   {0, 1, 2, 0, 3, 1});
     simpleMesh.vao = m.vao;
-    simpleMesh.numIndices = m.numIndices;
+    simpleMesh.numIndices = m.num_indices;
 }
 
 Mesh::Mesh(std::vector<BasicVertex> vertices, std::vector<uint> indices) {
-    numIndices = static_cast<GLuint>(indices.size());
+    num_indices = static_cast<GLuint>(indices.size());
     GLuint vbo, ebo;
 
     glGenVertexArrays(1, &vao);
@@ -36,10 +36,10 @@ Mesh::Mesh(std::vector<BasicVertex> vertices, std::vector<uint> indices) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(BasicVertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
-    // uvCoord attribute
+    // uv_coord attribute
     glVertexAttribPointer(
         1, 2, GL_FLOAT, GL_FALSE, sizeof(BasicVertex),
-        reinterpret_cast<void*>(offsetof(BasicVertex, uvCoord)));
+        reinterpret_cast<void*>(offsetof(BasicVertex, uv_coord)));
     glEnableVertexAttribArray(1);
 
     // Reset vertex array binding for error safety
@@ -84,8 +84,7 @@ Mesh::Mesh(const char* file) {
 
 Mesh Mesh::simple() { return {simpleMesh.vao, simpleMesh.numIndices}; }
 
-RiggedMesh RiggedMesh::loadFromFile(const char* file) {
-    RiggedMesh result;
+RiggedMesh RiggedMesh::load_from_file(const char* file) {
     // Load data from file
     Assimp::Importer importer;
 
@@ -102,22 +101,20 @@ RiggedMesh RiggedMesh::loadFromFile(const char* file) {
 
     aiMesh& meshData = *scene->mMeshes[0];
 
-#ifndef SHADER_DEBUG
-    std::vector<Vertex> vertices;
-#endif
-    vertices.reserve(meshData.mNumVertices);
+    // Import vertex data
+    RiggedMesh result;
+
+    result.vertices.reserve(meshData.mNumVertices);
+    result.shader_vertices.reserve(meshData.mNumVertices);
+
     aiVector3D* vertData = meshData.mVertices;
     for (size_t i = 0; i < meshData.mNumVertices; ++i) {
-        vertices.push_back(
-            {{vertData[i].x, vertData[i].y, 0.0f},
-             {0.0f, 0.0f},
-             {10, 10},       // So they reference the unity matrix by default
-             {1.0f, 0.0f}}); // Or 0.5f, 0.5f?
+        result.vertices.push_back({{vertData[i].x, vertData[i].y, 0.0f},
+                                   {0.0f, 0.0f},
+                                   {0, 0},
+                                   {0.0f, 0.0f}}); // Or 0.5f, 0.5f?
+        result.shader_vertices.push_back({});
     }
-
-#ifdef SHADER_DEBUG
-    debugVertices = new DebugVertex[meshData.mNumVertices];
-#endif //  SHADER_DEBUG
 
     std::vector<uint> indices;
     indices.reserve(static_cast<size_t>(meshData.mNumFaces) * 3);
@@ -127,22 +124,14 @@ RiggedMesh RiggedMesh::loadFromFile(const char* file) {
         indices.push_back(face.mIndices[1]);
         indices.push_back(face.mIndices[2]);
     }
-    result.numIndices = static_cast<GLuint>(indices.size());
+    result.num_indices = static_cast<GLuint>(indices.size());
 
     // Parse bones and sort weights/indices into vertex data
-
-    // Create unity bone
-    const uint availableBones = maxBones - 1;
-    result.bones.name[availableBones] = "unity";
-    result.bones.inverseTransform[availableBones] = glm::mat4(1.0f);
-    result.bones.rotation[availableBones] = glm::mat4(1.0f);
-    SDL_assert(static_cast<size_t>(meshData.mNumBones) <= availableBones);
-
     struct WeightData {
-        uint vertIndex, boneIndex;
+        uint vert_index, bone_index;
         float weight;
     };
-    std::vector<WeightData> weightData;
+    std::vector<WeightData> weight_data;
 
     // TODO: Maybe remove later
     auto convertMatrix = [](glm::mat4& out, aiMatrix4x4& in) {
@@ -150,102 +139,93 @@ RiggedMesh RiggedMesh::loadFromFile(const char* file) {
         out = glm::transpose(out);
     };
 
-    for (uint i = 0; i < availableBones; ++i) {
-        result.bones.rotation[i] = glm::mat4(1.0f);
-        if (i >= meshData.mNumBones) {
-            result.bones.name[i] = "null";
-            result.bones.inverseTransform[i] = glm::mat4(1.0f);
-            continue;
-        }
-        aiBone& b = *meshData.mBones[i];
+    // Create bones and populate weight_data
+    result.bones.reserve(meshData.mNumBones);
+    for (uint i = 0; i < meshData.mNumBones; ++i) {
+        RiggedMesh::Bone b;
+        b.rotation = glm::mat4(1.0f);
+        aiBone& ai_bone = *meshData.mBones[i];
 
-        result.bones.name[i] = b.mName.C_Str();
-        convertMatrix(result.bones.inverseTransform[i], b.mOffsetMatrix);
+        b.name = ai_bone.mName.C_Str();
+        convertMatrix(b.inverse_transform, ai_bone.mOffsetMatrix);
 
-        for (uint j = 0; j < b.mNumWeights; ++j) {
-            weightData.push_back(
-                {b.mWeights[j].mVertexId, i, b.mWeights[j].mWeight});
+        for (uint j = 0; j < ai_bone.mNumWeights; ++j) {
+            weight_data.push_back({ai_bone.mWeights[j].mVertexId, i,
+                                   ai_bone.mWeights[j].mWeight});
         }
+
+        result.bones.push_back(b);
     }
 
-    size_t* vertexBoneCounts = new size_t[vertices.size()];
-    memset(vertexBoneCounts, 0, vertices.size() * sizeof(size_t));
-    for (auto w : weightData) {
-        size_t boneCount = vertexBoneCounts[w.vertIndex];
-        if (boneCount == 2)
+    // Assign bones and weights to vertices
+    auto& vertices = result.vertices;
+    size_t* vertex_bone_counts = new size_t[vertices.size()];
+    memset(vertex_bone_counts, 0, vertices.size() * sizeof(size_t));
+
+    for (auto w : weight_data) {
+        size_t bone_count = vertex_bone_counts[w.vert_index];
+        if (bone_count == MAX_BONES_PER_VERTEX)
             continue;
-        vertices[w.vertIndex].boneIndex[boneCount] = w.boneIndex;
-        vertices[w.vertIndex].boneWeight[boneCount] = w.weight;
-        ++boneCount;
+
+        vertices[w.vert_index].bone_index[bone_count] = w.bone_index;
+        vertices[w.vert_index].bone_weight[bone_count] = w.weight;
+        ++bone_count;
     }
-    delete[] vertexBoneCounts;
+    delete[] vertex_bone_counts;
 
     // Upload data to GPU
     glGenVertexArrays(1, &result.vao);
     glBindVertexArray(result.vao);
 
+    // Create index buffer
     GLuint ebo;
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indices.size(),
                  indices.data(), GL_STATIC_DRAW);
 
-#ifndef SHADER_DEBUG
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
+    // Create vertex buffer
+    glGenBuffers(1, &result.vbo);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(),
-                 vertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, result.vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ShaderVertex) * vertices.size(), NULL,
+                 GL_DYNAMIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
     // uvCoord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          reinterpret_cast<void*>(offsetof(Vertex, uvCoord)));
+    glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
+        reinterpret_cast<void*>(offsetof(ShaderVertex, uv_coord)));
     glEnableVertexAttribArray(1);
+
+#ifndef CPU_RENDERING
     // boneIndex attribute
     glVertexAttribIPointer(
         2, 2, GL_UNSIGNED_INT, sizeof(Vertex),
-        reinterpret_cast<void*>(offsetof(Vertex, boneIndex)));
+        reinterpret_cast<void*>(offsetof(Vertex, bone_index)));
     glEnableVertexAttribArray(2);
     // boneWeight attribute
     glVertexAttribPointer(
         3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-        reinterpret_cast<void*>(offsetof(Vertex, boneWeight)));
+        reinterpret_cast<void*>(offsetof(Vertex, bone_weight)));
     glEnableVertexAttribArray(3);
-#else
-    glGenBuffers(1, &vbo);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(DebugVertex) * vertices.size(), NULL,
-                 GL_DYNAMIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebugVertex),
-                          reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0);
-    // uvCoord attribute
-    glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE, sizeof(DebugVertex),
-        reinterpret_cast<void*>(offsetof(DebugVertex, uvCoord)));
-    glEnableVertexAttribArray(1);
 #endif
 
     // Reset vertex array binding for error safety
     glBindVertexArray(0);
 
-	return result;
+    return result;
 }
 
-uint RiggedMesh::Bones::getIndex(const char* n) {
-    for (uint i = 0; i < maxBones; ++i) {
-        if (name[i].compare(n) == 0) {
+uint RiggedMesh::get_bone_index(const char* str) const {
+    for (uint i = 0; i < bones.size(); ++i) {
+        if (bones[i].name.compare(str) == 0) {
             return i;
         }
     }
     SDL_assert(false);
-    return maxBones - 1;
+    return (uint)0 - (uint)1;
 }

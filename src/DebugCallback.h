@@ -3,10 +3,10 @@
 
 #pragma warning(push, 0)
 
-void GLAPIENTRY handleGLDebugOutput(GLenum source, GLenum type, GLuint id,
-                                    GLenum severity, GLsizei length,
-                                    const GLchar *message,
-                                    const void *userParam) {
+void GLAPIENTRY handle_gl_debug_output(GLenum source, GLenum type, GLuint id,
+                                       GLenum severity, GLsizei length,
+                                       const GLchar* message,
+                                       const void* user_param) {
     // ignore non-significant error/warning codes
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
         return;
@@ -84,7 +84,7 @@ void GLAPIENTRY handleGLDebugOutput(GLenum source, GLenum type, GLuint id,
     std::cout << std::endl;
     std::cout << std::endl;
 
-	SDL_assert(false);
+    SDL_assert(false);
 };
 
 #pragma warning(pop)

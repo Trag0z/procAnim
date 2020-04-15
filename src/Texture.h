@@ -5,6 +5,6 @@ struct Texture {
     GLuint id;
     GLuint w, h;
     glm::vec2 dimensions;
-};
 
-Texture loadTexture(const char *path);
+    static Texture load_from_file(const char* path);
+};

@@ -19,6 +19,7 @@
         "system_error": "cpp",
         "type_traits": "cpp",
         "xhash": "cpp",
-        "xlocinfo": "cpp"
+        "xlocinfo": "cpp",
+        "xmemory": "cpp"
     }
 }
