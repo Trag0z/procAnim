@@ -5,19 +5,57 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.81.16 commit date:2019-12-04, commit time:11:32, hash:f1aa4d18d49d</authoring_tool>
     </contributor>
-    <created>2020-04-16T13:59:16</created>
-    <modified>2020-04-16T13:59:16</modified>
+    <created>2020-04-17T00:43:15</created>
+    <modified>2020-04-17T00:43:15</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
-  <library_images/>
+  <library_effects>
+    <effect id="DefalutMat-effect">
+      <profile_COMMON>
+        <newparam sid="playerTexture_png-surface">
+          <surface type="2D">
+            <init_from>playerTexture_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="playerTexture_png-sampler">
+          <sampler2D>
+            <source>playerTexture_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <diffuse>
+              <texture texture="playerTexture_png-sampler" texcoord="UVMap"/>
+            </diffuse>
+            <index_of_refraction>
+              <float sid="ior">1.45</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_images>
+    <image id="playerTexture_png" name="playerTexture_png">
+      <init_from>playerTexture.png</init_from>
+    </image>
+  </library_images>
+  <library_materials>
+    <material id="DefalutMat-material" name="DefalutMat">
+      <instance_effect url="#DefalutMat-effect"/>
+    </material>
+  </library_materials>
   <library_geometries>
     <geometry id="Plane-mesh" name="Plane">
       <mesh>
         <source id="Plane-mesh-positions">
-          <float_array id="Plane-mesh-positions-array" count="60">-0.4573417 0 0 0.4573417 0 0 -0.3450268 1.397095 0 0.3450268 1.397095 0 0 2.140058 0 0.4652625 0.8095701 0 0.9480652 1.277276 0 -0.4652625 0.8095701 0 -0.9480652 1.277276 0 0 -0.04773461 0.04029119 0.09272217 -0.6931778 0 -0.09272217 -0.6931778 0 -0.3812153 -0.6961873 0 0.3812153 -0.6961873 0 -0.2470083 -1.345663 0 0.2470083 -1.345663 0 -0.9432592 0.9547851 0 0.9432592 0.9547851 0 -1.665785 1.133572 0 1.665785 1.133572 0</float_array>
+          <float_array id="Plane-mesh-positions-array" count="66">-0.4573417 0 0 0.4573417 0 0 -0.3450268 1.397095 0 0.3450268 1.397095 0 0 2.006411 0 0.4652625 0.8095701 0 0.9480652 1.277276 0 -0.4652625 0.8095701 0 -0.9480652 1.277276 0 0 -0.04773461 0.04029119 0.09272217 -0.6931778 0 -0.09272217 -0.6931778 0 -0.3812153 -0.6961873 0 0.3812153 -0.6961873 0 -0.2470083 -1.345663 0 0.2470083 -1.345663 0 -0.9432592 0.9547851 0 0.9432592 0.9547851 0 -1.665785 1.133572 0 1.665785 1.133572 0 0.3 1.9 0 -0.3 1.9 0</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-positions-array" count="20" stride="3">
+            <accessor source="#Plane-mesh-positions-array" count="22" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
@@ -34,10 +72,19 @@
             </accessor>
           </technique_common>
         </source>
-        <source id="Plane-mesh-colors-Col" name="Col">
-          <float_array id="Plane-mesh-colors-Col-array" count="216">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+        <source id="Plane-mesh-map-0">
+          <float_array id="Plane-mesh-map-0-array" count="120">0.3981438 0.7932547 0.2167999 0.7578728 0.3614026 0.6168215 0.3614026 0.6168215 0.3624405 0.3735257 0.5003294 0.358425 0.3624405 0.3735257 0.3840814 0.1641807 0.5003294 0.358425 0.3840814 0.1641807 0.4301565 0.003385961 0.4707821 0.164332 0.5003294 0.358425 0.5285368 0.1641328 0.6152343 0.1633833 0.5285368 0.1641328 0.5733917 0.004720211 0.6152343 0.1633833 0.3840814 0.1641807 0.4707821 0.164332 0.5003294 0.358425 0.6152343 0.1633833 0.6383191 0.3725739 0.5003294 0.358425 0.6383191 0.3725739 0.6410359 0.6158567 0.5003294 0.358425 0.7848299 0.6589999 0.9847801 0.7138385 0.7866085 0.7559071 0.6410359 0.6158567 0.7848299 0.6589999 0.7866085 0.7559071 0.5974518 0.7962599 0.5853697 0.9272955 0.4988781 0.9479571 0.6410359 0.6158567 0.7866085 0.7559071 0.5974518 0.7962599 0.3614026 0.6168215 0.5003294 0.358425 0.6410359 0.6158567 0.2167999 0.7578728 0.01957046 0.7110918 0.2179097 0.6609558 0.2179097 0.6609558 0.3614026 0.6168215 0.2167999 0.7578728 0.3614026 0.6168215 0.6410359 0.6158567 0.3981438 0.7932547 0.6410359 0.6158567 0.5974518 0.7962599 0.3981438 0.7932547 0.5974518 0.7962599 0.4988781 0.9479571 0.3981438 0.7932547 0.4988781 0.9479571 0.4047954 0.9226925 0.3981438 0.7932547</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-colors-Col-array" count="54" stride="4">
+            <accessor source="#Plane-mesh-map-0-array" count="60" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Plane-mesh-colors-Col" name="Col">
+          <float_array id="Plane-mesh-colors-Col-array" count="240">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+          <technique_common>
+            <accessor source="#Plane-mesh-colors-Col-array" count="60" stride="4">
               <param name="R" type="float"/>
               <param name="G" type="float"/>
               <param name="B" type="float"/>
@@ -48,11 +95,12 @@
         <vertices id="Plane-mesh-vertices">
           <input semantic="POSITION" source="#Plane-mesh-positions"/>
         </vertices>
-        <triangles count="18">
+        <triangles material="DefalutMat-material" count="20">
           <input semantic="VERTEX" source="#Plane-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#Plane-mesh-normals" offset="1"/>
-          <input semantic="COLOR" source="#Plane-mesh-colors-Col" offset="2" set="0"/>
-          <p>2 0 0 8 0 1 7 0 2 7 1 3 0 1 4 9 1 5 0 2 6 12 2 7 9 2 8 12 0 9 14 0 10 11 0 11 9 3 12 10 3 13 13 3 14 10 0 15 15 0 16 13 0 17 12 4 18 11 4 19 9 4 20 13 5 21 1 5 22 9 5 23 1 6 24 5 6 25 9 6 26 17 0 27 19 0 28 6 0 29 5 0 30 17 0 31 6 0 32 3 0 33 4 0 34 2 0 35 5 0 36 6 0 37 3 0 38 7 7 39 9 7 40 5 7 41 8 0 42 18 0 43 16 0 44 16 0 45 7 0 46 8 0 47 7 0 48 5 0 49 2 0 50 5 0 51 3 0 52 2 0 53</p>
+          <input semantic="TEXCOORD" source="#Plane-mesh-map-0" offset="2" set="0"/>
+          <input semantic="COLOR" source="#Plane-mesh-colors-Col" offset="3" set="0"/>
+          <p>2 0 0 0 8 0 1 1 7 0 2 2 7 1 3 3 0 1 4 4 9 1 5 5 0 2 6 6 12 2 7 7 9 2 8 8 12 0 9 9 14 0 10 10 11 0 11 11 9 3 12 12 10 3 13 13 13 3 14 14 10 0 15 15 15 0 16 16 13 0 17 17 12 4 18 18 11 4 19 19 9 4 20 20 13 5 21 21 1 5 22 22 9 5 23 23 1 6 24 24 5 6 25 25 9 6 26 26 17 0 27 27 19 0 28 28 6 0 29 29 5 0 30 30 17 0 31 31 6 0 32 32 3 0 33 33 20 0 34 34 4 0 35 35 5 0 36 36 6 0 37 37 3 0 38 38 7 7 39 39 9 7 40 40 5 7 41 41 8 0 42 42 18 0 43 43 16 0 44 44 16 0 45 45 7 0 46 46 8 0 47 47 7 0 48 48 5 0 49 49 2 0 50 50 5 0 51 51 3 0 52 52 2 0 53 53 3 0 54 54 4 0 55 55 2 0 56 56 4 0 57 57 21 0 58 58 2 0 59 59</p>
         </triangles>
       </mesh>
     </geometry>
@@ -78,9 +126,9 @@
           </technique_common>
         </source>
         <source id="B_Guy-skin-weights">
-          <float_array id="B_Guy-skin-weights-array" count="20">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+          <float_array id="B_Guy-skin-weights-array" count="22">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
           <technique_common>
-            <accessor source="#B_Guy-skin-weights-array" count="20" stride="1">
+            <accessor source="#B_Guy-skin-weights-array" count="22" stride="1">
               <param name="WEIGHT" type="float"/>
             </accessor>
           </technique_common>
@@ -89,11 +137,11 @@
           <input semantic="JOINT" source="#B_Guy-skin-joints"/>
           <input semantic="INV_BIND_MATRIX" source="#B_Guy-skin-bind_poses"/>
         </joints>
-        <vertex_weights count="20">
+        <vertex_weights count="22">
           <input semantic="JOINT" source="#B_Guy-skin-joints" offset="0"/>
           <input semantic="WEIGHT" source="#B_Guy-skin-weights" offset="1"/>
-          <vcount>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </vcount>
-          <v>4 0 4 1 4 2 4 3 4 4 4 5 6 6 4 7 8 8 4 9 3 10 2 11 2 12 3 13 9 14 10 15 8 16 6 17 5 18 7 19</v>
+          <vcount>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </vcount>
+          <v>4 0 4 1 4 2 4 3 4 4 4 5 6 6 4 7 8 8 4 9 3 10 2 11 2 12 3 13 9 14 10 15 8 16 6 17 5 18 7 19 4 20 4 21</v>
         </vertex_weights>
       </skin>
     </controller>
@@ -235,6 +283,13 @@
           <skeleton>#B_Spine</skeleton>
           <skeleton>#B_Hip_R</skeleton>
           <skeleton>#B_Hip_L</skeleton>
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="DefalutMat-material" target="#DefalutMat-material">
+                <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
         </instance_controller>
       </node>
     </visual_scene>

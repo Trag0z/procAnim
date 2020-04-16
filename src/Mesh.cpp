@@ -60,20 +60,20 @@ Mesh::Mesh(const char* file) {
 
     SDL_assert(scene->HasMeshes());
 
-    aiMesh& meshData = *scene->mMeshes[0];
+    aiMesh& mesh_data = *scene->mMeshes[0];
 
     std::vector<BasicVertex> vertices;
-    vertices.reserve(meshData.mNumVertices);
-    aiVector3D* vertData = meshData.mVertices;
-    for (size_t i = 0; i < meshData.mNumVertices; ++i) {
+    vertices.reserve(mesh_data.mNumVertices);
+    aiVector3D* vertData = mesh_data.mVertices;
+    for (size_t i = 0; i < mesh_data.mNumVertices; ++i) {
         vertices.push_back(
             {{vertData[i].x, vertData[i].y, 0.0f}, {0.0f, 0.0f}});
     }
 
     std::vector<uint> indices;
-    indices.reserve(static_cast<size_t>(meshData.mNumFaces) * 3);
-    for (size_t i = 0; i < meshData.mNumFaces; ++i) {
-        aiFace& face = meshData.mFaces[i];
+    indices.reserve(static_cast<size_t>(mesh_data.mNumFaces) * 3);
+    for (size_t i = 0; i < mesh_data.mNumFaces; ++i) {
+        aiFace& face = mesh_data.mFaces[i];
         indices.push_back(face.mIndices[0]);
         indices.push_back(face.mIndices[1]);
         indices.push_back(face.mIndices[2]);
@@ -99,27 +99,30 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
 
     SDL_assert(scene->HasMeshes());
 
-    aiMesh& meshData = *scene->mMeshes[0];
+    aiMesh& mesh_data = *scene->mMeshes[0];
 
     // Import vertex data
     RiggedMesh result;
 
-    result.vertices.reserve(meshData.mNumVertices);
-    result.shader_vertices.reserve(meshData.mNumVertices);
+    result.vertices.reserve(mesh_data.mNumVertices);
+    result.shader_vertices.reserve(mesh_data.mNumVertices);
 
-    aiVector3D* vertData = meshData.mVertices;
-    for (size_t i = 0; i < meshData.mNumVertices; ++i) {
+    aiVector3D* vertData = mesh_data.mVertices;
+    aiVector3D* uvCoords = mesh_data.mTextureCoords[0];
+    SDL_assert(uvCoords);
+
+    for (size_t i = 0; i < mesh_data.mNumVertices; ++i) {
         result.vertices.push_back({{vertData[i].x, vertData[i].y, 0.0f},
-                                   {0.0f, 0.0f},
+                                   {uvCoords[i].x, 1.0f - uvCoords[i].y},
                                    {0, 0},
                                    {0.0f, 0.0f}}); // Or 0.5f, 0.5f?
         result.shader_vertices.push_back({});
     }
 
     std::vector<uint> indices;
-    indices.reserve(static_cast<size_t>(meshData.mNumFaces) * 3);
-    for (size_t i = 0; i < meshData.mNumFaces; ++i) {
-        aiFace& face = meshData.mFaces[i];
+    indices.reserve(static_cast<size_t>(mesh_data.mNumFaces) * 3);
+    for (size_t i = 0; i < mesh_data.mNumFaces; ++i) {
+        aiFace& face = mesh_data.mFaces[i];
         indices.push_back(face.mIndices[0]);
         indices.push_back(face.mIndices[1]);
         indices.push_back(face.mIndices[2]);
@@ -140,11 +143,11 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
     };
 
     // Create bones and populate weight_data
-    result.bones.reserve(meshData.mNumBones);
-    for (uint i = 0; i < meshData.mNumBones; ++i) {
+    result.bones.reserve(mesh_data.mNumBones);
+    for (uint i = 0; i < mesh_data.mNumBones; ++i) {
         RiggedMesh::Bone b;
         b.rotation = glm::mat4(1.0f);
-        aiBone& ai_bone = *meshData.mBones[i];
+        aiBone& ai_bone = *mesh_data.mBones[i];
 
         b.name = ai_bone.mName.C_Str();
         convertMatrix(b.inverse_transform, ai_bone.mOffsetMatrix);
@@ -200,7 +203,8 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         if (bone_count == MAX_BONES_PER_VERTEX)
             continue;
 
-        vertices[w.vert_index].bone_index[bone_count] = static_cast<GLuint>(w.bone_index);
+        vertices[w.vert_index].bone_index[bone_count] =
+            static_cast<GLuint>(w.bone_index);
         vertices[w.vert_index].bone_weight[bone_count] = w.weight;
         ++bone_count;
     }
@@ -225,7 +229,7 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
                  GL_DYNAMIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
     // uvCoord attribute

@@ -65,8 +65,8 @@ void Game::init() {
     // OpenGL configuration
     glViewport(0, 0, game_config.window_size.x, game_config.window_size.y);
     // glEnable(GL_CULL_FACE);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (DEBUG_MODE) {
         glEnable(GL_DEBUG_OUTPUT);
@@ -103,7 +103,7 @@ void Game::init() {
 
     // Player
     player.pos = {1920.0f / 2.0f, 1080.0f / 2.0f};
-    player.tex = Texture::load_from_file("../assets/red100x100.png");
+    player.tex = Texture::load_from_file("../assets/playerTexture.png");
     player.rigged_mesh = RiggedMesh::load_from_file("../assets/guy.dae");
     player.gamepad_input = &gamepad_inputs[0];
 
