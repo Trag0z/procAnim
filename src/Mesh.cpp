@@ -1,8 +1,6 @@
 #pragma once
 #include "pch.h"
 #include "Mesh.h"
-#include <limits.h>
-#include <map>
 
 using namespace MeshDetail;
 
@@ -159,13 +157,13 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         result.bones.push_back(b);
     }
 
-	// Find bone partents
-	aiNode* root = scene->mRootNode;
+    // Find bone partents
+    aiNode* root = scene->mRootNode;
 
-	for (auto& b : result.bones) {
-		aiNode* node = root->FindNode(b.name.c_str());
-		b.parent = result.find_bone_index(node->mParent->mName.C_Str());
-	}
+    for (auto& b : result.bones) {
+        aiNode* node = root->FindNode(b.name.c_str());
+        b.parent = result.find_bone_index(node->mParent->mName.C_Str());
+    }
 
     // Assign bones and weights to vertices
     auto& vertices = result.vertices;

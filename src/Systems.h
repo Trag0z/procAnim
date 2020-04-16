@@ -124,9 +124,10 @@ inline void update_player(Player& player) {
     // Arm control
     constexpr float sensitivity = 0.4f;
     auto& mesh = player.rigged_mesh;
-    uint boneIndex = mesh.find_bone_index("B_Arm_L");
-    mesh.bones[boneIndex].rotation = glm::rotate(
-        mesh.bones[boneIndex].rotation,
+    uint bone_index = mesh.find_bone_index("B_Arm_L_2");
+    SDL_assert(bone_index != UINT_MAX);
+    mesh.bones[bone_index].rotation = glm::rotate(
+        mesh.bones[bone_index].rotation,
         degToRad(-sensitivity *
                  player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY]),
         glm::vec3(0.0f, 0.0f, 1.0f));

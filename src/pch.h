@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <limits.h>
 
 #include <GL/glew.h>
 #include <gl/glew.h>

@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.81.16 commit date:2019-12-04, commit time:11:32, hash:f1aa4d18d49d</authoring_tool>
     </contributor>
-    <created>2020-04-15T20:27:41</created>
-    <modified>2020-04-15T20:27:41</modified>
+    <created>2020-04-16T12:07:59</created>
+    <modified>2020-04-16T12:07:59</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -15,9 +15,9 @@
     <geometry id="Plane-mesh" name="Plane">
       <mesh>
         <source id="Plane-mesh-positions">
-          <float_array id="Plane-mesh-positions-array" count="36">-0.4573417 0 0 0.4573417 0 0 -0.3450268 1.469742 0 0.3450268 1.469742 0 0 2.4674 0 0.4652625 0.8095701 0 1.679748 1.183437 0 -0.4652625 0.8095701 0 -1.745675 1.164583 0 0 -0.04773461 0.04029119 0.3 -1 0 -0.3 -1 0</float_array>
+          <float_array id="Plane-mesh-positions-array" count="60">-0.4573417 0 0 0.4573417 0 0 -0.3450268 1.397095 0 0.3450268 1.397095 0 0 2.140058 0 0.4652625 0.8095701 0 0.9480652 1.277276 0 -0.4652625 0.8095701 0 -0.9480652 1.277276 0 0 -0.04773461 0.04029119 0.09272217 -0.6931778 0 -0.09272217 -0.6931778 0 -0.3812153 -0.6961873 0 0.3812153 -0.6961873 0 -0.2470083 -1.345663 0 0.2470083 -1.345663 0 -0.9432592 0.9547851 0 0.9432592 0.9547851 0 -1.665785 1.133572 0 1.665785 1.133572 0</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-positions-array" count="12" stride="3">
+            <accessor source="#Plane-mesh-positions-array" count="20" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
@@ -25,9 +25,9 @@
           </technique_common>
         </source>
         <source id="Plane-mesh-normals">
-          <float_array id="Plane-mesh-normals-array" count="18">0 0 1 -0.08784782 -8.59498e-4 0.9961336 -0.08920377 -0.01403546 0.9959145 0.08920377 -0.01403546 0.9959145 0.08784782 -8.59498e-4 0.9961336 0 0.04694575 0.9988975</float_array>
+          <float_array id="Plane-mesh-normals-array" count="24">0 0 1 -0.08784782 -8.59498e-4 0.9961336 -0.08875989 -0.009705662 0.9960058 -6.50901e-4 -0.06239598 0.9980514 6.50901e-4 -0.06239598 0.9980514 0.08875989 -0.009705662 0.9960058 0.08784782 -8.59498e-4 0.9961336 0 0.04694575 0.9988975</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-normals-array" count="6" stride="3">
+            <accessor source="#Plane-mesh-normals-array" count="8" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
@@ -35,9 +35,9 @@
           </technique_common>
         </source>
         <source id="Plane-mesh-colors-Col" name="Col">
-          <float_array id="Plane-mesh-colors-Col-array" count="120">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+          <float_array id="Plane-mesh-colors-Col-array" count="216">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-colors-Col-array" count="30" stride="4">
+            <accessor source="#Plane-mesh-colors-Col-array" count="54" stride="4">
               <param name="R" type="float"/>
               <param name="G" type="float"/>
               <param name="B" type="float"/>
@@ -48,11 +48,11 @@
         <vertices id="Plane-mesh-vertices">
           <input semantic="POSITION" source="#Plane-mesh-positions"/>
         </vertices>
-        <triangles count="10">
+        <triangles count="18">
           <input semantic="VERTEX" source="#Plane-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#Plane-mesh-normals" offset="1"/>
           <input semantic="COLOR" source="#Plane-mesh-colors-Col" offset="2" set="0"/>
-          <p>5 0 0 3 0 1 2 0 2 7 1 3 0 1 4 9 1 5 0 2 6 11 2 7 9 2 8 9 3 9 10 3 10 1 3 11 2 0 12 8 0 13 7 0 14 3 0 15 4 0 16 2 0 17 5 0 18 6 0 19 3 0 20 9 4 21 1 4 22 5 4 23 2 0 24 7 0 25 5 0 26 7 5 27 9 5 28 5 5 29</p>
+          <p>2 0 0 8 0 1 7 0 2 7 1 3 0 1 4 9 1 5 0 2 6 12 2 7 9 2 8 12 0 9 14 0 10 11 0 11 9 3 12 10 3 13 13 3 14 10 0 15 15 0 16 13 0 17 12 4 18 11 4 19 9 4 20 13 5 21 1 5 22 9 5 23 1 6 24 5 6 25 9 6 26 17 0 27 19 0 28 6 0 29 5 0 30 17 0 31 6 0 32 3 0 33 4 0 34 2 0 35 5 0 36 6 0 37 3 0 38 7 7 39 9 7 40 5 7 41 8 0 42 18 0 43 16 0 44 16 0 45 7 0 46 8 0 47 7 0 48 5 0 49 2 0 50 5 0 51 3 0 52 2 0 53</p>
         </triangles>
       </mesh>
     </geometry>
@@ -62,25 +62,25 @@
       <skin source="#Plane-mesh">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="B_Guy-skin-joints">
-          <Name_array id="B_Guy-skin-joints-array" count="5">Arm_R Arm_L Leg_L Leg_R Spine</Name_array>
+          <Name_array id="B_Guy-skin-joints-array" count="11">Shoulder_R Shoulder_L Leg_L_1 Leg_R_1 Spine Arm_L_2 Arm_R_1 Arm_R_2 Arm_L_1 Leg_L_2 Leg_R_2</Name_array>
           <technique_common>
-            <accessor source="#B_Guy-skin-joints-array" count="5" stride="1">
+            <accessor source="#B_Guy-skin-joints-array" count="11" stride="1">
               <param name="JOINT" type="name"/>
             </accessor>
           </technique_common>
         </source>
         <source id="B_Guy-skin-bind_poses">
-          <float_array id="B_Guy-skin-bind_poses-array" count="80">-0.02888411 -0.9995827 0 1.199499 0.9995827 -0.02888429 0 0.03466111 0 0 1 0 0 0 0 1 -0.02888411 0.9995827 0 -1.199499 -0.9995827 -0.02888429 0 0.03466111 0 0 1 0 0 0 0 1 -0.9987123 0.05073034 0 -0.249678 -0.05073022 -0.9987123 0 -0.01268255 0 0 1 0 0 0 0 1 -0.9989606 -0.0455839 0 0.2497401 0.04558402 -0.9989606 0 -0.01139599 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</float_array>
+          <float_array id="B_Guy-skin-bind_poses-array" count="176">-0.03616142 -0.999346 0 1.199215 0.999346 -0.03616142 0 0.04339367 0 0 1 0 0 0 0 1 -0.03616142 0.999346 0 -1.199215 -0.999346 -0.03616142 0 0.04339367 0 0 1 0 0 0 0 1 -0.999827 0.01860171 0 -0.2499567 -0.01860177 -0.999827 0 -0.004650413 0 0 1 0 0 0 0 1 -0.999827 -0.01860171 0 0.2499567 0.01860177 -0.999827 0 -0.004650413 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.009375035 0.9999561 0 -1.119482 -0.9999561 0.009375035 0 -1.008819 0 0 1 0 0 0 0 1 -0.09389841 -0.9955819 0 1.217639 0.9955819 -0.09389835 0 -0.2833229 0 0 1 0 0 0 0 1 0.009375035 -0.9999561 0 1.119482 0.9999561 0.009375035 0 -1.008819 0 0 1 0 0 0 0 1 -0.09389841 0.9955819 0 -1.217639 -0.9955819 -0.09389835 0 -0.2833229 0 0 1 0 0 0 0 1 -0.999719 -0.02370297 0 -0.2794347 0.02370291 -0.9997191 0 -0.6910417 0 0 1 0 0 0 0 1 -0.999719 0.02370297 0 0.2794347 -0.02370291 -0.9997191 0 -0.6910417 0 0 1 0 0 0 0 1</float_array>
           <technique_common>
-            <accessor source="#B_Guy-skin-bind_poses-array" count="5" stride="16">
+            <accessor source="#B_Guy-skin-bind_poses-array" count="11" stride="16">
               <param name="TRANSFORM" type="float4x4"/>
             </accessor>
           </technique_common>
         </source>
         <source id="B_Guy-skin-weights">
-          <float_array id="B_Guy-skin-weights-array" count="12">1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+          <float_array id="B_Guy-skin-weights-array" count="20">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
           <technique_common>
-            <accessor source="#B_Guy-skin-weights-array" count="12" stride="1">
+            <accessor source="#B_Guy-skin-weights-array" count="20" stride="1">
               <param name="WEIGHT" type="float"/>
             </accessor>
           </technique_common>
@@ -89,11 +89,11 @@
           <input semantic="JOINT" source="#B_Guy-skin-joints"/>
           <input semantic="INV_BIND_MATRIX" source="#B_Guy-skin-bind_poses"/>
         </joints>
-        <vertex_weights count="12">
+        <vertex_weights count="20">
           <input semantic="JOINT" source="#B_Guy-skin-joints" offset="0"/>
           <input semantic="WEIGHT" source="#B_Guy-skin-weights" offset="1"/>
-          <vcount>1 1 1 1 1 1 1 1 1 1 1 1 </vcount>
-          <v>4 0 4 1 4 2 4 3 4 4 4 5 0 6 4 7 1 8 4 9 3 10 2 11</v>
+          <vcount>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </vcount>
+          <v>4 0 4 1 4 2 4 3 4 4 4 5 6 6 4 7 8 8 4 9 3 10 2 11 2 12 3 13 9 14 10 15 8 16 6 17 5 18 7 19</v>
         </vertex_weights>
       </skin>
     </controller>
@@ -104,27 +104,63 @@
         <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
         <node id="B_Spine" name="Spine" sid="Spine" type="JOINT">
           <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
-          <node id="B_Arm_L" name="Arm_L" sid="Arm_L" type="JOINT">
-            <matrix sid="transform">-0.02888429 -0.9995828 0 0 0.9995828 -0.02888416 0 1.2 0 0 1 0 0 0 0 1</matrix>
+          <node id="B_Shoulder_L" name="Shoulder_L" sid="Shoulder_L" type="JOINT">
+            <matrix sid="transform">-0.03616142 -0.999346 0 0 0.999346 -0.03616145 0 1.2 0 0 1 0 0 0 0 1</matrix>
+            <node id="B_Arm_L_1" name="Arm_L_1" sid="Arm_L_1" type="JOINT">
+              <matrix sid="transform">0.9983261 -0.05783532 0 0 0.05783532 0.9983261 0 0.3966649 0 0 1 0 0 0 0 1</matrix>
+              <node id="B_Arm_L_2" name="Arm_L_2" sid="Arm_L_2" type="JOINT">
+                <matrix sid="transform">0.9946578 0.1032279 0 1.19209e-7 -0.1032279 0.9946577 0 0.6045449 0 0 1 0 0 0 0 1</matrix>
+                <extra>
+                  <technique profile="blender">
+                    <connect sid="connect" type="bool">1</connect>
+                    <layer sid="layer" type="string">0</layer>
+                    <tip_x sid="tip_x" type="float">-0.6232149</tip_x>
+                    <tip_y sid="tip_y" type="float">0.005842924</tip_y>
+                    <tip_z sid="tip_z" type="float">0</tip_z>
+                  </technique>
+                </extra>
+              </node>
+              <extra>
+                <technique profile="blender">
+                  <connect sid="connect" type="bool">1</connect>
+                  <layer sid="layer" type="string">0</layer>
+                </technique>
+              </extra>
+            </node>
             <extra>
               <technique profile="blender">
                 <connect sid="connect" type="bool">1</connect>
                 <layer sid="layer" type="string">0</layer>
-                <tip_x sid="tip_x" type="float">-1.505984</tip_x>
-                <tip_y sid="tip_y" type="float">-0.04351723</tip_y>
-                <tip_z sid="tip_z" type="float">0</tip_z>
               </technique>
             </extra>
           </node>
-          <node id="B_Arm_R" name="Arm_R" sid="Arm_R" type="JOINT">
-            <matrix sid="transform">-0.02888429 0.9995828 0 0 -0.9995828 -0.02888416 0 1.2 0 0 1 0 0 0 0 1</matrix>
+          <node id="B_Shoulder_R" name="Shoulder_R" sid="Shoulder_R" type="JOINT">
+            <matrix sid="transform">-0.03616142 0.999346 0 0 -0.999346 -0.03616145 0 1.2 0 0 1 0 0 0 0 1</matrix>
+            <node id="B_Arm_R_1" name="Arm_R_1" sid="Arm_R_1" type="JOINT">
+              <matrix sid="transform">0.9983261 0.05783532 0 0 -0.05783532 0.9983261 0 0.3966649 0 0 1 0 0 0 0 1</matrix>
+              <node id="B_Arm_R_2" name="Arm_R_2" sid="Arm_R_2" type="JOINT">
+                <matrix sid="transform">0.9946578 -0.1032279 0 -1.19209e-7 0.1032279 0.9946577 0 0.6045449 0 0 1 0 0 0 0 1</matrix>
+                <extra>
+                  <technique profile="blender">
+                    <connect sid="connect" type="bool">1</connect>
+                    <layer sid="layer" type="string">0</layer>
+                    <tip_x sid="tip_x" type="float">0.6232149</tip_x>
+                    <tip_y sid="tip_y" type="float">0.005842924</tip_y>
+                    <tip_z sid="tip_z" type="float">0</tip_z>
+                  </technique>
+                </extra>
+              </node>
+              <extra>
+                <technique profile="blender">
+                  <connect sid="connect" type="bool">1</connect>
+                  <layer sid="layer" type="string">0</layer>
+                </technique>
+              </extra>
+            </node>
             <extra>
               <technique profile="blender">
                 <connect sid="connect" type="bool">1</connect>
                 <layer sid="layer" type="string">0</layer>
-                <tip_x sid="tip_x" type="float">1.505984</tip_x>
-                <tip_y sid="tip_y" type="float">-0.04351723</tip_y>
-                <tip_z sid="tip_z" type="float">0</tip_z>
               </technique>
             </extra>
           </node>
@@ -136,15 +172,24 @@
         </node>
         <node id="B_Hip_R" name="Hip_R" sid="Hip_R" type="JOINT">
           <matrix sid="transform">0 1 0 0 -1 0 0 0 0 0 1 0 0 0 0 1</matrix>
-          <node id="B_Leg_R" name="Leg_R" sid="Leg_R" type="JOINT">
-            <matrix sid="transform">0.04558402 0.9989605 0 0 -0.9989605 0.04558394 0 0.25 0 0 1 0 0 0 0 1</matrix>
+          <node id="B_Leg_R_1" name="Leg_R_1" sid="Leg_R_1" type="JOINT">
+            <matrix sid="transform">0.01860178 0.999827 0 0 -0.999827 0.01860172 0 0.25 0 0 1 0 0 0 0 1</matrix>
+            <node id="B_Leg_R_2" name="Leg_R_2" sid="Leg_R_2" type="JOINT">
+              <matrix sid="transform">0.9991052 0.04229539 0 0 -0.04229539 0.9991052 0 0.6975917 0 0 1 0 0 0 0 1</matrix>
+              <extra>
+                <technique profile="blender">
+                  <connect sid="connect" type="bool">1</connect>
+                  <layer sid="layer" type="string">0</layer>
+                  <tip_x sid="tip_x" type="float">-0.01541483</tip_x>
+                  <tip_y sid="tip_y" type="float">-0.6501512</tip_y>
+                  <tip_z sid="tip_z" type="float">0</tip_z>
+                </technique>
+              </extra>
+            </node>
             <extra>
               <technique profile="blender">
                 <connect sid="connect" type="bool">1</connect>
                 <layer sid="layer" type="string">0</layer>
-                <tip_x sid="tip_x" type="float">0.04273378</tip_x>
-                <tip_y sid="tip_y" type="float">-0.9365002</tip_y>
-                <tip_z sid="tip_z" type="float">0</tip_z>
               </technique>
             </extra>
           </node>
@@ -156,15 +201,24 @@
         </node>
         <node id="B_Hip_L" name="Hip_L" sid="Hip_L" type="JOINT">
           <matrix sid="transform">0 -1 0 0 1 0 0 0 0 0 1 0 0 0 0 1</matrix>
-          <node id="B_Leg_L" name="Leg_L" sid="Leg_L" type="JOINT">
-            <matrix sid="transform">0.05073029 -0.9987124 0 0 0.9987124 0.05073039 0 0.25 0 0 1 0 0 0 0 1</matrix>
+          <node id="B_Leg_L_1" name="Leg_L_1" sid="Leg_L_1" type="JOINT">
+            <matrix sid="transform">0.01860178 -0.999827 0 0 0.999827 0.01860172 0 0.25 0 0 1 0 0 0 0 1</matrix>
+            <node id="B_Leg_L_2" name="Leg_L_2" sid="Leg_L_2" type="JOINT">
+              <matrix sid="transform">0.9991052 -0.04229539 0 0 0.04229539 0.9991052 0 0.6975917 0 0 1 0 0 0 0 1</matrix>
+              <extra>
+                <technique profile="blender">
+                  <connect sid="connect" type="bool">1</connect>
+                  <layer sid="layer" type="string">0</layer>
+                  <tip_x sid="tip_x" type="float">0.01541483</tip_x>
+                  <tip_y sid="tip_y" type="float">-0.6501512</tip_y>
+                  <tip_z sid="tip_z" type="float">0</tip_z>
+                </technique>
+              </extra>
+            </node>
             <extra>
               <technique profile="blender">
                 <connect sid="connect" type="bool">1</connect>
                 <layer sid="layer" type="string">0</layer>
-                <tip_x sid="tip_x" type="float">-0.04718899</tip_x>
-                <tip_y sid="tip_y" type="float">-0.9289948</tip_y>
-                <tip_z sid="tip_z" type="float">0</tip_z>
               </technique>
             </extra>
           </node>
