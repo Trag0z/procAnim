@@ -122,7 +122,7 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
 
 inline void update_player(Player& player) {
     // Arm control
-    constexpr float sensitivity = 0.4f;
+    constexpr float sensitivity = 0.7f;
     auto& mesh = player.rigged_mesh;
 
     // Rotate upper arm
@@ -174,24 +174,16 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
             bone_transforms[i] =
                 inverse(b.inverse_transform) * b.rotation * b.inverse_transform;
         } else {
-            if (i == 6 || i == 6)
-                SDL_assert(true);
             // What if the parent has a parent?
-            bone_transforms[i] =
-                ((inverse(rm.bones[b.parent].inverse_transform) *
-                  rm.bones[b.parent].rotation)                  // M1
-                 * (inverse(b.inverse_transform) * b.rotation)) // M2
-                * inverse(inverse(rm.bones[b.parent].inverse_transform) *
-                          inverse(b.inverse_transform)); // (B1 * B2)^-1
+            bone_transforms[i] = bone_transforms[b.parent] *
+                                 inverse(b.inverse_transform) * b.rotation *
+                                 b.inverse_transform;
         }
     }
 
     // Calculate vertex posistions for rendering
     for (size_t i = 0; i < rm.vertices.size(); ++i) {
         Vertex vert = rm.vertices[i];
-        if (vert.bone_index[0] == 3 || vert.bone_index[0] == 6)
-            SDL_assert(true);
-
         rm.shader_vertices[i].uv_coord = vert.uv_coord;
 
         mat4 bone = bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
