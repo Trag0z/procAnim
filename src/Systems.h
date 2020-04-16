@@ -174,16 +174,23 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
             bone_transforms[i] =
                 inverse(b.inverse_transform) * b.rotation * b.inverse_transform;
         } else {
+            if (i == 6 || i == 6)
+                SDL_assert(true);
             // What if the parent has a parent?
-            mat4 parent_transform = bone_transforms[b.parent];
-            bone_transforms[i] = inverse(b.inverse_transform) * b.rotation *
-                                 b.inverse_transform * parent_transform;
+            bone_transforms[i] =
+                ((inverse(rm.bones[b.parent].inverse_transform) *
+                  rm.bones[b.parent].rotation)                  // M1
+                 * (inverse(b.inverse_transform) * b.rotation)) // M2
+                * inverse(inverse(rm.bones[b.parent].inverse_transform) *
+                          inverse(b.inverse_transform)); // (B1 * B2)^-1
         }
     }
 
     // Calculate vertex posistions for rendering
     for (size_t i = 0; i < rm.vertices.size(); ++i) {
         Vertex vert = rm.vertices[i];
+        if (vert.bone_index[0] == 3 || vert.bone_index[0] == 6)
+            SDL_assert(true);
 
         rm.shader_vertices[i].uv_coord = vert.uv_coord;
 

@@ -128,7 +128,7 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
 
     // Parse bones and sort weights/indices into vertex data
     struct WeightData {
-        uint vert_index, bone_index;
+        size_t vert_index, bone_index;
         float weight;
     };
     std::vector<WeightData> weight_data;
@@ -157,7 +157,7 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         result.bones.push_back(b);
     }
 
-    // Find bone partents
+    // Find bone parents
     aiNode* root = scene->mRootNode;
 
     for (auto& b : result.bones) {
@@ -166,7 +166,9 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
     }
 
     // Sort array so parents are always before children
-    // NOTE: Does not take into account multiple children on the same bone
+    // NOTE: Does not take into account multiple children on the same bone,
+    // wrong if there are longer chains of inheritence
+    // TODO: clean this up, probably change the whole function
     bool sorted = false;
     while (!sorted) {
         sorted = true;
@@ -178,6 +180,12 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
 
             b.parent = i;
             std::swap(result.bones[i], result.bones[parent_index]);
+            for (auto& w : weight_data) {
+                if (w.bone_index == parent_index)
+                    w.bone_index = i;
+                else if (w.bone_index == i)
+                    w.bone_index = parent_index;
+            }
             sorted = false;
         }
     }
@@ -192,7 +200,7 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         if (bone_count == MAX_BONES_PER_VERTEX)
             continue;
 
-        vertices[w.vert_index].bone_index[bone_count] = w.bone_index;
+        vertices[w.vert_index].bone_index[bone_count] = static_cast<GLuint>(w.bone_index);
         vertices[w.vert_index].bone_weight[bone_count] = w.weight;
         ++bone_count;
     }

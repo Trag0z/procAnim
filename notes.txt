@@ -1,6 +1,6 @@
 TODO:
 - add second layer of bones
-
+- longer chains, multiple parents?
 
 
 Optimizations:
