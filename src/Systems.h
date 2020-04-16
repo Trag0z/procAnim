@@ -124,12 +124,25 @@ inline void update_player(Player& player) {
     // Arm control
     constexpr float sensitivity = 0.4f;
     auto& mesh = player.rigged_mesh;
-    uint bone_index = mesh.find_bone_index("B_Arm_L_2");
-    SDL_assert(bone_index != UINT_MAX);
+
+    // Rotate upper arm
+    size_t bone_index = mesh.find_bone_index("B_Arm_L_1");
+    SDL_assert(bone_index != RiggedMesh::Bone::no_parent);
+
     mesh.bones[bone_index].rotation = glm::rotate(
         mesh.bones[bone_index].rotation,
         degToRad(-sensitivity *
                  player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY]),
+        glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // Rotate lower arm
+    bone_index = mesh.find_bone_index("B_Arm_L_2");
+    SDL_assert(bone_index != RiggedMesh::Bone::no_parent);
+
+    mesh.bones[bone_index].rotation = glm::rotate(
+        mesh.bones[bone_index].rotation,
+        degToRad(-sensitivity *
+                 player.gamepad_input->axis[SDL_CONTROLLER_AXIS_RIGHTY]),
         glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
@@ -142,42 +155,43 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
     const auto& rs = render_data.rigged_shader;
     glUseProgram(rs.id);
     mat4 projection = ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
-    // glUniformMatrix4fv(rs.projection_matrix_loc, 1, GL_FALSE,
-    //                    value_ptr(projection));
 
+    // Translate first to multiply translation from the left to the scaled model
+    // This resolves to model * translation * scale
     mat4 model(1.0f);
-    // Entity transformations first to multiply from the left to
-    // spriteRenderer transfotmation
-    // model = scale(model, vec3(e.transform->scale, 1.0f));
-    // model = rotate(model, e.transform->rot, vec3(0.0f, 0.0f, 1.0f));
-    // model = translate(model, vec3(player.pos, 0.0f));
     model = translate(model, vec3(player.pos, 0.0f));
-
-    // Move the center of the texture to the spriteRenderers position
     model = scale(model, vec3(100.0f, 100.0f, 1.0f));
-    // glUniformMatrix4fv(rs.model_matrix_loc, 1, GL_FALSE, value_ptr(model));
 
     RiggedMesh& rm = player.rigged_mesh;
+
+    // Calculate bone transforms from their rotations
+    size_t bone_count = rm.bones.size();
+    mat4* bone_transforms = new mat4[bone_count];
+    for (size_t i = 0; i < bone_count; ++i) {
+        auto& b = rm.bones[i];
+
+        if (b.parent == RiggedMesh::Bone::no_parent) {
+            bone_transforms[i] =
+                inverse(b.inverse_transform) * b.rotation * b.inverse_transform;
+        } else {
+            // What if the parent has a parent?
+            mat4 parent_transform = bone_transforms[b.parent];
+            bone_transforms[i] = inverse(b.inverse_transform) * b.rotation *
+                                 b.inverse_transform * parent_transform;
+        }
+    }
+
+    // Calculate vertex posistions for rendering
     for (size_t i = 0; i < rm.vertices.size(); ++i) {
         Vertex vert = rm.vertices[i];
 
         rm.shader_vertices[i].uv_coord = vert.uv_coord;
 
-        RiggedMesh::Bone* bones[2];
-        bones[0] = &rm.bones[vert.bone_index[0]];
-        bones[1] = &rm.bones[vert.bone_index[1]];
-
-        mat4 boneTransform =
-            (inverse(bones[0]->inverse_transform) * bones[0]->rotation *
-             bones[0]->inverse_transform) *
-            vert.bone_weight[0];
-
-        boneTransform += (inverse(bones[1]->inverse_transform) *
-                          bones[1]->rotation * bones[1]->inverse_transform) *
-                         vert.bone_weight[1];
+        mat4 bone = bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
+                    bone_transforms[vert.bone_index[1]] * vert.bone_weight[1];
 
         rm.shader_vertices[i].pos =
-            projection * model * boneTransform * vec4(vert.position, 1.0f);
+            projection * model * bone * vec4(vert.position, 1.0f);
     }
 
     glNamedBufferSubData(

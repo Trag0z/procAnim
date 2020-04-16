@@ -58,12 +58,14 @@ struct RiggedMesh {
 
     struct Bone {
         std::string name;
-        uint parent;
+        size_t parent;
         glm::mat4 inverse_transform;
         glm::mat4 rotation;
+
+        static constexpr size_t no_parent = UINT_MAX;
     };
     std::vector<Bone> bones;
 
-    uint find_bone_index(const char* name) const;
+    size_t find_bone_index(const char* name) const;
     static RiggedMesh load_from_file(const char* file);
 };

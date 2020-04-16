@@ -165,6 +165,23 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         b.parent = result.find_bone_index(node->mParent->mName.C_Str());
     }
 
+    // Sort array so parents are always before children
+    // NOTE: Does not take into account multiple children on the same bone
+    bool sorted = false;
+    while (!sorted) {
+        sorted = true;
+        for (size_t i = 0; i < result.bones.size(); ++i) {
+            auto& b = result.bones[i];
+            auto parent_index = b.parent;
+            if (parent_index == Bone::no_parent || parent_index < i)
+                continue;
+
+            b.parent = i;
+            std::swap(result.bones[i], result.bones[parent_index]);
+            sorted = false;
+        }
+    }
+
     // Assign bones and weights to vertices
     auto& vertices = result.vertices;
     size_t* vertex_bone_counts = new size_t[vertices.size()];
@@ -228,11 +245,11 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
     return result;
 }
 
-uint RiggedMesh::find_bone_index(const char* str) const {
+size_t RiggedMesh::find_bone_index(const char* str) const {
     for (uint i = 0; i < bones.size(); ++i) {
         if (bones[i].name.compare(str) == 0) {
             return i;
         }
     }
-    return UINT_MAX;
+    return Bone::no_parent;
 }
