@@ -1,2 +1,7 @@
 TODO:
 - add second layer of bones
+
+
+
+Optimizations:
+- save rotatio in bones as float

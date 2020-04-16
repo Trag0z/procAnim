@@ -1,6 +1,8 @@
 #pragma once
 #include "pch.h"
 #include "Mesh.h"
+#include <limits.h>
+#include <map>
 
 using namespace MeshDetail;
 
@@ -157,6 +159,14 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         result.bones.push_back(b);
     }
 
+	// Find bone partents
+	aiNode* root = scene->mRootNode;
+
+	for (auto& b : result.bones) {
+		aiNode* node = root->FindNode(b.name.c_str());
+		b.parent = result.find_bone_index(node->mParent->mName.C_Str());
+	}
+
     // Assign bones and weights to vertices
     auto& vertices = result.vertices;
     size_t* vertex_bone_counts = new size_t[vertices.size()];
@@ -220,12 +230,11 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
     return result;
 }
 
-uint RiggedMesh::get_bone_index(const char* str) const {
+uint RiggedMesh::find_bone_index(const char* str) const {
     for (uint i = 0; i < bones.size(); ++i) {
         if (bones[i].name.compare(str) == 0) {
             return i;
         }
     }
-    SDL_assert(false);
-    return (uint)0 - (uint)1;
+    return UINT_MAX;
 }

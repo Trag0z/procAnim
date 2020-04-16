@@ -124,10 +124,10 @@ inline void update_player(Player& player) {
     // Arm control
     constexpr float sensitivity = 0.4f;
     auto& mesh = player.rigged_mesh;
-    uint boneIndex = mesh.get_bone_index("B_Arm_L");
+    uint boneIndex = mesh.find_bone_index("B_Arm_L");
     mesh.bones[boneIndex].rotation = glm::rotate(
         mesh.bones[boneIndex].rotation,
-        degToRad(sensitivity *
+        degToRad(-sensitivity *
                  player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY]),
         glm::vec3(0.0f, 0.0f, 1.0f));
 }
@@ -140,7 +140,7 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
 
     const auto& rs = render_data.rigged_shader;
     glUseProgram(rs.id);
-    mat4 projection = ortho(0.0f, 1920.0f, 0.0f, 1080.0f,  -1.0f, 1.0f);
+    mat4 projection = ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
     // glUniformMatrix4fv(rs.projection_matrix_loc, 1, GL_FALSE,
     //                    value_ptr(projection));
 
@@ -175,8 +175,8 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
                           bones[1]->rotation * bones[1]->inverse_transform) *
                          vert.bone_weight[1];
 
-        rm.shader_vertices[i].pos = 
-         projection * model * boneTransform * vec4(vert.position, 1.0f);
+        rm.shader_vertices[i].pos =
+            projection * model * boneTransform * vec4(vert.position, 1.0f);
     }
 
     glNamedBufferSubData(
