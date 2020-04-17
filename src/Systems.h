@@ -122,7 +122,7 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
 
 inline void update_player(Player& player) {
     // Arm control
-    constexpr float sensitivity = 0.7f;
+    constexpr float sensitivity = 1.5f;
     auto& mesh = player.rigged_mesh;
 
     // Rotate upper arm
@@ -231,9 +231,16 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         glBindVertexArray(rm.bones_vao);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, render_data.wire_texture.id);
+        glBindTexture(GL_TEXTURE_2D, render_data.bone_texture.id);
 
-        glDrawElements(GL_LINES, static_cast<GLsizei>(rm.bones_shader_vertices.size()),
+        glLineWidth(2.0f);
+        glDrawElements(GL_LINES,
+                       static_cast<GLsizei>(rm.bones_shader_vertices.size()),
+                       GL_UNSIGNED_INT, 0);
+        glLineWidth(1.0f);
+
+        glDrawElements(GL_POINTS,
+                       static_cast<GLsizei>(rm.bones_shader_vertices.size()),
                        GL_UNSIGNED_INT, 0);
     }
 

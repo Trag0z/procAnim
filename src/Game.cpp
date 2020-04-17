@@ -67,6 +67,7 @@ void Game::init() {
     // glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPointSize(5.0f);
 
     if (DEBUG_MODE) {
         glEnable(GL_DEBUG_OUTPUT);
@@ -160,6 +161,7 @@ void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id) {
     rigged_shader.id = rigged_shader_id;
 
     wire_texture = Texture::load_from_file("../assets/red100x100.png");
+    bone_texture = Texture::load_from_file("../assets/blue100x100.png");
 
 #ifndef CPU_RENDERING
     rigged_shader.model_matrix_loc =

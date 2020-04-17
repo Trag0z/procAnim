@@ -84,7 +84,8 @@ void GLAPIENTRY handle_gl_debug_output(GLenum source, GLenum type, GLuint id,
     std::cout << std::endl;
     std::cout << std::endl;
 
-    SDL_assert(false);
+    SDL_assert(severity == GL_DEBUG_SEVERITY_LOW ||
+               severity == GL_DEBUG_SEVERITY_NOTIFICATION);
 };
 
 #pragma warning(pop)
