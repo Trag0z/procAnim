@@ -126,7 +126,7 @@ inline void update_player(Player& player) {
     auto& mesh = player.rigged_mesh;
 
     // Rotate upper arm
-    size_t bone_index = mesh.find_bone_index("B_Arm_L_1");
+    size_t bone_index = mesh.find_bone_index("Arm_L_1");
     SDL_assert(bone_index != RiggedMesh::Bone::INDEX_NOT_FOUND);
 
     mesh.bones[bone_index].rotation = glm::rotate(
@@ -136,7 +136,7 @@ inline void update_player(Player& player) {
         glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Rotate lower arm
-    bone_index = mesh.find_bone_index("B_Arm_L_2");
+    bone_index = mesh.find_bone_index("Arm_L_2");
     SDL_assert(bone_index != RiggedMesh::Bone::INDEX_NOT_FOUND);
 
     mesh.bones[bone_index].rotation = glm::rotate(
@@ -198,11 +198,23 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         rm.shader_vertices.data());
     glBindVertexArray(player.rigged_mesh.vao);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, player.tex.id);
+    if (render_data.draw_wireframes) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    glDrawElements(GL_TRIANGLES, player.rigged_mesh.num_indices,
-                   GL_UNSIGNED_INT, 0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, render_data.wire_texture.id);
+
+        glDrawElements(GL_TRIANGLES, player.rigged_mesh.num_indices,
+                       GL_UNSIGNED_INT, 0);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    } else {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, player.tex.id);
+
+        glDrawElements(GL_TRIANGLES, player.rigged_mesh.num_indices,
+                       GL_UNSIGNED_INT, 0);
+    }
 
     // Unbind vao for error safety
     glBindVertexArray(0);

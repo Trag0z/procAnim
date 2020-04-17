@@ -104,7 +104,9 @@ void Game::init() {
     // Player
     player.pos = {1920.0f / 2.0f, 1080.0f / 2.0f};
     player.tex = Texture::load_from_file("../assets/playerTexture.png");
+    // player.tex = Texture::load_from_file("../assets/red100x100.png");
     player.rigged_mesh = RiggedMesh::load_from_file("../assets/guy.fbx");
+    // player.rigged_mesh = RiggedMesh::load_from_file("../assets/guy.dae");
     player.gamepad_input = &gamepad_inputs[0];
 
     // Initialize other structs
@@ -118,6 +120,10 @@ bool Game::run() {
         frameStart = SDL_GetTicks();
 
         poll_inputs(mouse_keyboard_input, gamepad_inputs);
+
+        if (mouse_keyboard_input.key_down[SDL_SCANCODE_W]) {
+            render_data.draw_wireframes = !render_data.draw_wireframes;
+        }
 
         update_player(player);
 
@@ -145,6 +151,8 @@ void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id) {
     SDL_assert_always(simple_shader_id != -1 && rigged_shader_id != -1);
     simple_shader.id = simple_shader_id;
     rigged_shader.id = rigged_shader_id;
+
+    wire_texture = Texture::load_from_file("../assets/red100x100.png");
 
 #ifndef CPU_RENDERING
     rigged_shader.model_matrix_loc =

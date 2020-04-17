@@ -168,7 +168,7 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         aiNode* node = root->FindNode(b.name.c_str());
         b.parent = result.find_bone_index(node->mParent->mName.C_Str());
 
-        if (node->mChildren > 0) {
+        if (node->mNumChildren > 0) {
             auto& child_transform = node->mChildren[0]->mTransformation;
             b.length = glm::length(glm::vec3(
                 child_transform.a4, child_transform.b4, child_transform.c4));

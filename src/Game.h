@@ -62,6 +62,9 @@ struct RenderData {
         GLuint id, model_matrix_loc, projection_matrix_loc, bonesLoc;
     } rigged_shader;
 
+    bool draw_wireframes = false;
+    Texture wire_texture;
+
     void init(GLuint simple_shader_id, GLuint rigged_shader_id);
 };
 
@@ -73,20 +76,20 @@ struct Player {
 };
 
 struct Game {
-	bool running = false;
-	U32 frameStart;
+    bool running = false;
+    U32 frameStart;
 
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	SDL_GLContext gl_context;
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    SDL_GLContext gl_context;
 
-	GameConfig game_config;
-	RenderData render_data;
-	MouseKeyboardInput mouse_keyboard_input;
-	Player player;
+    GameConfig game_config;
+    RenderData render_data;
+    MouseKeyboardInput mouse_keyboard_input;
+    Player player;
 
-	std::array<GamepadInput, 4> gamepad_inputs;
+    std::array<GamepadInput, 4> gamepad_inputs;
 
-	void init();
-	bool run();
+    void init();
+    bool run();
 };
