@@ -6,8 +6,5 @@ TODO:
 
 - more polygons, nicer texture
 
-Bugs:
-- fbx messes up indices?
-
 Optimizations:
 - save rotation in bones as float
