@@ -196,7 +196,7 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
     glNamedBufferSubData(
         rm.vbo, 0, sizeof(RiggedMesh::ShaderVertex) * rm.shader_vertices.size(),
         rm.shader_vertices.data());
-    glBindVertexArray(player.rigged_mesh.vao);
+    glBindVertexArray(rm.vao);
 
     if (render_data.draw_wireframes) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -204,15 +204,36 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, render_data.wire_texture.id);
 
-        glDrawElements(GL_TRIANGLES, player.rigged_mesh.num_indices,
-                       GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, rm.num_indices, GL_UNSIGNED_INT, 0);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     } else {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, player.tex.id);
 
-        glDrawElements(GL_TRIANGLES, player.rigged_mesh.num_indices,
+        glDrawElements(GL_TRIANGLES, rm.num_indices, GL_UNSIGNED_INT, 0);
+    }
+
+    if (render_data.draw_bones) {
+        for (size_t i = 0; i < rm.bones.size(); ++i) {
+            rm.bones_shader_vertices[i * 2].pos = projection * model *
+                                                  bone_transforms[i] *
+                                                  vec4(rm.bones[i].head, 1.0f);
+            rm.bones_shader_vertices[i * 2 + 1].pos =
+                projection * model * bone_transforms[i] *
+                vec4(rm.bones[i].tail, 1.0f);
+        }
+
+        glNamedBufferSubData(rm.bones_vbo, 0,
+                             sizeof(RiggedMesh::ShaderVertex) *
+                                 rm.bones_shader_vertices.size(),
+                             rm.bones_shader_vertices.data());
+        glBindVertexArray(rm.bones_vao);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, render_data.wire_texture.id);
+
+        glDrawElements(GL_LINES, static_cast<GLsizei>(rm.bones_shader_vertices.size()),
                        GL_UNSIGNED_INT, 0);
     }
 

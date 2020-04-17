@@ -144,6 +144,7 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
 
     // Create bones and populate weight_data
     result.bones.reserve(mesh_data.mNumBones);
+    result.bones_shader_vertices.reserve(mesh_data.mNumBones * 2);
     for (uint i = 0; i < mesh_data.mNumBones; ++i) {
         RiggedMesh::Bone b;
         b.rotation = glm::mat4(1.0f);
@@ -159,9 +160,13 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         }
 
         result.bones.push_back(b);
+        result.bones_shader_vertices.push_back(
+            {glm::vec4(), glm::vec2(0.0f, 0.0f)});
+        result.bones_shader_vertices.push_back(
+            {glm::vec4(), glm::vec2(0.0f, 0.0f)});
     }
 
-    // Find bone parents
+    // Find bone parents, calculate length and head/tail positions
     aiNode* root = scene->mRootNode;
 
     for (auto& b : result.bones) {
@@ -170,8 +175,14 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
 
         if (node->mNumChildren > 0) {
             auto& child_transform = node->mChildren[0]->mTransformation;
-            b.length = glm::length(glm::vec3(
-                child_transform.a4, child_transform.b4, child_transform.c4));
+            glm::vec4 tail_local_space =
+                glm::vec4(child_transform.a4, child_transform.b4,
+                          child_transform.c4, 1.0f);
+
+            glm::mat4 bone_transform = inverse(b.inverse_transform);
+            b.head = bone_transform[3];
+            b.tail = bone_transform * tail_local_space;
+            b.length = glm::length(tail_local_space);
         }
     }
 
@@ -257,6 +268,39 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         reinterpret_cast<void*>(offsetof(Vertex, bone_weight)));
     glEnableVertexAttribArray(3);
 #endif
+
+    // Create and upload bone render data to GPU
+    size_t num_bone_indices = result.bones_shader_vertices.size();
+    uint* bone_indices = new uint[num_bone_indices];
+    for (size_t i = 0; i < num_bone_indices; ++i) {
+        bone_indices[i] = static_cast<uint>(i);
+    }
+
+    glGenVertexArrays(1, &result.bones_vao);
+    glBindVertexArray(result.bones_vao);
+
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * num_bone_indices,
+                 bone_indices, GL_STATIC_DRAW);
+    delete[] bone_indices;
+
+    glGenBuffers(1, &result.bones_vbo);
+
+    glBindBuffer(GL_ARRAY_BUFFER, result.bones_vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(ShaderVertex) * result.bones_shader_vertices.size(),
+                 NULL, GL_DYNAMIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+    // uvCoord attribute
+    glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
+        reinterpret_cast<void*>(offsetof(ShaderVertex, uv_coord)));
+    glEnableVertexAttribArray(1);
 
     // Reset vertex array binding for error safety
     glBindVertexArray(0);

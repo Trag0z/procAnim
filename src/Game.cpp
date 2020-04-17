@@ -121,8 +121,15 @@ bool Game::run() {
 
         poll_inputs(mouse_keyboard_input, gamepad_inputs);
 
-        if (mouse_keyboard_input.key_down[SDL_SCANCODE_W]) {
+        // Handle keyboard inputs
+        if (mouse_keyboard_input.key_down[SDL_SCANCODE_F1]) {
             render_data.draw_wireframes = !render_data.draw_wireframes;
+        }
+        if (mouse_keyboard_input.key_down[SDL_SCANCODE_F2]) {
+            render_data.draw_bones = !render_data.draw_bones;
+        }
+        if (mouse_keyboard_input.key_down[SDL_SCANCODE_ESCAPE]) {
+            running = false;
         }
 
         update_player(player);

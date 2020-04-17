@@ -62,6 +62,7 @@ struct RenderData {
         GLuint id, model_matrix_loc, projection_matrix_loc, bonesLoc;
     } rigged_shader;
 
+    bool draw_bones = false;
     bool draw_wireframes = false;
     Texture wire_texture;
 

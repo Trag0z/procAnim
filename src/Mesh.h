@@ -44,9 +44,10 @@ struct Mesh {
 };
 
 struct RiggedMesh {
-    GLuint vao;
-    GLuint vbo;
+    GLuint vao, vbo;
     GLuint num_indices;
+
+    GLuint bones_vao, bones_vbo;
 
     std::vector<Vertex> vertices;
 
@@ -55,12 +56,14 @@ struct RiggedMesh {
         glm::vec2 uv_coord;
     };
     std::vector<ShaderVertex> shader_vertices;
+    std::vector<ShaderVertex> bones_shader_vertices;
 
     struct Bone {
         std::string name;
         size_t parent;
         glm::mat4 inverse_transform;
         glm::mat4 rotation;
+        glm::vec3 head, tail;
         float length;
 
         static constexpr size_t INDEX_NOT_FOUND = UINT_MAX;
