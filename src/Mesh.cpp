@@ -137,7 +137,7 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
     std::vector<WeightData> weight_data;
 
     // TODO: Maybe remove later
-    auto convertMatrix = [](glm::mat4& out, aiMatrix4x4& in) {
+    auto convert_to_column_major = [](glm::mat4& out, aiMatrix4x4& in) {
         memcpy(&out, &in, sizeof(float) * 4 * 4);
         out = glm::transpose(out);
     };
@@ -147,10 +147,11 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
     for (uint i = 0; i < mesh_data.mNumBones; ++i) {
         RiggedMesh::Bone b;
         b.rotation = glm::mat4(1.0f);
-        aiBone& ai_bone = *mesh_data.mBones[i];
 
+        aiBone& ai_bone = *mesh_data.mBones[i];
         b.name = ai_bone.mName.C_Str();
-        convertMatrix(b.inverse_transform, ai_bone.mOffsetMatrix);
+        convert_to_column_major(b.inverse_transform, ai_bone.mOffsetMatrix);
+        b.length = 0.0f;
 
         for (uint j = 0; j < ai_bone.mNumWeights; ++j) {
             weight_data.push_back({ai_bone.mWeights[j].mVertexId, i,
@@ -166,6 +167,12 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
     for (auto& b : result.bones) {
         aiNode* node = root->FindNode(b.name.c_str());
         b.parent = result.find_bone_index(node->mParent->mName.C_Str());
+
+        if (node->mChildren > 0) {
+            auto& child_transform = node->mChildren[0]->mTransformation;
+            b.length = glm::length(glm::vec3(
+                child_transform.a4, child_transform.b4, child_transform.c4));
+        }
     }
 
     // Sort array so parents are always before children
@@ -178,7 +185,7 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         for (size_t i = 0; i < result.bones.size(); ++i) {
             auto& b = result.bones[i];
             auto parent_index = b.parent;
-            if (parent_index == Bone::no_parent || parent_index < i)
+            if (!b.has_parent() || parent_index < i)
                 continue;
 
             b.parent = i;
@@ -263,5 +270,5 @@ size_t RiggedMesh::find_bone_index(const char* str) const {
             return i;
         }
     }
-    return Bone::no_parent;
+    return Bone::INDEX_NOT_FOUND;
 }

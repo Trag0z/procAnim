@@ -127,7 +127,7 @@ inline void update_player(Player& player) {
 
     // Rotate upper arm
     size_t bone_index = mesh.find_bone_index("B_Arm_L_1");
-    SDL_assert(bone_index != RiggedMesh::Bone::no_parent);
+    SDL_assert(bone_index != RiggedMesh::Bone::INDEX_NOT_FOUND);
 
     mesh.bones[bone_index].rotation = glm::rotate(
         mesh.bones[bone_index].rotation,
@@ -137,7 +137,7 @@ inline void update_player(Player& player) {
 
     // Rotate lower arm
     bone_index = mesh.find_bone_index("B_Arm_L_2");
-    SDL_assert(bone_index != RiggedMesh::Bone::no_parent);
+    SDL_assert(bone_index != RiggedMesh::Bone::INDEX_NOT_FOUND);
 
     mesh.bones[bone_index].rotation = glm::rotate(
         mesh.bones[bone_index].rotation,
@@ -170,7 +170,7 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
     for (size_t i = 0; i < bone_count; ++i) {
         auto& b = rm.bones[i];
 
-        if (b.parent == RiggedMesh::Bone::no_parent) {
+        if (b.parent == RiggedMesh::Bone::INDEX_NOT_FOUND) {
             bone_transforms[i] =
                 inverse(b.inverse_transform) * b.rotation * b.inverse_transform;
         } else {

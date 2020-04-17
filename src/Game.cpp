@@ -104,7 +104,7 @@ void Game::init() {
     // Player
     player.pos = {1920.0f / 2.0f, 1080.0f / 2.0f};
     player.tex = Texture::load_from_file("../assets/playerTexture.png");
-    player.rigged_mesh = RiggedMesh::load_from_file("../assets/guy.dae");
+    player.rigged_mesh = RiggedMesh::load_from_file("../assets/guy.fbx");
     player.gamepad_input = &gamepad_inputs[0];
 
     // Initialize other structs

@@ -1,7 +1,11 @@
 TODO:
-- add second layer of bones
-- longer chains, multiple parents?
+- draw bones
+- collision detection
+- longer bone chains, multiple parents?
+- improve bone sorting
+
+- more polygons, nicer texture
 
 
 Optimizations:
-- save rotatio in bones as float
+- save rotation in bones as float

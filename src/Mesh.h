@@ -61,8 +61,10 @@ struct RiggedMesh {
         size_t parent;
         glm::mat4 inverse_transform;
         glm::mat4 rotation;
+        float length;
 
-        static constexpr size_t no_parent = UINT_MAX;
+        static constexpr size_t INDEX_NOT_FOUND = UINT_MAX;
+        inline bool has_parent() const { return parent != INDEX_NOT_FOUND; }
     };
     std::vector<Bone> bones;
 
