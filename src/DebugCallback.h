@@ -8,7 +8,8 @@ void GLAPIENTRY handle_gl_debug_output(GLenum source, GLenum type, GLuint id,
                                        const GLchar* message,
                                        const void* user_param) {
     // ignore non-significant error/warning codes
-    if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
+    if ( // id == 131169 || id == 131185 || id == 131218 || id == 131204 ||
+        id == 100)
         return;
 
     std::cout << "---------------" << std::endl;

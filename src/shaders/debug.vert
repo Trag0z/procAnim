@@ -1,11 +1,11 @@
 #version 330 core
 layout (location = 0) in vec4 pos; 
-layout (location = 1) in vec2 inUVCoord;
 
-out vec2 uvCoord;
+uniform vec4 color;
+out vec4 aColor;
 
 void main()
 {
+    aColor = color;
     gl_Position = pos;
-    uvCoord = inUVCoord;
 }

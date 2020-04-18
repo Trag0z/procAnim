@@ -1,10 +1,12 @@
 TODO:
-- draw bones
 - collision detection
 - longer bone chains, multiple parents?
 - improve bone sorting
+- integrate imgui, display information about bones when you click them
 
 - more polygons, nicer texture
+
+Bugs:
 
 Optimizations:
 - save rotation in bones as float

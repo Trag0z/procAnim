@@ -160,10 +160,8 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
         }
 
         result.bones.push_back(b);
-        result.bones_shader_vertices.push_back(
-            {glm::vec4(), glm::vec2(0.0f, 0.0f)});
-        result.bones_shader_vertices.push_back(
-            {glm::vec4(), glm::vec2(0.0f, 0.0f)});
+        result.bones_shader_vertices.push_back({glm::vec4()});
+        result.bones_shader_vertices.push_back({glm::vec4()});
     }
 
     // Find bone parents, calculate length and head/tail positions
@@ -289,18 +287,14 @@ RiggedMesh RiggedMesh::load_from_file(const char* file) {
 
     glBindBuffer(GL_ARRAY_BUFFER, result.bones_vbo);
     glBufferData(GL_ARRAY_BUFFER,
-                 sizeof(ShaderVertex) * result.bones_shader_vertices.size(),
+                 sizeof(DebugShaderVertex) *
+                     result.bones_shader_vertices.size(),
                  NULL, GL_DYNAMIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebugShaderVertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
-    // uvCoord attribute
-    glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
-        reinterpret_cast<void*>(offsetof(ShaderVertex, uv_coord)));
-    glEnableVertexAttribArray(1);
 
     // Reset vertex array binding for error safety
     glBindVertexArray(0);

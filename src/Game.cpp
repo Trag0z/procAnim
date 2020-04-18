@@ -80,16 +80,12 @@ void Game::init() {
     // Initialize members
     GLuint simple_shader_id = loadAndCompileShaderFromFile(
         "../src/shaders/simple.vert", "../src/shaders/simple.frag");
-    GLuint rigged_shader_id =
-#ifdef CPU_RENDERING
-        loadAndCompileShaderFromFile("../src/shaders/debug.vert",
-                                     "../src/shaders/rigged.frag");
-#else
-        loadAndCompileShaderFromFile("../src/shaders/rigged.vert",
-                                     "../src/shaders/rigged.frag");
-#endif
+    GLuint rigged_shader_id = loadAndCompileShaderFromFile(
+        "../src/shaders/rigged.vert", "../src/shaders/rigged.frag");
+    GLuint debug_shader_id = loadAndCompileShaderFromFile(
+        "../src/shaders/debug.vert", "../src/shaders/debug.frag");
 
-    render_data.init(simple_shader_id, rigged_shader_id);
+    render_data.init(simple_shader_id, rigged_shader_id, debug_shader_id);
 
     mouse_keyboard_input.init();
 
@@ -155,10 +151,14 @@ bool Game::run() {
     return 0;
 };
 
-void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id) {
+void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
+                      GLuint debug_shader_id) {
     SDL_assert_always(simple_shader_id != -1 && rigged_shader_id != -1);
     simple_shader.id = simple_shader_id;
     rigged_shader.id = rigged_shader_id;
+    debug_shader.id = debug_shader_id;
+
+    debug_shader.color_loc = glGetUniformLocation(debug_shader_id, "color");
 
     wire_texture = Texture::load_from_file("../assets/red100x100.png");
     bone_texture = Texture::load_from_file("../assets/blue100x100.png");

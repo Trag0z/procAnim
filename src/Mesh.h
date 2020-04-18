@@ -56,7 +56,11 @@ struct RiggedMesh {
         glm::vec2 uv_coord;
     };
     std::vector<ShaderVertex> shader_vertices;
-    std::vector<ShaderVertex> bones_shader_vertices;
+
+    struct DebugShaderVertex {
+        glm::vec4 pos;
+    };
+    std::vector<DebugShaderVertex> bones_shader_vertices;
 
     struct Bone {
         std::string name;

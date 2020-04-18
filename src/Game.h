@@ -59,14 +59,19 @@ struct RenderData {
     } simple_shader;
 
     struct {
-        GLuint id, model_matrix_loc, projection_matrix_loc, bonesLoc;
+        GLuint id, model_matrix_loc, projection_matrix_loc, bones_loc;
     } rigged_shader;
+
+    struct {
+        GLuint id, color_loc;
+    } debug_shader;
 
     bool draw_bones = false;
     bool draw_wireframes = false;
     Texture wire_texture, bone_texture;
 
-    void init(GLuint simple_shader_id, GLuint rigged_shader_id);
+    void init(GLuint simple_shader_id, GLuint rigged_shader_id,
+              GLuint debug_shader_id);
 };
 
 struct Player {

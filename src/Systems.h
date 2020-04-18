@@ -152,8 +152,6 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
 
     using namespace glm;
 
-    const auto& rs = render_data.rigged_shader;
-    glUseProgram(rs.id);
     mat4 projection = ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
 
     // Translate first to multiply translation from the left to the scaled model
@@ -199,15 +197,16 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
     glBindVertexArray(rm.vao);
 
     if (render_data.draw_wireframes) {
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 0.1f, 0.1f, 1.0f, 1.0f);
+
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, render_data.wire_texture.id);
-
         glDrawElements(GL_TRIANGLES, rm.num_indices, GL_UNSIGNED_INT, 0);
-
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     } else {
+        glUseProgram(render_data.rigged_shader.id);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, player.tex.id);
 
@@ -225,13 +224,13 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         }
 
         glNamedBufferSubData(rm.bones_vbo, 0,
-                             sizeof(RiggedMesh::ShaderVertex) *
+                             sizeof(RiggedMesh::DebugShaderVertex) *
                                  rm.bones_shader_vertices.size(),
                              rm.bones_shader_vertices.data());
         glBindVertexArray(rm.bones_vao);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, render_data.bone_texture.id);
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 0.0f, 1.0f);
 
         glLineWidth(2.0f);
         glDrawElements(GL_LINES,
