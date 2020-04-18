@@ -1,6 +1,9 @@
 #pragma once
 #include "pch.h"
 #include "Mesh.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 inline void poll_inputs(MouseKeyboardInput& mkb,
                         std::array<GamepadInput, 4>& pads) {
@@ -146,6 +149,20 @@ inline void update_player(Player& player) {
         glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
+inline void update_gui(SDL_Window* window, RenderData& render_data) {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame(window);
+    ImGui::NewFrame();
+
+    ImGui::Begin("Debug control", NULL,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Checkbox("Render model", &render_data.draw_models);
+    ImGui::Checkbox("Render wireframes", &render_data.draw_wireframes);
+    ImGui::Checkbox("Render bones", &render_data.draw_bones);
+
+    ImGui::End();
+}
+
 inline void render(SDL_Window* window, RenderData render_data, Player& player) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -196,6 +213,15 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         rm.shader_vertices.data());
     glBindVertexArray(rm.vao);
 
+    if (render_data.draw_models) {
+        glUseProgram(render_data.rigged_shader.id);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, player.tex.id);
+
+        glDrawElements(GL_TRIANGLES, rm.num_indices, GL_UNSIGNED_INT, 0);
+    }
+
     if (render_data.draw_wireframes) {
         glUseProgram(render_data.debug_shader.id);
         glUniform4f(render_data.debug_shader.color_loc, 0.1f, 0.1f, 1.0f, 1.0f);
@@ -203,14 +229,6 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLES, rm.num_indices, GL_UNSIGNED_INT, 0);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    } else {
-        glUseProgram(render_data.rigged_shader.id);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, player.tex.id);
-
-        glDrawElements(GL_TRIANGLES, rm.num_indices, GL_UNSIGNED_INT, 0);
     }
 
     if (render_data.draw_bones) {
@@ -245,6 +263,9 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
 
     // Unbind vao for error safety
     glBindVertexArray(0);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     SDL_GL_SwapWindow(window);
 };

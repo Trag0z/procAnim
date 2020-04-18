@@ -66,9 +66,9 @@ struct RenderData {
         GLuint id, color_loc;
     } debug_shader;
 
+    bool draw_models = true;
     bool draw_bones = false;
     bool draw_wireframes = false;
-    Texture wire_texture, bone_texture;
 
     void init(GLuint simple_shader_id, GLuint rigged_shader_id,
               GLuint debug_shader_id);

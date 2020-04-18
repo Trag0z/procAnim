@@ -31,7 +31,6 @@
 // #define SDL_MAIN_HANDLED
 // #include <ctype.h>
 // #include <float.h>
-// #include <limits.h>
 // #include <locale.h>
 // #include <malloc.h>
 // #include <math.h>

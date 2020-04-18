@@ -4,6 +4,9 @@
 #include "DebugCallback.h"
 #include "Systems.h"
 #include "Shaders.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 U32 GamepadInput::num_gamepads = 0;
 
@@ -35,6 +38,7 @@ void Game::init() {
     }
 
     // Use OpenGL 3.3 core
+    const char* glsl_version = "#version 330 core";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
@@ -43,7 +47,7 @@ void Game::init() {
     if (DEBUG_MODE)
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
-    // Create context
+    // Create openGL context
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context == NULL) {
         printf("OpenGL context could not be created! SDL Error: %s\n",
@@ -57,12 +61,10 @@ void Game::init() {
         printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
     }
 
-    // Use Vsync
+    // OpenGL configuration
     if (SDL_GL_SetSwapInterval(1) < 0) {
         printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
     }
-
-    // OpenGL configuration
     glViewport(0, 0, game_config.window_size.x, game_config.window_size.y);
     // glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
@@ -77,7 +79,15 @@ void Game::init() {
                               nullptr, GL_TRUE);
     }
 
-    // Initialize members
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+    // Initialize member variables
     GLuint simple_shader_id = loadAndCompileShaderFromFile(
         "../src/shaders/simple.vert", "../src/shaders/simple.frag");
     GLuint rigged_shader_id = loadAndCompileShaderFromFile(
@@ -116,6 +126,17 @@ bool Game::run() {
     while (running) {
         frameStart = SDL_GetTicks();
 
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT)
+                running = false;
+            if (event.type == SDL_WINDOWEVENT &&
+                event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                event.window.windowID == SDL_GetWindowID(window))
+                running = false;
+        }
+
         poll_inputs(mouse_keyboard_input, gamepad_inputs);
 
         // Handle keyboard inputs
@@ -130,6 +151,8 @@ bool Game::run() {
         }
 
         update_player(player);
+
+        update_gui(window, render_data);
 
         render(window, render_data, player);
 
@@ -159,9 +182,6 @@ void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
     debug_shader.id = debug_shader_id;
 
     debug_shader.color_loc = glGetUniformLocation(debug_shader_id, "color");
-
-    wire_texture = Texture::load_from_file("../assets/red100x100.png");
-    bone_texture = Texture::load_from_file("../assets/blue100x100.png");
 
 #ifndef CPU_RENDERING
     rigged_shader.model_matrix_loc =
