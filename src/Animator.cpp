@@ -25,14 +25,14 @@ void LimbAnimator::update() {
 
     target_pos_bone_sapce[0] =
         bones[0]->inverse_bind_pose_transform * target_pos;
-    target_pos_bone_sapce[1] = bones[0]->bind_pose_transform *
-                               glm::rotate(glm::mat4(1.0f), bones[0]->rotation,
-                                           glm::vec3(0.0f, 0.0f, 1.0f)) *
-                               bones[0]->inverse_bind_pose_transform *
-                               bones[1]->inverse_bind_pose_transform *
-                               target_pos;
 
-    ;
+    glm::mat4 parent_transform =
+        bones[0]->bind_pose_transform *
+        glm::rotate(glm::mat4(1.0f), bones[0]->rotation,
+                    glm::vec3(0.0f, 0.0f, 1.0f)) *
+        bones[0]->inverse_bind_pose_transform;
+    target_pos_bone_sapce[1] = bones[1]->inverse_bind_pose_transform *
+                               glm::inverse(parent_transform) * target_pos;
 
     float target_distance = glm::length(target_pos_bone_sapce[0]);
     float target_rotation[2];
@@ -62,9 +62,9 @@ void LimbAnimator::update() {
         target_rotation[1] = 180.0f - acosf(cosAngle1);
     }
 
-    bones[0]->rotation = target_rotation[0];
-    // lerp(bones[0]->rotation, target_rotation[0], animation_speed);
+    bones[0]->rotation =
+        lerp(bones[0]->rotation, target_rotation[0], animation_speed);
 
-    bones[1]->rotation = target_rotation[1];
-    // lerp(bones[1]->rotation, target_rotation[1], animation_speed);
+    bones[1]->rotation =
+        lerp(bones[1]->rotation, target_rotation[1], animation_speed);
 }
