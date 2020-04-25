@@ -126,7 +126,9 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
 inline void update_player(Player& player, const MouseKeyboardInput& mkb,
                           const RenderData& render_data) {
     if (mkb.mouse_button_down(1)) {
-        player.rigged_mesh.animators[1].target_world_pos = glm::vec4(
+        player.rigged_mesh.animators[1].target_pos_model_space =
+            inverse(player.model) *
+            glm::vec4(
                 static_cast<float>(mkb.mouse_pos.x),
                 static_cast<float>(render_data.window_size.y - mkb.mouse_pos.y),
                 0.0f, 1.0f);
@@ -184,10 +186,11 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
 
     // Render animator target positions
     for (auto& a : rm.animators) {
-        if (a.target_world_pos.w == 0.0f)
+        if (a.target_pos_model_space.w == 0.0f)
             continue;
 
-        vec4 render_pos = render_data.projection * a.target_world_pos;
+        vec4 render_pos =
+            render_data.projection * player.model * a.target_pos_model_space;
 
         a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
                                         &render_pos)); // ugly, but it works

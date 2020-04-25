@@ -8,21 +8,22 @@ using namespace MeshDetail;
 const float LimbAnimator::animation_speed = 0.1f;
 
 void LimbAnimator::update() {
-    float target_distance =
-        glm::length(target_world_pos - bone1->bone_transform * bone1->head);
+    float target_distance = glm::length(target_pos_model_space -
+                                        bone1->bone_transform * bone1->head);
     float target_rotation[2];
 
     glm::vec3 target_local_pos[2];
 
     // Return if no position was set
-    if (target_world_pos.w == 0.0f) {
+    if (target_pos_model_space.w == 0.0f) {
         return;
     }
 
     target_local_pos[0] = glm::vec3(
         bone1->bone_transform *
-        target_world_pos); // NOTE: This only transforms to model space!
-    target_local_pos[1] = glm::vec3(bone2->bone_transform * target_world_pos);
+        target_pos_model_space); // NOTE: This only transforms to model space!
+    target_local_pos[1] =
+        glm::vec3(bone2->bone_transform * target_pos_model_space);
 
     if (target_distance > bone1->length + bone2->length) {
         // Target out of reach

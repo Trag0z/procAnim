@@ -147,16 +147,16 @@ struct LimbAnimator {
     Bone* bone1;
     Bone* bone2;
 
-    glm::vec4 target_world_pos;
+    glm::vec4 target_pos_model_space;
 
     VertexArrayData<DebugShaderVertex> vao;
 
     const static float animation_speed;
 
     LimbAnimator(Bone* b1, Bone* b2) : bone1(b1), bone2(b2) {
-        target_world_pos = glm::vec4{0.0f, 0.0f, 0.0f, 0.0f};
+        target_pos_model_space = glm::vec4{0.0f, 0.0f, 0.0f, 0.0f};
 
-        // Init render data for rendering target_world_pos as a point
+        // Init render data for rendering target_pos_model_space as a point
         GLuint index = 0;
 
         vao.init(&index, 1, NULL, 1);
