@@ -5,7 +5,7 @@
 
 struct Bone {
     std::string name;
-    size_t parent;
+    const Bone* parent;
     glm::mat4 bind_pose_transform;
     glm::mat4 inverse_bind_pose_transform;
     // Position in local space
@@ -15,7 +15,7 @@ struct Bone {
     float length;
 
     static constexpr size_t INDEX_NOT_FOUND = UINT_MAX;
-    inline bool has_parent() const { return parent != INDEX_NOT_FOUND; }
+    glm::mat4 get_transform() const;
 };
 
 struct RiggedMesh {
@@ -31,6 +31,6 @@ struct RiggedMesh {
 
     std::vector<LimbAnimator> animators;
 
-    size_t find_bone_index(const char* name) const;
+    Bone* find_bone(const char* name);
     void load_from_file(const char* file);
 };

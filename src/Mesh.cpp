@@ -3,6 +3,20 @@
 #include "Mesh.h"
 #include "Util.h"
 
+glm::mat4 Bone::get_transform() const {
+    // Recurse until there's no parent
+    if (parent) {
+        return parent->get_transform() * bind_pose_transform *
+               glm::rotate(glm::mat4(1.0f), rotation,
+                           glm::vec3(0.0f, 0.0f, 1.0f)) *
+               inverse_bind_pose_transform;
+    }
+
+    return bind_pose_transform *
+           glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f)) *
+           inverse_bind_pose_transform;
+}
+
 void RiggedMesh::load_from_file(const char* file) {
     // Load data from file
     Assimp::Importer importer;
@@ -87,7 +101,7 @@ void RiggedMesh::load_from_file(const char* file) {
 
     for (auto& b : bones) {
         aiNode* node = root->FindNode(b.name.c_str());
-        b.parent = find_bone_index(node->mParent->mName.C_Str());
+        b.parent = find_bone(node->mParent->mName.C_Str());
 
         if (node->mNumChildren > 0) {
             auto& child_transform = node->mChildren[0]->mTransformation;
@@ -103,26 +117,26 @@ void RiggedMesh::load_from_file(const char* file) {
     // NOTE: Does not take into account multiple children on the same bone,
     // wrong if there are longer chains of inheritence
     // TODO: clean this up, probably change the whole function
-    bool sorted = false;
-    while (!sorted) {
-        sorted = true;
-        for (size_t i = 0; i < bones.size(); ++i) {
-            auto& b = bones[i];
-            auto parent_index = b.parent;
-            if (!b.has_parent() || parent_index < i)
-                continue;
+    // bool sorted = false;
+    // while (!sorted) {
+    //     sorted = true;
+    //     for (size_t i = 0; i < bones.size(); ++i) {
+    //         auto& b = bones[i];
+    //         auto parent_index = b.parent;
+    //         if (!b.has_parent() || parent_index < i)
+    //             continue;
 
-            b.parent = i;
-            std::swap(bones[i], bones[parent_index]);
-            for (auto& w : weight_data) {
-                if (w.bone_index == parent_index)
-                    w.bone_index = i;
-                else if (w.bone_index == i)
-                    w.bone_index = parent_index;
-            }
-            sorted = false;
-        }
-    }
+    //         b.parent = i;
+    //         std::swap(bones[i], bones[parent_index]);
+    //         for (auto& w : weight_data) {
+    //             if (w.bone_index == parent_index)
+    //                 w.bone_index = i;
+    //             else if (w.bone_index == i)
+    //                 w.bone_index = parent_index;
+    //         }
+    //         sorted = false;
+    //     }
+    // }
 
     // Assign bones and weights to vertices
     size_t* vertex_bone_counts = new size_t[vertices.size()];
@@ -142,14 +156,10 @@ void RiggedMesh::load_from_file(const char* file) {
 
     // Init LimbAnimators
     animators.reserve(4);
-    animators.push_back({&bones[find_bone_index("Arm_L_1")],
-                         &bones[find_bone_index("Arm_L_2")]});
-    animators.push_back({&bones[find_bone_index("Arm_R_1")],
-                         &bones[find_bone_index("Arm_R_2")]});
-    animators.push_back({&bones[find_bone_index("Leg_L_1")],
-                         &bones[find_bone_index("Leg_L_2")]});
-    animators.push_back({&bones[find_bone_index("Leg_R_1")],
-                         &bones[find_bone_index("Leg_R_2")]});
+    animators.push_back({find_bone("Arm_L_1"), find_bone("Arm_L_2")});
+    animators.push_back({find_bone("Arm_R_1"), find_bone("Arm_R_2")});
+    animators.push_back({find_bone("Leg_L_1"), find_bone("Leg_L_2")});
+    animators.push_back({find_bone("Leg_R_1"), find_bone("Leg_R_2")});
 
     vao.init(indices.data(), static_cast<GLuint>(indices.size()), NULL,
              static_cast<GLuint>(vertices.size()));
@@ -178,11 +188,11 @@ void RiggedMesh::load_from_file(const char* file) {
                    static_cast<GLuint>(bones_shader_vertices.size()));
 }
 
-size_t RiggedMesh::find_bone_index(const char* str) const {
+Bone* RiggedMesh::find_bone(const char* str) {
     for (uint i = 0; i < bones.size(); ++i) {
         if (bones[i].name.compare(str) == 0) {
-            return i;
+            return &bones[i];
         }
     }
-    return Bone::INDEX_NOT_FOUND;
+    return nullptr;
 }

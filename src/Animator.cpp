@@ -23,16 +23,13 @@ void LimbAnimator::update() {
         return;
     }
 
+    // NOTE: Assumes that bone[0] has no rotating parents
     target_pos_bone_sapce[0] =
         bones[0]->inverse_bind_pose_transform * target_pos;
 
-    glm::mat4 parent_transform =
-        bones[0]->bind_pose_transform *
-        glm::rotate(glm::mat4(1.0f), bones[0]->rotation,
-                    glm::vec3(0.0f, 0.0f, 1.0f)) *
-        bones[0]->inverse_bind_pose_transform;
     target_pos_bone_sapce[1] = bones[1]->inverse_bind_pose_transform *
-                               glm::inverse(parent_transform) * target_pos;
+                               glm::inverse(bones[1]->parent->get_transform()) *
+                               target_pos;
 
     float target_distance = glm::length(target_pos_bone_sapce[0]);
     float target_rotation[2];

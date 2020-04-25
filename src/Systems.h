@@ -143,18 +143,18 @@ inline void update_player(Player& player, const MouseKeyboardInput& mkb,
     auto& mesh = player.rigged_mesh;
 
     // Rotate upper arm
-    size_t bone_index = mesh.find_bone_index("Arm_L_1");
-    SDL_assert(bone_index != Bone::INDEX_NOT_FOUND);
+    Bone* bone = mesh.find_bone("Arm_L_1");
+    SDL_assert(bone);
 
-    mesh.bones[bone_index].rotation = mesh.bones[bone_index].rotation,
-    -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY];
+    bone->rotation +=
+        -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY];
 
     // Rotate lower arm
-    bone_index = mesh.find_bone_index("Arm_L_2");
-    SDL_assert(bone_index != Bone::INDEX_NOT_FOUND);
+    bone = mesh.find_bone("Arm_L_2");
+    SDL_assert(bone);
 
-    mesh.bones[bone_index].rotation = mesh.bones[bone_index].rotation,
-    -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_RIGHTY];
+    bone->rotation +=
+        -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_RIGHTY];
 }
 
 inline void update_gui(SDL_Window* window, RenderData& render_data) {
@@ -227,15 +227,7 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         mat4 rotation_matrix =
             rotate(mat4(1.0f), b.rotation, vec3(0.0f, 0.0f, 1.0f));
 
-        if (b.parent == Bone::INDEX_NOT_FOUND) {
-            bone_transforms[i] = b.bind_pose_transform * rotation_matrix *
-                                 b.inverse_bind_pose_transform;
-        } else {
-            // What if the parent has a parent?
-            bone_transforms[i] = bone_transforms[b.parent] *
-                                 b.bind_pose_transform * rotation_matrix *
-                                 b.inverse_bind_pose_transform;
-        }
+        bone_transforms[i] = b.get_transform();
     }
 
     // Calculate vertex posistions for rendering
