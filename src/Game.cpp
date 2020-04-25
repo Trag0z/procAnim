@@ -20,8 +20,8 @@ void Game::init() {
     printf("SDL initialized\n");
 
     window = SDL_CreateWindow(
-        "procAnim", SDL_WINDOWPOS_CENTERED, 0, game_config.window_size.x,
-        game_config.window_size.y, game_config.window_flags);
+        "procAnim", SDL_WINDOWPOS_CENTERED, 0, render_data.window_size.x,
+        render_data.window_size.y, game_config.window_flags);
     SDL_assert_always(window);
     printf("Window created\n");
 
@@ -65,7 +65,7 @@ void Game::init() {
     if (SDL_GL_SetSwapInterval(1) < 0) {
         printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
     }
-    glViewport(0, 0, game_config.window_size.x, game_config.window_size.y);
+    glViewport(0, 0, render_data.window_size.x, render_data.window_size.y);
     // glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -112,12 +112,9 @@ void Game::init() {
     player.pos = {1920.0f / 2.0f, 1080.0f / 2.0f};
     player.tex = Texture::load_from_file("../assets/playerTexture.png");
     // player.tex = Texture::load_from_file("../assets/red100x100.png");
-    player.rigged_mesh = RiggedMesh::load_from_file("../assets/guy.fbx");
+    player.rigged_mesh.load_from_file("../assets/guy.fbx");
     // player.rigged_mesh = RiggedMesh::load_from_file("../assets/guy.dae");
     player.gamepad_input = &gamepad_inputs[0];
-
-    // Initialize other structs
-    Mesh::init();
 
     running = true;
 };
@@ -150,7 +147,7 @@ bool Game::run() {
             running = false;
         }
 
-        update_player(player);
+        update_player(player, mouse_keyboard_input, render_data);
 
         update_gui(window, render_data);
 

@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Util.h"
 #include "Mesh.h"
+#include "Animator.h"
 
 //      Member structs      //
 
@@ -12,8 +13,6 @@ struct GameConfig {
     const U32 frame_delay = 1000 / fps;
     const U32 window_flags =
         SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
-
-    glm::ivec2 window_size = {1920, 1080};
 };
 
 struct GamepadInput {
@@ -51,9 +50,15 @@ struct MouseKeyboardInput {
         key_down = key + num_keys;
         key_up = key_down + num_keys;
     };
+
+    bool mouse_button_down(uint button) const {
+        return mouse_button_down_map & button;
+    };
 };
 
 struct RenderData {
+    glm::ivec2 window_size = {1920, 1080};
+
     struct {
         GLuint id, model_matrix_loc, projection_matrix_loc;
     } simple_shader;
@@ -70,6 +75,9 @@ struct RenderData {
     bool draw_bones = false;
     bool draw_wireframes = false;
 
+    glm::mat4 projection =
+        glm::ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
+
     void init(GLuint simple_shader_id, GLuint rigged_shader_id,
               GLuint debug_shader_id);
 };
@@ -79,6 +87,8 @@ struct Player {
     Texture tex;
     RiggedMesh rigged_mesh;
     GamepadInput* gamepad_input;
+
+    glm::mat4 model;
 };
 
 struct Game {

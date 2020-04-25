@@ -1,4 +1,5 @@
 TODO:
+- IK
 - collision detection
 - longer bone chains, multiple parents?
 - improve bone sorting

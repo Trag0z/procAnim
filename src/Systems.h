@@ -123,30 +123,38 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
     }
 }
 
-inline void update_player(Player& player) {
+inline void update_player(Player& player, const MouseKeyboardInput& mkb,
+                          const RenderData& render_data) {
+    if (mkb.mouse_button_down(1)) {
+        player.rigged_mesh.animators[1].target_world_pos =
+            inverse(player.model) * inverse(render_data.projection) *
+            glm::vec4(
+                static_cast<float>(mkb.mouse_pos.x),
+                static_cast<float>(render_data.window_size.y - mkb.mouse_pos.y),
+                0.0f, 1.0f);
+    }
+
+    for (auto& anim : player.rigged_mesh.animators) {
+        anim.update();
+    }
+
     // Arm control
-    constexpr float sensitivity = 1.5f;
+    constexpr float sensitivity = 0.2f;
     auto& mesh = player.rigged_mesh;
 
     // Rotate upper arm
     size_t bone_index = mesh.find_bone_index("Arm_L_1");
-    SDL_assert(bone_index != RiggedMesh::Bone::INDEX_NOT_FOUND);
+    SDL_assert(bone_index != Bone::INDEX_NOT_FOUND);
 
-    mesh.bones[bone_index].rotation = glm::rotate(
-        mesh.bones[bone_index].rotation,
-        degToRad(-sensitivity *
-                 player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY]),
-        glm::vec3(0.0f, 0.0f, 1.0f));
+    mesh.bones[bone_index].rotation = mesh.bones[bone_index].rotation,
+    -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY];
 
     // Rotate lower arm
     bone_index = mesh.find_bone_index("Arm_L_2");
-    SDL_assert(bone_index != RiggedMesh::Bone::INDEX_NOT_FOUND);
+    SDL_assert(bone_index != Bone::INDEX_NOT_FOUND);
 
-    mesh.bones[bone_index].rotation = glm::rotate(
-        mesh.bones[bone_index].rotation,
-        degToRad(-sensitivity *
-                 player.gamepad_input->axis[SDL_CONTROLLER_AXIS_RIGHTY]),
-        glm::vec3(0.0f, 0.0f, 1.0f));
+    mesh.bones[bone_index].rotation = mesh.bones[bone_index].rotation,
+    -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_RIGHTY];
 }
 
 inline void update_gui(SDL_Window* window, RenderData& render_data) {
@@ -156,7 +164,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data) {
 
     ImGui::Begin("Debug control", NULL,
                  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-    ImGui::Checkbox("Render model", &render_data.draw_models);
+    ImGui::Checkbox("Render player.model", &render_data.draw_models);
     ImGui::Checkbox("Render wireframes", &render_data.draw_wireframes);
     ImGui::Checkbox("Render bones", &render_data.draw_bones);
 
@@ -169,30 +177,48 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
 
     using namespace glm;
 
-    mat4 projection = ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
-
-    // Translate first to multiply translation from the left to the scaled model
-    // This resolves to model * translation * scale
-    mat4 model(1.0f);
-    model = translate(model, vec3(player.pos, 0.0f));
-    model = scale(model, vec3(100.0f, 100.0f, 1.0f));
+    // Translate first to multiply translation from the left to the scaled
+    // player.model This resolves to model * translation * scale
+    player.model = translate(mat4(1.0f), vec3(player.pos, 0.0f));
+    player.model = scale(player.model, vec3(100.0f, 100.0f, 1.0f));
 
     RiggedMesh& rm = player.rigged_mesh;
+
+    // Render animator target positions
+    for (auto& a : rm.animators) {
+        if (a.target_world_pos.w == 0.0f)
+            continue;
+
+        vec4 render_pos = render_data.projection * a.target_world_pos;
+
+        a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
+                                        &render_pos)); // ugly, but it works
+        a.vao.bind();
+
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
+
+        a.vao.draw(GL_POINTS);
+    }
 
     // Calculate bone transforms from their rotations
     size_t bone_count = rm.bones.size();
     mat4* bone_transforms = new mat4[bone_count];
     for (size_t i = 0; i < bone_count; ++i) {
         auto& b = rm.bones[i];
+        mat4 rotation_matrix =
+            glm::rotate(glm::mat4(1.0f), b.rotation, vec3(0.0f, 0.0f, 1.0f));
 
-        if (b.parent == RiggedMesh::Bone::INDEX_NOT_FOUND) {
-            bone_transforms[i] =
-                inverse(b.inverse_transform) * b.rotation * b.inverse_transform;
+        if (b.parent == Bone::INDEX_NOT_FOUND) {
+            bone_transforms[i] = inverse(b.inverse_bind_pose_transform) *
+                                 rotation_matrix *
+                                 b.inverse_bind_pose_transform;
         } else {
             // What if the parent has a parent?
             bone_transforms[i] = bone_transforms[b.parent] *
-                                 inverse(b.inverse_transform) * b.rotation *
-                                 b.inverse_transform;
+                                 inverse(b.inverse_bind_pose_transform) *
+                                 rotation_matrix *
+                                 b.inverse_bind_pose_transform;
         }
     }
 
@@ -204,14 +230,12 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         mat4 bone = bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
                     bone_transforms[vert.bone_index[1]] * vert.bone_weight[1];
 
-        rm.shader_vertices[i].pos =
-            projection * model * bone * vec4(vert.position, 1.0f);
+        rm.shader_vertices[i].pos = render_data.projection * player.model *
+                                    bone * vec4(vert.position, 1.0f);
     }
 
-    glNamedBufferSubData(
-        rm.vbo, 0, sizeof(RiggedMesh::ShaderVertex) * rm.shader_vertices.size(),
-        rm.shader_vertices.data());
-    glBindVertexArray(rm.vao);
+    rm.vao.update_vertex_data(rm.shader_vertices);
+    rm.vao.bind();
 
     if (render_data.draw_models) {
         glUseProgram(render_data.rigged_shader.id);
@@ -219,46 +243,42 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, player.tex.id);
 
-        glDrawElements(GL_TRIANGLES, rm.num_indices, GL_UNSIGNED_INT, 0);
+        rm.vao.draw(GL_TRIANGLES);
     }
 
     if (render_data.draw_wireframes) {
         glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 0.1f, 0.1f, 1.0f, 1.0f);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 0.0f, 1.0f,
+                    1.0f); // red
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glDrawElements(GL_TRIANGLES, rm.num_indices, GL_UNSIGNED_INT, 0);
+        rm.vao.draw(GL_TRIANGLES);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     if (render_data.draw_bones) {
         for (size_t i = 0; i < rm.bones.size(); ++i) {
-            rm.bones_shader_vertices[i * 2].pos = projection * model *
-                                                  bone_transforms[i] *
-                                                  vec4(rm.bones[i].head, 1.0f);
+            rm.bones_shader_vertices[i * 2].pos =
+                render_data.projection * player.model * bone_transforms[i] *
+                rm.bones[i].head,
+                                         1.0f;
             rm.bones_shader_vertices[i * 2 + 1].pos =
-                projection * model * bone_transforms[i] *
-                vec4(rm.bones[i].tail, 1.0f);
+                render_data.projection * player.model * bone_transforms[i] *
+                rm.bones[i].tail;
         }
 
-        glNamedBufferSubData(rm.bones_vbo, 0,
-                             sizeof(RiggedMesh::DebugShaderVertex) *
-                                 rm.bones_shader_vertices.size(),
-                             rm.bones_shader_vertices.data());
-        glBindVertexArray(rm.bones_vao);
+        rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
+        rm.bones_vao.bind();
 
         glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 0.0f, 1.0f);
+        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 0.0f,
+                    1.0f); // blue
 
         glLineWidth(2.0f);
-        glDrawElements(GL_LINES,
-                       static_cast<GLsizei>(rm.bones_shader_vertices.size()),
-                       GL_UNSIGNED_INT, 0);
+        rm.bones_vao.draw(GL_LINES);
         glLineWidth(1.0f);
 
-        glDrawElements(GL_POINTS,
-                       static_cast<GLsizei>(rm.bones_shader_vertices.size()),
-                       GL_UNSIGNED_INT, 0);
+        rm.bones_vao.draw(GL_POINTS);
     }
 
     // Unbind vao for error safety

@@ -143,6 +143,7 @@
     <ClCompile Include="..\include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\include\imgui\imgui_impl_sdl.cpp" />
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\src\Animator.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Mesh.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="..\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\src\Animator.h" />
     <ClInclude Include="..\src\DebugCallback.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Mesh.h" />
@@ -171,6 +173,7 @@
     <ClInclude Include="..\src\Texture.h" />
     <ClInclude Include="..\src\Types.h" />
     <ClInclude Include="..\src\Util.h" />
+    <ClInclude Include="..\src\VertexArrayData.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\debug.vert" />

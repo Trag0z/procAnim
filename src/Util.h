@@ -7,9 +7,11 @@ constexpr float PI = 3.14159265358979323846f;
 
 inline void setNthBitTo(unsigned int& bitField, unsigned int n, int value) {
     bitField ^= (-value ^ bitField) & (1u << n);
-};
+}
 
-inline float degToRad(float degrees) { return degrees * PI / 180; }
+inline float degToRad(float degrees) { return degrees * PI / 180.0f; }
+
+inline float radToDeg(float radians) { return radians * 180.0f / PI; }
 
 void printGlm(const glm::vec4& v);
 void printGlm(const glm::mat4& m);
@@ -18,3 +20,5 @@ template <typename T> void printGlm(const char* title, const T& t) {
     printf("%s\n", title);
     printGlm(t);
 }
+
+inline float lerp(float a, float b, float t) { return a + (b - a) * t; }
