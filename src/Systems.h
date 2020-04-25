@@ -74,26 +74,26 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
             // If it's a stick, calculate and set it's value
             tempAxis = SDL_GameControllerGetAxis(
                 pad.sdl_ptr, static_cast<SDL_GameControllerAxis>(i));
-            if (tempAxis > -GamepadInput::joy_deadzone_in &&
-                tempAxis < GamepadInput::joy_deadzone_in) {
+            if (tempAxis > -GamepadInput::stick_deadzone_in &&
+                tempAxis < GamepadInput::stick_deadzone_in) {
                 pad.axis[i] = 0.0F;
-            } else if (tempAxis > GamepadInput::joy_deadzone_out) {
+            } else if (tempAxis > GamepadInput::stick_deadzone_out) {
                 pad.axis[i] = 1.0F;
-            } else if (tempAxis < -GamepadInput::joy_deadzone_out) {
+            } else if (tempAxis < -GamepadInput::stick_deadzone_out) {
                 pad.axis[i] = -1.0F;
             } else {
                 if (tempAxis > 0) {
                     pad.axis[i] =
                         static_cast<float>(tempAxis -
-                                           GamepadInput::joy_deadzone_in) /
-                        static_cast<float>(GamepadInput::joy_deadzone_out -
-                                           GamepadInput::joy_deadzone_in);
+                                           GamepadInput::stick_deadzone_in) /
+                        static_cast<float>(GamepadInput::stick_deadzone_out -
+                                           GamepadInput::stick_deadzone_in);
                 } else {
                     pad.axis[i] =
                         static_cast<float>(tempAxis +
-                                           GamepadInput::joy_deadzone_in) /
-                        static_cast<float>(GamepadInput::joy_deadzone_out -
-                                           GamepadInput::joy_deadzone_in);
+                                           GamepadInput::stick_deadzone_in) /
+                        static_cast<float>(GamepadInput::stick_deadzone_out -
+                                           GamepadInput::stick_deadzone_in);
                 }
             }
             // Invert Y axis cause it's the wrong way by default
@@ -126,7 +126,7 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
 inline void update_player(Player& player, const MouseKeyboardInput& mkb,
                           const RenderData& render_data) {
     if (mkb.mouse_button_down(1)) {
-        player.rigged_mesh.animators[1].target_pos_model_space =
+        player.rigged_mesh.animators[1].target_pos =
             inverse(player.model) *
             glm::vec4(
                 static_cast<float>(mkb.mouse_pos.x),
@@ -186,11 +186,10 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
 
     // Render animator target positions
     for (auto& a : rm.animators) {
-        if (a.target_pos_model_space.w == 0.0f)
+        if (a.target_pos.w == 0.0f)
             continue;
 
-        vec4 render_pos =
-            render_data.projection * player.model * a.target_pos_model_space;
+        vec4 render_pos = render_data.projection * player.model * a.target_pos;
 
         a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
                                         &render_pos)); // ugly, but it works
@@ -198,6 +197,19 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
 
         glUseProgram(render_data.debug_shader.id);
         glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
+
+        a.vao.draw(GL_POINTS);
+
+        render_pos = render_data.projection * player.model *
+                     a.bones[0]->bind_pose_transform *
+                     a.target_pos_bone_sapce[0];
+
+        a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
+                                        &render_pos)); // ugly, but it works
+        a.vao.bind();
+
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 1.0f, 1.0f);
 
         a.vao.draw(GL_POINTS);
     }
@@ -208,17 +220,15 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
     for (size_t i = 0; i < bone_count; ++i) {
         auto& b = rm.bones[i];
         mat4 rotation_matrix =
-            glm::rotate(glm::mat4(1.0f), b.rotation, vec3(0.0f, 0.0f, 1.0f));
+            rotate(mat4(1.0f), b.rotation, vec3(0.0f, 0.0f, 1.0f));
 
         if (b.parent == Bone::INDEX_NOT_FOUND) {
-            bone_transforms[i] = inverse(b.inverse_bind_pose_transform) *
-                                 rotation_matrix *
+            bone_transforms[i] = b.bind_pose_transform * rotation_matrix *
                                  b.inverse_bind_pose_transform;
         } else {
             // What if the parent has a parent?
             bone_transforms[i] = bone_transforms[b.parent] *
-                                 inverse(b.inverse_bind_pose_transform) *
-                                 rotation_matrix *
+                                 b.bind_pose_transform * rotation_matrix *
                                  b.inverse_bind_pose_transform;
         }
     }
@@ -261,11 +271,12 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         for (size_t i = 0; i < rm.bones.size(); ++i) {
             rm.bones_shader_vertices[i * 2].pos =
                 render_data.projection * player.model * bone_transforms[i] *
-                rm.bones[i].head,
-                                         1.0f;
+                rm.bones[i]
+                    .bind_pose_transform[3]; // Renders (0.0f, 0.0f, 0.0f) in
+                                             // the bones local space
             rm.bones_shader_vertices[i * 2 + 1].pos =
                 render_data.projection * player.model * bone_transforms[i] *
-                rm.bones[i].tail;
+                rm.bones[i].bind_pose_transform * rm.bones[i].tail;
         }
 
         rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);

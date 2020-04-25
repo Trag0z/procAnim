@@ -3,57 +3,6 @@
 #include "Mesh.h"
 #include "Util.h"
 
-using namespace MeshDetail;
-
-const float LimbAnimator::animation_speed = 0.1f;
-
-void LimbAnimator::update() {
-    float target_distance = glm::length(target_pos_model_space -
-                                        bone1->bone_transform * bone1->head);
-    float target_rotation[2];
-
-    glm::vec3 target_local_pos[2];
-
-    // Return if no position was set
-    if (target_pos_model_space.w == 0.0f) {
-        return;
-    }
-
-    target_local_pos[0] = glm::vec3(
-        bone1->bone_transform *
-        target_pos_model_space); // NOTE: This only transforms to model space!
-    target_local_pos[1] =
-        glm::vec3(bone2->bone_transform * target_pos_model_space);
-
-    if (target_distance > bone1->length + bone2->length) {
-        // Target out of reach
-        // Get angle between local up (y-axis) and target position
-        target_rotation[0] =
-            atan2f(target_local_pos[0].x, target_local_pos[0].y);
-        target_rotation[1] =
-            atan2f(target_local_pos[0].x, target_local_pos[0].y);
-    } else {
-        float target_distance2 = target_distance * target_distance;
-        float length2[2] = {bone1->length * bone1->length,
-                            bone2->length * bone2->length};
-
-        float cosAngle0 = (target_distance2 + length2[0] + length2[1]) /
-                          (2 * target_distance2 * length2[0]);
-        target_rotation[0] = acosf(cosAngle0) - atan2f(target_local_pos[0].x,
-                                                       target_local_pos[0].y);
-
-        float cosAngle1 = (length2[1] + length2[0] - target_distance2) /
-                          (2.0f * length2[1] * length2[0]);
-        target_rotation[1] = 180.0f - acosf(cosAngle1);
-    }
-
-    bone1->rotation =
-        lerp(bone1->rotation, target_rotation[0], animation_speed);
-
-    bone2->rotation =
-        lerp(bone2->rotation, target_rotation[1], animation_speed);
-}
-
 void RiggedMesh::load_from_file(const char* file) {
     // Load data from file
     Assimp::Importer importer;
@@ -142,14 +91,11 @@ void RiggedMesh::load_from_file(const char* file) {
 
         if (node->mNumChildren > 0) {
             auto& child_transform = node->mChildren[0]->mTransformation;
-            glm::vec4 tail_local_space =
-                glm::vec4(child_transform.a4, child_transform.b4,
-                          child_transform.c4, 1.0f);
+            b.tail = glm::vec4(child_transform.a4, child_transform.b4,
+                               child_transform.c4, 1.0f);
 
-            b.bone_transform = inverse(b.inverse_bind_pose_transform);
-            b.head = b.bone_transform[3];
-            b.tail = b.bone_transform * tail_local_space;
-            b.length = glm::length(tail_local_space);
+            b.bind_pose_transform = inverse(b.inverse_bind_pose_transform);
+            b.length = glm::length(b.tail);
         }
     }
 

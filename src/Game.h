@@ -4,7 +4,6 @@
 #include "Texture.h"
 #include "Util.h"
 #include "Mesh.h"
-#include "Animator.h"
 
 //      Member structs      //
 
@@ -18,8 +17,8 @@ struct GameConfig {
 struct GamepadInput {
     static const U32 num_axes = SDL_CONTROLLER_AXIS_MAX;
     static const U32 num_buttons = SDL_CONTROLLER_BUTTON_MAX;
-    static const S32 joy_deadzone_in = 8000;
-    static const S32 joy_deadzone_out = 32767 - 1000;
+    static const S32 stick_deadzone_in = 8000;
+    static const S32 stick_deadzone_out = 32767 - 1000;
 
     static U32 num_gamepads;
 
@@ -72,7 +71,7 @@ struct RenderData {
     } debug_shader;
 
     bool draw_models = true;
-    bool draw_bones = false;
+    bool draw_bones = true;
     bool draw_wireframes = false;
 
     glm::mat4 projection =

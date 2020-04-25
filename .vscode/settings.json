@@ -23,6 +23,8 @@
         "xmemory": "cpp",
         "ios": "cpp",
         "istream": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "list": "cpp",
+        "xtree": "cpp"
     }
 }
