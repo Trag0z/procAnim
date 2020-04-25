@@ -14,6 +14,11 @@ void LimbAnimator::update() {
 
     glm::vec3 target_local_pos[2];
 
+    // Return if no position was set
+    if (target_world_pos.w == 0.0f) {
+        return;
+    }
+
     target_local_pos[0] = glm::vec3(
         bone1->bone_transform *
         target_world_pos); // NOTE: This only transforms to model space!
@@ -140,9 +145,9 @@ void RiggedMesh::load_from_file(const char* file) {
                 glm::vec4(child_transform.a4, child_transform.b4,
                           child_transform.c4, 1.0f);
 
-            glm::mat4 bone_transform = inverse(b.inverse_bind_pose_transform);
-            b.head = bone_transform[3];
-            b.tail = bone_transform * tail_local_space;
+            b.bone_transform = inverse(b.inverse_bind_pose_transform);
+            b.head = b.bone_transform[3];
+            b.tail = b.bone_transform * tail_local_space;
             b.length = glm::length(tail_local_space);
         }
     }

@@ -126,9 +126,7 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
 inline void update_player(Player& player, const MouseKeyboardInput& mkb,
                           const RenderData& render_data) {
     if (mkb.mouse_button_down(1)) {
-        player.rigged_mesh.animators[1].target_world_pos =
-            inverse(player.model) * inverse(render_data.projection) *
-            glm::vec4(
+        player.rigged_mesh.animators[1].target_world_pos = glm::vec4(
                 static_cast<float>(mkb.mouse_pos.x),
                 static_cast<float>(render_data.window_size.y - mkb.mouse_pos.y),
                 0.0f, 1.0f);
