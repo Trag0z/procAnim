@@ -8,11 +8,11 @@ struct Bone {
     const Bone* parent;
     glm::mat4 bind_pose_transform;
     glm::mat4 inverse_bind_pose_transform;
-    // Position in local space
+    // Position and length in local space
     glm::vec4 tail;
+    float length;
     // Radians around z-Axis
     float rotation = 0.0f;
-    float length;
 
     static constexpr size_t INDEX_NOT_FOUND = UINT_MAX;
     glm::mat4 get_transform() const;

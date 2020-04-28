@@ -214,7 +214,7 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         a.vao.bind();
 
         glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 1.0f, 1.0f);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 1.0f, 0.5f);
 
         a.vao.draw(GL_POINTS);
     }

@@ -109,34 +109,9 @@ void RiggedMesh::load_from_file(const char* file) {
                                child_transform.c4, 1.0f);
 
             b.bind_pose_transform = inverse(b.inverse_bind_pose_transform);
-            b.length = glm::length(b.tail);
+            b.length = glm::length((glm::vec3)b.tail);
         }
     }
-
-    // Sort array so parents are always before children
-    // NOTE: Does not take into account multiple children on the same bone,
-    // wrong if there are longer chains of inheritence
-    // TODO: clean this up, probably change the whole function
-    // bool sorted = false;
-    // while (!sorted) {
-    //     sorted = true;
-    //     for (size_t i = 0; i < bones.size(); ++i) {
-    //         auto& b = bones[i];
-    //         auto parent_index = b.parent;
-    //         if (!b.has_parent() || parent_index < i)
-    //             continue;
-
-    //         b.parent = i;
-    //         std::swap(bones[i], bones[parent_index]);
-    //         for (auto& w : weight_data) {
-    //             if (w.bone_index == parent_index)
-    //                 w.bone_index = i;
-    //             else if (w.bone_index == i)
-    //                 w.bone_index = parent_index;
-    //         }
-    //         sorted = false;
-    //     }
-    // }
 
     // Assign bones and weights to vertices
     size_t* vertex_bone_counts = new size_t[vertices.size()];

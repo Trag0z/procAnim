@@ -31,10 +31,12 @@ void LimbAnimator::update() {
                                glm::inverse(bones[1]->parent->get_transform()) *
                                target_pos;
 
-    float target_distance = glm::length(target_pos_bone_sapce[0]);
+    float target_distance =
+        glm::length(static_cast<glm::vec3>(target_pos - bones[0]->bind_pose_transform[3]));
     float target_rotation[2];
 
-    if (target_distance > bones[0]->length + bones[1]->length) {
+    if (target_distance > bones[0]->length +
+        bones[1]->length) {
         // Target out of reach
         // Get angle between local up (y-axis) and target position
         target_rotation[0] =
@@ -51,12 +53,13 @@ void LimbAnimator::update() {
         float cosAngle0 = (target_distance2 + length2[0] + length2[1]) /
                           (2 * target_distance2 * length2[0]);
         target_rotation[0] =
-            acosf(cosAngle0) -
-            atan2f(target_pos_bone_sapce[0].x, target_pos_bone_sapce[0].y);
+            atan2f(target_pos_bone_sapce[0].x, target_pos_bone_sapce[0].y) -
+            acosf(cosAngle0) - degToRad(90.0f);
 
-        float cosAngle1 = (length2[1] + length2[0] - target_distance2) /
-                          (2.0f * length2[1] * length2[0]);
-        target_rotation[1] = 180.0f - acosf(cosAngle1);
+        float cosAngle1 = (length2[0] + length2[1] - target_distance2) /
+                          (2.0f * length2[0] * length2[1]);
+        target_rotation[1] =
+            degToRad(180.0f) - acosf(cosAngle1) - degToRad(90.0f);
     }
 
     bones[0]->rotation =
