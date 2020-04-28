@@ -123,7 +123,8 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
     }
 }
 
-inline void update_player(Player& player, const MouseKeyboardInput& mkb,
+inline void update_player(float delta_time, Player& player,
+                          const MouseKeyboardInput& mkb,
                           const RenderData& render_data) {
     if (mkb.mouse_button_down(1)) {
         player.rigged_mesh.animators[1].target_pos =
@@ -135,40 +136,45 @@ inline void update_player(Player& player, const MouseKeyboardInput& mkb,
     }
 
     for (auto& anim : player.rigged_mesh.animators) {
-        anim.update();
+        anim.update(delta_time);
     }
 
-    // Arm control
-    constexpr float sensitivity = 0.2f;
-    auto& mesh = player.rigged_mesh;
+    // // Arm control
+    // constexpr float sensitivity = 0.2f;
+    // auto& mesh = player.rigged_mesh;
 
-    // Rotate upper arm
-    Bone* bone = mesh.find_bone("Arm_L_1");
-    SDL_assert(bone);
+    // // Rotate upper arm
+    // Bone* bone = mesh.find_bone("Arm_L_1");
+    // SDL_assert(bone);
 
-    bone->rotation +=
-        -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY];
+    // bone->rotation +=
+    //     -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY];
 
-    // Rotate lower arm
-    bone = mesh.find_bone("Arm_L_2");
-    SDL_assert(bone);
+    // // Rotate lower arm
+    // bone = mesh.find_bone("Arm_L_2");
+    // SDL_assert(bone);
 
-    bone->rotation +=
-        -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_RIGHTY];
+    // bone->rotation +=
+    //     -sensitivity *
+    //     player.gamepad_input->axis[SDL_CONTROLLER_AXIS_RIGHTY];
 }
 
-inline void update_gui(SDL_Window* window, RenderData& render_data) {
+inline void update_gui(SDL_Window* window, RenderData& render_data,
+                       GameConfig& game_config) {
+    using namespace ImGui;
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
-    ImGui::NewFrame();
+    NewFrame();
 
-    ImGui::Begin("Debug control", NULL,
-                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-    ImGui::Checkbox("Render player.model", &render_data.draw_models);
-    ImGui::Checkbox("Render wireframes", &render_data.draw_wireframes);
-    ImGui::Checkbox("Render bones", &render_data.draw_bones);
+    Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
+    Checkbox("Render player.model", &render_data.draw_models);
+    Checkbox("Render wireframes", &render_data.draw_wireframes);
+    Checkbox("Render bones", &render_data.draw_bones);
 
-    ImGui::End();
+    SetNextItemWidth(100);
+    DragFloat("Game speed", &game_config.speed, 0.01f, 0.0f, 10.0f, "%.2f");
+
+    End();
 }
 
 inline void render(SDL_Window* window, RenderData render_data, Player& player) {

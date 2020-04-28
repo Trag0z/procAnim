@@ -17,7 +17,7 @@ LimbAnimator::LimbAnimator(Bone* b1, Bone* b2) {
     vao.init(&index, 1, NULL, 1);
 }
 
-void LimbAnimator::update() {
+void LimbAnimator::update(float delta_time) {
     // Return if no target position was set
     if (glm::length(target_pos) == 0.0f) {
         return;
@@ -31,12 +31,11 @@ void LimbAnimator::update() {
                                glm::inverse(bones[1]->parent->get_transform()) *
                                target_pos;
 
-    float target_distance =
-        glm::length(static_cast<glm::vec3>(target_pos - bones[0]->bind_pose_transform[3]));
+    float target_distance = glm::length(
+        static_cast<glm::vec3>(target_pos - bones[0]->bind_pose_transform[3]));
     float target_rotation[2];
 
-    if (target_distance > bones[0]->length +
-        bones[1]->length) {
+    if (target_distance > bones[0]->length + bones[1]->length) {
         // Target out of reach
         // Get angle between local up (y-axis) and target position
         target_rotation[0] =
@@ -63,8 +62,8 @@ void LimbAnimator::update() {
     }
 
     bones[0]->rotation =
-        lerp(bones[0]->rotation, target_rotation[0], animation_speed);
+        lerp(bones[0]->rotation, target_rotation[0], animation_speed * delta_time);
 
     bones[1]->rotation =
-        lerp(bones[1]->rotation, target_rotation[1], animation_speed);
+        lerp(bones[1]->rotation, target_rotation[1], animation_speed * delta_time);
 }

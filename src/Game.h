@@ -8,10 +8,13 @@
 //      Member structs      //
 
 struct GameConfig {
-    const U32 fps = 60;
-    const U32 frame_delay = 1000 / fps;
     const U32 window_flags =
         SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
+
+    const U32 fps = 60;
+    const U32 frame_delay = 1000 / fps;
+
+    float speed = 1.0f;
 };
 
 struct GamepadInput {
@@ -92,7 +95,7 @@ struct Player {
 
 struct Game {
     bool running = false;
-    U32 frameStart;
+    U32 frame_start, last_frame_start;
 
     SDL_Window* window;
     SDL_Renderer* renderer;

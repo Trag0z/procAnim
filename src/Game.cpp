@@ -121,7 +121,8 @@ void Game::init() {
 
 bool Game::run() {
     while (running) {
-        frameStart = SDL_GetTicks();
+        last_frame_start = frame_start;
+        frame_start = SDL_GetTicks();
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -147,9 +148,16 @@ bool Game::run() {
             running = false;
         }
 
-        update_player(player, mouse_keyboard_input, render_data);
+        float last_frame_duration = static_cast<float>(frame_start - last_frame_start);
+        float frame_delay = static_cast<float>(game_config.frame_delay);
 
-        update_gui(window, render_data);
+        float delta_time = last_frame_duration /
+            frame_delay *
+                           game_config.speed;
+
+        update_player(delta_time, player, mouse_keyboard_input, render_data);
+
+        update_gui(window, render_data, game_config);
 
         render(window, render_data, player);
 
@@ -160,9 +168,9 @@ bool Game::run() {
         }
 
         // Wait for next frame
-        U32 frameTime = SDL_GetTicks() - frameStart;
-        if (game_config.frame_delay > frameTime)
-            SDL_Delay(game_config.frame_delay - frameTime);
+        U32 last_frame_time = SDL_GetTicks() - frame_start;
+        if (game_config.frame_delay > last_frame_time)
+            SDL_Delay(game_config.frame_delay - last_frame_time);
     }
 
     TTF_Quit();

@@ -25,6 +25,8 @@
         "istream": "cpp",
         "ostream": "cpp",
         "list": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "sstream": "cpp",
+        "xlocnum": "cpp"
     }
 }

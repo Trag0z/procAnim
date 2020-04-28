@@ -17,5 +17,5 @@ struct LimbAnimator {
 
     LimbAnimator(Bone* b1, Bone* b2);
 
-    void update();
+    void update(float delta_time);
 };
