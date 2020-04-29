@@ -135,6 +135,10 @@ inline void update_player(float delta_time, Player& player,
                 0.0f, 1.0f);
     }
 
+    // Walking animation
+    if (mkb.key[SDL_SCANCODE_RIGHT]) {
+    }
+
     for (auto& anim : player.rigged_mesh.animators) {
         anim.update(delta_time);
     }
@@ -203,24 +207,6 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
 
         glUseProgram(render_data.debug_shader.id);
         glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
-
-        a.vao.draw(GL_POINTS);
-
-        // Render from pos of 2nd bone
-        mat4 parent_transform = a.bones[0]->bind_pose_transform *
-                                rotate(glm::mat4(1.0f), a.bones[0]->rotation,
-                                       glm::vec3(0.0f, 0.0f, 1.0f)) *
-                                a.bones[0]->inverse_bind_pose_transform;
-        render_pos = render_data.projection * player.model * parent_transform *
-                     a.bones[1]->bind_pose_transform *
-                     a.target_pos_bone_sapce[1];
-
-        a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
-                                        &render_pos)); // ugly, but it works
-        a.vao.bind();
-
-        glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 1.0f, 0.5f);
 
         a.vao.draw(GL_POINTS);
     }
