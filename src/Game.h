@@ -51,11 +51,15 @@ struct MouseKeyboardInput {
         key = (bool*)malloc(sizeof(bool) * (num_keys * 3));
         key_down = key + num_keys;
         key_up = key_down + num_keys;
-    };
+    }
 
-    bool mouse_button_down(uint button) const {
+    inline bool mouse_button_down(uint button) const {
         return mouse_button_down_map & button;
-    };
+    }
+
+    inline bool mouse_button(uint button) const {
+        return mouse_button_map & button;
+    }
 };
 
 struct RenderData {

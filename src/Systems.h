@@ -126,7 +126,7 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
 inline void update_player(float delta_time, Player& player,
                           const MouseKeyboardInput& mkb,
                           const RenderData& render_data) {
-    if (mkb.mouse_button_down(1)) {
+    if (mkb.mouse_button(1)) {
         player.rigged_mesh.animators[1].target_pos =
             inverse(player.model) *
             glm::vec4(

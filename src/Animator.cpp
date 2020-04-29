@@ -49,16 +49,30 @@ void LimbAnimator::update(float delta_time) {
         float length2[2] = {bones[0]->length * bones[0]->length,
                             bones[1]->length * bones[1]->length};
 
-        float cosAngle0 = (target_distance2 + length2[0] + length2[1]) /
-                          (2 * target_distance2 * length2[0]);
+        float cosAngle0 = (target_distance2 + length2[0] - length2[1]) /
+                          (2 * target_distance * bones[0]->length);
         target_rotation[0] =
-            atan2f(target_pos_bone_sapce[0].x, target_pos_bone_sapce[0].y) -
+            atan2f(target_pos_bone_sapce[0].y, target_pos_bone_sapce[0].x) -
             acosf(cosAngle0) - degToRad(90.0f);
 
         float cosAngle1 = (length2[0] + length2[1] - target_distance2) /
-                          (2.0f * length2[0] * length2[1]);
+                          (2.0f * bones[0]->length * bones[1]->length);
         target_rotation[1] =
-            degToRad(180.0f) - acosf(cosAngle1) - degToRad(90.0f);
+            degToRad(180.0f) - acosf(cosAngle1);
+    }
+
+    if (target_rotation[0] - bones[0]->rotation > PI) {
+        target_rotation[0] -= 2.0f * PI;
+    }
+    else if (target_rotation[0] - bones[0]->rotation < -PI) {
+        target_rotation[0] += 2.0f * PI;
+    }
+
+    if (target_rotation[1] - bones[1]->rotation > PI) {
+        target_rotation[1] -= 2.0f * PI;
+    }
+    else if (target_rotation[1] - bones[1]->rotation < -PI) {
+        target_rotation[1] += 2.0f * PI;
     }
 
     bones[0]->rotation =
