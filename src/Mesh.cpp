@@ -130,11 +130,10 @@ void RiggedMesh::load_from_file(const char* file) {
     delete[] vertex_bone_counts;
 
     // Init LimbAnimators
-    animators.reserve(4);
-    animators.push_back({find_bone("Arm_L_1"), find_bone("Arm_L_2")});
-    animators.push_back({find_bone("Arm_R_1"), find_bone("Arm_R_2")});
-    animators.push_back({find_bone("Leg_L_1"), find_bone("Leg_L_2")});
-    animators.push_back({find_bone("Leg_R_1"), find_bone("Leg_R_2")});
+    arm_animators[0] = ArmAnimator(find_bone("Arm_L_1"), find_bone("Arm_L_2"));
+    arm_animators[1] = ArmAnimator(find_bone("Arm_R_1"), find_bone("Arm_R_2"));
+    leg_animators[0] = LegAnimator(find_bone("Leg_L_1"), find_bone("Leg_L_2"));
+    leg_animators[1] = LegAnimator(find_bone("Leg_R_1"), find_bone("Leg_R_2"));
 
     vao.init(indices.data(), static_cast<GLuint>(indices.size()), NULL,
              static_cast<GLuint>(vertices.size()));

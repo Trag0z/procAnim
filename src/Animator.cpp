@@ -93,14 +93,19 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2) {
     bones[1] = b2;
     target_pos = glm::vec4{0.0f, 0.0f, 0.0f, 0.0f};
 
-    // Init render data for rendering the spline that the foot follows
-    GLuint indices[debug_render_steps * 2];
-    for (GLuint i = 0; i < debug_render_steps; ++i) {
-        indices[i * 2] = i;
-        indices[i * 2 + 1] = i + 1;
-    }
+    // Init render data for rendering target_pos_model_space as a point
+    GLuint index = 0;
 
-    vao.init(indices, debug_render_steps * 2, NULL, 20);
+    vao.init(&index, 1, NULL, 1);
+
+    // // Init render data for rendering the spline that the foot follows
+    // GLuint indices[debug_render_steps * 2];
+    // for (GLuint i = 0; i < debug_render_steps; ++i) {
+    //     indices[i * 2] = i;
+    //     indices[i * 2 + 1] = i + 1;
+    // }
+
+    // vao.init(indices, debug_render_steps * 2, NULL, 20);
 }
 
 void LegAnimator::update(float delta_time) {
@@ -111,14 +116,24 @@ void LegAnimator::update(float delta_time) {
 
     time_since_start += delta_time;
 
+    if (time_since_start > step_duration) {
+        time_since_start -= step_duration;
+        second_phase = !second_phase;
+    }
+
     float point_in_animation = time_since_start / step_duration;
-    float sine = sinf(point_in_animation * PI);
-    glm::vec4 current_foot_pos =
-        target_pos -
-        glm::vec4(sine * step_length, sine * step_height, 0.0f, 1.0f);
+    if (!second_phase) {
+        float sine = sinf(point_in_animation * PI);
+        foot_pos = target_pos - glm::vec4(point_in_animation * step_length,
+                                          -sine * step_height, 0.0f, 0.0f);
+    } else {
+        foot_pos =
+            target_pos - glm::vec4(1.0f - point_in_animation * step_length,
+                                   0.0f, 0.0f, 0.0f);
+    }
 
     float target_rotations[2];
-    resolve_ik(bones, target_pos, target_rotations);
+    resolve_ik(bones, foot_pos, target_rotations);
 
     bones[0]->rotation = target_rotations[0];
     bones[1]->rotation = target_rotations[1];

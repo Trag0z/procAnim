@@ -127,40 +127,42 @@ inline void update_player(float delta_time, Player& player,
                           const MouseKeyboardInput& mkb,
                           const RenderData& render_data) {
     if (mkb.mouse_button(1)) {
-        player.rigged_mesh.animators[1].target_pos =
+        player.rigged_mesh.arm_animators[1].target_pos =
             inverse(player.model) *
             glm::vec4(
                 static_cast<float>(mkb.mouse_pos.x),
                 static_cast<float>(render_data.window_size.y - mkb.mouse_pos.y),
                 0.0f, 1.0f);
     }
-
-    // Walking animation
-    if (mkb.key[SDL_SCANCODE_RIGHT]) {
-    }
-
-    for (auto& anim : player.rigged_mesh.animators) {
+    for (auto& anim : player.rigged_mesh.arm_animators) {
         anim.update(delta_time);
     }
 
-    // // Arm control
-    // constexpr float sensitivity = 0.2f;
-    // auto& mesh = player.rigged_mesh;
+    // Walking animation
+    if (mkb.key[SDL_SCANCODE_LEFT]) {
+        // Left leg
+        auto& anim0 = player.rigged_mesh.leg_animators[0];
+        anim0.second_phase = false;
+        anim0.target_pos =
+            anim0.bones[1]->bind_pose_transform * anim0.bones[1]->tail;
 
-    // // Rotate upper arm
-    // Bone* bone = mesh.find_bone("Arm_L_1");
-    // SDL_assert(bone);
+        // TODO: Calculate the point better, on a circle around the bone
+        anim0.target_pos.x += anim0.step_length / 2.0f;
+        anim0.target_pos.y += 0.07f;
 
-    // bone->rotation +=
-    //     -sensitivity * player.gamepad_input->axis[SDL_CONTROLLER_AXIS_LEFTY];
+        // Right leg
+        auto& anim1 = player.rigged_mesh.leg_animators[1];
+        anim1.second_phase = true;
+        anim1.target_pos =
+            anim1.bones[1]->bind_pose_transform * anim1.bones[1]->tail;
 
-    // // Rotate lower arm
-    // bone = mesh.find_bone("Arm_L_2");
-    // SDL_assert(bone);
-
-    // bone->rotation +=
-    //     -sensitivity *
-    //     player.gamepad_input->axis[SDL_CONTROLLER_AXIS_RIGHTY];
+        // TODO: Calculate the point better, on a circle around the bone
+        anim1.target_pos.x += anim1.step_length / 2.0f;
+        anim1.target_pos.y += 0.07f;
+    }
+    for (auto& anim : player.rigged_mesh.leg_animators) {
+        anim.update(delta_time);
+    }
 }
 
 inline void update_gui(SDL_Window* window, RenderData& render_data,
@@ -176,7 +178,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     Checkbox("Render bones", &render_data.draw_bones);
 
     SetNextItemWidth(100);
-    DragFloat("Game speed", &game_config.speed, 0.01f, 0.0f, 10.0f, "%.2f");
+    DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
 
     End();
 }
@@ -195,11 +197,27 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
     RiggedMesh& rm = player.rigged_mesh;
 
     // Render animator target positions
-    for (auto& a : rm.animators) {
+    for (auto& a : rm.arm_animators) {
         if (a.target_pos.w == 0.0f)
             continue;
 
         vec4 render_pos = render_data.projection * player.model * a.target_pos;
+
+        a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
+                                        &render_pos)); // ugly, but it works
+        a.vao.bind();
+
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
+
+        a.vao.draw(GL_POINTS);
+    }
+
+    for (auto& a : rm.leg_animators) {
+        if (a.target_pos.w == 0.0f)
+            continue;
+
+        vec4 render_pos = render_data.projection * player.model * a.foot_pos;
 
         a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
                                         &render_pos)); // ugly, but it works

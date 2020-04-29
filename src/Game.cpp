@@ -111,9 +111,7 @@ void Game::init() {
     // Player
     player.pos = {1920.0f / 2.0f, 1080.0f / 2.0f};
     player.tex = Texture::load_from_file("../assets/playerTexture.png");
-    // player.tex = Texture::load_from_file("../assets/red100x100.png");
     player.rigged_mesh.load_from_file("../assets/guy.fbx");
-    // player.rigged_mesh = RiggedMesh::load_from_file("../assets/guy.dae");
     player.gamepad_input = &gamepad_inputs[0];
 
     running = true;

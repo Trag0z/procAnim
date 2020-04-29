@@ -29,7 +29,8 @@ struct RiggedMesh {
 
     std::vector<Bone> bones;
 
-    std::vector<ArmAnimator> animators;
+    std::array<ArmAnimator, 2> arm_animators;
+    std::array<LegAnimator, 2> leg_animators;
 
     Bone* find_bone(const char* name);
     void load_from_file(const char* file);
