@@ -158,7 +158,8 @@ bool Game::run() {
                 last_frame_duration / frame_delay * game_config.speed;
             update_player(delta_time, player, mouse_keyboard_input,
                           render_data);
-        } else if (mouse_keyboard_input.key_down[SDL_SCANCODE_N]) {
+        } else if (mouse_keyboard_input.key_down[SDL_SCANCODE_N] ||
+                   mouse_keyboard_input.key[SDL_SCANCODE_M]) {
             update_player(game_config.speed, player, mouse_keyboard_input,
                           render_data);
         }

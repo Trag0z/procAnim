@@ -178,6 +178,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     Checkbox("Render wireframes", &render_data.draw_wireframes);
     Checkbox("Render bones", &render_data.draw_bones);
 
+    NewLine();
     SetNextItemWidth(100);
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
     Checkbox("Step mode", &game_config.step_mode);
@@ -217,8 +218,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     Columns(1);
     Separator();
 
-    Text(""); // Best way I found to insert a line break
-
+    NewLine();
     Text("Limb data");
     Columns(3);
     Separator();

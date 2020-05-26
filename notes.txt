@@ -1,4 +1,5 @@
 TODO:
+- find out why the arm position is never really at the target point
 - find target points in a good way
 - bone rotation restrictions
 
