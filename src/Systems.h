@@ -180,6 +180,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
 
     SetNextItemWidth(100);
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
+    Checkbox("Step mode", &game_config.step_mode);
 
     End();
 

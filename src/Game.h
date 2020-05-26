@@ -5,7 +5,9 @@
 #include "Util.h"
 #include "Mesh.h"
 
-//      Member structs      //
+//----------------------------------//
+//----------Member structs----------//
+//----------------------------------//
 
 struct GameConfig {
     const U32 window_flags =
@@ -15,6 +17,7 @@ struct GameConfig {
     const U32 frame_delay = 1000 / fps;
 
     float speed = 1.0f;
+    bool step_mode = false;
 };
 
 struct GamepadInput {
@@ -96,6 +99,10 @@ struct Player {
 
     glm::mat4 model;
 };
+
+//-------------------------------//
+//----------Game struct----------//
+//-------------------------------//
 
 struct Game {
     bool running = false;

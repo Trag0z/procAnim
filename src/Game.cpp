@@ -135,25 +135,33 @@ bool Game::run() {
 
         poll_inputs(mouse_keyboard_input, gamepad_inputs);
 
-        // Handle keyboard inputs
+        // Handle general keyboard inputs
         if (mouse_keyboard_input.key_down[SDL_SCANCODE_F1]) {
             render_data.draw_wireframes = !render_data.draw_wireframes;
         }
         if (mouse_keyboard_input.key_down[SDL_SCANCODE_F2]) {
             render_data.draw_bones = !render_data.draw_bones;
         }
+        if (mouse_keyboard_input.key_down[SDL_SCANCODE_P]) {
+            game_config.step_mode = !game_config.step_mode;
+        }
         if (mouse_keyboard_input.key_down[SDL_SCANCODE_ESCAPE]) {
             running = false;
         }
 
-        float last_frame_duration = static_cast<float>(frame_start - last_frame_start);
+        float last_frame_duration =
+            static_cast<float>(frame_start - last_frame_start);
         float frame_delay = static_cast<float>(game_config.frame_delay);
 
-        float delta_time = last_frame_duration /
-            frame_delay *
-                           game_config.speed;
-
-        update_player(delta_time, player, mouse_keyboard_input, render_data);
+        if (!game_config.step_mode) {
+            float delta_time =
+                last_frame_duration / frame_delay * game_config.speed;
+            update_player(delta_time, player, mouse_keyboard_input,
+                          render_data);
+        } else if (mouse_keyboard_input.key_down[SDL_SCANCODE_N]) {
+            update_player(game_config.speed, player, mouse_keyboard_input,
+                          render_data);
+        }
 
         update_gui(window, render_data, game_config, player);
 
