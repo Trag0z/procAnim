@@ -1,7 +1,9 @@
 TODO:
+- find target points in a good way
+- bone rotation restrictions
+
 - collision detection
 - longer bone chains, multiple parents?
-
 - more polygons, nicer texture
 
 Bugs:

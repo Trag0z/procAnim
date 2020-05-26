@@ -155,7 +155,7 @@ bool Game::run() {
 
         update_player(delta_time, player, mouse_keyboard_input, render_data);
 
-        update_gui(window, render_data, game_config);
+        update_gui(window, render_data, game_config, player);
 
         render(window, render_data, player);
 

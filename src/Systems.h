@@ -166,12 +166,13 @@ inline void update_player(float delta_time, Player& player,
 }
 
 inline void update_gui(SDL_Window* window, RenderData& render_data,
-                       GameConfig& game_config) {
+                       GameConfig& game_config, const Player& player) {
     using namespace ImGui;
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
     NewFrame();
 
+    // Debug controls window
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
     Checkbox("Render player.model", &render_data.draw_models);
     Checkbox("Render wireframes", &render_data.draw_wireframes);
@@ -179,6 +180,37 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
 
     SetNextItemWidth(100);
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
+
+    End();
+
+    // Limb data display window
+    Begin("Limb Data", NULL, ImGuiWindowFlags_NoTitleBar);
+    Text("Limb data");
+    Columns(3);
+    Separator();
+    Text("Name");
+    NextColumn();
+    Text("Rotation (deg.)");
+    NextColumn();
+    Text("Tail Position");
+    NextColumn();
+    Separator();
+
+    for (const auto& bone : player.rigged_mesh.bones) {
+        Text(bone.name.c_str());
+        NextColumn();
+
+        char label[64];
+        sprintf_s(label, "% 5.1f", radToDeg(bone.rotation));
+        Text(label);
+        NextColumn();
+
+        glm::vec4 tail_world_pos = player.model * bone.get_transform() *
+                                   bone.bind_pose_transform * bone.tail;
+        sprintf_s(label, "% 7.1f, % 7.1f", tail_world_pos.x, tail_world_pos.y);
+        Text(label);
+        NextColumn();
+    }
 
     End();
 }
