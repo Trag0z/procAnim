@@ -184,7 +184,40 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     End();
 
     // Limb data display window
-    Begin("Limb Data", NULL, ImGuiWindowFlags_NoTitleBar);
+    Begin("Limb data", NULL, ImGuiWindowFlags_NoTitleBar);
+    Text("Target Positions");
+    Columns(4);
+    Separator();
+    Text("Arm_L");
+    NextColumn();
+    Text("Arm_R");
+    NextColumn();
+    Text("Leg_L");
+    NextColumn();
+    Text("Leg_R");
+    NextColumn();
+    Separator();
+
+    char label[64];
+    for (const auto& anim : player.rigged_mesh.arm_animators) {
+        glm::vec4 target_world_pos = player.model * anim.target_pos;
+        sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
+                  target_world_pos.y);
+        Text(label);
+        NextColumn();
+    }
+    for (const auto& anim : player.rigged_mesh.leg_animators) {
+        glm::vec4 target_world_pos = player.model * anim.target_pos;
+        sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
+                  target_world_pos.y);
+        Text(label);
+        NextColumn();
+    }
+    Columns(1);
+    Separator();
+
+    Text(""); // Best way I found to insert a line break
+
     Text("Limb data");
     Columns(3);
     Separator();
@@ -200,7 +233,6 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
         Text(bone.name.c_str());
         NextColumn();
 
-        char label[64];
         sprintf_s(label, "% 5.1f", radToDeg(bone.rotation));
         Text(label);
         NextColumn();
@@ -211,6 +243,8 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
         Text(label);
         NextColumn();
     }
+    Columns(1);
+    Separator();
 
     End();
 }
@@ -229,36 +263,37 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
     RiggedMesh& rm = player.rigged_mesh;
 
     // Render animator target positions
-    for (auto& a : rm.arm_animators) {
-        if (a.target_pos.w == 0.0f)
+    for (auto& anim : rm.arm_animators) {
+        if (anim.target_pos.w == 0.0f)
             continue;
 
-        vec4 render_pos = render_data.projection * player.model * a.target_pos;
+        vec4 render_pos =
+            render_data.projection * player.model * anim.target_pos;
 
-        a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
-                                        &render_pos)); // ugly, but it works
-        a.vao.bind();
+        anim.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
+                                           &render_pos)); // ugly, but it works
+        anim.vao.bind();
 
         glUseProgram(render_data.debug_shader.id);
         glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
 
-        a.vao.draw(GL_POINTS);
+        anim.vao.draw(GL_POINTS);
     }
 
-    for (auto& a : rm.leg_animators) {
-        if (a.target_pos.w == 0.0f)
+    for (auto& anim : rm.leg_animators) {
+        if (anim.target_pos.w == 0.0f)
             continue;
 
-        vec4 render_pos = render_data.projection * player.model * a.foot_pos;
+        vec4 render_pos = render_data.projection * player.model * anim.foot_pos;
 
-        a.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
-                                        &render_pos)); // ugly, but it works
-        a.vao.bind();
+        anim.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
+                                           &render_pos)); // ugly, but it works
+        anim.vao.bind();
 
         glUseProgram(render_data.debug_shader.id);
         glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
 
-        a.vao.draw(GL_POINTS);
+        anim.vao.draw(GL_POINTS);
     }
 
     // Calculate bone transforms from their rotations
