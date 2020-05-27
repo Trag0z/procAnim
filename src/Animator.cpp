@@ -6,7 +6,8 @@
 
 static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
                        float* target_rotations) {
-    // NOTE: Assumes that bone[0] has no rotating parents
+    SDL_assert(bones[0]->parent->rotation == 0.0f);
+
     glm::vec4 target_pos_bone_space[2];
     target_pos_bone_space[0] =
         bones[0]->inverse_bind_pose_transform * target_pos;
@@ -41,7 +42,12 @@ static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
 
         float cosAngle1 = (length2[0] + length2[1] - target_distance2) /
                           (2.0f * bones[0]->length * bones[1]->length);
-        target_rotations[1] = degToRad(180.0f) - acosf(cosAngle1);
+        target_rotations[1] =
+            degToRad(175.0f) -
+            acosf(cosAngle1); // TODO: The argument for degToRad() should be
+                              // 180, but then the arm overshoots the position
+                              // by a bit. Find out why that is! 175 gives
+                              // almost pixel perfect results for arms.
     }
 
     // NOTE: Is this necessary if the point is out of reach?
@@ -82,10 +88,10 @@ void ArmAnimator::update(float delta_time) {
     resolve_ik(bones, target_pos, target_rotations);
 
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
-                              animation_speed * delta_time);
+                              std::min(1.0f, animation_speed * delta_time));
 
     bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
-                              animation_speed * delta_time);
+                              std::min(1.0f, animation_speed * delta_time));
 }
 
 LegAnimator::LegAnimator(Bone* b1, Bone* b2) {

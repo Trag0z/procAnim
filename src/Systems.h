@@ -224,7 +224,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     Separator();
     Text("Name");
     NextColumn();
-    Text("Rotation (deg.)");
+    Text("Rotation deg/rad");
     NextColumn();
     Text("Tail Position");
     NextColumn();
@@ -234,7 +234,8 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
         Text(bone.name.c_str());
         NextColumn();
 
-        sprintf_s(label, "% 5.1f", radToDeg(bone.rotation));
+        sprintf_s(label, "% 6.1f /% 1.2f", radToDeg(bone.rotation),
+                  bone.rotation);
         Text(label);
         NextColumn();
 
