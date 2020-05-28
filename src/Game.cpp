@@ -109,14 +109,13 @@ void Game::init() {
     }
 
     // Player
-    player.pos = {1920.0f / 2.0f, 1080.0f / 2.0f + 200.0f};
-    player.tex = Texture::load_from_file("../assets/playerTexture.png");
-    player.rigged_mesh.load_from_file("../assets/guy.fbx");
-    player.gamepad_input = &gamepad_inputs[0];
+    player.init({1920.0f / 2.0f, 1080.0f / 2.0f + 200.0f},
+                "../assets/playerTexture.png", "../assets/guy.fbx",
+                &gamepad_inputs[0]);
 
     // Ground
-    ground =
-        BoxCollider({player.pos.x, player.pos.y - 400.0f}, {1920.0f / 2.1f, 10.0f});
+    ground = BoxCollider({player.pos.x, player.pos.y - 400.0f},
+                         {1920.0f / 2.1f, 10.0f});
 
     running = true;
 };
@@ -166,12 +165,12 @@ bool Game::run() {
         if (!game_config.step_mode) {
             float delta_time =
                 last_frame_duration / frame_delay * game_config.speed;
-            update_player(delta_time, player, mouse_keyboard_input,
+            update_player(delta_time, player, ground, mouse_keyboard_input,
                           render_data);
         } else if (mouse_keyboard_input.key_down[SDL_SCANCODE_N] ||
                    mouse_keyboard_input.key[SDL_SCANCODE_M]) {
-            update_player(game_config.speed, player, mouse_keyboard_input,
-                          render_data);
+            update_player(game_config.speed, player, ground,
+                          mouse_keyboard_input, render_data);
         }
 
         update_gui(window, render_data, game_config, player);
@@ -194,7 +193,7 @@ bool Game::run() {
     IMG_Quit();
     SDL_Quit();
     return 0;
-};
+}
 
 void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
                       GLuint debug_shader_id) {
@@ -212,4 +211,17 @@ void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
         glGetUniformLocation(rigged_shader_id, "projection");
     rigged_shader.bonesLoc = glGetUniformLocation(rigged_shader_id, "bones");
 #endif
+}
+
+void Player::init(glm::vec2 position, const char* texture_path,
+                  const char* mesh_path, GamepadInput* gamepad) {
+    pos = position;
+    tex = Texture::load_from_file(texture_path);
+    rigged_mesh.load_from_file(mesh_path);
+    gamepad_input = gamepad;
+
+    grounded = false;
+
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
+    model = glm::scale(model, glm::vec3(100.0f, 100.0f, 1.0f));
 }

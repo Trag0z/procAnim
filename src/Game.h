@@ -100,8 +100,11 @@ struct Player {
 
     glm::mat4 model;
 
-    bool grounded = false;
-    const float gravity = 1.0f;
+    bool grounded;
+    const float gravity = 2.0f;
+
+    void init(glm::vec2 position, const char* texture_path,
+              const char* mesh_path, GamepadInput* gamepad);
 };
 
 //-------------------------------//

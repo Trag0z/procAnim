@@ -124,6 +124,7 @@ inline void poll_inputs(MouseKeyboardInput& mkb,
 }
 
 inline void update_player(float delta_time, Player& player,
+                          const BoxCollider& ground,
                           const MouseKeyboardInput& mkb,
                           const RenderData& render_data) {
     if (mkb.mouse_button(1)) {
@@ -143,7 +144,25 @@ inline void update_player(float delta_time, Player& player,
     }
 
     // Find closest point on gorund
-    // Since ground is flat,
+    auto& leg_anims = player.rigged_mesh.leg_animators;
+
+    glm::vec4 foot_pos_world[2];
+    float distance_to_ground[2];
+
+    for (size_t i = 0; i < 2; ++i) {
+        foot_pos_world[i] = player.model * leg_anims[i].foot_pos;
+        distance_to_ground[i] =
+            foot_pos_world[i].y - ground.pos.y - ground.half_ext.y;
+    }
+
+    float smaller_distance =
+        std::min(distance_to_ground[0], distance_to_ground[1]);
+    if (smaller_distance <= 0.0f) {
+        player.pos.y -= smaller_distance;
+        player.grounded = true;
+    } else {
+        player.grounded = false;
+    }
 
     // Walking animation
     if (mkb.key[SDL_SCANCODE_LEFT]) {
@@ -276,13 +295,13 @@ inline void render(SDL_Window* window, const RenderData& render_data,
 
     glUseProgram(render_data.debug_shader.id);
     glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.5f, 0.2f,
-                1.0f); // orange-ish
+                1.0f); // ugly orange-ish
     ground.vao.draw(GL_TRIANGLES);
 
     // Translate first to multiply translation from the left to the scaled
     // player.model
     // This resolves to model * translation * scale
-    player.model = translate(mat4(1.0f), vec3(player.pos, 0.0f));
+    player.model = player.model = translate(mat4(1.0f), vec3(player.pos, 0.0f));
     player.model = scale(player.model, vec3(100.0f, 100.0f, 1.0f));
 
     RiggedMesh& rm = player.rigged_mesh;

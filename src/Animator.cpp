@@ -4,6 +4,9 @@
 #include "Util.h"
 #include "Mesh.h"
 
+// Takes a target_pos in model space and finds two target_rotations for the
+// bones, so that the tail of bone[1] is at (or at the closest possible point
+// to) target_pos
 static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
                        float* target_rotations) {
     SDL_assert(bones[0]->parent->rotation == 0.0f);
@@ -98,8 +101,10 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2) {
     bones[0] = b1;
     bones[1] = b2;
     target_pos = glm::vec4{0.0f, 0.0f, 0.0f, 0.0f};
+    foot_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
+               bones[1]->tail;
 
-    // Init render data for rendering target_pos_model_space as a point
+    // Init render data for rendering target_pos as a point
     GLuint index = 0;
 
     vao.init(&index, 1, NULL, 1);
@@ -117,6 +122,8 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2) {
 void LegAnimator::update(float delta_time) {
     // Return if no target position was set
     if (glm::length(target_pos) == 0.0f) {
+        foot_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
+                   bones[1]->tail;
         return;
     }
 
