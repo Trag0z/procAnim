@@ -1,11 +1,21 @@
 TODO:
-- find out why the arm position is never really at the target point
-- find target points in a good way
-- bone rotation restrictions
-
 - collision detection
+- bone rotation restrictions
+- find target points in a good way
+
 - longer bone chains, multiple parents?
 - more polygons, nicer texture
 
 Bugs:
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely
+
+Cleanup:
+- remove using namespace ...; everywhere
+
+
+Walking states:
+(Leg1 straight in front, leg2 straight behind)
+1) push body over leg1, bend leg2
+2) leg1 moves to back, leg2 straightens, touches ground in front
+
+- start in the middle of 1)

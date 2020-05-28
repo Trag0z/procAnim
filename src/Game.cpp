@@ -109,10 +109,14 @@ void Game::init() {
     }
 
     // Player
-    player.pos = {1920.0f / 2.0f, 1080.0f / 2.0f};
+    player.pos = {1920.0f / 2.0f, 1080.0f / 2.0f + 200.0f};
     player.tex = Texture::load_from_file("../assets/playerTexture.png");
     player.rigged_mesh.load_from_file("../assets/guy.fbx");
     player.gamepad_input = &gamepad_inputs[0];
+
+    // Ground
+    ground =
+        BoxCollider({player.pos.x, player.pos.y - 400.0f}, {1920.0f / 2.1f, 10.0f});
 
     running = true;
 };
@@ -172,7 +176,7 @@ bool Game::run() {
 
         update_gui(window, render_data, game_config, player);
 
-        render(window, render_data, player);
+        render(window, render_data, player, ground);
 
         // Check for errors and clear error queue
         while (GLenum error = glGetError()) {

@@ -1,7 +1,9 @@
+#pragma once
 #include "pch.h"
 
 constexpr size_t MAX_BONES_PER_VERTEX = 2;
 
+// Not used until complex shaders are a thing
 struct Vertex {
     glm::vec3 position;
     glm::vec2 uv_coord;
@@ -9,11 +11,13 @@ struct Vertex {
     float bone_weight[MAX_BONES_PER_VERTEX];
 };
 
+// Vertex format used by rigged shader
 struct ShaderVertex {
     glm::vec4 pos;
     glm::vec2 uv_coord;
 };
 
+// Vertex format used by debug shader
 struct DebugShaderVertex {
     glm::vec4 pos;
 };
@@ -25,6 +29,8 @@ template <typename vertex_t> class VertexArrayData {
   public:
     void init(const GLuint* indices, GLuint num_indices,
               const vertex_t* vertices, GLuint num_vertices) {
+        // Template specifications for acceptable vertex types are defined
+        // below. If this function overload is called, something went wrong.
         printf("[ERROR] You are trying to initialize VertexArrayData of an "
                "unknown vertex type");
         SDL_assert(false);
@@ -41,9 +47,10 @@ template <typename vertex_t> class VertexArrayData {
         glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * num_vertices, data);
     }
 
-    void bind() { glBindVertexArray(vao_id); }
+    inline void bind() const { glBindVertexArray(vao_id); }
 
-    void draw(GLenum mode) {
+    inline void draw(GLenum mode) const {
+        bind();
         glDrawElements(mode, _num_indices, GL_UNSIGNED_INT, 0);
     }
 };

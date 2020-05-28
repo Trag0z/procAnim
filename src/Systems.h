@@ -138,6 +138,13 @@ inline void update_player(float delta_time, Player& player,
         anim.update(delta_time);
     }
 
+    if (!player.grounded) {
+        player.pos.y -= player.gravity;
+    }
+
+    // Find closest point on gorund
+    // Since ground is flat,
+
     // Walking animation
     if (mkb.key[SDL_SCANCODE_LEFT]) {
         // Left leg
@@ -251,18 +258,108 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     End();
 }
 
-inline void render(SDL_Window* window, RenderData render_data, Player& player) {
+inline void render(SDL_Window* window, const RenderData& render_data,
+                   Player& player, BoxCollider& ground) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     using namespace glm;
 
+    // Render ground
+    ground.model = translate(mat4(1.0f), vec3(ground.pos, 0.0f));
+
+    for (size_t i = 0; i < ground.vertices.size(); ++i) {
+        ground.shader_vertices[i].pos =
+            render_data.projection * ground.model * ground.vertices[i];
+    }
+    ground.vao.update_vertex_data(ground.shader_vertices);
+
+    glUseProgram(render_data.debug_shader.id);
+    glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.5f, 0.2f,
+                1.0f); // orange-ish
+    ground.vao.draw(GL_TRIANGLES);
+
     // Translate first to multiply translation from the left to the scaled
-    // player.model This resolves to model * translation * scale
+    // player.model
+    // This resolves to model * translation * scale
     player.model = translate(mat4(1.0f), vec3(player.pos, 0.0f));
     player.model = scale(player.model, vec3(100.0f, 100.0f, 1.0f));
 
     RiggedMesh& rm = player.rigged_mesh;
+
+    // Calculate bone transforms from their rotations
+    size_t bone_count = rm.bones.size();
+    mat4* bone_transforms = new mat4[bone_count];
+    for (size_t i = 0; i < bone_count; ++i) {
+        auto& b = rm.bones[i];
+        mat4 rotation_matrix =
+            rotate(mat4(1.0f), b.rotation, vec3(0.0f, 0.0f, 1.0f));
+
+        bone_transforms[i] = b.get_transform();
+    }
+
+    // Calculate vertex posistions for rendering
+    for (size_t i = 0; i < rm.vertices.size(); ++i) {
+        Vertex vert = rm.vertices[i];
+        rm.shader_vertices[i].uv_coord = vert.uv_coord;
+
+        mat4 bone = bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
+                    bone_transforms[vert.bone_index[1]] * vert.bone_weight[1];
+
+        rm.shader_vertices[i].pos = render_data.projection * player.model *
+                                    bone * vec4(vert.position, 1.0f);
+    }
+
+    rm.vao.update_vertex_data(rm.shader_vertices);
+    rm.vao.bind();
+
+    // Render player model
+    if (render_data.draw_models) {
+        glUseProgram(render_data.rigged_shader.id);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, player.tex.id);
+
+        rm.vao.draw(GL_TRIANGLES);
+    }
+
+    // Render wireframes
+    if (render_data.draw_wireframes) {
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 0.0f, 1.0f,
+                    1.0f); // red
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        rm.vao.draw(GL_TRIANGLES);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+
+    // Render bones
+    if (render_data.draw_bones) {
+        for (size_t i = 0; i < rm.bones.size(); ++i) {
+            rm.bones_shader_vertices[i * 2].pos =
+                render_data.projection * player.model * bone_transforms[i] *
+                rm.bones[i]
+                    .bind_pose_transform[3]; // Renders (0.0f, 0.0f, 0.0f) in
+                                             // the bones local space
+            rm.bones_shader_vertices[i * 2 + 1].pos =
+                render_data.projection * player.model * bone_transforms[i] *
+                rm.bones[i].bind_pose_transform * rm.bones[i].tail;
+        }
+
+        rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
+        rm.bones_vao.bind();
+
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 0.0f,
+                    1.0f); // blue
+
+        glLineWidth(2.0f);
+        rm.bones_vao.draw(GL_LINES);
+        glLineWidth(1.0f);
+
+        rm.bones_vao.draw(GL_POINTS);
+    }
 
     // Render animator target positions
     for (auto& anim : rm.arm_animators) {
@@ -296,77 +393,6 @@ inline void render(SDL_Window* window, RenderData render_data, Player& player) {
         glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
 
         anim.vao.draw(GL_POINTS);
-    }
-
-    // Calculate bone transforms from their rotations
-    size_t bone_count = rm.bones.size();
-    mat4* bone_transforms = new mat4[bone_count];
-    for (size_t i = 0; i < bone_count; ++i) {
-        auto& b = rm.bones[i];
-        mat4 rotation_matrix =
-            rotate(mat4(1.0f), b.rotation, vec3(0.0f, 0.0f, 1.0f));
-
-        bone_transforms[i] = b.get_transform();
-    }
-
-    // Calculate vertex posistions for rendering
-    for (size_t i = 0; i < rm.vertices.size(); ++i) {
-        Vertex vert = rm.vertices[i];
-        rm.shader_vertices[i].uv_coord = vert.uv_coord;
-
-        mat4 bone = bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
-                    bone_transforms[vert.bone_index[1]] * vert.bone_weight[1];
-
-        rm.shader_vertices[i].pos = render_data.projection * player.model *
-                                    bone * vec4(vert.position, 1.0f);
-    }
-
-    rm.vao.update_vertex_data(rm.shader_vertices);
-    rm.vao.bind();
-
-    if (render_data.draw_models) {
-        glUseProgram(render_data.rigged_shader.id);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, player.tex.id);
-
-        rm.vao.draw(GL_TRIANGLES);
-    }
-
-    if (render_data.draw_wireframes) {
-        glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 0.0f, 1.0f,
-                    1.0f); // red
-
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        rm.vao.draw(GL_TRIANGLES);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
-    if (render_data.draw_bones) {
-        for (size_t i = 0; i < rm.bones.size(); ++i) {
-            rm.bones_shader_vertices[i * 2].pos =
-                render_data.projection * player.model * bone_transforms[i] *
-                rm.bones[i]
-                    .bind_pose_transform[3]; // Renders (0.0f, 0.0f, 0.0f) in
-                                             // the bones local space
-            rm.bones_shader_vertices[i * 2 + 1].pos =
-                render_data.projection * player.model * bone_transforms[i] *
-                rm.bones[i].bind_pose_transform * rm.bones[i].tail;
-        }
-
-        rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
-        rm.bones_vao.bind();
-
-        glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 0.0f,
-                    1.0f); // blue
-
-        glLineWidth(2.0f);
-        rm.bones_vao.draw(GL_LINES);
-        glLineWidth(1.0f);
-
-        rm.bones_vao.draw(GL_POINTS);
     }
 
     // Unbind vao for error safety

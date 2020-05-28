@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Util.h"
 #include "Mesh.h"
+#include "Collider.h"
 
 //----------------------------------//
 //----------Member structs----------//
@@ -98,6 +99,9 @@ struct Player {
     GamepadInput* gamepad_input;
 
     glm::mat4 model;
+
+    bool grounded = false;
+    const float gravity = 1.0f;
 };
 
 //-------------------------------//
@@ -116,6 +120,7 @@ struct Game {
     RenderData render_data;
     MouseKeyboardInput mouse_keyboard_input;
     Player player;
+    BoxCollider ground;
 
     std::array<GamepadInput, 4> gamepad_inputs;
 

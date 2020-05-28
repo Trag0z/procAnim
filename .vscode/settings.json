@@ -27,6 +27,7 @@
         "list": "cpp",
         "xtree": "cpp",
         "sstream": "cpp",
-        "xlocnum": "cpp"
+        "xlocnum": "cpp",
+        "xlocbuf": "cpp"
     }
 }
