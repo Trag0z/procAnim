@@ -311,7 +311,6 @@ inline void render(SDL_Window* window, const RenderData& render_data,
     }
 
     rm.vao.update_vertex_data(rm.shader_vertices);
-    rm.vao.bind();
 
     // Render player model
     if (render_data.draw_models) {
@@ -348,7 +347,6 @@ inline void render(SDL_Window* window, const RenderData& render_data,
         }
 
         rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
-        rm.bones_vao.bind();
 
         glUseProgram(render_data.debug_shader.id);
         glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 0.0f,
@@ -371,7 +369,6 @@ inline void render(SDL_Window* window, const RenderData& render_data,
 
         anim.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
                                            &render_pos)); // ugly, but it works
-        anim.vao.bind();
 
         glUseProgram(render_data.debug_shader.id);
         glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
@@ -387,7 +384,6 @@ inline void render(SDL_Window* window, const RenderData& render_data,
 
         anim.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
                                            &render_pos)); // ugly, but it works
-        anim.vao.bind();
 
         glUseProgram(render_data.debug_shader.id);
         glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);

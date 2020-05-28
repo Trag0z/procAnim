@@ -47,10 +47,8 @@ template <typename vertex_t> class VertexArrayData {
         glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * num_vertices, data);
     }
 
-    inline void bind() const { glBindVertexArray(vao_id); }
-
     inline void draw(GLenum mode) const {
-        bind();
+        glBindVertexArray(vao_id);
         glDrawElements(mode, _num_indices, GL_UNSIGNED_INT, 0);
     }
 };
