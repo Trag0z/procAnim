@@ -180,7 +180,21 @@ inline void update_player(float delta_time, Player& player,
     }
 
     //////          Walking animation           //////
+    int move_direction = 0;
     if (mkb.key[SDL_SCANCODE_LEFT]) {
+        move_direction -= 1;
+    }
+    if (mkb.key[SDL_SCANCODE_RIGHT]) {
+        move_direction += 1;
+    }
+
+    if (move_direction != 0) {
+        if ((player.facing_left && move_direction == 1) ||
+            (!player.facing_left && move_direction == -1)) {
+            player.facing_left = !player.facing_left;
+            player.scale.x *= -1.0f;
+        }
+
         switch (player.anim_state) {
         case Player::STANDING:
             // Start walking
