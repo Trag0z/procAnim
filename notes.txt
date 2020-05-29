@@ -11,6 +11,9 @@ Bugs:
 Cleanup:
 - remove using namespace ...; everywhere
 
+Optimizations:
+- bone.get_transform() is called often, calculates recursively every time
+
 
 Walking states:
 (Leg1 straight in front, leg2 straight behind)

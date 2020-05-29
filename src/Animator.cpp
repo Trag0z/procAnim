@@ -87,7 +87,6 @@ void ArmAnimator::update(float delta_time) {
     }
 
     float target_rotations[2];
-
     resolve_ik(bones, target_pos, target_rotations);
 
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
@@ -97,57 +96,62 @@ void ArmAnimator::update(float delta_time) {
                               std::min(1.0f, animation_speed * delta_time));
 }
 
+float LegAnimator::step_length = 1.0f;
+float LegAnimator::step_height = 0.5f;
+
 LegAnimator::LegAnimator(Bone* b1, Bone* b2) {
     bones[0] = b1;
     bones[1] = b2;
     target_pos = glm::vec4{0.0f, 0.0f, 0.0f, 0.0f};
     foot_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
                bones[1]->tail;
+    last_foot_movement = glm::vec4(0.0f);
+    grounded = false;
 
     // Init render data for rendering target_pos as a point
     GLuint index = 0;
 
     vao.init(&index, 1, NULL, 1);
-
-    // // Init render data for rendering the spline that the foot follows
-    // GLuint indices[debug_render_steps * 2];
-    // for (GLuint i = 0; i < debug_render_steps; ++i) {
-    //     indices[i * 2] = i;
-    //     indices[i * 2 + 1] = i + 1;
-    // }
-
-    // vao.init(indices, debug_render_steps * 2, NULL, 20);
 }
 
-void LegAnimator::update(float delta_time) {
-    // Return if no target position was set
+void LegAnimator::update(float delta_time, float walking_speed) {
+    // If no target position was set, update foot_pos and return
     if (glm::length(target_pos) == 0.0f) {
         foot_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
                    bones[1]->tail;
         return;
     }
 
-    time_since_start += delta_time;
+    resolve_ik(bones, target_pos, target_rotation);
 
-    if (time_since_start > step_duration) {
-        time_since_start -= step_duration;
-        second_phase = !second_phase;
+    // NOTE: delta_time is always 1.0f if we hit the target framerate and the
+    // game is running at normal speed multiplier
+    // NOTE: These lerps never reach 1.0f because walking_speed * delta_time is always about 0.2
+    bones[0]->rotation = lerp(bones[0]->rotation, target_rotation[0],
+                              std::min(1.0f, walking_speed * delta_time));
+
+    bones[1]->rotation = lerp(bones[1]->rotation, target_rotation[1],
+                              std::min(1.0f, walking_speed * delta_time));
+
+    // Update foot_pos
+    glm::vec4 new_foot_pos = bones[1]->get_transform() *
+                             bones[1]->bind_pose_transform * bones[1]->tail;
+    last_foot_movement = new_foot_pos - foot_pos;
+    foot_pos = new_foot_pos;
+}
+
+bool LegAnimator::has_reached_target_rotation() const {
+    return std::abs(bones[0]->rotation - target_rotation[0]) < 0.1f &&
+           std::abs(bones[1]->rotation - target_rotation[1]) < 0.1f;
+}
+
+void LegAnimator::set_target_foot_pos(TargetFootPosition pos) {
+    target_pos = bones[1]->bind_pose_transform * bones[1]->tail;
+    if (pos == RAISED) {
+        target_pos.y += step_height;
+    } else if (pos == LEFT) {
+        target_pos.x -= step_length / 2.0f;
+    } else if (pos == RIGHT) {
+        target_pos.x += step_length / 2.0f;
     }
-
-    float point_in_animation = time_since_start / step_duration;
-    if (!second_phase) {
-        float sine = sinf(point_in_animation * PI);
-        foot_pos = target_pos - glm::vec4(point_in_animation * step_length,
-                                          -sine * step_height, 0.0f, 0.0f);
-    } else {
-        foot_pos =
-            target_pos - glm::vec4(1.0f - point_in_animation * step_length,
-                                   0.0f, 0.0f, 0.0f);
-    }
-
-    float target_rotations[2];
-    resolve_ik(bones, foot_pos, target_rotations);
-
-    bones[0]->rotation = target_rotations[0];
-    bones[1]->rotation = target_rotations[1];
 }

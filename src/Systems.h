@@ -127,6 +127,7 @@ inline void update_player(float delta_time, Player& player,
                           const BoxCollider& ground,
                           const MouseKeyboardInput& mkb,
                           const RenderData& render_data) {
+    //////          Arm animation           //////
     if (mkb.mouse_button(1)) {
         player.rigged_mesh.arm_animators[1].target_pos =
             inverse(player.model) *
@@ -135,14 +136,15 @@ inline void update_player(float delta_time, Player& player,
                 static_cast<float>(render_data.window_size.y - mkb.mouse_pos.y),
                 0.0f, 1.0f);
     }
-    for (auto& anim : player.rigged_mesh.arm_animators) {
-        anim.update(delta_time);
+    for (auto& arm_anim : player.rigged_mesh.arm_animators) {
+        arm_anim.update(delta_time);
     }
 
     if (!player.grounded) {
         player.pos.y -= player.gravity;
     }
 
+    //////          Collision Detection         //////
     // Find closest point on gorund
     auto& leg_anims = player.rigged_mesh.leg_animators;
 
@@ -155,39 +157,94 @@ inline void update_player(float delta_time, Player& player,
             foot_pos_world[i].y - ground.pos.y - ground.half_ext.y;
     }
 
-    float smaller_distance =
-        std::min(distance_to_ground[0], distance_to_ground[1]);
-    if (smaller_distance <= 0.0f) {
-        player.pos.y -= smaller_distance;
+    size_t closer_to_ground =
+        distance_to_ground[0] < distance_to_ground[1] ? 0 : 1;
+    // Should be the same as:
+    // if (distance_to_ground[0] < distance_to_ground[1]) {
+    //     closer_to_ground = 0;
+    // } else {
+    //     closer_to_ground = 1;
+    // }
+
+    // Set grounded status
+    if (distance_to_ground[closer_to_ground] <= 0.0f) {
+        player.pos.y -= distance_to_ground[closer_to_ground];
+
         player.grounded = true;
+        leg_anims[closer_to_ground].grounded = true;
+        leg_anims[closer_to_ground ^ 1].grounded = false;
     } else {
         player.grounded = false;
+        leg_anims[0].grounded = false;
+        leg_anims[1].grounded = false;
     }
 
-    // Walking animation
+    //////          Walking animation           //////
     if (mkb.key[SDL_SCANCODE_LEFT]) {
-        // Left leg
-        auto& anim0 = player.rigged_mesh.leg_animators[0];
-        anim0.second_phase = false;
-        anim0.target_pos =
-            anim0.bones[1]->bind_pose_transform * anim0.bones[1]->tail;
+        switch (player.anim_state) {
+        case Player::STANDING:
+            // Start walking
+            leg_anims[0].set_target_foot_pos(LegAnimator::RAISED);
+            leg_anims[1].set_target_foot_pos(LegAnimator::NEUTRAL);
 
-        // TODO: Calculate the point better, on a circle around the bone
-        anim0.target_pos.x += anim0.step_length / 2.0f;
-        anim0.target_pos.y += 0.07f;
+            player.anim_state = Player::WALKING;
+            player.walk_state = Player::LEFT_UP;
+            break;
+        case Player::WALKING:
+            if (leg_anims[0].has_reached_target_rotation() &&
+                leg_anims[1].has_reached_target_rotation()) {
+                switch (player.walk_state) {
+                case Player::LEFT_UP:
+                    leg_anims[0].set_target_foot_pos(LegAnimator::LEFT);
+                    leg_anims[1].set_target_foot_pos(LegAnimator::RIGHT);
 
-        // Right leg
-        auto& anim1 = player.rigged_mesh.leg_animators[1];
-        anim1.second_phase = true;
-        anim1.target_pos =
-            anim1.bones[1]->bind_pose_transform * anim1.bones[1]->tail;
+                    player.walk_state = Player::LEFT_DOWN;
+                    break;
+                case Player::LEFT_DOWN:
+                    leg_anims[0].set_target_foot_pos(LegAnimator::NEUTRAL);
+                    leg_anims[1].set_target_foot_pos(LegAnimator::RAISED);
 
-        // TODO: Calculate the point better, on a circle around the bone
-        anim1.target_pos.x += anim1.step_length / 2.0f;
-        anim1.target_pos.y += 0.07f;
+                    player.walk_state = Player::RIGHT_UP;
+                    break;
+                case Player::RIGHT_UP:
+                    leg_anims[0].set_target_foot_pos(LegAnimator::RIGHT);
+                    leg_anims[1].set_target_foot_pos(LegAnimator::LEFT);
+
+                    player.walk_state = Player::RIGHT_DOWN;
+                    break;
+                case Player::RIGHT_DOWN:
+                    leg_anims[0].set_target_foot_pos(LegAnimator::RAISED);
+                    leg_anims[1].set_target_foot_pos(LegAnimator::NEUTRAL);
+
+                    player.walk_state = Player::LEFT_UP;
+                    break;
+                }
+            }
+            break;
+        default:
+            SDL_TriggerBreakpoint();
+            break;
+        }
+    } else if (player.anim_state == Player::WALKING) {
+        // Stop walking, reset to bind pose positions
+        leg_anims[0].target_pos = leg_anims[0].bones[1]->bind_pose_transform *
+                                  leg_anims[0].bones[1]->tail;
+
+        leg_anims[1].target_pos = leg_anims[1].bones[1]->bind_pose_transform *
+                                  leg_anims[1].bones[1]->tail;
+        player.anim_state = Player::STANDING;
     }
-    for (auto& anim : player.rigged_mesh.leg_animators) {
-        anim.update(delta_time);
+
+    for (auto& anim : leg_anims) {
+        anim.update(delta_time, player.walking_speed);
+    }
+
+    if (player.grounded) {
+        // So ugly with all the casting
+        glm::vec2 move = static_cast<glm::vec2>(
+            player.scale * static_cast<glm::vec3>(
+                               leg_anims[closer_to_ground].last_foot_movement));
+        player.pos -= move;
     }
 }
 
@@ -198,7 +255,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     ImGui_ImplSDL2_NewFrame(window);
     NewFrame();
 
-    // Debug controls window
+    //////          Debug controls window           //////
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
     Checkbox("Render player.model", &render_data.draw_models);
     Checkbox("Render wireframes", &render_data.draw_wireframes);
@@ -211,8 +268,17 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
 
     End();
 
-    // Limb data display window
+    //////          Limb data display window            //////
     Begin("Limb data", NULL, ImGuiWindowFlags_NoTitleBar);
+
+    char label[64];
+
+    sprintf_s(label, "% 6.1f, % 6.1f", player.pos.x, player.pos.y);
+    Text("Player position");
+    SameLine();
+    Text(label);
+    NewLine();
+
     Text("Target Positions");
     Columns(4);
     Separator();
@@ -226,7 +292,6 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     NextColumn();
     Separator();
 
-    char label[64];
     for (const auto& anim : player.rigged_mesh.arm_animators) {
         glm::vec4 target_world_pos = player.model * anim.target_pos;
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
@@ -302,7 +367,7 @@ inline void render(SDL_Window* window, const RenderData& render_data,
     // player.model
     // This resolves to model * translation * scale
     player.model = player.model = translate(mat4(1.0f), vec3(player.pos, 0.0f));
-    player.model = scale(player.model, vec3(100.0f, 100.0f, 1.0f));
+    player.model = scale(player.model, player.scale);
 
     RiggedMesh& rm = player.rigged_mesh;
 

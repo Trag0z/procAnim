@@ -110,8 +110,8 @@ void Game::init() {
 
     // Player
     player.init({1920.0f / 2.0f, 1080.0f / 2.0f + 200.0f},
-                "../assets/playerTexture.png", "../assets/guy.fbx",
-                &gamepad_inputs[0]);
+                glm::vec3(100.0f, 100.0f, 1.0f), "../assets/playerTexture.png",
+                "../assets/guy.fbx", &gamepad_inputs[0]);
 
     // Ground
     ground = BoxCollider({player.pos.x, player.pos.y - 400.0f},
@@ -213,12 +213,17 @@ void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
 #endif
 }
 
-void Player::init(glm::vec2 position, const char* texture_path,
-                  const char* mesh_path, GamepadInput* gamepad) {
+void Player::init(glm::vec2 position, glm::vec3 scale_factor,
+                  const char* texture_path, const char* mesh_path,
+                  GamepadInput* gamepad) {
     pos = position;
+    scale = scale_factor;
     tex = Texture::load_from_file(texture_path);
     rigged_mesh.load_from_file(mesh_path);
     gamepad_input = gamepad;
+
+    anim_state = AnimState::STANDING;
+    walk_state = WalkState::LEFT_UP;
 
     grounded = false;
 

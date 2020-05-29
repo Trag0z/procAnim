@@ -23,18 +23,20 @@ struct LegAnimator {
     Bone* bones[2];
 
     glm::vec4 target_pos, foot_pos;
-    float step_length = 1.0f, step_height = 0.5f;
-    float step_duration = 100.0f;
-    float time_since_start = 0.0f;
+    glm::vec4 last_foot_movement;
+    static float step_length, step_height;
+    bool grounded;
 
-    bool second_phase = false;
+    float target_rotation[2];
 
     VertexArrayData<DebugShaderVertex> vao;
-
-    const static GLuint debug_render_steps = 20;
 
     LegAnimator() {}
     LegAnimator(Bone* b1, Bone* b2);
 
-    void update(float delta_time);
+    void update(float delta_time, float walking_speed);
+    bool has_reached_target_rotation() const;
+
+    enum TargetFootPosition { NEUTRAL, RAISED, LEFT, RIGHT };
+    void set_target_foot_pos(TargetFootPosition pos);
 };
