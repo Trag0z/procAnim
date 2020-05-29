@@ -274,10 +274,10 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     char label[64];
 
     sprintf_s(label, "% 6.1f, % 6.1f", player.pos.x, player.pos.y);
-    Text("Player position");
+    Text("Player position: ");
     SameLine();
-    Text(label);
-    NewLine();
+    DragFloat2("Player position", (float*)&player.pos, 1.0f, 0.0f, 0.0f,
+               "% .2f");
 
     Text("Target Positions");
     Columns(4);
