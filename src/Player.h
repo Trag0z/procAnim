@@ -19,7 +19,7 @@ struct Player {
     enum WalkState { LEFT_UP, LEFT_DOWN, RIGHT_UP, RIGHT_DOWN } walk_state;
 
     bool grounded;
-    float walking_speed = 0.2f;
+    float walking_speed = 0.1f;
     const float gravity = 2.0f;
     bool facing_left = true;
 

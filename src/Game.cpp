@@ -117,6 +117,7 @@ void Game::init() {
     ground = BoxCollider({player.pos.x, player.pos.y - 400.0f},
                          {1920.0f / 2.1f, 10.0f});
 
+    frame_start = SDL_GetTicks();
     running = true;
 };
 

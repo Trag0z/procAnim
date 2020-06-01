@@ -141,7 +141,7 @@ inline void update_player(float delta_time, Player& player,
     }
 
     if (!player.grounded) {
-        player.pos.y -= player.gravity;
+        player.pos.y -= player.gravity * delta_time;
     }
 
     //////          Collision Detection         //////
