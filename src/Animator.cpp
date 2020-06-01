@@ -96,8 +96,8 @@ void ArmAnimator::update(float delta_time) {
                               std::min(1.0f, animation_speed * delta_time));
 }
 
-float LegAnimator::step_length = 1.0f;
-float LegAnimator::step_height = 0.5f;
+float LegAnimator::step_length = 1.5f;
+float LegAnimator::step_height = 0.7f;
 
 LegAnimator::LegAnimator(Bone* b1, Bone* b2) {
     bones[0] = b1;
@@ -126,7 +126,8 @@ void LegAnimator::update(float delta_time, float walking_speed) {
 
     // NOTE: delta_time is always 1.0f if we hit the target framerate and the
     // game is running at normal speed multiplier
-    // NOTE: These lerps never reach 1.0f because walking_speed * delta_time is always about 0.2
+    // NOTE: These lerps never reach 1.0f because walking_speed * delta_time is
+    // always about 0.2
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotation[0],
                               std::min(1.0f, walking_speed * delta_time));
 
@@ -148,10 +149,12 @@ bool LegAnimator::has_reached_target_rotation() const {
 void LegAnimator::set_target_foot_pos(TargetFootPosition pos) {
     target_pos = bones[1]->bind_pose_transform * bones[1]->tail;
     if (pos == RAISED) {
+        target_pos.x -= step_length / 4.0f;
         target_pos.y += step_height;
-    } else if (pos == LEFT) {
+    } else if (pos == FRONT) {
         target_pos.x -= step_length / 2.0f;
-    } else if (pos == RIGHT) {
+        target_pos.y += 0.24f;
+    } else if (pos == BACK) {
         target_pos.x += step_length / 2.0f;
     }
 }

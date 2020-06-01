@@ -209,8 +209,8 @@ inline void update_player(float delta_time, Player& player,
                 leg_anims[1].has_reached_target_rotation()) {
                 switch (player.walk_state) {
                 case Player::LEFT_UP:
-                    leg_anims[0].set_target_foot_pos(LegAnimator::LEFT);
-                    leg_anims[1].set_target_foot_pos(LegAnimator::RIGHT);
+                    leg_anims[0].set_target_foot_pos(LegAnimator::FRONT);
+                    leg_anims[1].set_target_foot_pos(LegAnimator::BACK);
 
                     player.walk_state = Player::LEFT_DOWN;
                     break;
@@ -221,8 +221,8 @@ inline void update_player(float delta_time, Player& player,
                     player.walk_state = Player::RIGHT_UP;
                     break;
                 case Player::RIGHT_UP:
-                    leg_anims[0].set_target_foot_pos(LegAnimator::RIGHT);
-                    leg_anims[1].set_target_foot_pos(LegAnimator::LEFT);
+                    leg_anims[0].set_target_foot_pos(LegAnimator::BACK);
+                    leg_anims[1].set_target_foot_pos(LegAnimator::FRONT);
 
                     player.walk_state = Player::RIGHT_DOWN;
                     break;
@@ -478,7 +478,8 @@ inline void render(SDL_Window* window, const RenderData& render_data,
         if (anim.target_pos.w == 0.0f)
             continue;
 
-        vec4 render_pos = render_data.projection * player.model * anim.foot_pos;
+        vec4 render_pos =
+            render_data.projection * player.model * anim.target_pos;
 
         anim.vao.update_vertex_data(1, reinterpret_cast<DebugShaderVertex*>(
                                            &render_pos)); // ugly, but it works

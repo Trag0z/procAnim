@@ -29,6 +29,7 @@
         "sstream": "cpp",
         "xlocnum": "cpp",
         "xlocbuf": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "cstddef": "cpp"
     }
 }

@@ -37,6 +37,6 @@ struct LegAnimator {
     void update(float delta_time, float walking_speed);
     bool has_reached_target_rotation() const;
 
-    enum TargetFootPosition { NEUTRAL, RAISED, LEFT, RIGHT };
+    enum TargetFootPosition { NEUTRAL, RAISED, FRONT, BACK };
     void set_target_foot_pos(TargetFootPosition pos);
 };
