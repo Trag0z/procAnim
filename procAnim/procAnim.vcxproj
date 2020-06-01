@@ -151,6 +151,7 @@
     <ClCompile Include="..\src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\src\Player.cpp" />
     <ClCompile Include="..\src\Shaders.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
     <ClCompile Include="..\src\Util.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Mesh.h" />
     <ClInclude Include="..\src\pch.h" />
+    <ClInclude Include="..\src\Player.h" />
     <ClInclude Include="..\src\Shaders.h" />
     <ClInclude Include="..\src\Systems.h" />
     <ClInclude Include="..\src\Texture.h" />

@@ -1,4 +1,5 @@
 TODO:
+- use splines for limb movements
 - find target points in a good way
 - bone rotation restrictions
 
@@ -13,11 +14,3 @@ Cleanup:
 
 Optimizations:
 - bone.get_transform() is called often, calculates recursively every time
-
-
-Walking states:
-(Leg1 straight in front, leg2 straight behind)
-1) push body over leg1, bend leg2
-2) leg1 moves to back, leg2 straightens, touches ground in front
-
-- start in the middle of 1)

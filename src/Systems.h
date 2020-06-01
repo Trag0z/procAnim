@@ -159,12 +159,6 @@ inline void update_player(float delta_time, Player& player,
 
     size_t closer_to_ground =
         distance_to_ground[0] < distance_to_ground[1] ? 0 : 1;
-    // Should be the same as:
-    // if (distance_to_ground[0] < distance_to_ground[1]) {
-    //     closer_to_ground = 0;
-    // } else {
-    //     closer_to_ground = 1;
-    // }
 
     // Set grounded status
     if (distance_to_ground[closer_to_ground] <= 0.0f) {
