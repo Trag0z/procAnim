@@ -21,7 +21,7 @@ struct Player {
     bool grounded;
     float walking_speed = 0.1f;
     const float gravity = 2.0f;
-    bool facing_left = true;
+    bool facing_right = true;
 
     void init(glm::vec2 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,

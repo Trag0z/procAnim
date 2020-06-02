@@ -9,19 +9,22 @@
 // to) target_pos
 static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
                        float* target_rotations) {
-    SDL_assert(bones[0]->parent->rotation == 0.0f);
-
+    // We need the target positions before the bone's rotation is applied to
+    // find the new, absolute rotation. Therefore, we use the
+    // inverse_bind_pose_transform
     glm::vec4 target_pos_bone_space[2];
-    target_pos_bone_space[0] =
-        bones[0]->inverse_bind_pose_transform * target_pos;
+    target_pos_bone_space[0] = bones[0]->inverse_bind_pose_transform *
+                               glm::inverse(bones[0]->parent->get_transform()) *
+                               target_pos;
 
     target_pos_bone_space[1] = bones[1]->inverse_bind_pose_transform *
-                               glm::inverse(bones[1]->parent->get_transform()) *
+                               glm::inverse(bones[0]->get_transform()) *
                                target_pos;
 
     float target_distance = glm::length(
         static_cast<glm::vec3>(target_pos - bones[0]->bind_pose_transform[3]));
 
+    // THe resulting rotations here are applied counter clockwise, but why?
     if (target_distance > bones[0]->length + bones[1]->length) {
         // Target out of reach
         // Get angle between local up (y-axis) and target position
@@ -32,27 +35,37 @@ static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
             atan2f(target_pos_bone_space[1].y, target_pos_bone_space[1].x) -
             degToRad(90.0f);
     } else {
-
         float target_distance2 = target_distance * target_distance;
         float length2[2] = {bones[0]->length * bones[0]->length,
                             bones[1]->length * bones[1]->length};
 
         float cosAngle0 = (target_distance2 + length2[0] - length2[1]) /
                           (2 * target_distance * bones[0]->length);
-        target_rotations[0] =
-            atan2f(target_pos_bone_space[0].y, target_pos_bone_space[0].x) -
-            acosf(cosAngle0) - degToRad(90.0f);
+
+        float atan =
+            atan2f(target_pos_bone_space[0].y, target_pos_bone_space[0].x);
+        float acos = acosf(cosAngle0);
+        target_rotations[0] = atan - acos - PI * 0.5f;
 
         float cosAngle1 = (length2[0] + length2[1] - target_distance2) /
                           (2.0f * bones[0]->length * bones[1]->length);
+        float acos1 = acosf(cosAngle1);
         target_rotations[1] =
-            degToRad(175.0f) -
-            acosf(cosAngle1); // TODO: The argument for degToRad() should be
-                              // 180, but then the arm overshoots the position
-                              // by a bit. Find out why that is! 175 gives
-                              // almost pixel perfect results for arms.
+            PI - acos1; // TODO: The argument for degToRad() should be
+                        // 180, but then the arm overshoots the position
+                        // by a bit. Find out why that is! 175 gives
+                        // almost pixel perfect results for arms.
+
+        /*if (target_rotations[1] > 0.0f) {
+            target_rotations[0] = -atan2f(target_pos_bone_space[0].y,
+                                          target_pos_bone_space[0].x) +
+                                  acosf(cosAngle0) + degToRad(180.0f);
+            target_rotations[1] = degToRad(180.0f) + acosf(cosAngle1);
+        }*/
     }
 
+    // If the target rotation is more than 180 degrees away from the current
+    // rotation, choose the shorter way around the circle
     // NOTE: Is this necessary if the point is out of reach?
     if (target_rotations[0] - bones[0]->rotation > PI) {
         target_rotations[0] -= 2.0f * PI;
@@ -149,12 +162,12 @@ bool LegAnimator::has_reached_target_rotation() const {
 void LegAnimator::set_target_foot_pos(TargetFootPosition pos) {
     target_pos = bones[1]->bind_pose_transform * bones[1]->tail;
     if (pos == RAISED) {
-        target_pos.x -= step_length / 4.0f;
+        target_pos.x += step_length / 4.0f;
         target_pos.y += step_height;
     } else if (pos == FRONT) {
-        target_pos.x -= step_length / 2.0f;
+        target_pos.x += step_length / 2.0f;
         target_pos.y += 0.24f;
     } else if (pos == BACK) {
-        target_pos.x += step_length / 2.0f;
+        target_pos.x -= step_length / 2.0f;
     }
 }

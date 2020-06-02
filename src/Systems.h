@@ -183,9 +183,9 @@ inline void update_player(float delta_time, Player& player,
     }
 
     if (move_direction != 0) {
-        if ((player.facing_left && move_direction == 1) ||
-            (!player.facing_left && move_direction == -1)) {
-            player.facing_left = !player.facing_left;
+        if ((player.facing_right && move_direction == -1) ||
+            (!player.facing_right && move_direction == 1)) {
+            player.facing_right = !player.facing_right;
             player.scale.x *= -1.0f;
         }
 
