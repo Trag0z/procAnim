@@ -4,8 +4,13 @@
 
 struct Bone;
 
+struct BoneRestrictions {
+    float min_rotation, max_rotation;
+};
+
 struct ArmAnimator {
     Bone* bones[2];
+    BoneRestrictions bone_restrictions[2];
 
     glm::vec4 target_pos;
 
@@ -14,13 +19,14 @@ struct ArmAnimator {
     const static float animation_speed;
 
     ArmAnimator() {}
-    ArmAnimator(Bone* b1, Bone* b2);
+    ArmAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2] = nullptr);
 
     void update(float delta_time);
 };
 
 struct LegAnimator {
     Bone* bones[2];
+    BoneRestrictions bone_restrictions[2];
 
     glm::vec4 target_pos, foot_pos;
     glm::vec4 last_foot_movement;
@@ -32,7 +38,7 @@ struct LegAnimator {
     VertexArrayData<DebugShaderVertex> vao;
 
     LegAnimator() {}
-    LegAnimator(Bone* b1, Bone* b2);
+    LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2] = nullptr);
 
     void update(float delta_time, float walking_speed);
     bool has_reached_target_rotation() const;

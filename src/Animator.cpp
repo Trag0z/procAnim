@@ -7,8 +7,11 @@
 // Takes a target_pos in model space and finds two target_rotations for the
 // bones, so that the tail of bone[1] is at (or at the closest possible point
 // to) target_pos
-static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
-                       float* target_rotations) {
+static void resolve_ik(Bone* const bones[2],
+                       const BoneRestrictions bone_restrictions[2],
+                       glm::vec4 target_pos, float* target_rotations) {
+    SDL_assert(bones != nullptr && bone_restrictions != nullptr);
+
     // We need the target positions before the bone's rotation is applied to
     // find the new, absolute rotation. Therefore, we use the
     // inverse_bind_pose_transform
@@ -24,7 +27,8 @@ static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
     float target_distance = glm::length(
         static_cast<glm::vec3>(target_pos - bones[0]->bind_pose_transform[3]));
 
-    // THe resulting rotations here are applied counter clockwise, but why?
+    // NOTE: The resulting rotations here are applied counter clockwise, but
+    // why?
     if (target_distance > bones[0]->length + bones[1]->length) {
         // Target out of reach
         // Get angle between local up (y-axis) and target position
@@ -56,12 +60,11 @@ static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
                         // by a bit. Find out why that is! 175 gives
                         // almost pixel perfect results for arms.
 
-        /*if (target_rotations[1] > 0.0f) {
-            target_rotations[0] = -atan2f(target_pos_bone_space[0].y,
-                                          target_pos_bone_space[0].x) +
-                                  acosf(cosAngle0) + degToRad(180.0f);
-            target_rotations[1] = degToRad(180.0f) + acosf(cosAngle1);
-        }*/
+        if ((target_rotations[1] < bone_restrictions[1].min_rotation ||
+             target_rotations[1] > bone_restrictions[1].max_rotation)) {
+            target_rotations[0] += acos * 2.0f;
+            target_rotations[1] *= -1.0f;
+        }
     }
 
     // If the target rotation is more than 180 degrees away from the current
@@ -82,9 +85,20 @@ static void resolve_ik(Bone* const bones[2], glm::vec4 target_pos,
 
 const float ArmAnimator::animation_speed = 0.1f;
 
-ArmAnimator::ArmAnimator(Bone* b1, Bone* b2) {
+ArmAnimator::ArmAnimator(Bone* b1, Bone* b2,
+                         BoneRestrictions restrictions[2]) {
     bones[0] = b1;
     bones[1] = b2;
+
+    if (restrictions == nullptr) {
+        bone_restrictions[0] = {std::numeric_limits<float>::min(),
+                                std::numeric_limits<float>::max()};
+        bone_restrictions[1] = bone_restrictions[0];
+    } else {
+        bone_restrictions[0] = restrictions[0];
+        bone_restrictions[1] = restrictions[1];
+    }
+
     target_pos = glm::vec4{0.0f, 0.0f, 0.0f, 0.0f};
 
     // Init render data for rendering target_pos_model_space as a point
@@ -100,7 +114,7 @@ void ArmAnimator::update(float delta_time) {
     }
 
     float target_rotations[2];
-    resolve_ik(bones, target_pos, target_rotations);
+    resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
 
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
                               std::min(1.0f, animation_speed * delta_time));
@@ -112,9 +126,20 @@ void ArmAnimator::update(float delta_time) {
 float LegAnimator::step_length = 1.5f;
 float LegAnimator::step_height = 0.7f;
 
-LegAnimator::LegAnimator(Bone* b1, Bone* b2) {
+LegAnimator::LegAnimator(Bone* b1, Bone* b2,
+                         BoneRestrictions restrictions[2]) {
     bones[0] = b1;
     bones[1] = b2;
+
+    if (restrictions == nullptr) {
+        bone_restrictions[0] = {std::numeric_limits<float>::min(),
+                                std::numeric_limits<float>::max()};
+        bone_restrictions[1] = bone_restrictions[0];
+    } else {
+        bone_restrictions[0] = restrictions[0];
+        bone_restrictions[1] = restrictions[1];
+    }
+
     target_pos = glm::vec4{0.0f, 0.0f, 0.0f, 0.0f};
     foot_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
                bones[1]->tail;
@@ -135,7 +160,7 @@ void LegAnimator::update(float delta_time, float walking_speed) {
         return;
     }
 
-    resolve_ik(bones, target_pos, target_rotation);
+    resolve_ik(bones, bone_restrictions, target_pos, target_rotation);
 
     // NOTE: delta_time is always 1.0f if we hit the target framerate and the
     // game is running at normal speed multiplier

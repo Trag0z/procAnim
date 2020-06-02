@@ -1,7 +1,10 @@
 TODO:
+- bone rotation restrictions:
+    > need to apply when out of range
+    > are not used for bone[0]
+    > not yet set for ArmAnimators
 - use splines for limb movements
 - find target points in a good way
-- bone rotation restrictions
 
 - longer bone chains, multiple parents?
 - more polygons, nicer texture
