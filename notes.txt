@@ -9,11 +9,11 @@ TODO:
 - longer bone chains, multiple parents?
 - more polygons, nicer texture
 
-Bugs:
+Bugs:               (@BUG)
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely
 
-Cleanup:
+Cleanup:            (@CLEANUP)
 - remove using namespace ...; everywhere
 
-Optimizations:
+Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time

@@ -32,12 +32,39 @@ static void resolve_ik(Bone* const bones[2],
     if (target_distance > bones[0]->length + bones[1]->length) {
         // Target out of reach
         // Get angle between local up (y-axis) and target position
-        target_rotations[0] =
-            atan2f(target_pos_bone_space[0].y, target_pos_bone_space[0].x) -
-            degToRad(90.0f);
-        target_rotations[1] =
-            atan2f(target_pos_bone_space[1].y, target_pos_bone_space[1].x) -
-            degToRad(90.0f);
+
+        for (size_t i = 0; i < 2; ++i) {
+            target_rotations[i] =
+                atan2f(target_pos_bone_space[i].y, target_pos_bone_space[i].x) -
+                degToRad(90.0f);
+
+            SDL_assert(target_rotations[i] < 2.0f * PI &&
+                       target_rotations[i] > -2.0f * PI);
+
+            // Find out if min_rotation or max_rotation is closer to the
+            // target_rotation and set target_rotation to the closer one.
+            // @OPTIMIZE: Maybe the clamp below can be covered by this
+            // section?
+            if (target_rotations[i] < 0.0f) {
+                if (std::abs(target_rotations[i] -
+                             bone_restrictions[i].min_rotation) >
+                    std::abs(target_rotations[i] + 2.0f * PI -
+                             bone_restrictions[i].max_rotation)) {
+                    target_rotations[i] += 2.0f * PI;
+                }
+            } else {
+                if (std::abs(target_rotations[i] - 2.0f * PI -
+                             bone_restrictions[i].min_rotation) <
+                    std::abs(target_rotations[i] -
+                             bone_restrictions[i].max_rotation)) {
+                    target_rotations[i] -= 2.0f * PI;
+                }
+            }
+
+            target_rotations[i] =
+                clamp(target_rotations[i], bone_restrictions[i].min_rotation,
+                      bone_restrictions[i].max_rotation);
+        }
     } else {
         float target_distance2 = target_distance * target_distance;
         float length2[2] = {bones[0]->length * bones[0]->length,
@@ -55,7 +82,7 @@ static void resolve_ik(Bone* const bones[2],
                           (2.0f * bones[0]->length * bones[1]->length);
         float acos1 = acosf(cosAngle1);
         target_rotations[1] =
-            PI - acos1; // TODO: The argument for degToRad() should be
+            PI - acos1; // BUG: The argument for degToRad() should be
                         // 180, but then the arm overshoots the position
                         // by a bit. Find out why that is! 175 gives
                         // almost pixel perfect results for arms.
@@ -85,14 +112,12 @@ static void resolve_ik(Bone* const bones[2],
 
 const float ArmAnimator::animation_speed = 0.1f;
 
-ArmAnimator::ArmAnimator(Bone* b1, Bone* b2,
-                         BoneRestrictions restrictions[2]) {
+ArmAnimator::ArmAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
     bones[0] = b1;
     bones[1] = b2;
 
     if (restrictions == nullptr) {
-        bone_restrictions[0] = {std::numeric_limits<float>::min(),
-                                std::numeric_limits<float>::max()};
+        bone_restrictions[0] = {-2.0f * PI, 2.0f * PI};
         bone_restrictions[1] = bone_restrictions[0];
     } else {
         bone_restrictions[0] = restrictions[0];
@@ -126,8 +151,7 @@ void ArmAnimator::update(float delta_time) {
 float LegAnimator::step_length = 1.5f;
 float LegAnimator::step_height = 0.7f;
 
-LegAnimator::LegAnimator(Bone* b1, Bone* b2,
-                         BoneRestrictions restrictions[2]) {
+LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
     bones[0] = b1;
     bones[1] = b2;
 

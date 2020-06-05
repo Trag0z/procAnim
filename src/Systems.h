@@ -1,9 +1,6 @@
 #pragma once
 #include "pch.h"
 #include "Mesh.h"
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_sdl.h>
-#include <imgui/imgui_impl_opengl3.h>
 
 inline void poll_inputs(MouseKeyboardInput& mkb,
                         std::array<GamepadInput, 4>& pads) {

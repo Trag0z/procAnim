@@ -5,6 +5,7 @@
 #pragma warning(push, 0)
 
 #include <array>
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -25,6 +26,10 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 #pragma warning(pop)
 

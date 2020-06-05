@@ -130,9 +130,15 @@ void RiggedMesh::load_from_file(const char* file) {
     delete[] vertex_bone_counts;
 
     // Init LimbAnimators
-    BoneRestrictions restrictions[2] = {{-180.0f, 180.0f}, {-110.0f, 0.0f}};
-    arm_animators[0] = ArmAnimator(find_bone("Arm_L_1"), find_bone("Arm_L_2"));
-    arm_animators[1] = ArmAnimator(find_bone("Arm_R_1"), find_bone("Arm_R_2"));
+    BoneRestrictions restrictions[2] = {{-0.5f * PI, 0.5 * PI},
+                                        {0.0f, 0.75f * PI}};
+    arm_animators[0] =
+        ArmAnimator(find_bone("Arm_L_1"), find_bone("Arm_L_2"), restrictions);
+    arm_animators[1] =
+        ArmAnimator(find_bone("Arm_R_1"), find_bone("Arm_R_2"), restrictions);
+
+    restrictions[0] = {-0.5f * PI, -0.5f * PI};
+    restrictions[1] = {degToRad(-110.0f), 0.0f};
     leg_animators[0] =
         LegAnimator(find_bone("Leg_L_1"), find_bone("Leg_L_2"), restrictions);
     leg_animators[1] =
