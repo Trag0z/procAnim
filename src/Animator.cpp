@@ -27,6 +27,33 @@ static void resolve_ik(Bone* const bones[2],
     float target_distance = glm::length(
         static_cast<glm::vec3>(target_pos - bones[0]->bind_pose_transform[3]));
 
+    // Find out if min_rotation or max_rotation is closer to the target_rotation
+    // and set target_rotation to the closer one if it is out of the restricted
+    // range
+    auto clampToClosestRestriction = [target_rotations,
+                                      bone_restrictions](size_t bone_index) {
+        if (target_rotations[bone_index] < 0.0f) {
+            if (std::abs(target_rotations[bone_index] -
+                         bone_restrictions[bone_index].min_rotation) >
+                std::abs(target_rotations[bone_index] + 2.0f * PI -
+                         bone_restrictions[bone_index].max_rotation)) {
+                target_rotations[bone_index] += 2.0f * PI;
+            }
+        } else {
+            if (std::abs(target_rotations[bone_index] - 2.0f * PI -
+                         bone_restrictions[bone_index].min_rotation) <
+                std::abs(target_rotations[bone_index] -
+                         bone_restrictions[bone_index].max_rotation)) {
+                target_rotations[bone_index] -= 2.0f * PI;
+            }
+        }
+
+        target_rotations[bone_index] = // Does this actually change the value?
+            clamp(target_rotations[bone_index],
+                  bone_restrictions[bone_index].min_rotation,
+                  bone_restrictions[bone_index].max_rotation);
+    };
+
     // NOTE: The resulting rotations here are applied counter clockwise, but
     // why?
     if (target_distance > bones[0]->length + bones[1]->length) {
@@ -41,29 +68,7 @@ static void resolve_ik(Bone* const bones[2],
             SDL_assert(target_rotations[i] < 2.0f * PI &&
                        target_rotations[i] > -2.0f * PI);
 
-            // Find out if min_rotation or max_rotation is closer to the
-            // target_rotation and set target_rotation to the closer one.
-            // @OPTIMIZE: Maybe the clamp below can be covered by this
-            // section?
-            if (target_rotations[i] < 0.0f) {
-                if (std::abs(target_rotations[i] -
-                             bone_restrictions[i].min_rotation) >
-                    std::abs(target_rotations[i] + 2.0f * PI -
-                             bone_restrictions[i].max_rotation)) {
-                    target_rotations[i] += 2.0f * PI;
-                }
-            } else {
-                if (std::abs(target_rotations[i] - 2.0f * PI -
-                             bone_restrictions[i].min_rotation) <
-                    std::abs(target_rotations[i] -
-                             bone_restrictions[i].max_rotation)) {
-                    target_rotations[i] -= 2.0f * PI;
-                }
-            }
-
-            target_rotations[i] =
-                clamp(target_rotations[i], bone_restrictions[i].min_rotation,
-                      bone_restrictions[i].max_rotation);
+            clampToClosestRestriction(i);
         }
     } else {
         float target_distance2 = target_distance * target_distance;
@@ -82,21 +87,19 @@ static void resolve_ik(Bone* const bones[2],
                           (2.0f * bones[0]->length * bones[1]->length);
         float acos1 = acosf(cosAngle1);
         target_rotations[1] =
-            PI - acos1; // BUG: The argument for degToRad() should be
-                        // 180, but then the arm overshoots the position
-                        // by a bit. Find out why that is! 175 gives
-                        // almost pixel perfect results for arms.
+            PI -
+            acos1; // BUG: PI should be the right value here, but then the arm
+                   // overshoots the position by a bit. Find out why that is!
+                   // 175 degrees gives almost pixel perfect results for arms.
 
-        if ((target_rotations[1] < bone_restrictions[1].min_rotation ||
-             target_rotations[1] > bone_restrictions[1].max_rotation)) {
-            target_rotations[0] += acos * 2.0f;
-            target_rotations[1] *= -1.0f;
-        }
+        clampToClosestRestriction(0);
+        clampToClosestRestriction(1);
     }
 
-    // If the target rotation is more than 180 degrees away from the current
+    // NOTE: The following stuff should be covered by
+    // clampToClosestRestriction()
+    /* // If the target rotation is more than 180 degrees away from the current
     // rotation, choose the shorter way around the circle
-    // NOTE: Is this necessary if the point is out of reach?
     if (target_rotations[0] - bones[0]->rotation > PI) {
         target_rotations[0] -= 2.0f * PI;
     } else if (target_rotations[0] - bones[0]->rotation < -PI) {
@@ -107,7 +110,7 @@ static void resolve_ik(Bone* const bones[2],
         target_rotations[1] -= 2.0f * PI;
     } else if (target_rotations[1] - bones[1]->rotation < -PI) {
         target_rotations[1] += 2.0f * PI;
-    }
+    } */
 }
 
 const float ArmAnimator::animation_speed = 0.1f;
@@ -186,10 +189,10 @@ void LegAnimator::update(float delta_time, float walking_speed) {
 
     resolve_ik(bones, bone_restrictions, target_pos, target_rotation);
 
-    // NOTE: delta_time is always 1.0f if we hit the target framerate and the
-    // game is running at normal speed multiplier
-    // NOTE: These lerps never reach 1.0f because walking_speed * delta_time is
-    // always about 0.2
+    // NOTE: delta_time is always 1.0f if we hit the target framerate and
+    // the game is running at normal speed multiplier NOTE: These lerps
+    // never reach 1.0f because walking_speed * delta_time is always about
+    // 0.2
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotation[0],
                               std::min(1.0f, walking_speed * delta_time));
 
