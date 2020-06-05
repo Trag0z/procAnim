@@ -92,6 +92,13 @@ static void resolve_ik(Bone* const bones[2],
                    // overshoots the position by a bit. Find out why that is!
                    // 175 degrees gives almost pixel perfect results for arms.
 
+        // If the target is unreachable, try rotating bone[0] the other way
+        if ((target_rotations[1] < bone_restrictions[1].min_rotation ||
+             target_rotations[1] > bone_restrictions[1].max_rotation)) {
+            target_rotations[0] += acos * 2.0f;
+            target_rotations[1] *= -1.0f;
+        }
+
         clampToClosestRestriction(0);
         clampToClosestRestriction(1);
     }
@@ -190,9 +197,10 @@ void LegAnimator::update(float delta_time, float walking_speed) {
     resolve_ik(bones, bone_restrictions, target_pos, target_rotation);
 
     // NOTE: delta_time is always 1.0f if we hit the target framerate and
-    // the game is running at normal speed multiplier NOTE: These lerps
-    // never reach 1.0f because walking_speed * delta_time is always about
-    // 0.2
+    // the game is running at normal speed multiplier
+
+    // NOTE: These lerps never reach 1.0f because walking_speed * delta_time is
+    // always about 0.2
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotation[0],
                               std::min(1.0f, walking_speed * delta_time));
 
@@ -207,8 +215,8 @@ void LegAnimator::update(float delta_time, float walking_speed) {
 }
 
 bool LegAnimator::has_reached_target_rotation() const {
-    return std::abs(bones[0]->rotation - target_rotation[0]) < 0.1f &&
-           std::abs(bones[1]->rotation - target_rotation[1]) < 0.1f;
+    return std::abs(bones[0]->rotation - target_rotation[0]) < 0.05f &&
+           std::abs(bones[1]->rotation - target_rotation[1]) < 0.05f;
 }
 
 void LegAnimator::set_target_foot_pos(TargetFootPosition pos) {

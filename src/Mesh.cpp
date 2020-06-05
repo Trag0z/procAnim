@@ -137,8 +137,8 @@ void RiggedMesh::load_from_file(const char* file) {
     arm_animators[1] =
         ArmAnimator(find_bone("Arm_R_1"), find_bone("Arm_R_2"), restrictions);
 
-    restrictions[0] = {-0.5f * PI, -0.5f * PI};
-    restrictions[1] = {degToRad(-110.0f), 0.0f};
+    restrictions[0] = {-0.7f * PI, 0.7f * PI};
+    restrictions[1] = {degToRad(-120.0f), 0.0f};
     leg_animators[0] =
         LegAnimator(find_bone("Leg_L_1"), find_bone("Leg_L_2"), restrictions);
     leg_animators[1] =

@@ -245,7 +245,7 @@ inline void update_player(float delta_time, Player& player,
     }
 
     if (player.grounded) {
-        // So ugly with all the casting
+        // @CLEANUP: This is so ugly with all the casting
         glm::vec2 move = static_cast<glm::vec2>(
             player.scale * static_cast<glm::vec3>(
                                leg_anims[closer_to_ground].last_foot_movement));
