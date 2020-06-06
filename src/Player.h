@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Texture.h"
 #include "Mesh.h"
+#include "Collider.h"
 
 class Gamepad;
 
@@ -26,4 +27,7 @@ struct Player {
     void init(glm::vec2 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,
               Gamepad* gamepad);
+
+    void update(float delta_time, const BoxCollider& ground,
+                const MouseKeyboardInput& mkb);
 };

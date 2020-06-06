@@ -104,6 +104,7 @@ bool Game::run() {
         last_frame_start = frame_start;
         frame_start = SDL_GetTicks();
 
+        SDL_PumpEvents();
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
@@ -115,7 +116,6 @@ bool Game::run() {
                 running = false;
         }
 
-        SDL_PumpEvents();
         mouse_keyboard_input.update();
         for (auto& pad : gamepad_inputs) {
             pad.update();
@@ -141,6 +141,8 @@ bool Game::run() {
             running = false;
         }
 
+        update_gui(window, render_data, game_config, player, spline_editor);
+
         if (game_config.spline_edit_mode) {
             spline_editor.update(mouse_keyboard_input);
         } else {
@@ -151,15 +153,12 @@ bool Game::run() {
             if (!game_config.step_mode) {
                 float delta_time =
                     last_frame_duration / frame_delay * game_config.speed;
-                update_player(delta_time, player, ground, mouse_keyboard_input);
+                player.update(delta_time, ground, mouse_keyboard_input);
             } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
                        mouse_keyboard_input.key(SDL_SCANCODE_M)) {
-                update_player(game_config.speed, player, ground,
-                              mouse_keyboard_input);
+                player.update(game_config.speed, ground, mouse_keyboard_input);
             }
         }
-
-        update_gui(window, render_data, game_config, player, spline_editor);
 
         render(window, render_data, player, ground, spline_editor);
 

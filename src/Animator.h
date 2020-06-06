@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "VertexArrayData.h"
+#include "Spline.h"
 
 struct Bone;
 
@@ -45,4 +46,18 @@ struct LegAnimator {
 
     enum TargetFootPosition { NEUTRAL, RAISED, FRONT, BACK };
     void set_target_foot_pos(TargetFootPosition pos);
+};
+
+class WalkAnimator {
+    ArmAnimator arm_animators[2];
+    LegAnimator leg_animators[2];
+
+    Spline splines[4];
+
+    enum {
+        LEG_FORWARD = 0,
+        LEG_BACKWARD = 1,
+        ARM_FORWARD = 2,
+        ARM_BACKWARD = 3
+    };
 };

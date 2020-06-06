@@ -1,6 +1,3 @@
-NEXT:
-- add projection matrix to shaders so splines render correctly (and it's more efficient)
-
 TODO:
 - use splines for limb movements
 - find target points in a good way
