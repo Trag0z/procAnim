@@ -7,8 +7,8 @@ Spline::Spline(glm::vec2 points_[num_points]) {
 
     // Init line render data
     glm::mat4 parameter_matrix = glm::mat4(
-        glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[1], 0.0f, 1.0f),
-        glm::vec4(points[2], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f));
+        glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f),
+        glm::vec4(points[1], 0.0f, 1.0f), glm::vec4(points[2], 0.0f, 1.0f));
 
     GLuint indices[render_steps];
     glm::vec4 interpolation_vector;
@@ -34,8 +34,8 @@ Spline::Spline(glm::vec2 points_[num_points]) {
 void Spline::update_render_data() {
     // Line
     glm::mat4 parameter_matrix = glm::mat4(
-        glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[1], 0.0f, 1.0f),
-        glm::vec4(points[2], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f));
+        glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f),
+        glm::vec4(points[1], 0.0f, 1.0f), glm::vec4(points[2], 0.0f, 1.0f));
 
     glm::vec4 interpolation_vector;
     for (size_t i = 0; i < render_steps; ++i) {
@@ -68,42 +68,40 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
             return;
         }
 
-        last.points[1] = input.mouse_world_pos();
+        last.points[3] = input.mouse_world_pos();
 
-        glm::vec2 start_to_end = last.points[1] - last.points[0];
-        last.points[2] = last.points[0] + start_to_end * 0.3f;
-        last.points[3] = last.points[1] + start_to_end * 0.3f;
+        glm::vec2 start_to_end = last.points[3] - last.points[0];
+        last.points[1] = last.points[0] + start_to_end * 0.3f;
+        last.points[2] = last.points[3] + start_to_end * 0.3f;
         last.update_render_data();
 
         if (input.mouse_button_down(1)) {
             creating_new_spline = false;
+            first_point_set = false;
         }
         return;
     }
 
     if (input.mouse_button_up(1)) {
         selected_point = nullptr;
-        selected_spline = nullptr;
         return;
     }
 
     glm::vec2 mouse_pos = input.mouse_world_pos();
     if (input.mouse_button_down(1)) {
-        for (auto& s : splines) {
-            for (auto& p : s.points) {
+        for (size_t i = 0; i < splines.size(); ++i) {
+            for (auto& p : splines[i].points) {
                 if (glm::length(p - mouse_pos) < 3.0f) {
                     selected_point = &p;
-                    selected_spline = &s;
+                    selected_spline_index = i;
                 }
             }
         }
     }
 
     if (selected_point) {
-        SDL_assert(selected_spline);
-
         *selected_point = mouse_pos;
-        selected_spline->update_render_data();
+        splines[selected_spline_index].update_render_data();
     }
 }
 
@@ -111,11 +109,36 @@ void SplineEditor::update_gui() {
     using namespace ImGui;
 
     Begin("Spline Editor");
+    Text("Splines");
+
+    char** spline_names = new char*[splines.size()];
+
+    for (size_t i = 0; i < splines.size(); ++i) {
+        spline_names[i] = new char[16];
+        sprintf_s(spline_names[i], 16, "Spline %zu", i);
+    }
+
+    int selected = static_cast<int>(selected_spline_index);
+    ListBox("", &selected, spline_names, static_cast<int>(splines.size()));
+
+    selected_spline_index = static_cast<size_t>(selected);
+
+    for (size_t i = 0; i < splines.size(); ++i) {
+        delete[] spline_names[i];
+    }
+    delete[] spline_names;
+
     if (Button("New spline") && !creating_new_spline) {
         glm::vec2 points[4] = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f),
                                glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f)};
         splines.push_back(Spline(points));
         creating_new_spline = true;
+        selected_spline_index = splines.size() - 1;
+    }
+    SameLine();
+
+    if (Button("Delete")) {
+        splines.erase(splines.begin() + selected_spline_index);
     }
 
     End();
@@ -129,9 +152,15 @@ void SplineEditor::render(GLuint shader_id, GLuint color_uniform_loc) {
 
         glLineWidth(1.0f);
         s.line_vao.draw(GL_LINE_STRIP);
+    }
+
+    if (selected_spline_index >= 0 && selected_spline_index < splines.size()) {
+        glUniform4f(color_uniform_loc, 0.7f, 0.0f, 0.7f,
+                    1.0f); // Light purple
+        splines[selected_spline_index].point_vao.draw(GL_LINES);
 
         glUniform4f(color_uniform_loc, 1.0f, 0.0f, 1.0f,
                     1.0f); // Purple
-        s.point_vao.draw(GL_POINTS);
+        splines[selected_spline_index].point_vao.draw(GL_POINTS);
     }
 }

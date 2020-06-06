@@ -18,21 +18,21 @@ struct Spline {
     std::array<DebugShaderVertex, num_points> point_shader_vertices;
 
   public:
-    // Points in format P1, P2, T1, T2
+    // Points in format P1, T1, T2, P2
     Spline(glm::vec2 points_[num_points]);
 
     void update_render_data();
 
-    const glm::mat4 hermite_matrix = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
-                                      -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
-                                      1.0f,  0.0f,  0.0f, 0.0f};
+    glm::mat4 hermite_matrix = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
+                                -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
+                                1.0f,  0.0f,  0.0f, 0.0f};
 };
 
 class SplineEditor {
     std::vector<Spline> splines;
 
     glm::vec2* selected_point = nullptr;
-    Spline* selected_spline = nullptr;
+    size_t selected_spline_index;
 
     bool creating_new_spline = false;
     bool first_point_set = false;

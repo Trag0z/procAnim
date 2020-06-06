@@ -12,6 +12,7 @@
 #include <sstream>
 #include <vector>
 #include <limits.h>
+#include <list>
 
 #include <GL/glew.h>
 #include <gl/glew.h>
