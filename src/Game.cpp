@@ -87,12 +87,13 @@ void Game::init() {
     Gamepad::init(gamepad_inputs);
 
     // Player
-    player.init({1920.0f / 2.0f, 1080.0f / 2.0f + 200.0f},
+    glm::vec2 position = { 1920.0f / 2.0f, 1080.0f / 2.0f };
+    player.init(position,
                 glm::vec3(100.0f, 100.0f, 1.0f), "../assets/playerTexture.png",
                 "../assets/guy.fbx", nullptr);
 
     // Ground
-    ground = BoxCollider({player.pos.x, player.pos.y - 400.0f},
+    ground = BoxCollider({position.x, position.y - 400.0f},
                          {1920.0f / 2.1f, 10.0f});
 
     frame_start = SDL_GetTicks();

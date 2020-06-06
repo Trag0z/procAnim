@@ -5,8 +5,10 @@
 #include "Collider.h"
 
 class Gamepad;
+struct GameConfig;
+struct RenderData;
 
-struct Player {
+class Player {
     glm::vec2 pos;
     glm::vec3 scale;
     Texture tex;
@@ -24,10 +26,17 @@ struct Player {
     const float gravity = 2.0f;
     bool facing_right = true;
 
+  public:
     void init(glm::vec2 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,
               Gamepad* gamepad);
 
     void update(float delta_time, const BoxCollider& ground,
                 const MouseKeyboardInput& mkb);
+
+    void render(const RenderData& render_data);
+
+    friend void update_gui(SDL_Window* window, RenderData& render_data,
+                           GameConfig& game_config, const Player& player,
+                           SplineEditor& spline_editor);
 };

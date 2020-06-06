@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Player.h"
+#include "Game.h"
 
 void Player::init(glm::vec2 position, glm::vec3 scale_factor,
                   const char* texture_path, const char* mesh_path,
@@ -144,5 +145,117 @@ void Player::update(float delta_time, const BoxCollider& ground,
             scale * static_cast<glm::vec3>(
                         leg_anims[closer_to_ground].last_foot_movement));
         pos -= move;
+    }
+}
+
+void Player::render(const RenderData& render_data) {
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
+    model = glm::scale(model, scale);
+
+    RiggedMesh& rm = rigged_mesh;
+
+    // Calculate bone transforms from their rotations
+    size_t bone_count = rm.bones.size();
+    glm::mat4* bone_transforms = new glm::mat4[bone_count];
+    for (size_t i = 0; i < bone_count; ++i) {
+        auto& b = rm.bones[i];
+        glm::mat4 rotation_matrix =
+            rotate(glm::mat4(1.0f), b.rotation, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        bone_transforms[i] = b.get_transform();
+    }
+
+    // Calculate vertex posistions for rendering
+    for (size_t i = 0; i < rm.vertices.size(); ++i) {
+        Vertex vert = rm.vertices[i];
+        rm.shader_vertices[i].uv_coord = vert.uv_coord;
+
+        glm::mat4 bone =
+            bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
+            bone_transforms[vert.bone_index[1]] * vert.bone_weight[1];
+
+        rm.shader_vertices[i].pos =
+            model * bone * glm::vec4(vert.position, 1.0f);
+    }
+
+    rm.vao.update_vertex_data(rm.shader_vertices);
+
+    // Render player model
+    if (render_data.draw_models) {
+        glUseProgram(render_data.rigged_shader.id);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tex.id);
+
+        rm.vao.draw(GL_TRIANGLES);
+    }
+
+    // Render wireframes
+    if (render_data.draw_wireframes) {
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 0.0f, 1.0f,
+                    1.0f); // Red
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        rm.vao.draw(GL_TRIANGLES);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+
+    // Render bones
+    if (render_data.draw_bones) {
+        for (size_t i = 0; i < rm.bones.size(); ++i) {
+            rm.bones_shader_vertices[i * 2].pos =
+                model * bone_transforms[i] *
+                rm.bones[i]
+                    .bind_pose_transform[3]; // Renders (0.0f, 0.0f, 0.0f) in
+                                             // the bones local space
+            rm.bones_shader_vertices[i * 2 + 1].pos =
+                model * bone_transforms[i] * rm.bones[i].bind_pose_transform *
+                rm.bones[i].tail;
+        }
+
+        rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
+
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 0.0f,
+                    1.0f); // Blue
+
+        glLineWidth(2.0f);
+        rm.bones_vao.draw(GL_LINES);
+
+        rm.bones_vao.draw(GL_POINTS);
+    }
+
+    // Render animator target positions
+    for (auto& anim : rm.arm_animators) {
+        if (anim.target_pos.w == 0.0f)
+            continue;
+
+        glm::vec4 render_pos = model * anim.target_pos;
+
+        anim.vao.update_vertex_data(
+            reinterpret_cast<DebugShaderVertex*>(&render_pos),
+            1); // ugly, but it works
+
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
+
+        anim.vao.draw(GL_POINTS);
+    }
+
+    for (auto& anim : rm.leg_animators) {
+        if (anim.target_pos.w == 0.0f)
+            continue;
+
+        glm::vec4 render_pos = model * anim.target_pos;
+
+        anim.vao.update_vertex_data(
+            reinterpret_cast<DebugShaderVertex*>(&render_pos),
+            1); // ugly, but it works
+
+        glUseProgram(render_data.debug_shader.id);
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
+
+        anim.vao.draw(GL_POINTS);
     }
 }

@@ -8,6 +8,9 @@
 #include "Player.h"
 #include "Spline.h"
 #include "Input.h"
+#include "Player.h"
+
+class Player;
 
 //----------------------------------//
 //----------Member structs----------//
