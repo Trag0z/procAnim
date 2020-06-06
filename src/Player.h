@@ -3,14 +3,14 @@
 #include "Texture.h"
 #include "Mesh.h"
 
-struct GamepadInput;
+class Gamepad;
 
 struct Player {
     glm::vec2 pos;
     glm::vec3 scale;
     Texture tex;
     RiggedMesh rigged_mesh;
-    GamepadInput* gamepad_input; // currently unused
+    Gamepad* gamepad_input; // currently unused
 
     glm::mat4 model;
 
@@ -25,5 +25,5 @@ struct Player {
 
     void init(glm::vec2 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,
-              GamepadInput* gamepad);
+              Gamepad* gamepad);
 };

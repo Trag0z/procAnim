@@ -30,6 +30,9 @@
         "xlocnum": "cpp",
         "xlocbuf": "cpp",
         "functional": "cpp",
-        "cstddef": "cpp"
+        "cstddef": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "unordered_map": "cpp"
     }
 }

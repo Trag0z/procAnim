@@ -42,7 +42,7 @@ template <typename vertex_t> class VertexArrayData {
                              data.data());
     }
 
-    void update_vertex_data(GLuint num_vertices, vertex_t* data) {
+    void update_vertex_data(vertex_t* data, GLuint num_vertices) {
         SDL_assert(num_vertices <= _num_vertices);
         glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * num_vertices, data);
     }

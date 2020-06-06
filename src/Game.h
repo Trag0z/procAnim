@@ -6,6 +6,8 @@
 #include "Mesh.h"
 #include "Collider.h"
 #include "Player.h"
+#include "Spline.h"
+#include "Input.h"
 
 //----------------------------------//
 //----------Member structs----------//
@@ -20,66 +22,22 @@ struct GameConfig {
 
     float speed = 1.0f;
     bool step_mode = false;
-};
-
-struct GamepadInput {
-    static const U32 num_axes = SDL_CONTROLLER_AXIS_MAX;
-    static const U32 num_buttons = SDL_CONTROLLER_BUTTON_MAX;
-    static const S32 stick_deadzone_in = 8000;
-    static const S32 stick_deadzone_out = 32767 - 1000;
-
-    static U32 num_gamepads;
-
-    SDL_GameController* sdl_ptr = nullptr;
-
-    float axis[num_axes];
-    Uint32 button_map, button_down_map, button_up_map;
-
-    // NOTE: These could only be shifted by n-1 if SDL_GAMECONTROLLER_BUTTON
-    // starts at 1
-    inline bool button(U32 n) const { return button_map & BIT(n); };
-    inline bool button_down(U32 n) const { return button_down_map & BIT(n); };
-    inline bool button_up(U32 n) const { return button_up_map & BIT(n); };
-};
-
-struct MouseKeyboardInput {
-    const static uint num_mouse_buttons = 3;
-    const Uint8* sdl_keyboard;
-    int num_keys;
-
-    bool *key, *key_up, *key_down;
-    uint mouse_button_map, mouse_button_down_map, mouse_button_up_map;
-    glm::ivec2 mouse_pos;
-
-    void init() {
-        sdl_keyboard = SDL_GetKeyboardState(&num_keys);
-        key = (bool*)malloc(sizeof(bool) * (num_keys * 3));
-        key_down = key + num_keys;
-        key_up = key_down + num_keys;
-    }
-
-    inline bool mouse_button_down(uint button) const {
-        return mouse_button_down_map & button;
-    }
-
-    inline bool mouse_button(uint button) const {
-        return mouse_button_map & button;
-    }
+    bool spline_edit_mode = false;
 };
 
 struct RenderData {
     glm::ivec2 window_size = {1920, 1080};
 
     struct {
-        GLuint id, model_matrix_loc, projection_matrix_loc;
+        GLuint id;
     } simple_shader;
 
     struct {
-        GLuint id, model_matrix_loc, projection_matrix_loc, bones_loc;
+        GLuint id, projection_loc;
     } rigged_shader;
 
     struct {
-        GLuint id, color_loc;
+        GLuint id, projection_loc, color_loc;
     } debug_shader;
 
     bool draw_models = true;
@@ -107,11 +65,14 @@ struct Game {
 
     GameConfig game_config;
     RenderData render_data;
+
     MouseKeyboardInput mouse_keyboard_input;
+    std::array<Gamepad, Gamepad::num_pads> gamepad_inputs;
+
     Player player;
     BoxCollider ground;
 
-    std::array<GamepadInput, 4> gamepad_inputs;
+    SplineEditor spline_editor;
 
     void init();
     bool run();

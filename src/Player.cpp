@@ -4,7 +4,7 @@
 
 void Player::init(glm::vec2 position, glm::vec3 scale_factor,
                   const char* texture_path, const char* mesh_path,
-                  GamepadInput* gamepad) {
+                  Gamepad* gamepad) {
     pos = position;
     scale = scale_factor;
     tex = Texture::load_from_file(texture_path);

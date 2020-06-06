@@ -4,11 +4,6 @@
 #include "DebugCallback.h"
 #include "Systems.h"
 #include "Shaders.h"
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_sdl.h>
-#include <imgui/imgui_impl_opengl3.h>
-
-U32 GamepadInput::num_gamepads = 0;
 
 constexpr bool DEBUG_MODE = true;
 
@@ -26,16 +21,6 @@ void Game::init() {
     printf("Window created\n");
 
     renderer = SDL_CreateRenderer(window, -1, 0);
-
-    const int numJoysticks = SDL_NumJoysticks();
-    for (int i = 0; i < numJoysticks; ++i) {
-        if (!SDL_IsGameController(i)) {
-            printf("[Input] Joystick%d is not a supported GameController!\n",
-                   i);
-            continue;
-        }
-        ++GamepadInput::num_gamepads;
-    }
 
     // Use OpenGL 3.3 core
     const char* glsl_version = "#version 330 core";
@@ -97,21 +82,14 @@ void Game::init() {
 
     render_data.init(simple_shader_id, rigged_shader_id, debug_shader_id);
 
-    mouse_keyboard_input.init();
+    mouse_keyboard_input.init(render_data.window_size.y);
 
-    // Open gamepads
-    for (U32 i = 0; i < GamepadInput::num_gamepads; ++i) {
-        gamepad_inputs[i].sdl_ptr = SDL_GameControllerOpen(i);
-        if (!gamepad_inputs[i].sdl_ptr) {
-            printf("[Input] Error opening gamepad%I32d: %s\n", i,
-                   SDL_GetError());
-        }
-    }
+    Gamepad::init(gamepad_inputs);
 
     // Player
     player.init({1920.0f / 2.0f, 1080.0f / 2.0f + 200.0f},
                 glm::vec3(100.0f, 100.0f, 1.0f), "../assets/playerTexture.png",
-                "../assets/guy.fbx", &gamepad_inputs[0]);
+                "../assets/guy.fbx", nullptr);
 
     // Ground
     ground = BoxCollider({player.pos.x, player.pos.y - 400.0f},
@@ -137,46 +115,53 @@ bool Game::run() {
                 running = false;
         }
 
-        poll_inputs(mouse_keyboard_input, gamepad_inputs);
+        SDL_PumpEvents();
+        mouse_keyboard_input.update();
+        for (auto& pad : gamepad_inputs) {
+            pad.update();
+        }
 
         // Handle general keyboard inputs
-        if (mouse_keyboard_input.key_down[SDL_SCANCODE_F1]) {
+        if (mouse_keyboard_input.key_down(SDL_SCANCODE_F1)) {
             render_data.draw_wireframes = !render_data.draw_wireframes;
         }
-        if (mouse_keyboard_input.key_down[SDL_SCANCODE_F2]) {
+        if (mouse_keyboard_input.key_down(SDL_SCANCODE_F2)) {
             render_data.draw_bones = !render_data.draw_bones;
         }
-        if (mouse_keyboard_input.key_down[SDL_SCANCODE_P]) {
+        if (mouse_keyboard_input.key_down(SDL_SCANCODE_P)) {
             game_config.step_mode = !game_config.step_mode;
         }
-        if (mouse_keyboard_input.key_down[SDL_SCANCODE_COMMA]) {
+        if (mouse_keyboard_input.key_down(SDL_SCANCODE_COMMA)) {
             game_config.speed = std::max(game_config.speed - 0.1f, 0.0f);
         }
-        if (mouse_keyboard_input.key_down[SDL_SCANCODE_PERIOD]) {
+        if (mouse_keyboard_input.key_down(SDL_SCANCODE_PERIOD)) {
             game_config.speed = game_config.speed + 0.1f;
         }
-        if (mouse_keyboard_input.key_down[SDL_SCANCODE_ESCAPE]) {
+        if (mouse_keyboard_input.key_down(SDL_SCANCODE_ESCAPE)) {
             running = false;
         }
 
-        float last_frame_duration =
-            static_cast<float>(frame_start - last_frame_start);
-        float frame_delay = static_cast<float>(game_config.frame_delay);
+        if (game_config.spline_edit_mode) {
+            spline_editor.update(mouse_keyboard_input);
+        } else {
+            float last_frame_duration =
+                static_cast<float>(frame_start - last_frame_start);
+            float frame_delay = static_cast<float>(game_config.frame_delay);
 
-        if (!game_config.step_mode) {
-            float delta_time =
-                last_frame_duration / frame_delay * game_config.speed;
-            update_player(delta_time, player, ground, mouse_keyboard_input,
-                          render_data);
-        } else if (mouse_keyboard_input.key_down[SDL_SCANCODE_N] ||
-                   mouse_keyboard_input.key[SDL_SCANCODE_M]) {
-            update_player(game_config.speed, player, ground,
-                          mouse_keyboard_input, render_data);
+            if (!game_config.step_mode) {
+                float delta_time =
+                    last_frame_duration / frame_delay * game_config.speed;
+                update_player(delta_time, player, ground, mouse_keyboard_input);
+            } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
+                       mouse_keyboard_input.key(SDL_SCANCODE_M)) {
+                update_player(game_config.speed, player, ground,
+                              mouse_keyboard_input);
+            }
         }
 
-        update_gui(window, render_data, game_config, player);
+        update_gui(window, render_data, game_config, player, spline_editor);
 
-        render(window, render_data, player, ground);
+        render(window, render_data, player, ground, spline_editor);
 
         // Check for errors and clear error queue
         while (GLenum error = glGetError()) {
@@ -203,11 +188,20 @@ void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
     rigged_shader.id = rigged_shader_id;
     debug_shader.id = debug_shader_id;
 
+    rigged_shader.projection_loc =
+        glGetUniformLocation(rigged_shader_id, "projection");
+    glUseProgram(rigged_shader.id);
+    glUniformMatrix4fv(rigged_shader.projection_loc, 1, GL_FALSE,
+                       value_ptr(projection));
+
+    debug_shader.projection_loc =
+        glGetUniformLocation(debug_shader_id, "projection");
+    glUseProgram(debug_shader.id);
+    glUniformMatrix4fv(debug_shader.projection_loc, 1, GL_FALSE,
+                       value_ptr(projection));
     debug_shader.color_loc = glGetUniformLocation(debug_shader_id, "color");
 
 #ifndef CPU_RENDERING
-    rigged_shader.model_matrix_loc =
-        glGetUniformLocation(rigged_shader_id, "model");
     rigged_shader.projection_matrix_loc =
         glGetUniformLocation(rigged_shader_id, "projection");
     rigged_shader.bonesLoc = glGetUniformLocation(rigged_shader_id, "bones");
