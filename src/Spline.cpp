@@ -6,17 +6,17 @@ Spline::Spline(glm::vec2 points_[num_points]) {
     memcpy_s(points, 4 * sizeof(glm::vec2), points_, 4 * sizeof(glm::vec2));
 
     // Init line render data
+    glm::mat4 parameter_matrix = glm::mat4(
+        glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[1], 0.0f, 1.0f),
+        glm::vec4(points[2], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f));
+
     GLuint indices[render_steps];
     glm::vec4 interpolation_vector;
     for (size_t i = 0; i < render_steps; ++i) {
         float t = static_cast<float>(i) / static_cast<float>(render_steps);
         interpolation_vector = {t * t * t, t * t, t, 1.0f};
         line_shader_vertices[i].pos =
-            interpolation_vector * hermite_matrix *
-            glm::mat4(glm::vec4(points[0], 0.0f, 1.0f),
-                      glm::vec4(points[1], 0.0f, 1.0f),
-                      glm::vec4(points[2], 0.0f, 1.0f),
-                      glm::vec4(points[3], 0.0f, 1.0f));
+            parameter_matrix * hermite_matrix * interpolation_vector;
 
         indices[i] = static_cast<GLuint>(i);
     }
@@ -39,13 +39,11 @@ void Spline::update_render_data() {
 
     glm::vec4 interpolation_vector;
     for (size_t i = 0; i < render_steps; ++i) {
-        float t = static_cast<float>(i) / static_cast<float>(render_steps);
+        float t = static_cast<float>(i) / static_cast<float>(render_steps - 1);
         interpolation_vector = {t * t * t, t * t, t, 1.0f};
 
-        line_shader_vertices[i].pos = hermite_matrix * interpolation_vector;
-
         line_shader_vertices[i].pos =
-            parameter_matrix * line_shader_vertices[i].pos;
+            parameter_matrix * hermite_matrix * interpolation_vector;
     }
 
     line_vao.update_vertex_data(
@@ -130,7 +128,7 @@ void SplineEditor::render(GLuint shader_id, GLuint color_uniform_loc) {
                     1.0f); // Green
 
         glLineWidth(1.0f);
-        s.line_vao.draw(GL_LINES);
+        s.line_vao.draw(GL_LINE_STRIP);
 
         glUniform4f(color_uniform_loc, 1.0f, 0.0f, 1.0f,
                     1.0f); // Purple
