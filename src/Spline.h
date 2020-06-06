@@ -3,7 +3,8 @@
 #include "Input.h"
 #include "VertexArrayData.h"
 
-// Simple Cardinal spline
+struct RenderData;
+
 struct Spline {
     static const size_t num_points = 4;
     static const size_t render_steps = 50;
@@ -40,5 +41,5 @@ class SplineEditor {
   public:
     void update(const MouseKeyboardInput& input);
     void update_gui();
-    void render(GLuint shader_id, GLuint color_uniform_loc);
+    void render(const RenderData& render_data);
 };

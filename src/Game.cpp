@@ -87,14 +87,13 @@ void Game::init() {
     Gamepad::init(gamepad_inputs);
 
     // Player
-    glm::vec2 position = { 1920.0f / 2.0f, 1080.0f / 2.0f };
-    player.init(position,
-                glm::vec3(100.0f, 100.0f, 1.0f), "../assets/playerTexture.png",
-                "../assets/guy.fbx", nullptr);
+    glm::vec2 position = {1920.0f / 2.0f, 1080.0f / 2.0f};
+    player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
+                "../assets/playerTexture.png", "../assets/guy.fbx", nullptr);
 
     // Ground
-    ground = BoxCollider({position.x, position.y - 400.0f},
-                         {1920.0f / 2.1f, 10.0f});
+    ground =
+        BoxCollider({position.x, position.y - 400.0f}, {1920.0f / 2.1f, 10.0f});
 
     frame_start = SDL_GetTicks();
     running = true;
@@ -183,27 +182,25 @@ bool Game::run() {
 
 void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
                       GLuint debug_shader_id) {
-    SDL_assert_always(simple_shader_id != -1 && rigged_shader_id != -1);
+    SDL_assert_always(simple_shader_id != -1 && rigged_shader_id != -1 && debug_shader_id != -1);
     simple_shader.id = simple_shader_id;
     rigged_shader.id = rigged_shader_id;
     debug_shader.id = debug_shader_id;
 
     rigged_shader.projection_loc =
         glGetUniformLocation(rigged_shader_id, "projection");
+    rigged_shader.model_loc = glGetUniformLocation(rigged_shader_id, "model");
+
     glUseProgram(rigged_shader.id);
     glUniformMatrix4fv(rigged_shader.projection_loc, 1, GL_FALSE,
                        value_ptr(projection));
 
     debug_shader.projection_loc =
         glGetUniformLocation(debug_shader_id, "projection");
+    debug_shader.model_loc = glGetUniformLocation(debug_shader_id, "model");
+    debug_shader.color_loc = glGetUniformLocation(debug_shader_id, "color");
+
     glUseProgram(debug_shader.id);
     glUniformMatrix4fv(debug_shader.projection_loc, 1, GL_FALSE,
                        value_ptr(projection));
-    debug_shader.color_loc = glGetUniformLocation(debug_shader_id, "color");
-
-#ifndef CPU_RENDERING
-    rigged_shader.projection_matrix_loc =
-        glGetUniformLocation(rigged_shader_id, "projection");
-    rigged_shader.bonesLoc = glGetUniformLocation(rigged_shader_id, "bones");
-#endif
 }

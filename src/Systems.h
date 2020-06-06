@@ -110,25 +110,11 @@ inline void render(SDL_Window* window, const RenderData& render_data,
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    using namespace glm;
-
-    // Render ground
-    ground.model = translate(mat4(1.0f), vec3(ground.pos, 0.0f));
-
-    for (size_t i = 0; i < ground.vertices.size(); ++i) {
-        ground.shader_vertices[i].pos = ground.model * ground.vertices[i];
-    }
-    ground.vao.update_vertex_data(ground.shader_vertices);
-
-    glUseProgram(render_data.debug_shader.id);
-    glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.5f, 0.2f,
-                1.0f); // ugly orange-ish
-    ground.vao.draw(GL_TRIANGLES);
+    ground.render(render_data);
 
     player.render(render_data);
 
-    spline_editor.render(render_data.debug_shader.id,
-                         render_data.debug_shader.color_loc);
+    spline_editor.render(render_data);
 
     // Unbind vao for error safety
     glBindVertexArray(0);

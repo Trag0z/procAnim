@@ -174,21 +174,27 @@ void Player::render(const RenderData& render_data) {
             bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
             bone_transforms[vert.bone_index[1]] * vert.bone_weight[1];
 
-        rm.shader_vertices[i].pos =
-            model * bone * glm::vec4(vert.position, 1.0f);
+        rm.shader_vertices[i].pos = bone * glm::vec4(vert.position, 1.0f);
     }
 
     rm.vao.update_vertex_data(rm.shader_vertices);
 
+    glUseProgram(render_data.rigged_shader.id);
+    glUniformMatrix4fv(render_data.rigged_shader.model_loc, 1, GL_FALSE,
+                       value_ptr(model));
+
     // Render player model
     if (render_data.draw_models) {
-        glUseProgram(render_data.rigged_shader.id);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex.id);
 
         rm.vao.draw(GL_TRIANGLES);
     }
+
+    glUseProgram(render_data.debug_shader.id);
+    glUniformMatrix4fv(render_data.debug_shader.model_loc, 1, GL_FALSE,
+                       value_ptr(model));
 
     // Render wireframes
     if (render_data.draw_wireframes) {
@@ -205,12 +211,12 @@ void Player::render(const RenderData& render_data) {
     if (render_data.draw_bones) {
         for (size_t i = 0; i < rm.bones.size(); ++i) {
             rm.bones_shader_vertices[i * 2].pos =
-                model * bone_transforms[i] *
+                bone_transforms[i] *
                 rm.bones[i]
                     .bind_pose_transform[3]; // Renders (0.0f, 0.0f, 0.0f) in
                                              // the bones local space
             rm.bones_shader_vertices[i * 2 + 1].pos =
-                model * bone_transforms[i] * rm.bones[i].bind_pose_transform *
+                bone_transforms[i] * rm.bones[i].bind_pose_transform *
                 rm.bones[i].tail;
         }
 
@@ -231,7 +237,7 @@ void Player::render(const RenderData& render_data) {
         if (anim.target_pos.w == 0.0f)
             continue;
 
-        glm::vec4 render_pos = model * anim.target_pos;
+        glm::vec4 render_pos = anim.target_pos;
 
         anim.vao.update_vertex_data(
             reinterpret_cast<DebugShaderVertex*>(&render_pos),
@@ -247,7 +253,7 @@ void Player::render(const RenderData& render_data) {
         if (anim.target_pos.w == 0.0f)
             continue;
 
-        glm::vec4 render_pos = model * anim.target_pos;
+        glm::vec4 render_pos = anim.target_pos;
 
         anim.vao.update_vertex_data(
             reinterpret_cast<DebugShaderVertex*>(&render_pos),

@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Spline.h"
+#include "Game.h"
 
 Spline::Spline(glm::vec2 points_[num_points]) {
     memcpy_s(points, 4 * sizeof(glm::vec2), points_, 4 * sizeof(glm::vec2));
@@ -148,15 +149,18 @@ void SplineEditor::update_gui() {
     End();
 }
 
-void SplineEditor::render(GLuint shader_id, GLuint color_uniform_loc) {
-    glUseProgram(shader_id);
+void SplineEditor::render(const RenderData& render_data) {
+    glUseProgram(render_data.debug_shader.id);
+    glm::mat4 model(1.0f);
+    glUniformMatrix4fv(render_data.debug_shader.model_loc, 1, GL_FALSE,
+                       value_ptr(model));
 
     size_t num_splines_to_render = splines.size();
     if (creating_new_spline && !first_point_set)
         num_splines_to_render -= 1;
 
     for (size_t i = 0; i < num_splines_to_render; ++i) {
-        glUniform4f(color_uniform_loc, 0.0f, 1.0f, 0.0f,
+        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f,
                     1.0f); // Green
 
         glLineWidth(1.0f);
@@ -165,11 +169,11 @@ void SplineEditor::render(GLuint shader_id, GLuint color_uniform_loc) {
 
     if (selected_spline_index >= 0 && selected_spline_index < splines.size() &&
         (!creating_new_spline && !first_point_set)) {
-        glUniform4f(color_uniform_loc, 0.7f, 0.0f, 0.7f,
+        glUniform4f(render_data.debug_shader.color_loc, 0.7f, 0.0f, 0.7f,
                     1.0f); // Light purple
         splines[selected_spline_index].point_vao.draw(GL_LINES);
 
-        glUniform4f(color_uniform_loc, 1.0f, 0.0f, 1.0f,
+        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 1.0f,
                     1.0f); // Purple
         splines[selected_spline_index].point_vao.draw(GL_POINTS);
     }

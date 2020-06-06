@@ -31,9 +31,9 @@ template <typename vertex_t> class VertexArrayData {
               const vertex_t* vertices, GLuint num_vertices) {
         // Template specifications for acceptable vertex types are defined
         // below. If this function overload is called, something went wrong.
-        printf("[ERROR] You are trying to initialize VertexArrayData of an "
-               "unknown vertex type");
-        SDL_assert(false);
+        printf("[ERROR] Trying to initialize VertexArrayData of an unknown "
+               "vertex type");
+        SDL_TriggerBreakpoint();
     }
 
     void update_vertex_data(std::vector<vertex_t> data) {

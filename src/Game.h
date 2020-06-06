@@ -36,11 +36,11 @@ struct RenderData {
     } simple_shader;
 
     struct {
-        GLuint id, projection_loc;
+        GLuint id, projection_loc, model_loc;
     } rigged_shader;
 
     struct {
-        GLuint id, projection_loc, color_loc;
+        GLuint id, projection_loc, color_loc, model_loc;
     } debug_shader;
 
     bool draw_models = true;
