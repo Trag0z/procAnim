@@ -63,7 +63,11 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
     if (creating_new_spline) {
         Spline& last = splines.back();
         if (!first_point_set && input.mouse_button_down(1)) {
-            last.points[0] = input.mouse_world_pos();
+            glm::vec2 mouse_pos = input.mouse_world_pos();
+            for (auto& p : last.points) {
+                p = mouse_pos;
+            }
+            last.update_render_data();
             first_point_set = true;
             return;
         }
@@ -91,7 +95,7 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
     if (input.mouse_button_down(1)) {
         for (size_t i = 0; i < splines.size(); ++i) {
             for (auto& p : splines[i].points) {
-                if (glm::length(p - mouse_pos) < 3.0f) {
+                if (glm::length(p - mouse_pos) < 4.0f) {
                     selected_point = &p;
                     selected_spline_index = i;
                 }
@@ -146,15 +150,21 @@ void SplineEditor::update_gui() {
 
 void SplineEditor::render(GLuint shader_id, GLuint color_uniform_loc) {
     glUseProgram(shader_id);
-    for (auto& s : splines) {
+
+    size_t num_splines_to_render = splines.size();
+    if (creating_new_spline && !first_point_set)
+        num_splines_to_render -= 1;
+
+    for (size_t i = 0; i < num_splines_to_render; ++i) {
         glUniform4f(color_uniform_loc, 0.0f, 1.0f, 0.0f,
                     1.0f); // Green
 
         glLineWidth(1.0f);
-        s.line_vao.draw(GL_LINE_STRIP);
+        splines[i].line_vao.draw(GL_LINE_STRIP);
     }
 
-    if (selected_spline_index >= 0 && selected_spline_index < splines.size()) {
+    if (selected_spline_index >= 0 && selected_spline_index < splines.size() &&
+        (!creating_new_spline && !first_point_set)) {
         glUniform4f(color_uniform_loc, 0.7f, 0.0f, 0.7f,
                     1.0f); // Light purple
         splines[selected_spline_index].point_vao.draw(GL_LINES);
