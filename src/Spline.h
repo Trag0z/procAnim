@@ -32,6 +32,7 @@ struct Spline {
 class SplineEditor {
     Spline* splines = nullptr;
     size_t num_splines;
+    std::vector<std::string> spline_names;
 
     glm::vec2* selected_point = nullptr;
     size_t selected_spline_index;
@@ -40,7 +41,7 @@ class SplineEditor {
     bool first_point_set = false;
 
   public:
-    void init(Spline* splines_, size_t num_splines_);
+    void init(Spline* splines_, size_t num_splines_, std::string* names);
     void update(const MouseKeyboardInput& input);
     void render(const RenderData& render_data);
     void update_gui();

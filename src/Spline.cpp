@@ -67,9 +67,15 @@ void Spline::update_render_data() {
         static_cast<GLuint>(point_shader_vertices.size()));
 }
 
-void SplineEditor::init(Spline* splines_, size_t num_splines_) {
+void SplineEditor::init(Spline* splines_, size_t num_splines_,
+                        std ::string* names) {
     splines = splines_;
     num_splines = num_splines_;
+
+    spline_names.reserve(num_splines);
+    for (size_t i = 0; i < num_splines; ++i) {
+        spline_names.push_back(names[i]);
+    }
 }
 
 void SplineEditor::update(const MouseKeyboardInput& input) {
@@ -135,22 +141,13 @@ void SplineEditor::update_gui() {
     Begin("Spline Editor");
     Text("Splines");
 
-    char** spline_names = new char*[num_splines];
-
-    for (size_t i = 0; i < num_splines; ++i) {
-        spline_names[i] = new char[16];
-        sprintf_s(spline_names[i], 16, "Spline %zu", i);
-    }
+    const char* names[] = {spline_names[0].c_str(), spline_names[1].c_str(),
+                           spline_names[2].c_str(), spline_names[3].c_str()};
 
     int selected = static_cast<int>(selected_spline_index);
-    ListBox("", &selected, spline_names, static_cast<int>(num_splines));
+    ListBox("", &selected, names, static_cast<int>(num_splines));
 
     selected_spline_index = static_cast<size_t>(selected);
-
-    for (size_t i = 0; i < num_splines; ++i) {
-        delete[] spline_names[i];
-    }
-    delete[] spline_names;
 
     if (Button("Replace with new spline") && !creating_new_spline) {
         creating_new_spline = true;

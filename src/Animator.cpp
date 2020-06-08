@@ -253,7 +253,10 @@ void WalkAnimator::init(RiggedMesh& mesh) {
     splines[2].init();
     splines[3].init();
 
-    spline_editor.init(splines, 4);
+    std::string names[] = {
+        {"Leg_Forward"}, {"Leg_Backward"}, {"Arm_Forward"}, {"Arm_Backward"}};
+
+    spline_editor.init(splines, 4, names);
 }
 
 void WalkAnimator::update() {}

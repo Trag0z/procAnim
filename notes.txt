@@ -1,3 +1,5 @@
+why does merging SplineEditor::update() and SplineEditor::update_gui() break the gui functionality?
+
 NEXT:
 - move splines to player space
 - figure out how to make one spline work for both legs
