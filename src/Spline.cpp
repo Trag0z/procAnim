@@ -3,6 +3,7 @@
 #include "Spline.h"
 #include "Game.h"
 
+/////           Spline          /////
 void Spline::init(glm::vec2 points_[num_points]) {
     if (points_ != nullptr) {
         memcpy_s(points, 4 * sizeof(glm::vec2), points_, 4 * sizeof(glm::vec2));
@@ -65,6 +66,48 @@ void Spline::update_render_data() {
     point_vao.update_vertex_data(
         point_shader_vertices.data(),
         static_cast<GLuint>(point_shader_vertices.size()));
+}
+
+/////           SplineEditor            /////
+const size_t SplineEditor::max_spline_name_length = 32;
+
+void SplineEditor::save_splines() {
+    SDL_RWops* file = SDL_RWFromFile(save_path, "wb");
+
+    SDL_RWwrite(file, &num_splines, sizeof(num_splines), 1);
+
+    for (size_t i = 0; i < num_splines; ++i) {
+        SDL_RWwrite(file, &splines[i].points, sizeof(splines[i].points), 1);
+
+        SDL_assert_always(spline_names[i].length() < max_spline_name_length);
+        SDL_RWwrite(file, spline_names[i].c_str(), sizeof(char),
+                    max_spline_name_length);
+    }
+
+    SDL_RWclose(file);
+}
+
+void SplineEditor::init(const Entity* parent_, Spline* splines_,
+                        const char* spline_path_) {
+    SDL_assert(parent_ != nullptr);
+    parent = parent_;
+    splines = splines_;
+    save_path = spline_path_;
+
+    SDL_RWops* file = SDL_RWFromFile(save_path, "rb");
+
+    SDL_RWread(file, &num_splines, sizeof(num_splines), 1);
+
+    char name_buf[32];
+    for (size_t i = 0; i < num_splines; ++i) {
+        SDL_RWread(file, &splines[i].points, sizeof(splines[i].points), 1);
+        splines[i].update_render_data();
+
+        SDL_RWread(file, name_buf, sizeof(char), max_spline_name_length);
+        spline_names.push_back(name_buf);
+    }
+
+    SDL_RWclose(file);
 }
 
 void SplineEditor::init(const Entity* parent_, Spline* splines_,
@@ -156,6 +199,9 @@ void SplineEditor::update_gui() {
         creating_new_spline = true;
     }
     SameLine();
+    if (Button("Save all")) {
+        save_splines();
+    }
 
     End();
 }

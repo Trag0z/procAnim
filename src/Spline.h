@@ -35,6 +35,7 @@ class SplineEditor {
     Spline* splines = nullptr;
     size_t num_splines;
     std::vector<std::string> spline_names;
+    const char* save_path;
 
     glm::vec2* selected_point = nullptr;
     size_t selected_spline_index;
@@ -42,7 +43,12 @@ class SplineEditor {
     bool creating_new_spline = false;
     bool first_point_set = false;
 
+    static const size_t max_spline_name_length;
+
+    void save_splines();
+
   public:
+    void init(const Entity* parent, Spline* splines_, const char* save_path_);
     void init(const Entity* parent, Spline* splines_, size_t num_splines_,
               std::string* names);
     void update(const MouseKeyboardInput& input);

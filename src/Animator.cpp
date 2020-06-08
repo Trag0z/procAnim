@@ -256,7 +256,7 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
     std::string names[] = {
         {"Leg_Forward"}, {"Leg_Backward"}, {"Arm_Forward"}, {"Arm_Backward"}};
 
-    spline_editor.init(parent, splines, 4, names);
+    spline_editor.init(parent, splines, "../assets/player_splines.spl");
 }
 
 void WalkAnimator::update() {}
