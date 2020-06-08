@@ -20,7 +20,7 @@ struct Spline {
 
   public:
     // Points in format P1, T1, T2, P2
-    Spline(glm::vec2 points_[num_points]);
+    void init(glm::vec2 points_[num_points] = nullptr);
 
     void update_render_data();
 
@@ -30,7 +30,8 @@ struct Spline {
 };
 
 class SplineEditor {
-    std::vector<Spline> splines;
+    Spline* splines = nullptr;
+    size_t num_splines;
 
     glm::vec2* selected_point = nullptr;
     size_t selected_spline_index;
@@ -39,7 +40,8 @@ class SplineEditor {
     bool first_point_set = false;
 
   public:
+    void init(Spline* splines_, size_t num_splines_);
     void update(const MouseKeyboardInput& input);
-    void update_gui();
     void render(const RenderData& render_data);
+    void update_gui();
 };

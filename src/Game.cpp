@@ -141,26 +141,22 @@ bool Game::run() {
             running = false;
         }
 
-        update_gui(window, render_data, game_config, player, spline_editor);
+        update_gui(window, render_data, game_config, player);
 
-        if (game_config.spline_edit_mode) {
-            spline_editor.update(mouse_keyboard_input);
-        } else {
-            float last_frame_duration =
-                static_cast<float>(frame_start - last_frame_start);
-            float frame_delay = static_cast<float>(game_config.frame_delay);
+        float last_frame_duration =
+            static_cast<float>(frame_start - last_frame_start);
+        float frame_delay = static_cast<float>(game_config.frame_delay);
 
-            if (!game_config.step_mode) {
-                float delta_time =
-                    last_frame_duration / frame_delay * game_config.speed;
-                player.update(delta_time, ground, mouse_keyboard_input);
-            } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
-                       mouse_keyboard_input.key(SDL_SCANCODE_M)) {
-                player.update(game_config.speed, ground, mouse_keyboard_input);
-            }
+        if (!game_config.step_mode) {
+            float delta_time =
+                last_frame_duration / frame_delay * game_config.speed;
+            player.update(delta_time, ground, mouse_keyboard_input);
+        } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
+                   mouse_keyboard_input.key(SDL_SCANCODE_M)) {
+            player.update(game_config.speed, ground, mouse_keyboard_input);
         }
 
-        render(window, render_data, player, ground, spline_editor);
+        render(window, render_data, player, ground);
 
         // Check for errors and clear error queue
         while (GLenum error = glGetError()) {
@@ -182,7 +178,8 @@ bool Game::run() {
 
 void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
                       GLuint debug_shader_id) {
-    SDL_assert_always(simple_shader_id != -1 && rigged_shader_id != -1 && debug_shader_id != -1);
+    SDL_assert_always(simple_shader_id != -1 && rigged_shader_id != -1 &&
+                      debug_shader_id != -1);
     simple_shader.id = simple_shader_id;
     rigged_shader.id = rigged_shader_id;
     debug_shader.id = debug_shader_id;

@@ -3,6 +3,7 @@
 #include "Animator.h"
 #include "Util.h"
 #include "Mesh.h"
+#include "Game.h"
 
 // Takes a target_pos in model space and finds two target_rotations for the
 // bones, so that the tail of bone[1] is at (or at the closest possible point
@@ -229,5 +230,63 @@ void LegAnimator::set_target_foot_pos(TargetFootPosition pos) {
         target_pos.y += 0.24f;
     } else if (pos == BACK) {
         target_pos.x -= step_length / 2.0f;
+    }
+}
+
+void WalkAnimator::init(RiggedMesh& mesh) {
+    BoneRestrictions restrictions[2] = {{-0.5f * PI, 0.5 * PI},
+                                        {0.0f, 0.75f * PI}};
+    arm_animators[0] = ArmAnimator(mesh.find_bone("Arm_L_1"),
+                                   mesh.find_bone("Arm_L_2"), restrictions);
+    arm_animators[1] = ArmAnimator(mesh.find_bone("Arm_R_1"),
+                                   mesh.find_bone("Arm_R_2"), restrictions);
+
+    restrictions[0] = {-0.7f * PI, 0.7f * PI};
+    restrictions[1] = {degToRad(-120.0f), 0.0f};
+    leg_animators[0] = LegAnimator(mesh.find_bone("Leg_L_1"),
+                                   mesh.find_bone("Leg_L_2"), restrictions);
+    leg_animators[1] = LegAnimator(mesh.find_bone("Leg_R_1"),
+                                   mesh.find_bone("Leg_R_2"), restrictions);
+
+    splines[0].init();
+    splines[1].init();
+    splines[2].init();
+    splines[3].init();
+
+    spline_editor.init(splines, 4);
+}
+
+void WalkAnimator::update() {}
+
+void WalkAnimator::render(const RenderData& render_data, bool render_splines) {
+    glUseProgram(render_data.debug_shader.id);
+    glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
+
+    for (auto& anim : arm_animators) {
+        if (anim.target_pos.w == 0.0f) {
+            // target_pos has not yet been set, so there's nothing to do
+            continue;
+        }
+
+        anim.vao.update_vertex_data(
+            reinterpret_cast<DebugShaderVertex*>(&anim.target_pos),
+            1); // ugly, but it works
+
+        anim.vao.draw(GL_POINTS);
+    }
+
+    for (auto& anim : leg_animators) {
+        if (anim.target_pos.w == 0.0f)
+            continue;
+
+        anim.vao.update_vertex_data(
+            reinterpret_cast<DebugShaderVertex*>(&anim.target_pos),
+            1); // ugly, but it works
+
+        anim.vao.draw(GL_POINTS);
+    }
+
+    if (render_splines) {
+        spline_editor.render(render_data);
     }
 }

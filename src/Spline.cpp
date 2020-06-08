@@ -3,8 +3,15 @@
 #include "Spline.h"
 #include "Game.h"
 
-Spline::Spline(glm::vec2 points_[num_points]) {
-    memcpy_s(points, 4 * sizeof(glm::vec2), points_, 4 * sizeof(glm::vec2));
+void Spline::init(glm::vec2 points_[num_points]) {
+    if (points_ != nullptr) {
+        memcpy_s(points, 4 * sizeof(glm::vec2), points_, 4 * sizeof(glm::vec2));
+    } else {
+        points[0] = glm::vec2(0.0f, 0.0f);
+        points[1] = glm::vec2(0.0f, 0.0f);
+        points[2] = glm::vec2(0.0f, 0.0f);
+        points[3] = glm::vec2(0.0f, 0.0f);
+    }
 
     // Init line render data
     glm::mat4 parameter_matrix = glm::mat4(
@@ -60,25 +67,38 @@ void Spline::update_render_data() {
         static_cast<GLuint>(point_shader_vertices.size()));
 }
 
+void SplineEditor::init(Spline* splines_, size_t num_splines_) {
+    splines = splines_;
+    num_splines = num_splines_;
+}
+
 void SplineEditor::update(const MouseKeyboardInput& input) {
+    glm::vec2 mouse_pos = input.mouse_world_pos();
+
     if (creating_new_spline) {
-        Spline& last = splines.back();
+        Spline& selected_spline = splines[selected_spline_index];
+
         if (!first_point_set && input.mouse_button_down(1)) {
-            glm::vec2 mouse_pos = input.mouse_world_pos();
-            for (auto& p : last.points) {
+            // Set all points to mouse position and return
+            for (auto& p : selected_spline.points) {
                 p = mouse_pos;
             }
-            last.update_render_data();
+            selected_spline.update_render_data();
             first_point_set = true;
             return;
         }
 
-        last.points[3] = input.mouse_world_pos();
+        // Set P2 to mouse position and the others to points along the
+        // way from P1 to P2 and return
+        selected_spline.points[3] = mouse_pos;
 
-        glm::vec2 start_to_end = last.points[3] - last.points[0];
-        last.points[1] = last.points[0] + start_to_end * 0.3f;
-        last.points[2] = last.points[3] + start_to_end * 0.3f;
-        last.update_render_data();
+        glm::vec2 start_to_end =
+            selected_spline.points[3] - selected_spline.points[0];
+        selected_spline.points[1] =
+            selected_spline.points[0] + start_to_end * 0.3f;
+        selected_spline.points[2] =
+            selected_spline.points[3] + start_to_end * 0.3f;
+        selected_spline.update_render_data();
 
         if (input.mouse_button_down(1)) {
             creating_new_spline = false;
@@ -92,9 +112,8 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
         return;
     }
 
-    glm::vec2 mouse_pos = input.mouse_world_pos();
     if (input.mouse_button_down(1)) {
-        for (size_t i = 0; i < splines.size(); ++i) {
+        for (size_t i = 0; i < num_splines; ++i) {
             for (auto& p : splines[i].points) {
                 if (glm::length(p - mouse_pos) < 4.0f) {
                     selected_point = &p;
@@ -116,35 +135,27 @@ void SplineEditor::update_gui() {
     Begin("Spline Editor");
     Text("Splines");
 
-    char** spline_names = new char*[splines.size()];
+    char** spline_names = new char*[num_splines];
 
-    for (size_t i = 0; i < splines.size(); ++i) {
+    for (size_t i = 0; i < num_splines; ++i) {
         spline_names[i] = new char[16];
         sprintf_s(spline_names[i], 16, "Spline %zu", i);
     }
 
     int selected = static_cast<int>(selected_spline_index);
-    ListBox("", &selected, spline_names, static_cast<int>(splines.size()));
+    ListBox("", &selected, spline_names, static_cast<int>(num_splines));
 
     selected_spline_index = static_cast<size_t>(selected);
 
-    for (size_t i = 0; i < splines.size(); ++i) {
+    for (size_t i = 0; i < num_splines; ++i) {
         delete[] spline_names[i];
     }
     delete[] spline_names;
 
-    if (Button("New spline") && !creating_new_spline) {
-        glm::vec2 points[4] = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f),
-                               glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f)};
-        splines.push_back(Spline(points));
+    if (Button("Replace with new spline") && !creating_new_spline) {
         creating_new_spline = true;
-        selected_spline_index = splines.size() - 1;
     }
     SameLine();
-
-    if (Button("Delete")) {
-        splines.erase(splines.begin() + selected_spline_index);
-    }
 
     End();
 }
@@ -155,11 +166,11 @@ void SplineEditor::render(const RenderData& render_data) {
     glUniformMatrix4fv(render_data.debug_shader.model_loc, 1, GL_FALSE,
                        value_ptr(model));
 
-    size_t num_splines_to_render = splines.size();
-    if (creating_new_spline && !first_point_set)
-        num_splines_to_render -= 1;
+    for (size_t i = 0; i < num_splines; ++i) {
+        if (i == selected_spline_index && creating_new_spline &&
+            !first_point_set)
+            continue;
 
-    for (size_t i = 0; i < num_splines_to_render; ++i) {
         glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f,
                     1.0f); // Green
 
@@ -167,7 +178,7 @@ void SplineEditor::render(const RenderData& render_data) {
         splines[i].line_vao.draw(GL_LINE_STRIP);
     }
 
-    if (selected_spline_index >= 0 && selected_spline_index < splines.size() &&
+    if (selected_spline_index >= 0 && selected_spline_index < num_splines &&
         (!creating_new_spline && !first_point_set)) {
         glUniform4f(render_data.debug_shader.color_loc, 0.7f, 0.0f, 0.7f,
                     1.0f); // Light purple

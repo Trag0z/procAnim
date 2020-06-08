@@ -25,7 +25,6 @@ struct GameConfig {
 
     float speed = 1.0f;
     bool step_mode = false;
-    bool spline_edit_mode = false;
 };
 
 struct RenderData {
@@ -74,8 +73,6 @@ struct Game {
 
     Player player;
     BoxCollider ground;
-
-    SplineEditor spline_editor;
 
     void init();
     bool run();

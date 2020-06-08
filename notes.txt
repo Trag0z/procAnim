@@ -1,3 +1,7 @@
+NEXT:
+- move splines to player space
+- figure out how to make one spline work for both legs
+
 TODO:
 - use splines for limb movements
 - find target points in a good way
@@ -9,7 +13,6 @@ Bugs:               (@BUG)
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely
 
 Cleanup:            (@CLEANUP)
-- remove using namespace ...; everywhere
 
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time

@@ -3,8 +3,7 @@
 #include "Mesh.h"
 
 inline void update_gui(SDL_Window* window, RenderData& render_data,
-                       GameConfig& game_config, const Player& player,
-                       SplineEditor& spline_editor) {
+                       GameConfig& game_config, Player& player) {
     using namespace ImGui;
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
@@ -22,7 +21,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
 
     NewLine();
     Checkbox("Step mode", &game_config.step_mode);
-    Checkbox("Spline edit mode", &game_config.spline_edit_mode);
+    Checkbox("Spline edit mode", &player.spline_edit_mode);
 
     End();
 
@@ -50,14 +49,14 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     NextColumn();
     Separator();
 
-    for (const auto& anim : player.rigged_mesh.arm_animators) {
+    for (const auto& anim : player.animator.arm_animators) {
         glm::vec4 target_world_pos = player.model * anim.target_pos;
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
         Text(label);
         NextColumn();
     }
-    for (const auto& anim : player.rigged_mesh.leg_animators) {
+    for (const auto& anim : player.animator.leg_animators) {
         glm::vec4 target_world_pos = player.model * anim.target_pos;
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
@@ -97,24 +96,17 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     Columns(1);
     Separator();
 
-    //////          Spline editor windows            //////
-    if (game_config.spline_edit_mode)
-        spline_editor.update_gui();
-
     End();
 }
 
 inline void render(SDL_Window* window, const RenderData& render_data,
-                   Player& player, BoxCollider& ground,
-                   SplineEditor& spline_editor) {
+                   Player& player, BoxCollider& ground) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ground.render(render_data);
 
     player.render(render_data);
-
-    spline_editor.render(render_data);
 
     // Unbind vao for error safety
     glBindVertexArray(0);

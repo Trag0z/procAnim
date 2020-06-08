@@ -4,6 +4,7 @@
 #include "Spline.h"
 
 struct Bone;
+struct RiggedMesh;
 
 struct BoneRestrictions {
     float min_rotation, max_rotation;
@@ -49,10 +50,11 @@ struct LegAnimator {
 };
 
 class WalkAnimator {
+  public:
     ArmAnimator arm_animators[2];
     LegAnimator leg_animators[2];
-
     Spline splines[4];
+    SplineEditor spline_editor;
 
     enum {
         LEG_FORWARD = 0,
@@ -60,4 +62,8 @@ class WalkAnimator {
         ARM_FORWARD = 2,
         ARM_BACKWARD = 3
     };
+
+    void init(RiggedMesh& mesh);
+    void update();
+    void render(const RenderData& render_data, bool render_splines);
 };

@@ -10,6 +10,7 @@ void Player::init(glm::vec2 position, glm::vec3 scale_factor,
     scale = scale_factor;
     tex = Texture::load_from_file(texture_path);
     rigged_mesh.load_from_file(mesh_path);
+    animator.init(rigged_mesh);
     gamepad_input = gamepad;
 
     anim_state = AnimState::STANDING;
@@ -23,12 +24,18 @@ void Player::init(glm::vec2 position, glm::vec3 scale_factor,
 
 void Player::update(float delta_time, const BoxCollider& ground,
                     const MouseKeyboardInput& input) {
+    if (spline_edit_mode) {
+        animator.spline_editor.update(input);
+        animator.spline_editor.update_gui();
+        return;
+    }
+
     //////          Arm animation           //////
     if (input.mouse_button(1)) {
-        rigged_mesh.arm_animators[1].target_pos =
+        animator.arm_animators[1].target_pos =
             inverse(model) * glm::vec4(input.mouse_world_pos(), 0.0f, 1.0f);
     }
-    for (auto& arm_anim : rigged_mesh.arm_animators) {
+    for (auto& arm_anim : animator.arm_animators) {
         arm_anim.update(delta_time);
     }
 
@@ -38,7 +45,7 @@ void Player::update(float delta_time, const BoxCollider& ground,
 
     //////          Collision Detection         //////
     // Find closest point on gorund
-    auto& leg_anims = rigged_mesh.leg_animators;
+    auto& leg_anims = animator.leg_animators;
 
     glm::vec4 foot_pos_world[2];
     float distance_to_ground[2];
@@ -233,35 +240,5 @@ void Player::render(const RenderData& render_data) {
     }
 
     // Render animator target positions
-    for (auto& anim : rm.arm_animators) {
-        if (anim.target_pos.w == 0.0f)
-            continue;
-
-        glm::vec4 render_pos = anim.target_pos;
-
-        anim.vao.update_vertex_data(
-            reinterpret_cast<DebugShaderVertex*>(&render_pos),
-            1); // ugly, but it works
-
-        glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
-
-        anim.vao.draw(GL_POINTS);
-    }
-
-    for (auto& anim : rm.leg_animators) {
-        if (anim.target_pos.w == 0.0f)
-            continue;
-
-        glm::vec4 render_pos = anim.target_pos;
-
-        anim.vao.update_vertex_data(
-            reinterpret_cast<DebugShaderVertex*>(&render_pos),
-            1); // ugly, but it works
-
-        glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
-
-        anim.vao.draw(GL_POINTS);
-    }
+    animator.render(render_data, spline_edit_mode);
 }

@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "Mesh.h"
 #include "Collider.h"
+#include "Animator.h"
 
 class Gamepad;
 struct GameConfig;
@@ -13,6 +14,7 @@ class Player {
     glm::vec3 scale;
     Texture tex;
     RiggedMesh rigged_mesh;
+    WalkAnimator animator;
     Gamepad* gamepad_input; // currently unused
 
     glm::mat4 model;
@@ -26,6 +28,8 @@ class Player {
     const float gravity = 2.0f;
     bool facing_right = true;
 
+    bool spline_edit_mode = false;
+
   public:
     void init(glm::vec2 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,
@@ -36,7 +40,8 @@ class Player {
 
     void render(const RenderData& render_data);
 
+    // The general UI displays the player's private members, so it needs to
+    // access them. This feels cleaner than writing a bunch of getters.
     friend void update_gui(SDL_Window* window, RenderData& render_data,
-                           GameConfig& game_config, const Player& player,
-                           SplineEditor& spline_editor);
+                           GameConfig& game_config, Player& player);
 };
