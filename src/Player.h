@@ -16,14 +16,11 @@ class Player : Entity {
     WalkAnimator animator;
     Gamepad* gamepad_input; // currently unused
 
-    enum AnimState { STANDING, WALKING } anim_state;
-
-    enum WalkState { LEFT_UP, LEFT_DOWN, RIGHT_UP, RIGHT_DOWN } walk_state;
-
     bool grounded;
-    float walking_speed = 0.1f;
+    float walking_speed = 0.03f;
     const float gravity = 2.0f;
     bool facing_right = true;
+    AnimState anim_state;
 
     bool spline_edit_mode = false;
 

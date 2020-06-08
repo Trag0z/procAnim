@@ -28,11 +28,11 @@ static void resolve_ik(Bone* const bones[2],
     float target_distance = glm::length(
         static_cast<glm::vec3>(target_pos - bones[0]->bind_pose_transform[3]));
 
-    // Find out if min_rotation or max_rotation is closer to the target_rotation
-    // and set target_rotation to the closer one if it is out of the restricted
-    // range
-    auto clampToClosestRestriction = [target_rotations,
-                                      bone_restrictions](size_t bone_index) {
+    // Find out if min_rotation or max_rotation is closer to the
+    // target_rotations and set target_rotations to the closer one if it is out
+    // of the restricted range
+    auto clamp_to_closest_restriction = [target_rotations,
+                                         bone_restrictions](size_t bone_index) {
         if (target_rotations[bone_index] < 0.0f) {
             if (std::abs(target_rotations[bone_index] -
                          bone_restrictions[bone_index].min_rotation) >
@@ -69,7 +69,7 @@ static void resolve_ik(Bone* const bones[2],
             SDL_assert(target_rotations[i] < 2.0f * PI &&
                        target_rotations[i] > -2.0f * PI);
 
-            clampToClosestRestriction(i);
+            // clamp_to_closest_restriction(i);
         }
     } else {
         float target_distance2 = target_distance * target_distance;
@@ -100,12 +100,12 @@ static void resolve_ik(Bone* const bones[2],
             target_rotations[1] *= -1.0f;
         }
 
-        clampToClosestRestriction(0);
-        clampToClosestRestriction(1);
+        // clamp_to_closest_restriction(0);
+        // clamp_to_closest_restriction(1);
     }
 
     // NOTE: The following stuff should be covered by
-    // clampToClosestRestriction()
+    // clamp_to_closest_restriction()
     /* // If the target rotation is more than 180 degrees away from the current
     // rotation, choose the shorter way around the circle
     if (target_rotations[0] - bones[0]->rotation > PI) {
@@ -159,9 +159,6 @@ void ArmAnimator::update(float delta_time) {
                               std::min(1.0f, animation_speed * delta_time));
 }
 
-float LegAnimator::step_length = 1.5f;
-float LegAnimator::step_height = 0.7f;
-
 LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
     bones[0] = b1;
     bones[1] = b2;
@@ -175,7 +172,6 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
         bone_restrictions[1] = restrictions[1];
     }
 
-    target_pos = glm::vec4{0.0f, 0.0f, 0.0f, 0.0f};
     foot_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
                bones[1]->tail;
     last_foot_movement = glm::vec4(0.0f);
@@ -189,48 +185,38 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
 
 void LegAnimator::update(float delta_time, float walking_speed) {
     // If no target position was set, update foot_pos and return
-    if (glm::length(target_pos) == 0.0f) {
-        foot_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
-                   bones[1]->tail;
-        return;
+    if (spline == nullptr) {
+        // @CLEANUP: Maybe save the default bone position somewhere?
+        bones[0]->rotation = 0.0f;
+        bones[1]->rotation = 0.0f;
+        target_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
+                     bones[1]->tail;
+        resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
+        // NOTE: delta_time is always 1.0f if we hit the target framerate and
+        // the game is running at normal speed multiplier
+
+        // NOTE: These lerps never reach 1.0f because walking_speed * delta_time
+        // is always about 0.2
+        bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
+                                  walking_speed * delta_time * 10.0f);
+
+        bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
+                                  walking_speed * delta_time * 10.0f);
+    } else {
+        current_interpolation =
+            std::min(current_interpolation + delta_time * walking_speed, 1.0f);
+        target_pos = spline->get_point_on_spline(current_interpolation);
+        resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
+
+        bones[0]->rotation = target_rotations[0];
+        bones[1]->rotation = target_rotations[1];
     }
-
-    resolve_ik(bones, bone_restrictions, target_pos, target_rotation);
-
-    // NOTE: delta_time is always 1.0f if we hit the target framerate and
-    // the game is running at normal speed multiplier
-
-    // NOTE: These lerps never reach 1.0f because walking_speed * delta_time is
-    // always about 0.2
-    bones[0]->rotation = lerp(bones[0]->rotation, target_rotation[0],
-                              std::min(1.0f, walking_speed * delta_time));
-
-    bones[1]->rotation = lerp(bones[1]->rotation, target_rotation[1],
-                              std::min(1.0f, walking_speed * delta_time));
 
     // Update foot_pos
     glm::vec4 new_foot_pos = bones[1]->get_transform() *
                              bones[1]->bind_pose_transform * bones[1]->tail;
     last_foot_movement = new_foot_pos - foot_pos;
     foot_pos = new_foot_pos;
-}
-
-bool LegAnimator::has_reached_target_rotation() const {
-    return std::abs(bones[0]->rotation - target_rotation[0]) < 0.05f &&
-           std::abs(bones[1]->rotation - target_rotation[1]) < 0.05f;
-}
-
-void LegAnimator::set_target_foot_pos(TargetFootPosition pos) {
-    target_pos = bones[1]->bind_pose_transform * bones[1]->tail;
-    if (pos == RAISED) {
-        target_pos.x += step_length / 4.0f;
-        target_pos.y += step_height;
-    } else if (pos == FRONT) {
-        target_pos.x += step_length / 2.0f;
-        target_pos.y += 0.24f;
-    } else if (pos == BACK) {
-        target_pos.x -= step_length / 2.0f;
-    }
 }
 
 void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
@@ -241,8 +227,8 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
     arm_animators[1] = ArmAnimator(mesh.find_bone("Arm_R_1"),
                                    mesh.find_bone("Arm_R_2"), restrictions);
 
-    restrictions[0] = {-0.7f * PI, 0.7f * PI};
-    restrictions[1] = {degToRad(-120.0f), 0.0f};
+    restrictions[0] = {0.0f, 0.0f}; //{-0.7f * PI, 0.7f * PI};
+    restrictions[1] = {0.0f, 0.0f}; //{degToRad(-120.0f), 0.0f};
     leg_animators[0] = LegAnimator(mesh.find_bone("Leg_L_1"),
                                    mesh.find_bone("Leg_L_2"), restrictions);
     leg_animators[1] = LegAnimator(mesh.find_bone("Leg_R_1"),
@@ -259,7 +245,49 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
     spline_editor.init(parent, splines, "../assets/player_splines.spl");
 }
 
-void WalkAnimator::update() {}
+void WalkAnimator::update(float delta_time, float walking_speed,
+                          AnimState state) {
+
+    auto reset_interpolations = [this]() -> void {
+        leg_animators[0].current_interpolation = 0.0f;
+        leg_animators[1].current_interpolation = 0.0f;
+    };
+
+    if (state == AnimState::WALKING) {
+        if (leg_state == NEUTRAL) {
+            // Starting to walk
+            leg_state = RIGHT_LEG_UP;
+            leg_animators[LEFT_LEG].spline = &splines[LEG_BACKWARD];
+            leg_animators[RIGHT_LEG].spline = &splines[LEG_FORWARD];
+            reset_interpolations();
+        } else if (leg_animators[0].current_interpolation == 1.0f &&
+                   leg_animators[1].current_interpolation == 1.0f) {
+            // Is walking and has reached the end of the current spline
+            if (leg_state == RIGHT_LEG_UP) {
+                leg_state = LEFT_LEG_UP;
+                leg_animators[LEFT_LEG].spline = &splines[LEG_FORWARD];
+                leg_animators[RIGHT_LEG].spline = &splines[LEG_BACKWARD];
+                reset_interpolations();
+            } else {
+                leg_state = RIGHT_LEG_UP;
+                leg_animators[LEFT_LEG].spline = &splines[LEG_BACKWARD];
+                leg_animators[RIGHT_LEG].spline = &splines[LEG_FORWARD];
+                reset_interpolations();
+            }
+        }
+    } else { // Player is standing
+        if (leg_state != NEUTRAL) {
+            leg_state = NEUTRAL;
+            leg_animators[LEFT_LEG].spline = nullptr;
+            leg_animators[RIGHT_LEG].spline = nullptr;
+        }
+    }
+
+    leg_animators[0].update(delta_time, walking_speed);
+    leg_animators[1].update(delta_time, walking_speed);
+    arm_animators[0].update(delta_time);
+    arm_animators[1].update(delta_time);
+}
 
 void WalkAnimator::render(const RenderData& render_data, bool render_splines) {
     glUseProgram(render_data.debug_shader.id);

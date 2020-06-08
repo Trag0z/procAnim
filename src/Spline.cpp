@@ -15,7 +15,7 @@ void Spline::init(glm::vec2 points_[num_points]) {
     }
 
     // Init line render data
-    glm::mat4 parameter_matrix = glm::mat4(
+    parameter_matrix = glm::mat4(
         glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f),
         glm::vec4(points[1], 0.0f, 1.0f), glm::vec4(points[2], 0.0f, 1.0f));
 
@@ -42,17 +42,15 @@ void Spline::init(glm::vec2 points_[num_points]) {
 
 void Spline::update_render_data() {
     // Line
-    glm::mat4 parameter_matrix = glm::mat4(
+    // @optimize
+    parameter_matrix = glm::mat4(
         glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f),
         glm::vec4(points[1], 0.0f, 1.0f), glm::vec4(points[2], 0.0f, 1.0f));
 
-    glm::vec4 interpolation_vector;
     for (size_t i = 0; i < render_steps; ++i) {
         float t = static_cast<float>(i) / static_cast<float>(render_steps - 1);
-        interpolation_vector = {t * t * t, t * t, t, 1.0f};
 
-        line_shader_vertices[i].pos =
-            parameter_matrix * hermite_matrix * interpolation_vector;
+        line_shader_vertices[i].pos = get_point_on_spline(t);
     }
 
     line_vao.update_vertex_data(
@@ -66,6 +64,11 @@ void Spline::update_render_data() {
     point_vao.update_vertex_data(
         point_shader_vertices.data(),
         static_cast<GLuint>(point_shader_vertices.size()));
+}
+
+glm::vec4 Spline::get_point_on_spline(float t) const {
+    glm::vec4 interpolation_vector = {t * t * t, t * t, t, 1.0f};
+    return parameter_matrix * hermite_matrix * interpolation_vector;
 }
 
 /////           SplineEditor            /////

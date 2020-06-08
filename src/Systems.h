@@ -11,9 +11,10 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
 
     //////          Debug controls window           //////
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
-    Checkbox("Render player.model", &render_data.draw_models);
+    Checkbox("Render player model", &render_data.draw_models);
     Checkbox("Render wireframes", &render_data.draw_wireframes);
     Checkbox("Render bones", &render_data.draw_bones);
+    Checkbox("Render splines", &render_data.draw_splines);
 
     NewLine();
     SetNextItemWidth(100);

@@ -6,6 +6,8 @@
 struct Bone;
 struct RiggedMesh;
 
+enum AnimState { STANDING, WALKING };
+
 struct BoneRestrictions {
     float min_rotation, max_rotation;
 };
@@ -30,12 +32,13 @@ struct LegAnimator {
     Bone* bones[2];
     BoneRestrictions bone_restrictions[2];
 
+    const Spline* spline = nullptr;
+    float current_interpolation = 0.0f;
     glm::vec4 target_pos, foot_pos;
     glm::vec4 last_foot_movement;
-    static float step_length, step_height;
     bool grounded;
 
-    float target_rotation[2];
+    float target_rotations[2];
 
     VertexArrayData<DebugShaderVertex> vao;
 
@@ -43,10 +46,6 @@ struct LegAnimator {
     LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2] = nullptr);
 
     void update(float delta_time, float walking_speed);
-    bool has_reached_target_rotation() const;
-
-    enum TargetFootPosition { NEUTRAL, RAISED, FRONT, BACK };
-    void set_target_foot_pos(TargetFootPosition pos);
 };
 
 class WalkAnimator {
@@ -63,7 +62,11 @@ class WalkAnimator {
         ARM_BACKWARD = 3
     };
 
+    enum { LEFT_LEG = 0, RIGHT_LEG = 1 };
+
+    enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state;
+
     void init(const Entity* parent, RiggedMesh& mesh);
-    void update();
+    void update(float delta_time, float walking_speed, AnimState state);
     void render(const RenderData& render_data, bool render_splines);
 };

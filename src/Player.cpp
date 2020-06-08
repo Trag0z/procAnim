@@ -13,7 +13,6 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
     gamepad_input = gamepad;
 
     anim_state = AnimState::STANDING;
-    walk_state = WalkState::LEFT_UP;
 
     grounded = false;
 }
@@ -31,11 +30,9 @@ void Player::update(float delta_time, const BoxCollider& ground,
 
     //////          Arm animation           //////
     if (input.mouse_button(1)) {
-        animator.arm_animators[1].target_pos =
-            inverse(model) * glm::vec4(input.mouse_world_pos(), 0.0f, 1.0f);
-    }
-    for (auto& arm_anim : animator.arm_animators) {
-        arm_anim.update(delta_time);
+        animator.arm_animators[1].target_pos = glm::vec4(
+            to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f)), 1.0f);
+        // inverse(model) * glm::vec4(input.mouse_world_pos(), 0.0f, 1.0f);
     }
 
     if (!grounded) {
@@ -72,78 +69,22 @@ void Player::update(float delta_time, const BoxCollider& ground,
     }
 
     //////          Walking animation           //////
-    int move_direction = 0;
-    if (input.key(SDL_SCANCODE_LEFT)) {
-        move_direction -= 1;
-    }
-    if (input.key(SDL_SCANCODE_RIGHT)) {
-        move_direction += 1;
-    }
 
-    if (move_direction != 0) {
-        if ((facing_right && move_direction == -1) ||
-            (!facing_right && move_direction == 1)) {
+    // obvious @BUG: Player will always walk right if both keys are pressed
+    if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
+        anim_state = WALKING;
+        if (input.key(SDL_SCANCODE_LEFT) && facing_right) {
+            facing_right = !facing_right;
+            scale.x *= -1.0f;
+        } else if (input.key(SDL_SCANCODE_RIGHT) && !facing_right) {
             facing_right = !facing_right;
             scale.x *= -1.0f;
         }
-
-        switch (anim_state) {
-        case Player::STANDING:
-            // Start walking
-            leg_anims[0].set_target_foot_pos(LegAnimator::RAISED);
-            leg_anims[1].set_target_foot_pos(LegAnimator::NEUTRAL);
-
-            anim_state = Player::WALKING;
-            walk_state = Player::LEFT_UP;
-            break;
-        case Player::WALKING:
-            if (leg_anims[0].has_reached_target_rotation() &&
-                leg_anims[1].has_reached_target_rotation()) {
-                switch (walk_state) {
-                case Player::LEFT_UP:
-                    leg_anims[0].set_target_foot_pos(LegAnimator::FRONT);
-                    leg_anims[1].set_target_foot_pos(LegAnimator::BACK);
-
-                    walk_state = Player::LEFT_DOWN;
-                    break;
-                case Player::LEFT_DOWN:
-                    leg_anims[0].set_target_foot_pos(LegAnimator::NEUTRAL);
-                    leg_anims[1].set_target_foot_pos(LegAnimator::RAISED);
-
-                    walk_state = Player::RIGHT_UP;
-                    break;
-                case Player::RIGHT_UP:
-                    leg_anims[0].set_target_foot_pos(LegAnimator::BACK);
-                    leg_anims[1].set_target_foot_pos(LegAnimator::FRONT);
-
-                    walk_state = Player::RIGHT_DOWN;
-                    break;
-                case Player::RIGHT_DOWN:
-                    leg_anims[0].set_target_foot_pos(LegAnimator::RAISED);
-                    leg_anims[1].set_target_foot_pos(LegAnimator::NEUTRAL);
-
-                    walk_state = Player::LEFT_UP;
-                    break;
-                }
-            }
-            break;
-        default:
-            SDL_TriggerBreakpoint();
-            break;
-        }
-    } else if (anim_state == Player::WALKING) {
-        // Stop walking, reset to bind pose positions
-        leg_anims[0].target_pos = leg_anims[0].bones[1]->bind_pose_transform *
-                                  leg_anims[0].bones[1]->tail;
-
-        leg_anims[1].target_pos = leg_anims[1].bones[1]->bind_pose_transform *
-                                  leg_anims[1].bones[1]->tail;
-        anim_state = Player::STANDING;
+    } else {
+        anim_state = STANDING;
     }
 
-    for (auto& anim : leg_anims) {
-        anim.update(delta_time, walking_speed);
-    }
+    animator.update(delta_time, walking_speed, anim_state);
 
     if (grounded) {
         // @CLEANUP: This is so ugly with all the casting
@@ -219,8 +160,8 @@ void Player::render(const RenderData& render_data) {
             rm.bones_shader_vertices[i * 2].pos =
                 bone_transforms[i] *
                 rm.bones[i]
-                    .bind_pose_transform[3]; // Renders (0.0f, 0.0f, 0.0f) in
-                                             // the bones local space
+                    .bind_pose_transform[3]; // Renders (0.0f, 0.0f, 0.0f)
+                                             // in the bones local space
             rm.bones_shader_vertices[i * 2 + 1].pos =
                 bone_transforms[i] * rm.bones[i].bind_pose_transform *
                 rm.bones[i].tail;
@@ -237,6 +178,10 @@ void Player::render(const RenderData& render_data) {
 
         rm.bones_vao.draw(GL_POINTS);
     }
+
+    // Render Splines
+    if (render_data.draw_splines)
+        animator.spline_editor.render(render_data);
 
     // Render animator target positions
     animator.render(render_data, spline_edit_mode);

@@ -12,6 +12,7 @@ struct Spline {
 
     // P1, P2, T1, T2
     glm::vec2 points[num_points];
+    glm::mat4 parameter_matrix;
 
     VertexArrayData<DebugShaderVertex> line_vao;
     std::array<DebugShaderVertex, render_steps> line_shader_vertices;
@@ -24,10 +25,11 @@ struct Spline {
     void init(glm::vec2 points_[num_points] = nullptr);
 
     void update_render_data();
+    glm::vec4 get_point_on_spline(float t) const;
 
-    glm::mat4 hermite_matrix = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
-                                -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
-                                1.0f,  0.0f,  0.0f, 0.0f};
+    const glm::mat4 hermite_matrix = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
+                                      -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
+                                      1.0f,  0.0f,  0.0f, 0.0f};
 };
 
 class SplineEditor {
