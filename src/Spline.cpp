@@ -67,8 +67,10 @@ void Spline::update_render_data() {
         static_cast<GLuint>(point_shader_vertices.size()));
 }
 
-void SplineEditor::init(Spline* splines_, size_t num_splines_,
-                        std ::string* names) {
+void SplineEditor::init(const Entity* parent_, Spline* splines_,
+                        size_t num_splines_, std ::string* names) {
+    SDL_assert(parent_ != nullptr);
+    parent = parent_;
     splines = splines_;
     num_splines = num_splines_;
 

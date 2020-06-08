@@ -171,6 +171,7 @@
     <ClInclude Include="..\src\Animator.h" />
     <ClInclude Include="..\src\Collider.h" />
     <ClInclude Include="..\src\DebugCallback.h" />
+    <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Input.h" />
     <ClInclude Include="..\src\Mesh.h" />

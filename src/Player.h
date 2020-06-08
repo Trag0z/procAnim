@@ -4,20 +4,17 @@
 #include "Mesh.h"
 #include "Collider.h"
 #include "Animator.h"
+#include "Entity.h"
 
 class Gamepad;
 struct GameConfig;
 struct RenderData;
 
-class Player {
-    glm::vec2 pos;
-    glm::vec3 scale;
+class Player : Entity {
     Texture tex;
     RiggedMesh rigged_mesh;
     WalkAnimator animator;
     Gamepad* gamepad_input; // currently unused
-
-    glm::mat4 model;
 
     enum AnimState { STANDING, WALKING } anim_state;
 
@@ -31,7 +28,7 @@ class Player {
     bool spline_edit_mode = false;
 
   public:
-    void init(glm::vec2 position, glm::vec3 scale_factor,
+    void init(glm::vec3 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,
               Gamepad* gamepad);
 

@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Input.h"
 #include "VertexArrayData.h"
+#include "Entity.h"
 
 struct RenderData;
 
@@ -30,6 +31,7 @@ struct Spline {
 };
 
 class SplineEditor {
+    const Entity* parent = nullptr;
     Spline* splines = nullptr;
     size_t num_splines;
     std::vector<std::string> spline_names;
@@ -41,7 +43,8 @@ class SplineEditor {
     bool first_point_set = false;
 
   public:
-    void init(Spline* splines_, size_t num_splines_, std::string* names);
+    void init(const Entity* parent, Spline* splines_, size_t num_splines_,
+              std::string* names);
     void update(const MouseKeyboardInput& input);
     void render(const RenderData& render_data);
     void update_gui();

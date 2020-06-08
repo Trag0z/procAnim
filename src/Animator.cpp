@@ -233,7 +233,7 @@ void LegAnimator::set_target_foot_pos(TargetFootPosition pos) {
     }
 }
 
-void WalkAnimator::init(RiggedMesh& mesh) {
+void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
     BoneRestrictions restrictions[2] = {{-0.5f * PI, 0.5 * PI},
                                         {0.0f, 0.75f * PI}};
     arm_animators[0] = ArmAnimator(mesh.find_bone("Arm_L_1"),
@@ -256,7 +256,7 @@ void WalkAnimator::init(RiggedMesh& mesh) {
     std::string names[] = {
         {"Leg_Forward"}, {"Leg_Backward"}, {"Arm_Forward"}, {"Arm_Backward"}};
 
-    spline_editor.init(splines, 4, names);
+    spline_editor.init(parent, splines, 4, names);
 }
 
 void WalkAnimator::update() {}

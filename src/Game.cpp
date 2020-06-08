@@ -87,7 +87,7 @@ void Game::init() {
     Gamepad::init(gamepad_inputs);
 
     // Player
-    glm::vec2 position = {1920.0f / 2.0f, 1080.0f / 2.0f};
+    glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
     player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
                 "../assets/playerTexture.png", "../assets/guy.fbx", nullptr);
 

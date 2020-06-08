@@ -3,23 +3,19 @@
 #include "Player.h"
 #include "Game.h"
 
-void Player::init(glm::vec2 position, glm::vec3 scale_factor,
+void Player::init(glm::vec3 position, glm::vec3 scale_,
                   const char* texture_path, const char* mesh_path,
                   Gamepad* gamepad) {
-    pos = position;
-    scale = scale_factor;
+    Entity::init(position, scale_);
     tex = Texture::load_from_file(texture_path);
     rigged_mesh.load_from_file(mesh_path);
-    animator.init(rigged_mesh);
+    animator.init(this, rigged_mesh);
     gamepad_input = gamepad;
 
     anim_state = AnimState::STANDING;
     walk_state = WalkState::LEFT_UP;
 
     grounded = false;
-
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
-    model = glm::scale(model, glm::vec3(100.0f, 100.0f, 1.0f));
 }
 
 void Player::update(float delta_time, const BoxCollider& ground,
@@ -151,16 +147,15 @@ void Player::update(float delta_time, const BoxCollider& ground,
 
     if (grounded) {
         // @CLEANUP: This is so ugly with all the casting
-        glm::vec2 move = static_cast<glm::vec2>(
+        glm::vec3 move =
             scale * static_cast<glm::vec3>(
-                        leg_anims[closer_to_ground].last_foot_movement));
+                        leg_anims[closer_to_ground].last_foot_movement);
         pos -= move;
     }
 }
 
 void Player::render(const RenderData& render_data) {
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
-    model = glm::scale(model, scale);
+    update_model_matrix();
 
     RiggedMesh& rm = rigged_mesh;
 

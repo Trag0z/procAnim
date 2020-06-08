@@ -1,4 +1,3 @@
-why does merging SplineEditor::update() and SplineEditor::update_gui() break the gui functionality?
 
 NEXT:
 - move splines to player space
@@ -13,6 +12,7 @@ TODO:
 
 Bugs:               (@BUG)
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely
+- why does merging SplineEditor::update() and SplineEditor::update_gui() break the gui functionality?
 
 Cleanup:            (@CLEANUP)
 

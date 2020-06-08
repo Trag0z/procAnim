@@ -63,7 +63,7 @@ class WalkAnimator {
         ARM_BACKWARD = 3
     };
 
-    void init(RiggedMesh& mesh);
+    void init(const Entity* parent, RiggedMesh& mesh);
     void update();
     void render(const RenderData& render_data, bool render_splines);
 };
