@@ -184,7 +184,7 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
     GLuint circle_indices[circle_segments];
     DebugShaderVertex circle_vertices[circle_segments];
     float radius = bones[0]->length + bones[1]->length;
-    glm::mat4 bone_transform = bones[0]->inverse_bind_pose_transform;
+    // glm::mat4 bone_transform = bones[0]->inverse_bind_pose_transform;
 
     for (size_t i = 0; i < circle_segments; ++i) {
         circle_indices[i] = static_cast<GLuint>(i);
@@ -193,7 +193,7 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
                       static_cast<float>(circle_segments) * 2.0f * PI;
 
         circle_vertices[i].pos =
-            bone_transform *
+            // bone_transform *
             glm::vec4(radius * cosf(theta), radius * sinf(theta), 0.0f, 1.0f);
     }
 

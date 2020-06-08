@@ -1,7 +1,6 @@
 
 NEXT:
-- move splines to player space
-- figure out how to make one spline work for both legs
+- saved spline is different in both bone spaces
 
 TODO:
 - use splines for limb movements

@@ -18,7 +18,7 @@ class Player : Entity {
 
     bool grounded;
     float walking_speed = 0.03f;
-    const float gravity = 2.0f;
+    const float gravity = 4.0f;
     bool facing_right = true;
     AnimState anim_state;
 
