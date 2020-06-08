@@ -15,6 +15,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     Checkbox("Render wireframes", &render_data.draw_wireframes);
     Checkbox("Render bones", &render_data.draw_bones);
     Checkbox("Render splines", &render_data.draw_splines);
+    Checkbox("Render leg circles", &render_data.draw_circles);
 
     NewLine();
     SetNextItemWidth(100);

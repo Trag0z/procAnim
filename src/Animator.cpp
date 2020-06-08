@@ -179,8 +179,26 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
 
     // Init render data for rendering target_pos as a point
     GLuint index = 0;
+    target_point_vao.init(&index, 1, NULL, 1);
 
-    vao.init(&index, 1, NULL, 1);
+    GLuint circle_indices[circle_segments];
+    DebugShaderVertex circle_vertices[circle_segments];
+    float radius = bones[0]->length + bones[1]->length;
+    glm::mat4 bone_transform = bones[0]->inverse_bind_pose_transform;
+
+    for (size_t i = 0; i < circle_segments; ++i) {
+        circle_indices[i] = static_cast<GLuint>(i);
+
+        float theta = static_cast<float>(i) /
+                      static_cast<float>(circle_segments) * 2.0f * PI;
+
+        circle_vertices[i].pos =
+            bone_transform *
+            glm::vec4(radius * cosf(theta), radius * sinf(theta), 0.0f, 1.0f);
+    }
+
+    circle_vao.init(circle_indices, circle_segments, circle_vertices,
+                    circle_segments);
 }
 
 void LegAnimator::update(float delta_time, float walking_speed) {
@@ -289,7 +307,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
     arm_animators[1].update(delta_time);
 }
 
-void WalkAnimator::render(const RenderData& render_data, bool render_splines) {
+void WalkAnimator::render(const RenderData& render_data) {
     glUseProgram(render_data.debug_shader.id);
     glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -310,14 +328,17 @@ void WalkAnimator::render(const RenderData& render_data, bool render_splines) {
         if (anim.target_pos.w == 0.0f)
             continue;
 
-        anim.vao.update_vertex_data(
+        anim.target_point_vao.update_vertex_data(
             reinterpret_cast<DebugShaderVertex*>(&anim.target_pos),
             1); // ugly, but it works
 
-        anim.vao.draw(GL_POINTS);
+        anim.target_point_vao.draw(GL_POINTS);
     }
 
-    if (render_splines) {
-        spline_editor.render(render_data);
+    if (render_data.draw_circles) {
+        glUniform4f(render_data.debug_shader.color_loc, 0.3f, 0.6f, 1.0f, 1.0f);
+        for (auto& anim : leg_animators) {
+            anim.circle_vao.draw(GL_LINE_LOOP);
+        }
     }
 }

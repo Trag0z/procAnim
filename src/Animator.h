@@ -40,7 +40,9 @@ struct LegAnimator {
 
     float target_rotations[2];
 
-    VertexArrayData<DebugShaderVertex> vao;
+    VertexArrayData<DebugShaderVertex> target_point_vao;
+    VertexArrayData<DebugShaderVertex> circle_vao;
+    static const size_t circle_segments = 30;
 
     LegAnimator() {}
     LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2] = nullptr);
@@ -68,5 +70,5 @@ class WalkAnimator {
 
     void init(const Entity* parent, RiggedMesh& mesh);
     void update(float delta_time, float walking_speed, AnimState state);
-    void render(const RenderData& render_data, bool render_splines);
+    void render(const RenderData& render_data);
 };
