@@ -81,7 +81,8 @@ void SplineEditor::init(const Entity* parent_, Spline* splines_,
 }
 
 void SplineEditor::update(const MouseKeyboardInput& input) {
-    glm::vec2 mouse_pos = input.mouse_world_pos();
+    glm::vec2 mouse_pos =
+        parent->to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f));
 
     if (creating_new_spline) {
         Spline& selected_spline = splines[selected_spline_index];
@@ -123,7 +124,7 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
     if (input.mouse_button_down(1)) {
         for (size_t i = 0; i < num_splines; ++i) {
             for (auto& p : splines[i].points) {
-                if (glm::length(p - mouse_pos) < 4.0f) {
+                if (glm::length(p - mouse_pos) < 0.2f) {
                     selected_point = &p;
                     selected_spline_index = i;
                 }
@@ -161,9 +162,6 @@ void SplineEditor::update_gui() {
 
 void SplineEditor::render(const RenderData& render_data) {
     glUseProgram(render_data.debug_shader.id);
-    glm::mat4 model(1.0f);
-    glUniformMatrix4fv(render_data.debug_shader.model_loc, 1, GL_FALSE,
-                       value_ptr(model));
 
     for (size_t i = 0; i < num_splines; ++i) {
         if (i == selected_spline_index && creating_new_spline &&

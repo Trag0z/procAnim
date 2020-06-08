@@ -152,10 +152,11 @@ void Player::update(float delta_time, const BoxCollider& ground,
                         leg_anims[closer_to_ground].last_foot_movement);
         pos -= move;
     }
+
+    update_model_matrix();
 }
 
 void Player::render(const RenderData& render_data) {
-    update_model_matrix();
 
     RiggedMesh& rm = rigged_mesh;
 

@@ -21,7 +21,11 @@ class Entity {
         parent = parent_;
     };
 
-    //   public:
+  public:
+    glm::vec3 to_local_space(const glm::vec3& world_space_pos) const {
+        return glm::inverse(model) * glm::vec4(world_space_pos, 1.0f);
+    };
+
     //     void set_pos(glm::vec3 p) {
     //         pos = p;
     //         update_model_matrix();
