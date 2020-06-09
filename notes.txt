@@ -1,9 +1,6 @@
-
 NEXT:
-- saved spline is different in both bone spaces
 
 TODO:
-- use splines for limb movements
 - find target points in a good way
 
 - longer bone chains, multiple parents?
