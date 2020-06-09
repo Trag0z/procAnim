@@ -22,8 +22,20 @@ class Entity {
     };
 
   public:
-    glm::vec3 to_local_space(const glm::vec3& world_space_pos) const {
-        return glm::inverse(model) * glm::vec4(world_space_pos, 1.0f);
+    glm::vec3 world_to_local_space(const glm::vec3& world_pos) const {
+        return glm::inverse(model) * glm::vec4(world_pos, 1.0f);
+    };
+
+    glm::vec4 world_to_local_space(const glm::vec4& world_pos) const {
+        return glm::inverse(model) * world_pos;
+    }
+
+    glm::vec3 local_to_world_space(const glm::vec3& local_pos) const {
+        return model * glm::vec4(local_pos, 1.0f);
+    };
+
+    glm::vec4 local_to_world_space(const glm::vec4& local_pos) const {
+        return model * local_pos;
     };
 
     //     void set_pos(glm::vec3 p) {

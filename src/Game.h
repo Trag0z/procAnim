@@ -25,6 +25,7 @@ struct GameConfig {
 
     float speed = 1.0f;
     bool step_mode = false;
+    bool use_const_delta_time = true;
 };
 
 struct RenderData {

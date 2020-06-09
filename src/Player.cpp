@@ -31,13 +31,28 @@ void Player::update(float delta_time, const BoxCollider& ground,
     //////          Arm animation           //////
     if (input.mouse_button(1)) {
         animator.arm_animators[1].target_pos = glm::vec4(
-            to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f)), 1.0f);
+            world_to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f)),
+            1.0f);
         // inverse(model) * glm::vec4(input.mouse_world_pos(), 0.0f, 1.0f);
     }
 
     if (!grounded) {
         pos.y -= gravity * delta_time;
     }
+
+    //////          Walking animation           //////
+    if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
+        anim_state = WALKING;
+        if ((input.key(SDL_SCANCODE_LEFT) && facing_right) ||
+            (input.key(SDL_SCANCODE_RIGHT) && !facing_right)) {
+            facing_right = !facing_right;
+            scale.x *= -1.0f;
+        }
+    } else {
+        anim_state = STANDING;
+    }
+
+    animator.update(delta_time, walking_speed, anim_state);
 
     //////          Collision Detection         //////
     // Find closest point on gorund
@@ -47,7 +62,7 @@ void Player::update(float delta_time, const BoxCollider& ground,
     float distance_to_ground[2];
 
     for (size_t i = 0; i < 2; ++i) {
-        foot_pos_world[i] = model * leg_anims[i].foot_pos;
+        foot_pos_world[i] = local_to_world_space(leg_anims[i].foot_pos);
         distance_to_ground[i] =
             foot_pos_world[i].y - ground.pos.y - ground.half_ext.y;
     }
@@ -67,24 +82,6 @@ void Player::update(float delta_time, const BoxCollider& ground,
         leg_anims[0].grounded = false;
         leg_anims[1].grounded = false;
     }
-
-    //////          Walking animation           //////
-
-    // obvious @BUG: Player will always walk right if both keys are pressed
-    if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
-        anim_state = WALKING;
-        if (input.key(SDL_SCANCODE_LEFT) && facing_right) {
-            facing_right = !facing_right;
-            scale.x *= -1.0f;
-        } else if (input.key(SDL_SCANCODE_RIGHT) && !facing_right) {
-            facing_right = !facing_right;
-            scale.x *= -1.0f;
-        }
-    } else {
-        anim_state = STANDING;
-    }
-
-    animator.update(delta_time, walking_speed, anim_state);
 
     if (grounded) {
         // @CLEANUP: This is so ugly with all the casting

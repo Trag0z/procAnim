@@ -224,7 +224,7 @@ void LegAnimator::update(float delta_time, float walking_speed) {
         current_interpolation =
             std::min(current_interpolation + delta_time * walking_speed, 1.0f);
         target_pos = spline->get_point_on_spline(current_interpolation);
-        target_pos.x + bones[0]
+        target_pos.x += bones[0]
                            ->inverse_bind_pose_transform[3]
                            .x; // Move left/right to be centered under directly
                                // under bone[0]

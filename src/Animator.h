@@ -36,7 +36,7 @@ struct LegAnimator {
     float current_interpolation = 0.0f;
     glm::vec4 target_pos, foot_pos;
     glm::vec4 last_foot_movement;
-    bool grounded;
+    bool grounded; // Currently never read
 
     float target_rotations[2];
 

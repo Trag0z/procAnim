@@ -128,7 +128,7 @@ void SplineEditor::init(const Entity* parent_, Spline* splines_,
 
 void SplineEditor::update(const MouseKeyboardInput& input) {
     glm::vec2 mouse_pos =
-        parent->to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f));
+        parent->world_to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f));
 
     if (creating_new_spline) {
         Spline& selected_spline = splines[selected_spline_index];

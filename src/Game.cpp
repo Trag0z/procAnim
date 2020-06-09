@@ -148,8 +148,14 @@ bool Game::run() {
         float frame_delay = static_cast<float>(game_config.frame_delay);
 
         if (!game_config.step_mode) {
-            float delta_time =
-                last_frame_duration / frame_delay * game_config.speed;
+            float delta_time;
+            if (game_config.use_const_delta_time) {
+                delta_time = game_config.speed;
+            } else {
+                delta_time =
+                    last_frame_duration / frame_delay * game_config.speed;
+            }
+
             player.update(delta_time, ground, mouse_keyboard_input);
         } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
                    mouse_keyboard_input.key(SDL_SCANCODE_M)) {
