@@ -132,10 +132,10 @@ bool Game::run() {
             game_config.step_mode = !game_config.step_mode;
         }
         if (mouse_keyboard_input.key_down(SDL_SCANCODE_COMMA)) {
-            game_config.speed = std::max(game_config.speed - 0.1f, 0.0f);
+            game_config.speed *= 0.5f;
         }
         if (mouse_keyboard_input.key_down(SDL_SCANCODE_PERIOD)) {
-            game_config.speed = game_config.speed + 0.1f;
+            game_config.speed *= 2.0f;
         }
         if (mouse_keyboard_input.key_down(SDL_SCANCODE_ESCAPE)) {
             running = false;
