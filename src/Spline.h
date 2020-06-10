@@ -54,6 +54,6 @@ class SplineEditor {
     void init(const Entity* parent, Spline* splines_, size_t num_splines_,
               std::string* names);
     void update(const MouseKeyboardInput& input);
-    void render(const RenderData& render_data);
+    void render(const RenderData& render_data, bool spline_edit_mode);
     void update_gui();
 };

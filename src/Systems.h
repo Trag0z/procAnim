@@ -36,13 +36,11 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     sprintf_s(label, "% 6.1f, % 6.1f", player.pos.x, player.pos.y);
     Text("Player position: ");
     SameLine();
-    bool changed_value = DragFloat2("Player position", (float*)&player.pos, 1.0f, 0.0f,
-                          0.0f, "% .2f");
+    bool changed_value = DragFloat2("Player position", (float*)&player.pos,
+                                    1.0f, 0.0f, 0.0f, "% .2f");
     if (changed_value) {
         player.grounded = false;
     }
-
-    
 
     Text("Target Positions");
     Columns(4);

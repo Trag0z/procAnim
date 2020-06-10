@@ -209,7 +209,8 @@ void SplineEditor::update_gui() {
     End();
 }
 
-void SplineEditor::render(const RenderData& render_data) {
+void SplineEditor::render(const RenderData& render_data,
+                          bool spline_edit_mode) {
     glUseProgram(render_data.debug_shader.id);
 
     for (size_t i = 0; i < num_splines; ++i) {
@@ -224,7 +225,7 @@ void SplineEditor::render(const RenderData& render_data) {
         splines[i].line_vao.draw(GL_LINE_STRIP);
     }
 
-    if (selected_spline_index >= 0 && selected_spline_index < num_splines &&
+    if (spline_edit_mode && selected_spline_index < num_splines &&
         (!creating_new_spline && !first_point_set)) {
         glUniform4f(render_data.debug_shader.color_loc, 0.7f, 0.0f, 0.7f,
                     1.0f); // Light purple

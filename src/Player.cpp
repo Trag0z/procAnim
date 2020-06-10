@@ -176,7 +176,7 @@ void Player::render(const RenderData& render_data) {
 
     // Render Splines
     if (render_data.draw_splines || spline_edit_mode)
-        animator.spline_editor.render(render_data);
+        animator.spline_editor.render(render_data, spline_edit_mode);
 
     // Render animator target positions
     animator.render(render_data);
