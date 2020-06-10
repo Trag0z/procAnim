@@ -305,7 +305,6 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             leg_state = NEUTRAL;
             leg_animators[LEFT_LEG].spline = nullptr;
             leg_animators[RIGHT_LEG].spline = nullptr;
-            grounded_leg_index = LEFT_LEG;
         }
     }
 

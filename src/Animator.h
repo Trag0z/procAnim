@@ -56,7 +56,7 @@ class WalkAnimator {
     Spline splines[4];
     SplineEditor spline_editor;
 
-    enum { LEFT_LEG = 0, RIGHT_LEG = 1 } grounded_leg_index;
+    enum { LEFT_LEG = 0, RIGHT_LEG = 1 } grounded_leg_index = LEFT_LEG;
 
     enum {
         LEG_FORWARD = 0,
