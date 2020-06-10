@@ -201,27 +201,24 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
 }
 
 void LegAnimator::update(float delta_time, float walking_speed) {
+    current_interpolation =
+        std::min(current_interpolation + delta_time * walking_speed, 1.0f);
+
     // If no target position was set, update foot_pos and return
     if (spline == nullptr) {
         // @CLEANUP: Maybe save the default bone position somewhere?
-        bones[0]->rotation = 0.0f;
-        bones[1]->rotation = 0.0f;
+
         target_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
                      bones[1]->tail;
-        resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
-        // NOTE: delta_time is always 1.0f if we hit the target framerate and
-        // the game is running at normal speed multiplier
+        target_rotations[0] = 0.0f;
+        target_rotations[1] = 0.0f;
 
-        // NOTE: These lerps never reach 1.0f because walking_speed * delta_time
-        // is always about 0.2
         bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
-                                  walking_speed * delta_time * 10.0f);
+                                  current_interpolation);
 
         bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
-                                  walking_speed * delta_time * 10.0f);
+                                  current_interpolation);
     } else {
-        current_interpolation =
-            std::min(current_interpolation + delta_time * walking_speed, 1.0f);
         target_pos = spline->get_point_on_spline(current_interpolation);
         target_pos.x += bones[0]
                             ->inverse_bind_pose_transform[3]
@@ -305,6 +302,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             leg_state = NEUTRAL;
             leg_animators[LEFT_LEG].spline = nullptr;
             leg_animators[RIGHT_LEG].spline = nullptr;
+            reset_interpolations();
         }
     }
 

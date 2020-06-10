@@ -1,6 +1,7 @@
 NEXT:
 
 TODO:
+- apply bone restrictions
 - find target points in a good way
 
 - longer bone chains, multiple parents?
