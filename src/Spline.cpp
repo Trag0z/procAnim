@@ -206,6 +206,32 @@ void SplineEditor::update_gui() {
         save_splines();
     }
 
+    NewLine();
+
+    if (CollapsingHeader("Spline Data")) {
+        for (size_t i = 0; i < num_splines; ++i) {
+            bool value_changed = false;
+            if (TreeNode(names[i])) {
+                auto& points = splines[i].points;
+                const float sensitivity = 0.1f;
+                value_changed |= DragFloat2("P1", value_ptr(points[0]),
+                                            sensitivity, 0.0f, 0.0f, "% .2f");
+                value_changed |= DragFloat2("T1", value_ptr(points[1]),
+                                            sensitivity, 0.0f, 0.0f, "% .2f");
+                value_changed |= DragFloat2("T2", value_ptr(points[2]),
+                                            sensitivity, 0.0f, 0.0f, "% .2f");
+                value_changed |= DragFloat2("P2", value_ptr(points[3]),
+                                            sensitivity, 0.0f, 0.0f, "% .2f");
+                TreePop();
+
+                if (value_changed) {
+                    selected_spline_index = i;
+                    splines[i].update_render_data();
+                }
+            }
+        }
+    }
+
     End();
 }
 
