@@ -175,7 +175,6 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
     foot_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
                bones[1]->tail;
     last_foot_movement = glm::vec4(0.0f);
-    grounded = false;
 
     // Init render data for rendering target_pos as a point
     GLuint index = 0;
@@ -225,9 +224,9 @@ void LegAnimator::update(float delta_time, float walking_speed) {
             std::min(current_interpolation + delta_time * walking_speed, 1.0f);
         target_pos = spline->get_point_on_spline(current_interpolation);
         target_pos.x += bones[0]
-                           ->inverse_bind_pose_transform[3]
-                           .x; // Move left/right to be centered under directly
-                               // under bone[0]
+                            ->inverse_bind_pose_transform[3]
+                            .x; // Move left/right to be centered under directly
+                                // under bone[0]
 
         resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
 
@@ -282,6 +281,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             leg_state = RIGHT_LEG_UP;
             leg_animators[LEFT_LEG].spline = &splines[LEG_BACKWARD];
             leg_animators[RIGHT_LEG].spline = &splines[LEG_FORWARD];
+            grounded_leg_index = LEFT_LEG;
             reset_interpolations();
         } else if (leg_animators[0].current_interpolation == 1.0f &&
                    leg_animators[1].current_interpolation == 1.0f) {
@@ -290,11 +290,13 @@ void WalkAnimator::update(float delta_time, float walking_speed,
                 leg_state = LEFT_LEG_UP;
                 leg_animators[LEFT_LEG].spline = &splines[LEG_FORWARD];
                 leg_animators[RIGHT_LEG].spline = &splines[LEG_BACKWARD];
+                grounded_leg_index = RIGHT_LEG;
                 reset_interpolations();
             } else {
                 leg_state = RIGHT_LEG_UP;
                 leg_animators[LEFT_LEG].spline = &splines[LEG_BACKWARD];
                 leg_animators[RIGHT_LEG].spline = &splines[LEG_FORWARD];
+                grounded_leg_index = LEFT_LEG;
                 reset_interpolations();
             }
         }
@@ -303,6 +305,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             leg_state = NEUTRAL;
             leg_animators[LEFT_LEG].spline = nullptr;
             leg_animators[RIGHT_LEG].spline = nullptr;
+            grounded_leg_index = LEFT_LEG;
         }
     }
 

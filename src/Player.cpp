@@ -28,16 +28,16 @@ void Player::update(float delta_time, const BoxCollider& ground,
         return;
     }
 
+    if (!grounded) {
+        pos.y -= gravity * delta_time;
+    }
+
     //////          Arm animation           //////
     if (input.mouse_button(1)) {
         animator.arm_animators[1].target_pos = glm::vec4(
             world_to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f)),
             1.0f);
         // inverse(model) * glm::vec4(input.mouse_world_pos(), 0.0f, 1.0f);
-    }
-
-    if (!grounded) {
-        pos.y -= gravity * delta_time;
     }
 
     //////          Walking animation           //////
@@ -55,39 +55,37 @@ void Player::update(float delta_time, const BoxCollider& ground,
     animator.update(delta_time, walking_speed, anim_state);
 
     //////          Collision Detection         //////
-    // Find closest point on gorund
-    auto& leg_anims = animator.leg_animators;
+    if (!grounded) {
+        // Find closest point on gorund
+        auto& leg_anims = animator.leg_animators;
 
-    glm::vec4 foot_pos_world[2];
-    float distance_to_ground[2];
+        glm::vec4 foot_pos_world[2];
+        float distance_to_ground[2];
 
-    for (size_t i = 0; i < 2; ++i) {
-        foot_pos_world[i] = local_to_world_space(leg_anims[i].foot_pos);
-        distance_to_ground[i] =
-            foot_pos_world[i].y - ground.pos.y - ground.half_ext.y;
-    }
+        for (size_t i = 0; i < 2; ++i) {
+            foot_pos_world[i] = local_to_world_space(leg_anims[i].foot_pos);
+            distance_to_ground[i] =
+                foot_pos_world[i].y - ground.pos.y - ground.half_ext.y;
+        }
 
-    size_t closer_to_ground =
-        distance_to_ground[0] < distance_to_ground[1] ? 0 : 1;
+        size_t closer_to_ground =
+            distance_to_ground[0] < distance_to_ground[1] ? 0 : 1;
 
-    // Set grounded status
-    if (distance_to_ground[closer_to_ground] <= 0.0f) {
-        pos.y -= distance_to_ground[closer_to_ground];
-
-        grounded = true;
-        leg_anims[closer_to_ground].grounded = true;
-        leg_anims[closer_to_ground ^ 1].grounded = false;
-    } else {
-        grounded = false;
-        leg_anims[0].grounded = false;
-        leg_anims[1].grounded = false;
+        // Set grounded status
+        if (distance_to_ground[closer_to_ground] <= 0.0f) {
+            pos.y -= distance_to_ground[closer_to_ground];
+            grounded = true;
+        } else {
+            grounded = false;
+        }
     }
 
     if (grounded) {
         // @CLEANUP: This is so ugly with all the casting
         glm::vec3 move =
             scale * static_cast<glm::vec3>(
-                        leg_anims[closer_to_ground].last_foot_movement);
+                        animator.leg_animators[animator.grounded_leg_index]
+                            .last_foot_movement);
         pos -= move;
     }
 
