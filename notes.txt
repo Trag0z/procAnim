@@ -1,4 +1,6 @@
 NEXT:
+- interpolation needs 2 variables, one for spline and one for lerp
+- arm animations
 
 TODO:
 - apply bone restrictions

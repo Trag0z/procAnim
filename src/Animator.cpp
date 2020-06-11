@@ -227,8 +227,10 @@ void LegAnimator::update(float delta_time, float walking_speed) {
 
         resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
 
-        bones[0]->rotation = target_rotations[0];
-        bones[1]->rotation = target_rotations[1];
+        bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
+                                  current_interpolation);
+        bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
+                                  current_interpolation);
     }
 
     // Update foot_pos
@@ -267,9 +269,9 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
 void WalkAnimator::update(float delta_time, float walking_speed,
                           AnimState state) {
 
-    auto reset_interpolations = [this]() -> void {
-        leg_animators[0].current_interpolation = 0.0f;
-        leg_animators[1].current_interpolation = 0.0f;
+    auto set_interpolations = [this](float t = 0.0f) -> void {
+        leg_animators[0].current_interpolation = t;
+        leg_animators[1].current_interpolation = t;
     };
 
     if (state == AnimState::WALKING) {
@@ -279,7 +281,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             leg_animators[LEFT_LEG].spline = &splines[LEG_BACKWARD];
             leg_animators[RIGHT_LEG].spline = &splines[LEG_FORWARD];
             grounded_leg_index = LEFT_LEG;
-            reset_interpolations();
+            set_interpolations(0.5f);
         } else if (leg_animators[0].current_interpolation == 1.0f &&
                    leg_animators[1].current_interpolation == 1.0f) {
             // Is walking and has reached the end of the current spline
@@ -288,13 +290,13 @@ void WalkAnimator::update(float delta_time, float walking_speed,
                 leg_animators[LEFT_LEG].spline = &splines[LEG_FORWARD];
                 leg_animators[RIGHT_LEG].spline = &splines[LEG_BACKWARD];
                 grounded_leg_index = RIGHT_LEG;
-                reset_interpolations();
+                set_interpolations();
             } else {
                 leg_state = RIGHT_LEG_UP;
                 leg_animators[LEFT_LEG].spline = &splines[LEG_BACKWARD];
                 leg_animators[RIGHT_LEG].spline = &splines[LEG_FORWARD];
                 grounded_leg_index = LEFT_LEG;
-                reset_interpolations();
+                set_interpolations();
             }
         }
     } else { // Player is standing
@@ -302,7 +304,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             leg_state = NEUTRAL;
             leg_animators[LEFT_LEG].spline = nullptr;
             leg_animators[RIGHT_LEG].spline = nullptr;
-            reset_interpolations();
+            set_interpolations();
         }
     }
 
