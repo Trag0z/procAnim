@@ -33,7 +33,10 @@ struct LegAnimator {
     BoneRestrictions bone_restrictions[2];
 
     const Spline* spline = nullptr;
-    float current_interpolation = 0.0f;
+    float spline_interpolation_factor = 0.0f;
+
+    float lerp_interpolation_factor = 1.0f;
+
     glm::vec4 target_pos, foot_pos;
     glm::vec4 last_foot_movement;
 
