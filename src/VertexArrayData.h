@@ -87,16 +87,6 @@ void VertexArrayData<ShaderVertex>::init(const GLuint* indices,
         reinterpret_cast<void*>(offsetof(ShaderVertex, uv_coord)));
     glEnableVertexAttribArray(1);
 
-    // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
-                          reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0);
-    // uvCoord attribute
-    glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE, sizeof(ShaderVertex),
-        reinterpret_cast<void*>(offsetof(ShaderVertex, uv_coord)));
-    glEnableVertexAttribArray(1);
-
     // Reset vertex array binding for error safety
     glBindVertexArray(0);
 }
