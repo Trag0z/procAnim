@@ -35,6 +35,7 @@ struct Spline {
 class SplineEditor {
     const Entity* parent = nullptr;
     Spline* splines = nullptr;
+    glm::vec2* spine_offsets = nullptr;
     size_t num_splines;
     std::vector<std::string> spline_names;
     const char* save_path;

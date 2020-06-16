@@ -29,7 +29,7 @@ struct GameConfig {
 };
 
 struct RenderData {
-    glm::ivec2 window_size = {1280, 720};
+    glm::ivec2 window_size = {1920, 1080};
 
     struct {
         GLuint id;

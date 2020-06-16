@@ -1,5 +1,6 @@
 NEXT:
-- arm animations
+- add offsets to SplineRenderer so splines can be rendered at arm/leg positions
+- arm animations are buggy
 
 TODO:
 - revert laptop compat changes
