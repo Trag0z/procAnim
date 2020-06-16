@@ -140,23 +140,55 @@ ArmAnimator::ArmAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
     // Init render data for rendering target_pos_model_space as a point
     GLuint index = 0;
 
-    vao.init(&index, 1, NULL, 1);
+    target_point_vao.init(&index, 1, NULL, 1);
 }
 
-void ArmAnimator::update(float delta_time) {
-    // Return if no target position was set
-    if (glm::length(target_pos) == 0.0f) {
+void ArmAnimator::update(float delta_time, float walking_speed,
+                         bool arm_follows_mouse) {
+    if (arm_follows_mouse) {
+        // Return if no target position was set
+        if (glm::length(target_pos) == 0.0f) {
+            return;
+        }
+
+        resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
+
+        bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
+                                  std::min(1.0f, animation_speed * delta_time));
+
+        bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
+                                  std::min(1.0f, animation_speed * delta_time));
         return;
     }
 
-    float target_rotations[2];
-    resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
+    lerp_interpolation_factor =
+        std::min(lerp_interpolation_factor + delta_time * walking_speed, 1.0f);
 
+    // If no target position was set, update foot_pos and return
+    if (spline == nullptr) {
+        // @CLEANUP: Maybe save the default bone position somewhere?
+
+        target_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
+                     bones[1]->tail;
+        target_rotations[0] = 0.0f;
+        target_rotations[1] = 0.0f;
+
+    } else {
+        spline_interpolation_factor = std::min(
+            spline_interpolation_factor + delta_time * walking_speed, 1.0f);
+
+        target_pos = spline->get_point_on_spline(spline_interpolation_factor);
+        target_pos.x += bones[0]
+                            ->inverse_bind_pose_transform[3]
+                            .x; // Move left/right to be centered under directly
+                                // under bone[0]
+
+        resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
+    }
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
-                              std::min(1.0f, animation_speed * delta_time));
-
+                              lerp_interpolation_factor);
     bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
-                              std::min(1.0f, animation_speed * delta_time));
+                              lerp_interpolation_factor);
 }
 
 LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
@@ -180,6 +212,7 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
     GLuint index = 0;
     target_point_vao.init(&index, 1, NULL, 1);
 
+    // Init render data for rendering circle
     GLuint circle_indices[circle_segments];
     DebugShaderVertex circle_vertices[circle_segments];
     float radius = bones[0]->length + bones[1]->length;
@@ -201,10 +234,9 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
 }
 
 void LegAnimator::update(float delta_time, float walking_speed) {
-    current_interpolation =
-        std::min(current_interpolation + delta_time * walking_speed, 1.0f);
+    lerp_interpolation_factor =
+        std::min(lerp_interpolation_factor + delta_time * walking_speed, 1.0f);
 
-    // If no target position was set, update foot_pos and return
     if (spline == nullptr) {
         // @CLEANUP: Maybe save the default bone position somewhere?
 
@@ -213,25 +245,22 @@ void LegAnimator::update(float delta_time, float walking_speed) {
         target_rotations[0] = 0.0f;
         target_rotations[1] = 0.0f;
 
-        bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
-                                  current_interpolation);
-
-        bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
-                                  current_interpolation);
     } else {
-        target_pos = spline->get_point_on_spline(current_interpolation);
+        spline_interpolation_factor = std::min(
+            spline_interpolation_factor + delta_time * walking_speed, 1.0f);
+
+        target_pos = spline->get_point_on_spline(spline_interpolation_factor);
         target_pos.x += bones[0]
                             ->inverse_bind_pose_transform[3]
                             .x; // Move left/right to be centered under directly
                                 // under bone[0]
 
         resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
-
-        bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
-                                  current_interpolation);
-        bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
-                                  current_interpolation);
     }
+    bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
+                              lerp_interpolation_factor);
+    bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
+                              lerp_interpolation_factor);
 
     // Update foot_pos
     glm::vec4 new_foot_pos = bones[1]->get_transform() *
@@ -269,9 +298,17 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
 void WalkAnimator::update(float delta_time, float walking_speed,
                           AnimState state) {
 
-    auto set_interpolations = [this](float t = 0.0f) -> void {
-        leg_animators[0].current_interpolation = t;
-        leg_animators[1].current_interpolation = t;
+    auto set_interpolations = [this](float spline_interpolation = 0.0f,
+                                     float lerp_interpolation = 0.0f) -> void {
+        leg_animators[0].spline_interpolation_factor = spline_interpolation;
+        leg_animators[0].lerp_interpolation_factor = lerp_interpolation;
+        leg_animators[1].spline_interpolation_factor = spline_interpolation;
+        leg_animators[1].lerp_interpolation_factor = lerp_interpolation;
+
+        arm_animators[0].spline_interpolation_factor = spline_interpolation;
+        arm_animators[0].lerp_interpolation_factor = lerp_interpolation;
+        arm_animators[1].spline_interpolation_factor = spline_interpolation;
+        arm_animators[1].lerp_interpolation_factor = lerp_interpolation;
     };
 
     if (state == AnimState::WALKING) {
@@ -280,21 +317,27 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             leg_state = RIGHT_LEG_UP;
             leg_animators[LEFT_LEG].spline = &splines[LEG_BACKWARD];
             leg_animators[RIGHT_LEG].spline = &splines[LEG_FORWARD];
+            arm_animators[LEFT_LEG].spline = &splines[ARM_FORWARD];
+            arm_animators[RIGHT_LEG].spline = &splines[ARM_BACKWARD];
             grounded_leg_index = LEFT_LEG;
-            set_interpolations(0.5f);
-        } else if (leg_animators[0].current_interpolation == 1.0f &&
-                   leg_animators[1].current_interpolation == 1.0f) {
+            set_interpolations(0.4f);
+        } else if (leg_animators[0].spline_interpolation_factor == 1.0f &&
+                   leg_animators[1].spline_interpolation_factor == 1.0f) {
             // Is walking and has reached the end of the current spline
             if (leg_state == RIGHT_LEG_UP) {
                 leg_state = LEFT_LEG_UP;
                 leg_animators[LEFT_LEG].spline = &splines[LEG_FORWARD];
                 leg_animators[RIGHT_LEG].spline = &splines[LEG_BACKWARD];
+                arm_animators[LEFT_LEG].spline = &splines[ARM_BACKWARD];
+                arm_animators[RIGHT_LEG].spline = &splines[ARM_FORWARD];
                 grounded_leg_index = RIGHT_LEG;
                 set_interpolations();
             } else {
                 leg_state = RIGHT_LEG_UP;
                 leg_animators[LEFT_LEG].spline = &splines[LEG_BACKWARD];
                 leg_animators[RIGHT_LEG].spline = &splines[LEG_FORWARD];
+                arm_animators[LEFT_LEG].spline = &splines[ARM_FORWARD];
+                arm_animators[RIGHT_LEG].spline = &splines[ARM_BACKWARD];
                 grounded_leg_index = LEFT_LEG;
                 set_interpolations();
             }
@@ -304,14 +347,16 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             leg_state = NEUTRAL;
             leg_animators[LEFT_LEG].spline = nullptr;
             leg_animators[RIGHT_LEG].spline = nullptr;
+            arm_animators[LEFT_LEG].spline = nullptr;
+            arm_animators[RIGHT_LEG].spline = nullptr;
             set_interpolations();
         }
     }
 
     leg_animators[0].update(delta_time, walking_speed);
     leg_animators[1].update(delta_time, walking_speed);
-    arm_animators[0].update(delta_time);
-    arm_animators[1].update(delta_time);
+    arm_animators[0].update(delta_time, walking_speed, arm_follows_mouse);
+    arm_animators[1].update(delta_time, walking_speed, arm_follows_mouse);
 }
 
 void WalkAnimator::render(const RenderData& render_data) {
@@ -324,11 +369,11 @@ void WalkAnimator::render(const RenderData& render_data) {
             continue;
         }
 
-        anim.vao.update_vertex_data(
+        anim.target_point_vao.update_vertex_data(
             reinterpret_cast<DebugShaderVertex*>(&anim.target_pos),
             1); // ugly, but it works
 
-        anim.vao.draw(GL_POINTS);
+        anim.target_point_vao.draw(GL_POINTS);
     }
 
     for (auto& anim : leg_animators) {

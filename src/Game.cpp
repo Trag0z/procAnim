@@ -165,10 +165,10 @@ bool Game::run() {
         render(window, render_data, player, ground);
 
         // Check for errors and clear error queue
-        while (GLenum error = glGetError()) {
-            printf("[OpenGL Error] %d\n", error);
-            SDL_assert(!error);
-        }
+        // while (GLenum error = glGetError()) {
+        //     printf("[OpenGL Error] %d\n", error);
+        //     SDL_assert(!error);
+        // }
 
         // Wait for next frame
         U32 last_frame_time = SDL_GetTicks() - frame_start;

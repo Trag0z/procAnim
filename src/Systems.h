@@ -23,6 +23,7 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
 
     NewLine();
+    Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);
     Checkbox("Step mode", &game_config.step_mode);
     Checkbox("Spline edit mode", &player.spline_edit_mode);
 

@@ -1,8 +1,9 @@
 NEXT:
-- interpolation needs 2 variables, one for spline and one for lerp
-- arm animations
+- add offsets to SplineRenderer so splines can be rendered at arm/leg positions
+- arm animations are buggy
 
 TODO:
+- revert laptop compat changes
 - apply bone restrictions
 - find target points in a good way
 
@@ -17,3 +18,4 @@ Cleanup:            (@CLEANUP)
 
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time
+- set some vertex arrays as static if they don't change

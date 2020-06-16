@@ -38,13 +38,17 @@ template <typename vertex_t> class VertexArrayData {
 
     void update_vertex_data(std::vector<vertex_t> data) {
         SDL_assert(data.size() <= _num_vertices);
-        glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * data.size(),
-                             data.data());
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_t) * data.size(), data.data());
+        // glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * data.size(),
+        //                      data.data());
     }
 
     void update_vertex_data(vertex_t* data, GLuint num_vertices) {
         SDL_assert(num_vertices <= _num_vertices);
-        glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * num_vertices, data);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_t) * num_vertices, data);
+        // glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * num_vertices, data);
     }
 
     inline void draw(GLenum mode) const {
