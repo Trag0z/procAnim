@@ -47,7 +47,8 @@ struct RenderData {
     bool draw_bones = true;
     bool draw_wireframes = false;
     bool draw_splines = true;
-    bool draw_circles = false;
+    bool draw_leg_circle = false;
+    bool draw_arm_circle = false;
 
     glm::mat4 projection =
         glm::ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);

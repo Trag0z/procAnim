@@ -127,7 +127,6 @@ void Player::render(const RenderData& render_data) {
 
     // Render player model
     if (render_data.draw_models) {
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex.id);
 

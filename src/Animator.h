@@ -23,7 +23,7 @@ struct ArmAnimator {
 
     float lerp_interpolation_factor = 1.0f;
 
-    glm::vec4 target_pos, foot_pos;
+    glm::vec4 target_pos;
     glm::vec4 last_foot_movement;
 
     float target_rotations[2];
@@ -51,8 +51,6 @@ struct LegAnimator {
     float target_rotations[2];
 
     VertexArrayData<DebugShaderVertex> target_point_vao;
-    VertexArrayData<DebugShaderVertex> circle_vao;
-    static const size_t circle_segments = 30;
 
     LegAnimator() {}
     LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2] = nullptr);
@@ -68,6 +66,9 @@ class WalkAnimator {
     SplineEditor spline_editor;
 
     bool arm_follows_mouse = false;
+
+    VertexArrayData<DebugShaderVertex> circle_vao[2];
+    static const size_t circle_segments = 30;
 
     enum { LEFT_LEG = 0, RIGHT_LEG = 1 } grounded_leg_index = LEFT_LEG;
 

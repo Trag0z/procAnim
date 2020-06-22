@@ -178,10 +178,10 @@ void ArmAnimator::update(float delta_time, float walking_speed,
             spline_interpolation_factor + delta_time * walking_speed, 1.0f);
 
         target_pos = spline->get_point_on_spline(spline_interpolation_factor);
-        target_pos.x += bones[0]
-                            ->inverse_bind_pose_transform[3]
-                            .x; // Move left/right to be centered under directly
-                                // under bone[0]
+        target_pos.x +=
+            bones[0]->inverse_bind_pose_transform[3].x; // Translate to bone
+        // space (but don't rotate!)
+        target_pos.y -= bones[0]->inverse_bind_pose_transform[3].y;
 
         resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
     }
@@ -211,26 +211,6 @@ LegAnimator::LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2]) {
     // Init render data for rendering target_pos as a point
     GLuint index = 0;
     target_point_vao.init(&index, 1, NULL, 1);
-
-    // Init render data for rendering circle
-    GLuint circle_indices[circle_segments];
-    DebugShaderVertex circle_vertices[circle_segments];
-    float radius = bones[0]->length + bones[1]->length;
-    // glm::mat4 bone_transform = bones[0]->inverse_bind_pose_transform;
-
-    for (size_t i = 0; i < circle_segments; ++i) {
-        circle_indices[i] = static_cast<GLuint>(i);
-
-        float theta = static_cast<float>(i) /
-                      static_cast<float>(circle_segments) * 2.0f * PI;
-
-        circle_vertices[i].pos =
-            // bone_transform *
-            glm::vec4(radius * cosf(theta), radius * sinf(theta), 0.0f, 1.0f);
-    }
-
-    circle_vao.init(circle_indices, circle_segments, circle_vertices,
-                    circle_segments);
 }
 
 void LegAnimator::update(float delta_time, float walking_speed) {
@@ -252,8 +232,9 @@ void LegAnimator::update(float delta_time, float walking_speed) {
         target_pos = spline->get_point_on_spline(spline_interpolation_factor);
         target_pos.x += bones[0]
                             ->inverse_bind_pose_transform[3]
-                            .x; // Move left/right to be centered under directly
-                                // under bone[0]
+                            .x; // Move left/right to be centered directly
+        // under bone[0]
+        target_pos.y += bones[0]->inverse_bind_pose_transform[3].y;
 
         resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
     }
@@ -289,10 +270,40 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
     splines[2].init();
     splines[3].init();
 
-    std::string names[] = {
-        {"Leg_Forward"}, {"Leg_Backward"}, {"Arm_Forward"}, {"Arm_Backward"}};
-
     spline_editor.init(parent, splines, "../assets/player_splines.spl");
+
+    // Init render data for rendering circle
+    GLuint circle_indices[circle_segments];
+    for (size_t i = 0; i < circle_segments; ++i) {
+        circle_indices[i] = static_cast<GLuint>(i);
+    }
+
+    auto set_circle_vertices = [](float radius, DebugShaderVertex* vertices,
+                                  size_t num_segments) {
+        for (size_t i = 0; i < num_segments; ++i) {
+            float theta = static_cast<float>(i) /
+                          static_cast<float>(circle_segments) * 2.0f * PI;
+
+            vertices[i].pos = glm::vec4(radius * cosf(theta),
+                                        radius * sinf(theta), 0.0f, 1.0f);
+        }
+    };
+
+    DebugShaderVertex circle_vertices[circle_segments];
+
+    float radius =
+        arm_animators[0].bones[0]->length + arm_animators[0].bones[1]->length;
+
+    set_circle_vertices(radius, circle_vertices, circle_segments);
+    circle_vao[0].init(circle_indices, circle_segments, circle_vertices,
+                       circle_segments);
+
+    radius =
+        leg_animators[0].bones[0]->length + leg_animators[0].bones[1]->length;
+
+    set_circle_vertices(radius, circle_vertices, circle_segments);
+    circle_vao[1].init(circle_indices, circle_segments, circle_vertices,
+                       circle_segments);
 }
 
 void WalkAnimator::update(float delta_time, float walking_speed,
@@ -387,10 +398,9 @@ void WalkAnimator::render(const RenderData& render_data) {
         anim.target_point_vao.draw(GL_POINTS);
     }
 
-    if (render_data.draw_circles) {
-        glUniform4f(render_data.debug_shader.color_loc, 0.3f, 0.6f, 1.0f, 1.0f);
-        for (auto& anim : leg_animators) {
-            anim.circle_vao.draw(GL_LINE_LOOP);
-        }
-    }
+    glUniform4f(render_data.debug_shader.color_loc, 0.3f, 0.6f, 1.0f, 1.0f);
+    if (render_data.draw_arm_circle)
+        circle_vao[0].draw(GL_LINE_LOOP);
+    if (render_data.draw_leg_circle)
+        circle_vao[1].draw(GL_LINE_LOOP);
 }

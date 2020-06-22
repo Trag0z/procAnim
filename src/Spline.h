@@ -53,7 +53,7 @@ class SplineEditor {
   public:
     void init(const Entity* parent, Spline* splines_, const char* save_path_);
     void init(const Entity* parent, Spline* splines_, size_t num_splines_,
-              std::string* names);
+              std::string* names); // Only used for first setup of splines
     void update(const MouseKeyboardInput& input);
     void render(const RenderData& render_data, bool spline_edit_mode);
     void update_gui();
