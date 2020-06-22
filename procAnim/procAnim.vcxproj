@@ -154,6 +154,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\Player.cpp" />
+    <ClCompile Include="..\src\Renderer.cpp" />
     <ClCompile Include="..\src\Shaders.cpp" />
     <ClCompile Include="..\src\Spline.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
     <ClInclude Include="..\src\Animator.h" />
     <ClInclude Include="..\src\Collider.h" />
+    <ClInclude Include="..\src\Colors.h" />
     <ClInclude Include="..\src\DebugCallback.h" />
     <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\Game.h" />
@@ -177,13 +179,14 @@
     <ClInclude Include="..\src\Mesh.h" />
     <ClInclude Include="..\src\pch.h" />
     <ClInclude Include="..\src\Player.h" />
+    <ClInclude Include="..\src\Renderer.h" />
     <ClInclude Include="..\src\Shaders.h" />
     <ClInclude Include="..\src\Spline.h" />
     <ClInclude Include="..\src\Systems.h" />
     <ClInclude Include="..\src\Texture.h" />
     <ClInclude Include="..\src\Types.h" />
     <ClInclude Include="..\src\Util.h" />
-    <ClInclude Include="..\src\VertexArrayData.h" />
+    <ClInclude Include="..\src\VertexArray.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\debug.vert" />

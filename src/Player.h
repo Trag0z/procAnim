@@ -5,10 +5,10 @@
 #include "Collider.h"
 #include "Animator.h"
 #include "Entity.h"
+#include "Renderer.h"
 
 class Gamepad;
 struct GameConfig;
-struct RenderData;
 
 class Player : Entity {
     Texture tex;
@@ -32,10 +32,10 @@ class Player : Entity {
     void update(float delta_time, const BoxCollider& ground,
                 const MouseKeyboardInput& mkb);
 
-    void render(const RenderData& render_data);
+    void render(const Renderer& renderer);
 
     // The general UI displays the player's private members, so it needs to
     // access them. This feels cleaner than writing a bunch of getters.
-    friend void update_gui(SDL_Window* window, RenderData& render_data,
+    friend void update_gui(SDL_Window* window, Renderer& renderer,
                            GameConfig& game_config, Player& player);
 };

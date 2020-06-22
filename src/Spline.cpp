@@ -235,17 +235,15 @@ void SplineEditor::update_gui() {
     End();
 }
 
-void SplineEditor::render(const RenderData& render_data,
-                          bool spline_edit_mode) {
-    glUseProgram(render_data.debug_shader.id);
+void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
+    renderer.debug_shader.use();
 
     for (size_t i = 0; i < num_splines; ++i) {
         if (i == selected_spline_index && creating_new_spline &&
             !first_point_set)
             continue;
 
-        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f,
-                    1.0f); // Green
+        renderer.debug_shader.set_color(&Colors::GREEN);
 
         glLineWidth(1.0f);
         splines[i].line_vao.draw(GL_LINE_STRIP);
@@ -253,12 +251,10 @@ void SplineEditor::render(const RenderData& render_data,
 
     if (spline_edit_mode && selected_spline_index < num_splines &&
         (!creating_new_spline && !first_point_set)) {
-        glUniform4f(render_data.debug_shader.color_loc, 0.7f, 0.0f, 0.7f,
-                    1.0f); // Light purple
+        renderer.debug_shader.set_color(&Colors::LIGHT_PURPLE);
         splines[selected_spline_index].point_vao.draw(GL_LINES);
 
-        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 1.0f,
-                    1.0f); // Purple
+        renderer.debug_shader.set_color(&Colors::PURPLE);
         splines[selected_spline_index].point_vao.draw(GL_POINTS);
     }
 }

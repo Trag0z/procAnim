@@ -18,13 +18,13 @@ struct Bone {
 };
 
 struct RiggedMesh {
-    std::vector<Vertex> vertices;
+    std::vector<RiggedVertex> vertices;
 
-    VertexArrayData<ShaderVertex> vao;
-    std::vector<ShaderVertex> shader_vertices;
+    VertexArray<RiggedShader::Vertex> vao;
+    std::vector<RiggedShader::Vertex> shader_vertices;
 
-    VertexArrayData<DebugShaderVertex> bones_vao;
-    std::vector<DebugShaderVertex> bones_shader_vertices;
+    VertexArray<DebugShader::Vertex> bones_vao;
+    std::vector<DebugShader::Vertex> bones_shader_vertices;
 
     std::vector<Bone> bones;
 

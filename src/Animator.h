@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "VertexArrayData.h"
+#include "VertexArray.h"
 #include "Spline.h"
 
 struct Bone;
@@ -28,7 +28,7 @@ struct ArmAnimator {
 
     float target_rotations[2];
 
-    VertexArrayData<DebugShaderVertex> target_point_vao;
+    VertexArray<DebugShader::Vertex> target_point_vao;
 
     ArmAnimator() {}
     ArmAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2] = nullptr);
@@ -50,7 +50,7 @@ struct LegAnimator {
 
     float target_rotations[2];
 
-    VertexArrayData<DebugShaderVertex> target_point_vao;
+    VertexArray<DebugShader::Vertex> target_point_vao;
 
     LegAnimator() {}
     LegAnimator(Bone* b1, Bone* b2, BoneRestrictions restrictions[2] = nullptr);
@@ -67,7 +67,7 @@ class WalkAnimator {
 
     bool arm_follows_mouse = false;
 
-    VertexArrayData<DebugShaderVertex> circle_vao[2];
+    VertexArray<DebugShader::Vertex> circle_vao[2];
     static const size_t circle_segments = 30;
 
     enum { LEFT_LEG = 0, RIGHT_LEG = 1 } grounded_leg_index = LEFT_LEG;
@@ -83,5 +83,5 @@ class WalkAnimator {
 
     void init(const Entity* parent, RiggedMesh& mesh);
     void update(float delta_time, float walking_speed, AnimState state);
-    void render(const RenderData& render_data);
+    void render(const Renderer& renderer);
 };

@@ -12,15 +12,13 @@ void Game::init() {
     SDL_assert_always(SDL_Init(SDL_INIT_EVERYTHING) == 0);
     SDL_assert_always(IMG_Init(IMG_INIT_PNG) != 0);
     SDL_assert_always(TTF_Init() == 0);
-    printf("SDL initialized\n");
 
     window = SDL_CreateWindow(
-        "procAnim", SDL_WINDOWPOS_CENTERED, 0, render_data.window_size.x,
-        render_data.window_size.y, game_config.window_flags);
+        "procAnim", SDL_WINDOWPOS_CENTERED, 0, renderer.window_size().x,
+        renderer.window_size().y, game_config.window_flags);
     SDL_assert_always(window);
-    printf("Window created\n");
 
-    renderer = SDL_CreateRenderer(window, -1, 0);
+    sdl_renderer = SDL_CreateRenderer(window, -1, 0);
 
     // Use OpenGL 3.3 core
     const char* glsl_version = "#version 330 core";
@@ -50,7 +48,7 @@ void Game::init() {
     if (SDL_GL_SetSwapInterval(1) < 0) {
         printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
     }
-    glViewport(0, 0, render_data.window_size.x, render_data.window_size.y);
+    glViewport(0, 0, renderer.window_size().x, renderer.window_size().y);
     // glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -73,16 +71,10 @@ void Game::init() {
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Initialize member variables
-    GLuint simple_shader_id = loadAndCompileShaderFromFile(
-        "../src/shaders/simple.vert", "../src/shaders/simple.frag");
-    GLuint rigged_shader_id = loadAndCompileShaderFromFile(
-        "../src/shaders/rigged.vert", "../src/shaders/rigged.frag");
-    GLuint debug_shader_id = loadAndCompileShaderFromFile(
-        "../src/shaders/debug.vert", "../src/shaders/debug.frag");
 
-    render_data.init(simple_shader_id, rigged_shader_id, debug_shader_id);
+    renderer.init();
 
-    mouse_keyboard_input.init(render_data.window_size.y);
+    mouse_keyboard_input.init(renderer.window_size().y);
 
     Gamepad::init(gamepad_inputs);
 
@@ -123,10 +115,10 @@ bool Game::run() {
 
         // Handle general keyboard inputs
         if (mouse_keyboard_input.key_down(SDL_SCANCODE_F1)) {
-            render_data.draw_wireframes = !render_data.draw_wireframes;
+            renderer.draw_wireframes = !renderer.draw_wireframes;
         }
         if (mouse_keyboard_input.key_down(SDL_SCANCODE_F2)) {
-            render_data.draw_bones = !render_data.draw_bones;
+            renderer.draw_bones = !renderer.draw_bones;
         }
         if (mouse_keyboard_input.key_down(SDL_SCANCODE_P)) {
             game_config.step_mode = !game_config.step_mode;
@@ -141,7 +133,7 @@ bool Game::run() {
             running = false;
         }
 
-        update_gui(window, render_data, game_config, player);
+        update_gui(window, renderer, game_config, player);
 
         float last_frame_duration =
             static_cast<float>(frame_start - last_frame_start);
@@ -162,7 +154,7 @@ bool Game::run() {
             player.update(game_config.speed, ground, mouse_keyboard_input);
         }
 
-        render(window, render_data, player, ground);
+        render(window, renderer, player, ground);
 
         // Check for errors and clear error queue
         // while (GLenum error = glGetError()) {
@@ -180,30 +172,4 @@ bool Game::run() {
     IMG_Quit();
     SDL_Quit();
     return 0;
-}
-
-void RenderData::init(GLuint simple_shader_id, GLuint rigged_shader_id,
-                      GLuint debug_shader_id) {
-    SDL_assert_always(simple_shader_id != -1 && rigged_shader_id != -1 &&
-                      debug_shader_id != -1);
-    simple_shader.id = simple_shader_id;
-    rigged_shader.id = rigged_shader_id;
-    debug_shader.id = debug_shader_id;
-
-    rigged_shader.projection_loc =
-        glGetUniformLocation(rigged_shader_id, "projection");
-    rigged_shader.model_loc = glGetUniformLocation(rigged_shader_id, "model");
-
-    glUseProgram(rigged_shader.id);
-    glUniformMatrix4fv(rigged_shader.projection_loc, 1, GL_FALSE,
-                       value_ptr(projection));
-
-    debug_shader.projection_loc =
-        glGetUniformLocation(debug_shader_id, "projection");
-    debug_shader.model_loc = glGetUniformLocation(debug_shader_id, "model");
-    debug_shader.color_loc = glGetUniformLocation(debug_shader_id, "color");
-
-    glUseProgram(debug_shader.id);
-    glUniformMatrix4fv(debug_shader.projection_loc, 1, GL_FALSE,
-                       value_ptr(projection));
 }

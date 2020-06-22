@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
-#include "VertexArrayData.h"
-
-struct RenderData;
+#include "VertexArray.h"
+#include "Renderer.h"
 
 struct BoxCollider {
     glm::vec2 pos;
@@ -12,10 +11,10 @@ struct BoxCollider {
 
     glm::vec4 vertices[4];
 
-    VertexArrayData<DebugShaderVertex> vao;
+    VertexArray<DebugShader::Vertex> vao;
 
     BoxCollider() {}
     BoxCollider(glm::vec2 pos, glm::vec2 half_ext);
 
-    void render(const RenderData& render_data);
+    void render(const Renderer& renderer);
 };

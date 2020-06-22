@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Mesh.h"
 
-inline void update_gui(SDL_Window* window, RenderData& render_data,
+inline void update_gui(SDL_Window* window, Renderer& renderer,
                        GameConfig& game_config, Player& player) {
     using namespace ImGui;
     ImGui_ImplOpenGL3_NewFrame();
@@ -11,12 +11,12 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
 
     //////          Debug controls window           //////
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
-    Checkbox("Render player model", &render_data.draw_models);
-    Checkbox("Render wireframes", &render_data.draw_wireframes);
-    Checkbox("Render bones", &render_data.draw_bones);
-    Checkbox("Render splines", &render_data.draw_splines);
-    Checkbox("Render arm circle", &render_data.draw_arm_circle);
-    Checkbox("Render leg circle", &render_data.draw_leg_circle);
+    Checkbox("Render player model", &renderer.draw_models);
+    Checkbox("Render wireframes", &renderer.draw_wireframes);
+    Checkbox("Render bones", &renderer.draw_bones);
+    Checkbox("Render splines", &renderer.draw_splines);
+    Checkbox("Render arm circle", &renderer.draw_arm_circle);
+    Checkbox("Render leg circle", &renderer.draw_leg_circle);
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
@@ -107,14 +107,14 @@ inline void update_gui(SDL_Window* window, RenderData& render_data,
     End();
 }
 
-inline void render(SDL_Window* window, const RenderData& render_data,
-                   Player& player, BoxCollider& ground) {
+inline void render(SDL_Window* window, const Renderer& renderer, Player& player,
+                   BoxCollider& ground) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    ground.render(render_data);
+    ground.render(renderer);
 
-    player.render(render_data);
+    player.render(renderer);
 
     // Unbind vao for error safety
     glBindVertexArray(0);

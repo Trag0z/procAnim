@@ -92,7 +92,7 @@ void Player::update(float delta_time, const BoxCollider& ground,
     update_model_matrix();
 }
 
-void Player::render(const RenderData& render_data) {
+void Player::render(const Renderer& renderer) {
 
     RiggedMesh& rm = rigged_mesh;
 
@@ -109,7 +109,7 @@ void Player::render(const RenderData& render_data) {
 
     // Calculate vertex posistions for rendering
     for (size_t i = 0; i < rm.vertices.size(); ++i) {
-        Vertex vert = rm.vertices[i];
+        RiggedVertex vert = rm.vertices[i];
         rm.shader_vertices[i].uv_coord = vert.uv_coord;
 
         glm::mat4 bone =
@@ -121,27 +121,23 @@ void Player::render(const RenderData& render_data) {
 
     rm.vao.update_vertex_data(rm.shader_vertices);
 
-    glUseProgram(render_data.rigged_shader.id);
-    glUniformMatrix4fv(render_data.rigged_shader.model_loc, 1, GL_FALSE,
-                       value_ptr(model));
+    renderer.rigged_shader.use();
+    renderer.rigged_shader.set_model(&model);
 
     // Render player model
-    if (render_data.draw_models) {
+    if (renderer.draw_models) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex.id);
 
         rm.vao.draw(GL_TRIANGLES);
     }
 
-    glUseProgram(render_data.debug_shader.id);
-    glUniformMatrix4fv(render_data.debug_shader.model_loc, 1, GL_FALSE,
-                       value_ptr(model));
+    renderer.debug_shader.use();
+    renderer.debug_shader.set_model(&model);
 
     // Render wireframes
-    if (render_data.draw_wireframes) {
-        glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 0.0f, 0.0f, 1.0f,
-                    1.0f); // Red
+    if (renderer.draw_wireframes) {
+        renderer.debug_shader.set_color(&Colors::RED);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         rm.vao.draw(GL_TRIANGLES);
@@ -149,7 +145,7 @@ void Player::render(const RenderData& render_data) {
     }
 
     // Render bones
-    if (render_data.draw_bones) {
+    if (renderer.draw_bones) {
         for (size_t i = 0; i < rm.bones.size(); ++i) {
             rm.bones_shader_vertices[i * 2].pos =
                 bone_transforms[i] *
@@ -163,9 +159,7 @@ void Player::render(const RenderData& render_data) {
 
         rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
 
-        glUseProgram(render_data.debug_shader.id);
-        glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.0f, 0.0f,
-                    1.0f); // Blue
+        renderer.debug_shader.set_color(&Colors::BLUE);
 
         glLineWidth(2.0f);
         rm.bones_vao.draw(GL_LINES);
@@ -174,9 +168,9 @@ void Player::render(const RenderData& render_data) {
     }
 
     // Render Splines
-    if (render_data.draw_splines || spline_edit_mode)
-        animator.spline_editor.render(render_data, spline_edit_mode);
+    if (renderer.draw_splines || spline_edit_mode)
+        animator.spline_editor.render(renderer, spline_edit_mode);
 
     // Render animator target positions
-    animator.render(render_data);
+    animator.render(renderer);
 }

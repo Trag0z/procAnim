@@ -13,17 +13,16 @@ BoxCollider::BoxCollider(glm::vec2 position, glm::vec2 half_extents) {
     vertices[2] = {-half_ext.x, -half_ext.y, 0.0f, 1.0f};
     vertices[3] = {half_ext.x, -half_ext.y, 0.0f, 1.0f};
 
-    vao.init(indices, 6, (DebugShaderVertex*)vertices, 4);
+    vao.init(indices, 6, (DebugShader::Vertex*)vertices, 4);
 }
 
-void BoxCollider::render(const RenderData& render_data) {
-    glUseProgram(render_data.debug_shader.id);
+void BoxCollider::render(const Renderer& renderer) {
+    renderer.debug_shader.use();
 
     model = glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
-    glUniformMatrix4fv(render_data.debug_shader.model_loc, 1, GL_FALSE,
-                       value_ptr(model));
-    glUniform4f(render_data.debug_shader.color_loc, 1.0f, 0.5f, 0.2f,
-                1.0f); // ugly orange-ish
+    renderer.debug_shader.set_model(&model);
+
+    renderer.debug_shader.set_color(&Colors::ORANGE);
 
     vao.draw(GL_TRIANGLES);
 }

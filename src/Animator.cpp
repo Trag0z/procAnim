@@ -278,7 +278,7 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
         circle_indices[i] = static_cast<GLuint>(i);
     }
 
-    auto set_circle_vertices = [](float radius, DebugShaderVertex* vertices,
+    auto set_circle_vertices = [](float radius, DebugShader::Vertex* vertices,
                                   size_t num_segments) {
         for (size_t i = 0; i < num_segments; ++i) {
             float theta = static_cast<float>(i) /
@@ -289,7 +289,7 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
         }
     };
 
-    DebugShaderVertex circle_vertices[circle_segments];
+    DebugShader::Vertex circle_vertices[circle_segments];
 
     float radius =
         arm_animators[0].bones[0]->length + arm_animators[0].bones[1]->length;
@@ -370,9 +370,9 @@ void WalkAnimator::update(float delta_time, float walking_speed,
     arm_animators[1].update(delta_time, walking_speed, arm_follows_mouse);
 }
 
-void WalkAnimator::render(const RenderData& render_data) {
-    glUseProgram(render_data.debug_shader.id);
-    glUniform4f(render_data.debug_shader.color_loc, 0.0f, 1.0f, 0.0f, 1.0f);
+void WalkAnimator::render(const Renderer& renderer) {
+    renderer.debug_shader.use();
+    renderer.debug_shader.set_color(&Colors::GREEN);
 
     for (auto& anim : arm_animators) {
         if (anim.target_pos.w == 0.0f) {
@@ -381,7 +381,7 @@ void WalkAnimator::render(const RenderData& render_data) {
         }
 
         anim.target_point_vao.update_vertex_data(
-            reinterpret_cast<DebugShaderVertex*>(&anim.target_pos),
+            reinterpret_cast<DebugShader::Vertex*>(&anim.target_pos),
             1); // ugly, but it works
 
         anim.target_point_vao.draw(GL_POINTS);
@@ -392,15 +392,15 @@ void WalkAnimator::render(const RenderData& render_data) {
             continue;
 
         anim.target_point_vao.update_vertex_data(
-            reinterpret_cast<DebugShaderVertex*>(&anim.target_pos),
+            reinterpret_cast<DebugShader::Vertex*>(&anim.target_pos),
             1); // ugly, but it works
 
         anim.target_point_vao.draw(GL_POINTS);
     }
 
-    glUniform4f(render_data.debug_shader.color_loc, 0.3f, 0.6f, 1.0f, 1.0f);
-    if (render_data.draw_arm_circle)
+    renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
+    if (renderer.draw_arm_circle)
         circle_vao[0].draw(GL_LINE_LOOP);
-    if (render_data.draw_leg_circle)
+    if (renderer.draw_leg_circle)
         circle_vao[1].draw(GL_LINE_LOOP);
 }

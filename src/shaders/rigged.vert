@@ -1,13 +1,14 @@
 #version 330 core
 layout (location = 0) in vec4 pos; 
-layout (location = 1) in vec2 inUVCoord;
+layout (location = 1) in vec2 in_uv_coord;
 
 uniform mat4 projection;
 uniform mat4 model;
-out vec2 uvCoord;
+
+out vec2 uv_coord;
 
 void main()
 {
     gl_Position = projection * model * pos;
-    uvCoord = inUVCoord;
+    uv_coord = in_uv_coord;
 }

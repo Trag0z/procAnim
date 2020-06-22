@@ -1,10 +1,9 @@
 #pragma once
 #include "pch.h"
 #include "Input.h"
-#include "VertexArrayData.h"
+#include "VertexArray.h"
 #include "Entity.h"
-
-struct RenderData;
+#include "Renderer.h"
 
 struct Spline {
     static const size_t num_points = 4;
@@ -14,11 +13,11 @@ struct Spline {
     glm::vec2 points[num_points];
     glm::mat4 parameter_matrix;
 
-    VertexArrayData<DebugShaderVertex> line_vao;
-    std::array<DebugShaderVertex, render_steps> line_shader_vertices;
+    VertexArray<DebugShader::Vertex> line_vao;
+    std::array<DebugShader::Vertex, render_steps> line_shader_vertices;
 
-    VertexArrayData<DebugShaderVertex> point_vao;
-    std::array<DebugShaderVertex, num_points> point_shader_vertices;
+    VertexArray<DebugShader::Vertex> point_vao;
+    std::array<DebugShader::Vertex, num_points> point_shader_vertices;
 
   public:
     // Points in format P1, T1, T2, P2
@@ -55,6 +54,6 @@ class SplineEditor {
     void init(const Entity* parent, Spline* splines_, size_t num_splines_,
               std::string* names); // Only used for first setup of splines
     void update(const MouseKeyboardInput& input);
-    void render(const RenderData& render_data, bool spline_edit_mode);
+    void render(const Renderer& renderer, bool spline_edit_mode);
     void update_gui();
 };
