@@ -72,7 +72,7 @@ glm::vec4 Spline::get_point_on_spline(float t) const {
 }
 
 /////           SplineEditor            /////
-const size_t SplineEditor::max_spline_name_length = 32;
+const size_t SplineEditor::MAX_SPLINE_NAME_LENGTH = 32;
 
 void SplineEditor::save_splines() {
     SDL_RWops* file = SDL_RWFromFile(save_path, "wb");
@@ -82,9 +82,9 @@ void SplineEditor::save_splines() {
     for (size_t i = 0; i < num_splines; ++i) {
         SDL_RWwrite(file, &splines[i].points, sizeof(splines[i].points), 1);
 
-        SDL_assert_always(spline_names[i].length() < max_spline_name_length);
+        SDL_assert_always(spline_names[i].length() < MAX_SPLINE_NAME_LENGTH);
         SDL_RWwrite(file, spline_names[i].c_str(), sizeof(char),
-                    max_spline_name_length);
+                    MAX_SPLINE_NAME_LENGTH);
     }
 
     SDL_RWclose(file);
@@ -106,7 +106,7 @@ void SplineEditor::init(const Entity* parent_, Spline* splines_,
         SDL_RWread(file, &splines[i].points, sizeof(splines[i].points), 1);
         splines[i].update_render_data();
 
-        SDL_RWread(file, name_buf, sizeof(char), max_spline_name_length);
+        SDL_RWread(file, name_buf, sizeof(char), MAX_SPLINE_NAME_LENGTH);
         spline_names.push_back(name_buf);
     }
 
@@ -114,15 +114,16 @@ void SplineEditor::init(const Entity* parent_, Spline* splines_,
 }
 
 void SplineEditor::init(const Entity* parent_, Spline* splines_,
-                        size_t num_splines_, std ::string* names) {
+                        size_t num_splines_, std ::string* spline_names_) {
     SDL_assert(parent_ != nullptr);
     parent = parent_;
     splines = splines_;
     num_splines = num_splines_;
 
     spline_names.reserve(num_splines);
-    for (size_t i = 0; i < num_splines; ++i) {
-        spline_names.push_back(names[i]);
+    for (size_t i = 0; i < num_splines / 2; ++i) {
+        spline_names.push_back(spline_names_[i]);
+        spline_names.push_back(spline_names_[i]);
     }
 }
 
@@ -190,13 +191,17 @@ void SplineEditor::update_gui() {
     Begin("Spline Editor");
     Text("Splines");
 
-    const char* names[] = {spline_names[0].c_str(), spline_names[1].c_str(),
-                           spline_names[2].c_str(), spline_names[3].c_str()};
+    const char** names = new const char*[num_splines];
+    for (size_t i = 0; i < num_splines; ++i) {
+        names[i] = spline_names[i].c_str();
+    }
 
     int selected = static_cast<int>(selected_spline_index);
-    ListBox("", &selected, names, static_cast<int>(num_splines));
-
+    ListBox("", &selected, names, static_cast<int>(num_splines),
+            static_cast<int>(num_splines));
     selected_spline_index = static_cast<size_t>(selected);
+
+    delete[] names;
 
     if (Button("Replace with new spline") && !creating_new_spline) {
         creating_new_spline = true;
@@ -208,27 +213,23 @@ void SplineEditor::update_gui() {
 
     NewLine();
 
-    if (CollapsingHeader("Spline Data")) {
-        for (size_t i = 0; i < num_splines; ++i) {
-            bool value_changed = false;
-            if (TreeNode(names[i])) {
-                auto& points = splines[i].points;
-                const float sensitivity = 0.1f;
-                value_changed |= DragFloat2("P1", value_ptr(points[0]),
-                                            sensitivity, 0.0f, 0.0f, "% .2f");
-                value_changed |= DragFloat2("T1", value_ptr(points[1]),
-                                            sensitivity, 0.0f, 0.0f, "% .2f");
-                value_changed |= DragFloat2("T2", value_ptr(points[2]),
-                                            sensitivity, 0.0f, 0.0f, "% .2f");
-                value_changed |= DragFloat2("P2", value_ptr(points[3]),
-                                            sensitivity, 0.0f, 0.0f, "% .2f");
-                TreePop();
+    if (selected > -1) {
+        auto& points = splines[selected_spline_index].points;
 
-                if (value_changed) {
-                    selected_spline_index = i;
-                    splines[i].update_render_data();
-                }
-            }
+        bool value_changed = false;
+        const float sensitivity = 0.1f;
+
+        value_changed |= DragFloat2("P1", value_ptr(points[0]), sensitivity,
+                                    0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("T1", value_ptr(points[1]), sensitivity,
+                                    0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("T2", value_ptr(points[2]), sensitivity,
+                                    0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("P2", value_ptr(points[3]), sensitivity,
+                                    0.0f, 0.0f, "% .2f");
+
+        if (value_changed) {
+            splines[selected_spline_index].update_render_data();
         }
     }
 

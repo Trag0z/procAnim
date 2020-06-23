@@ -34,9 +34,10 @@ struct Spline {
 class SplineEditor {
     const Entity* parent = nullptr;
     Spline* splines = nullptr;
-    glm::vec2* spine_offsets = nullptr;
     size_t num_splines;
+
     std::vector<std::string> spline_names;
+
     const char* save_path;
 
     glm::vec2* selected_point = nullptr;
@@ -45,14 +46,15 @@ class SplineEditor {
     bool creating_new_spline = false;
     bool first_point_set = false;
 
-    static const size_t max_spline_name_length;
+    static const size_t MAX_SPLINE_NAME_LENGTH;
 
     void save_splines();
 
   public:
     void init(const Entity* parent, Spline* splines_, const char* save_path_);
-    void init(const Entity* parent, Spline* splines_, size_t num_splines_,
-              std::string* names); // Only used for first setup of splines
+    void
+    init(const Entity* parent, Spline* splines_, size_t num_splines_,
+         std::string* spline_names_); // Only used for first setup of splines
     void update(const MouseKeyboardInput& input);
     void render(const Renderer& renderer, bool spline_edit_mode);
     void update_gui();

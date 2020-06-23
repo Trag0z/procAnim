@@ -17,7 +17,7 @@ Texture Texture::load_from_file(const char* path) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ret.w, ret.h, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, img->pixels);
     // NOTE: Is this actually useful?
-    glGenerateMipmap(GL_TEXTURE_2D);
+    // glGenerateMipmap(GL_TEXTURE_2D);
     SDL_FreeSurface(img);
 
     // Set Texture wrap and filter modes
@@ -26,6 +26,8 @@ Texture Texture::load_from_file(const char* path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // @OPTIMIZATION: delete this
     // Unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
 

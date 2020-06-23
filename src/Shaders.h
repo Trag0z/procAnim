@@ -22,7 +22,7 @@ class Shader {
     }
 
   public:
-    // @CLEANUP: use() is called in every single uniform setter every time
+    // @OPTIMIZATION: use() is called in every single uniform setter every time
     inline void use() const noexcept { glUseProgram(id); }
 
     inline void set_projection(const glm::mat4* mat) const noexcept {

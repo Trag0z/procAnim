@@ -33,12 +33,12 @@ void Player::update(float delta_time, const BoxCollider& ground,
     }
 
     //////          Arm animation           //////
-    if (input.mouse_button(1)) {
-        animator.arm_animators[1].target_pos = glm::vec4(
-            world_to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f)),
-            1.0f);
-        // inverse(model) * glm::vec4(input.mouse_world_pos(), 0.0f, 1.0f);
-    }
+    // if (input.mouse_button(1)) {
+    //    animator.arm_animators[1].target_pos = glm::vec4(
+    //        world_to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f)),
+    //        1.0f);
+    //    // inverse(model) * glm::vec4(input.mouse_world_pos(), 0.0f, 1.0f);
+    //}
 
     //////          Walking animation           //////
     if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
@@ -57,13 +57,15 @@ void Player::update(float delta_time, const BoxCollider& ground,
     //////          Collision Detection         //////
     if (!grounded) {
         // Find closest point on gorund
-        auto& leg_anims = animator.leg_animators;
-
         glm::vec4 foot_pos_world[2];
         float distance_to_ground[2];
 
+        foot_pos_world[0] = local_to_world_space(
+            animator.limb_animators[WalkAnimator::LEFT_LEG].tip_pos);
+        foot_pos_world[1] = local_to_world_space(
+            animator.limb_animators[WalkAnimator::RIGHT_LEG].tip_pos);
+
         for (size_t i = 0; i < 2; ++i) {
-            foot_pos_world[i] = local_to_world_space(leg_anims[i].foot_pos);
             distance_to_ground[i] =
                 foot_pos_world[i].y - ground.pos.y - ground.half_ext.y;
         }
@@ -84,8 +86,8 @@ void Player::update(float delta_time, const BoxCollider& ground,
         // @CLEANUP: This is so ugly with all the casting
         glm::vec3 move =
             scale * static_cast<glm::vec3>(
-                        animator.leg_animators[animator.grounded_leg_index]
-                            .last_foot_movement);
+                        animator.limb_animators[animator.grounded_leg_index]
+                            .last_tip_movement);
         pos -= move;
     }
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "pch.h"
 #include "Mesh.h"
+#include "Game.h"
+#include "Animator.h"
 
 inline void update_gui(SDL_Window* window, Renderer& renderer,
                        GameConfig& game_config, Player& player) {
@@ -57,20 +59,14 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     NextColumn();
     Separator();
 
-    for (const auto& anim : player.animator.arm_animators) {
+    for (const auto& anim : player.animator.limb_animators) {
         glm::vec4 target_world_pos = player.model * anim.target_pos;
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
         Text(label);
         NextColumn();
     }
-    for (const auto& anim : player.animator.leg_animators) {
-        glm::vec4 target_world_pos = player.model * anim.target_pos;
-        sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
-                  target_world_pos.y);
-        Text(label);
-        NextColumn();
-    }
+
     Columns(1);
     Separator();
 

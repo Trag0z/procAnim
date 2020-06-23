@@ -12,6 +12,37 @@ struct BoneRestrictions {
     float min_rotation, max_rotation;
 };
 
+struct LimbAnimator {
+    Bone* bones[2];
+    BoneRestrictions bone_restrictions[2];
+
+    // Points to array of two splines, one for moving the limb forward and one
+    // for moving it back
+    Spline* splines;
+    float spline_interpolation_factor = 0.0f;
+
+    float lerp_interpolation_factor = 1.0f;
+
+    glm::vec4 target_pos, tip_pos;
+    glm::vec4 last_tip_movement;
+
+    float target_rotations[2];
+
+    VertexArray<DebugShader::Vertex> target_point_vao;
+
+    LimbAnimator() {}
+    LimbAnimator(Bone* b1, Bone* b2, Spline* s,
+                 BoneRestrictions restrictions[2] = nullptr);
+
+    void update(float delta_time, float movement_speed);
+
+    enum AnimationState {
+        MOVE_FORWARD = 0,
+        MOVE_BACKWARD = 1,
+        NEUTRAL = 2
+    } animation_state = NEUTRAL;
+};
+
 struct ArmAnimator {
     Bone* bones[2];
     BoneRestrictions bone_restrictions[2];
@@ -59,18 +90,19 @@ struct LegAnimator {
 };
 
 class WalkAnimator {
-  public:
-    ArmAnimator arm_animators[2];
-    LegAnimator leg_animators[2];
-    Spline splines[4];
-    SplineEditor spline_editor;
+    Spline splines[8];
 
+  public:
+    SplineEditor spline_editor;
+    LimbAnimator limb_animators[4];
     bool arm_follows_mouse = false;
 
+    enum Limb { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
+    Limb grounded_leg_index = LEFT_LEG;
+
+  private:
     VertexArray<DebugShader::Vertex> circle_vao[2];
     static const size_t circle_segments = 30;
-
-    enum { LEFT_LEG = 0, RIGHT_LEG = 1 } grounded_leg_index = LEFT_LEG;
 
     enum {
         LEG_FORWARD = 0,
@@ -81,6 +113,7 @@ class WalkAnimator {
 
     enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state;
 
+  public:
     void init(const Entity* parent, RiggedMesh& mesh);
     void update(float delta_time, float walking_speed, AnimState state);
     void render(const Renderer& renderer);

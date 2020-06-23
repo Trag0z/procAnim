@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Types.h"
-#include "Animator.h"
+#include "VertexArray.h"
 
 struct Bone {
     std::string name;
