@@ -49,7 +49,8 @@ void Spline::update_render_data() {
     // @optimize
     parameter_matrix = glm::mat4(
         glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f),
-        glm::vec4(points[1], 0.0f, 1.0f), glm::vec4(points[2], 0.0f, 1.0f));
+        glm::vec4(points[1], 0.0f, 1.0f),
+        glm::vec4(points[3] + (points[3] - points[2]), 0.0f, 1.0f));
 
     for (size_t i = 0; i < render_steps; ++i) {
         float t = static_cast<float>(i) / static_cast<float>(render_steps - 1);
@@ -306,7 +307,7 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
         selected_spline.points[1] =
             selected_spline.points[0] + start_to_end * 0.3f;
         selected_spline.points[2] =
-            selected_spline.points[3] + start_to_end * 0.3f;
+            selected_spline.points[3] - start_to_end * 0.3f;
         selected_spline.update_render_data();
 
         if (input.mouse_button_down(1)) {
@@ -321,14 +322,14 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
         return;
     }
 
+    if (selected_spline_index > num_splines)
+        return;
+
     if (input.mouse_button_down(1)) {
-        for (size_t n_spline = 0; n_spline < num_splines; ++n_spline) {
-            for (size_t n_point = 0; n_point < Spline::num_points; ++n_point) {
-                if (glm::length(splines[n_spline].points[n_point] - mouse_pos) <
-                    0.2f) {
-                    selected_point_index = n_point;
-                    selected_spline_index = n_spline;
-                }
+        for (size_t n_point = 0; n_point < Spline::num_points; ++n_point) {
+            if (glm::length(splines[selected_spline_index].points[n_point] -
+                            mouse_pos) < 0.2f) {
+                selected_point_index = n_point;
             }
         }
     }
