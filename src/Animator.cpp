@@ -330,22 +330,18 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
         LimbAnimator(mesh.find_bone("Leg_R_1"), mesh.find_bone("Leg_R_2"),
                      &splines[6], restrictions);
 
-    float radii[4];
-    glm::vec4 circle_positions[4];
-    for (size_t i = 0; i < 4; ++i) {
-        radii[i] = limb_animators[i].bones[0]->length +
-                   limb_animators[i].bones[1]->length;
-
-        circle_positions[i] =
-            limb_animators[i].bones[0]->get_transform() *
-            limb_animators[i].bones[0]->bind_pose_transform[3];
-    }
-
     std::string limb_names[8] = {"Left arm forward",  "Left arm backward",
                                  "Right arm forward", "Right arm backward",
                                  "Left leg forward",  "Left leg backward",
                                  "Right leg forward", "Right leg backward"};
-    spline_editor.init(parent, splines, 8, limb_names, circle_positions, radii);
+
+    const Bone* limb_bones[4][2];
+    for (size_t i = 0; i < 4; ++i) {
+        limb_bones[i][0] = limb_animators[i].bones[0];
+        limb_bones[i][1] = limb_animators[i].bones[1];
+    }
+
+    spline_editor.init(parent, splines, 8, limb_names, limb_bones);
     // spline_editor.init(parent, splines, "../assets/player_splines.spl");
 }
 
@@ -422,6 +418,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
 }
 
 void WalkAnimator::render(const Renderer& renderer) {
+    renderer.debug_shader.use();
     renderer.debug_shader.set_color(&Colors::GREEN);
 
     for (auto& anim : limb_animators) {

@@ -1,5 +1,5 @@
 NEXT:
-- render limb circles in SplineEditor?
+- adjust SplineEditor::save_splines()
 
 TODO:
 - revert laptop compat changes

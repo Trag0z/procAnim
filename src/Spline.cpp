@@ -115,12 +115,16 @@ void SplineEditor::init(const Entity* parent_, Spline* splines_,
 
 void SplineEditor::init(const Entity* parent_, Spline* splines_,
                         size_t num_splines_, const std::string* spline_names_,
-                        const glm::vec4 circle_positions[4],
-                        const float radii[4]) {
+                        const Bone* limb_bones_[4][2]) {
     SDL_assert(parent_ != nullptr);
     parent = parent_;
     splines = splines_;
     num_splines = num_splines_;
+
+    for (size_t i = 0; i < 4; ++i) {
+        limb_bones[i][0] = limb_bones_[i][0];
+        limb_bones[i][1] = limb_bones_[i][1];
+    }
 
     spline_names.reserve(num_splines);
     for (size_t i = 0; i < num_splines; ++i) {
@@ -133,21 +137,7 @@ void SplineEditor::init(const Entity* parent_, Spline* splines_,
         circle_indices[i] = static_cast<GLuint>(i);
     }
 
-    DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];
-
-    for (size_t n_circle = 0; n_circle < NUM_CIRCLES; ++n_circle) {
-        for (size_t n_segment = 0; n_segment < CIRCLE_SEGMENTS; ++n_segment) {
-            float theta = static_cast<float>(n_segment) /
-                          static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
-
-            circle_vertices[n_segment].pos =
-                circle_positions[n_circle] +
-                glm::vec4(radii[n_circle] * cosf(theta),
-                          radii[n_circle] * sinf(theta), 0.0f, 1.0f);
-        }
-        circle_vao[n_circle].init(circle_indices, CIRCLE_SEGMENTS,
-                                  circle_vertices, CIRCLE_SEGMENTS);
-    }
+    circle_vao.init(circle_indices, CIRCLE_SEGMENTS, nullptr, CIRCLE_SEGMENTS);
 }
 
 void SplineEditor::update(const MouseKeyboardInput& input) {
@@ -263,11 +253,35 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     renderer.debug_shader.use();
     glLineWidth(1.0f);
 
+    // Draw circle for selected limb
     renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
     if (selected_spline_index < num_splines) {
-        circle_vao[selected_spline_index / 2].draw(GL_LINE_LOOP);
+        const Bone** selected_limb_bones =
+            limb_bones[selected_spline_index / 2];
+
+        // @OPTIMIZATION: Calculate this stuff less often
+        glm::vec4 limb_root_position =
+            selected_limb_bones[0]->get_transform() *
+            selected_limb_bones[0]->bind_pose_transform[3];
+        float radius =
+            selected_limb_bones[0]->length + selected_limb_bones[1]->length;
+
+        DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];
+
+        for (size_t n_segment = 0; n_segment < CIRCLE_SEGMENTS; ++n_segment) {
+            float theta = static_cast<float>(n_segment) /
+                          static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
+
+            circle_vertices[n_segment].pos =
+                limb_root_position + glm::vec4(radius * cosf(theta),
+                                               radius * sinf(theta), 0.0f,
+                                               0.0f);
+        }
+        circle_vao.update_vertex_data(circle_vertices, CIRCLE_SEGMENTS);
+        circle_vao.draw(GL_LINE_LOOP);
     }
 
+    // Draw splines
     renderer.debug_shader.set_color(&Colors::GREEN);
     for (size_t i = 0; i < num_splines; ++i) {
         if (i == selected_spline_index && creating_new_spline &&

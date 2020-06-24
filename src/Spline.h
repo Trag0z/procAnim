@@ -5,6 +5,8 @@
 #include "Entity.h"
 #include "Renderer.h"
 
+struct Bone;
+
 struct Spline {
     static const size_t num_points = 4;
     static const size_t render_steps = 50;
@@ -47,9 +49,9 @@ class SplineEditor {
 
     const char* save_path;
 
+    const Bone* limb_bones[4][2];
     static const size_t CIRCLE_SEGMENTS = 30;
-    static const size_t NUM_CIRCLES = 4;
-    VertexArray<DebugShader::Vertex> circle_vao[NUM_CIRCLES];
+    VertexArray<DebugShader::Vertex> circle_vao;
 
     void save_splines();
 
@@ -57,8 +59,7 @@ class SplineEditor {
     void init(const Entity* parent_, Spline* splines_, const char* save_path_);
     // Only used for first setup of splines
     void init(const Entity* parent_, Spline* splines_, size_t num_splines_,
-              const std::string* spline_names_,
-              const glm::vec4 circle_positions[4], const float radii[4]);
+              const std::string* spline_names_, const Bone* limb_bones_[4][2]);
     void update(const MouseKeyboardInput& input);
     void render(const Renderer& renderer, bool spline_edit_mode);
     void update_gui();
