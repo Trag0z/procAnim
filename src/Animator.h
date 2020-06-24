@@ -101,9 +101,6 @@ class WalkAnimator {
     Limb grounded_leg_index = LEFT_LEG;
 
   private:
-    VertexArray<DebugShader::Vertex> circle_vao[2];
-    static const size_t circle_segments = 30;
-
     enum {
         LEG_FORWARD = 0,
         LEG_BACKWARD = 1,

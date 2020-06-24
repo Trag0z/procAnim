@@ -36,10 +36,6 @@ class SplineEditor {
     Spline* splines = nullptr;
     size_t num_splines;
 
-    std::vector<std::string> spline_names;
-
-    const char* save_path;
-
     glm::vec2* selected_point = nullptr;
     size_t selected_spline_index;
 
@@ -47,14 +43,22 @@ class SplineEditor {
     bool first_point_set = false;
 
     static const size_t MAX_SPLINE_NAME_LENGTH;
+    std::vector<std::string> spline_names;
+
+    const char* save_path;
+
+    static const size_t CIRCLE_SEGMENTS = 30;
+    static const size_t NUM_CIRCLES = 4;
+    VertexArray<DebugShader::Vertex> circle_vao[NUM_CIRCLES];
 
     void save_splines();
 
   public:
-    void init(const Entity* parent, Spline* splines_, const char* save_path_);
-    void
-    init(const Entity* parent, Spline* splines_, size_t num_splines_,
-         std::string* spline_names_); // Only used for first setup of splines
+    void init(const Entity* parent_, Spline* splines_, const char* save_path_);
+    // Only used for first setup of splines
+    void init(const Entity* parent_, Spline* splines_, size_t num_splines_,
+              const std::string* spline_names_,
+              const glm::vec4 circle_positions[4], const float radii[4]);
     void update(const MouseKeyboardInput& input);
     void render(const Renderer& renderer, bool spline_edit_mode);
     void update_gui();

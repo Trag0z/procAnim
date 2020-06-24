@@ -1,6 +1,5 @@
 NEXT:
-- add offsets to SplineRenderer so splines can be rendered at arm/leg positions
-- arm animations are buggy
+- render limb circles in SplineEditor?
 
 TODO:
 - revert laptop compat changes

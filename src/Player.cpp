@@ -169,10 +169,10 @@ void Player::render(const Renderer& renderer) {
         rm.bones_vao.draw(GL_POINTS);
     }
 
+    // Render animator target positions
+    animator.render(renderer);
+
     // Render Splines
     if (renderer.draw_splines || spline_edit_mode)
         animator.spline_editor.render(renderer, spline_edit_mode);
-
-    // Render animator target positions
-    animator.render(renderer);
 }

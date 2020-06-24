@@ -312,13 +312,6 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
         s.init();
     }
 
-    std::string limb_names[8] = {"Left arm forward",  "Left arm backward",
-                                 "Right arm forward", "Right arm backward",
-                                 "Left leg forward",  "Left leg backward",
-                                 "Right leg forward", "Right leg backward"};
-    spline_editor.init(parent, splines, 8, limb_names);
-    // spline_editor.init(parent, splines, "../assets/player_splines.spl");
-
     BoneRestrictions restrictions[2] = {{-0.5f * PI, 0.5 * PI},
                                         {0.0f, 0.75f * PI}};
     limb_animators[LEFT_ARM] =
@@ -337,38 +330,23 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
         LimbAnimator(mesh.find_bone("Leg_R_1"), mesh.find_bone("Leg_R_2"),
                      &splines[6], restrictions);
 
-    // Init render data for rendering circle
-    GLuint circle_indices[circle_segments];
-    for (size_t i = 0; i < circle_segments; ++i) {
-        circle_indices[i] = static_cast<GLuint>(i);
+    float radii[4];
+    glm::vec4 circle_positions[4];
+    for (size_t i = 0; i < 4; ++i) {
+        radii[i] = limb_animators[i].bones[0]->length +
+                   limb_animators[i].bones[1]->length;
+
+        circle_positions[i] =
+            limb_animators[i].bones[0]->get_transform() *
+            limb_animators[i].bones[0]->bind_pose_transform[3];
     }
 
-    auto set_circle_vertices = [](float radius, DebugShader::Vertex* vertices,
-                                  size_t num_segments) {
-        for (size_t i = 0; i < num_segments; ++i) {
-            float theta = static_cast<float>(i) /
-                          static_cast<float>(circle_segments) * 2.0f * PI;
-
-            vertices[i].pos = glm::vec4(radius * cosf(theta),
-                                        radius * sinf(theta), 0.0f, 1.0f);
-        }
-    };
-
-    DebugShader::Vertex circle_vertices[circle_segments];
-
-    float radius = limb_animators[LEFT_ARM].bones[0]->length +
-                   limb_animators[LEFT_ARM].bones[1]->length;
-
-    set_circle_vertices(radius, circle_vertices, circle_segments);
-    circle_vao[0].init(circle_indices, circle_segments, circle_vertices,
-                       circle_segments);
-
-    radius = limb_animators[LEFT_LEG].bones[0]->length +
-             limb_animators[LEFT_LEG].bones[1]->length;
-
-    set_circle_vertices(radius, circle_vertices, circle_segments);
-    circle_vao[1].init(circle_indices, circle_segments, circle_vertices,
-                       circle_segments);
+    std::string limb_names[8] = {"Left arm forward",  "Left arm backward",
+                                 "Right arm forward", "Right arm backward",
+                                 "Left leg forward",  "Left leg backward",
+                                 "Right leg forward", "Right leg backward"};
+    spline_editor.init(parent, splines, 8, limb_names, circle_positions, radii);
+    // spline_editor.init(parent, splines, "../assets/player_splines.spl");
 }
 
 void WalkAnimator::update(float delta_time, float walking_speed,
@@ -444,7 +422,6 @@ void WalkAnimator::update(float delta_time, float walking_speed,
 }
 
 void WalkAnimator::render(const Renderer& renderer) {
-    renderer.debug_shader.use();
     renderer.debug_shader.set_color(&Colors::GREEN);
 
     for (auto& anim : limb_animators) {
@@ -460,10 +437,4 @@ void WalkAnimator::render(const Renderer& renderer) {
 
         anim.target_point_vao.draw(GL_POINTS);
     }
-
-    renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
-    if (renderer.draw_arm_circle)
-        circle_vao[0].draw(GL_LINE_LOOP);
-    if (renderer.draw_leg_circle)
-        circle_vao[1].draw(GL_LINE_LOOP);
 }
