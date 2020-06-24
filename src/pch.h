@@ -14,6 +14,8 @@
 #include <limits.h>
 #include <list>
 
+#include <shobjidl.h>
+
 #include <GL/glew.h>
 #include <gl/glew.h>
 #include <glm/ext.hpp>

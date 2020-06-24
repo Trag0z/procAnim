@@ -44,19 +44,22 @@ class SplineEditor {
     bool creating_new_spline = false;
     bool first_point_set = false;
 
-    static const size_t MAX_SPLINE_NAME_LENGTH;
+    static const size_t MAX_SPLINE_NAME_LENGTH = 32;
     std::vector<std::string> spline_names;
 
-    const char* save_path;
+    static const size_t MAX_SAVE_PATH_LENGTH = 128;
+    char* save_path = nullptr;
 
     const Bone* limb_bones[4][2];
     static const size_t CIRCLE_SEGMENTS = 30;
     VertexArray<DebugShader::Vertex> circle_vao;
 
-    void save_splines();
+    void save_splines(bool get_new_file_path = false);
+    void load_splines();
 
   public:
-    void init(const Entity* parent_, Spline* splines_, const char* save_path_);
+    void init(const Entity* parent_, Spline* splines_,
+              const Bone* limb_bones_[4][2], const char* spline_path);
     // Only used for first setup of splines
     void init(const Entity* parent_, Spline* splines_, size_t num_splines_,
               const std::string* spline_names_, const Bone* limb_bones_[4][2]);

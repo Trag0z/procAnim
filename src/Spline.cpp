@@ -2,8 +2,12 @@
 #include "pch.h"
 #include "Spline.h"
 #include "Game.h"
+#include <shobjidl.h>
 
-/////           Spline          /////
+/////                                   /////
+/////               Spline              /////
+/////                                   /////
+
 void Spline::init(glm::vec2 points_[num_points]) {
     if (points_ != nullptr) {
         memcpy_s(points, 4 * sizeof(glm::vec2), points_, 4 * sizeof(glm::vec2));
@@ -71,10 +75,63 @@ glm::vec4 Spline::get_point_on_spline(float t) const {
     return parameter_matrix * hermite_matrix * interpolation_vector;
 }
 
+/////                                   /////
 /////           SplineEditor            /////
-const size_t SplineEditor::MAX_SPLINE_NAME_LENGTH = 32;
+/////                                   /////
 
-void SplineEditor::save_splines() {
+void SplineEditor::save_splines(bool get_new_file_path) {
+    if (get_new_file_path || save_path == nullptr) {
+        HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+                                              COINIT_DISABLE_OLE1DDE);
+
+        SDL_assert_always(SUCCEEDED(hr));
+        IFileSaveDialog* pFileSave;
+
+        hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
+                              IID_IFileSaveDialog,
+                              reinterpret_cast<void**>(&pFileSave));
+
+        SDL_assert_always(SUCCEEDED(hr));
+
+        COMDLG_FILTERSPEC file_type = {L".spl", L"*.spl"};
+        pFileSave->SetFileTypes(1, &file_type);
+
+        // Show the Open dialog box.
+        hr = pFileSave->Show(NULL);
+
+        // Get the file name from the dialog box.
+        if (!SUCCEEDED(hr))
+            return;
+
+        IShellItem* pItem;
+        hr = pFileSave->GetResult(&pItem);
+
+        SDL_assert_always(SUCCEEDED(hr));
+        PWSTR pszFilePath;
+        hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+        // Copy path to save_path
+        size_t length = wcslen(pszFilePath) * sizeof(*pszFilePath);
+        if (save_path) {
+            delete[] save_path;
+        }
+        // @OPTIMIZATION: save_path is probably twice as long as it
+        // needs to be?
+        save_path = new char[length];
+
+        wcstombs_s(nullptr, save_path, length, pszFilePath, length);
+
+        CoTaskMemFree(pszFilePath);
+
+        SDL_assert_always(SUCCEEDED(hr));
+
+        pItem->Release();
+        pFileSave->Release();
+
+        CoUninitialize();
+    }
+
+    // Write data
     SDL_RWops* file = SDL_RWFromFile(save_path, "wb");
 
     SDL_RWwrite(file, &num_splines, sizeof(num_splines), 1);
@@ -90,12 +147,95 @@ void SplineEditor::save_splines() {
     SDL_RWclose(file);
 }
 
+void SplineEditor::load_splines() {
+    HRESULT hr =
+        CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+    SDL_assert_always(SUCCEEDED(hr));
+    IFileOpenDialog* pFileOpen;
+
+    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+                          IID_IFileOpenDialog,
+                          reinterpret_cast<void**>(&pFileOpen));
+
+    SDL_assert_always(SUCCEEDED(hr));
+
+    COMDLG_FILTERSPEC file_type = {L".spl", L"*.spl"};
+    pFileOpen->SetFileTypes(1, &file_type);
+
+    // Show the Open dialog box.
+    hr = pFileOpen->Show(NULL);
+
+    if (!SUCCEEDED(hr))
+        return;
+
+    // Get the file name from the dialog box.
+    IShellItem* pItem;
+    hr = pFileOpen->GetResult(&pItem);
+
+    SDL_assert_always(SUCCEEDED(hr));
+    PWSTR pszFilePath;
+    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+    if (save_path) {
+        delete[] save_path;
+    }
+    size_t length = wcslen(pszFilePath) * sizeof(*pszFilePath);
+    // @OPTIMIZATION: save_path is probably twice as long as it
+    // needs to be?
+    save_path = new char[length];
+
+    wcstombs_s(nullptr, save_path, length, pszFilePath, length);
+
+    CoTaskMemFree(pszFilePath);
+
+    SDL_assert_always(SUCCEEDED(hr));
+
+    pItem->Release();
+    pFileOpen->Release();
+
+    CoUninitialize();
+
+    // Read data
+    SDL_RWops* file = SDL_RWFromFile(save_path, "rb");
+
+    SDL_RWread(file, &num_splines, sizeof(num_splines), 1);
+
+    spline_names.clear();
+    for (size_t i = 0; i < num_splines; ++i) {
+        SDL_RWread(file, &splines[i].points, sizeof(splines[i].points), 1);
+
+        char name[MAX_SPLINE_NAME_LENGTH];
+        SDL_RWread(file, name, sizeof(char), MAX_SPLINE_NAME_LENGTH);
+        spline_names.push_back({name});
+    }
+
+    SDL_RWclose(file);
+
+    for (size_t i = 0; i < num_splines; ++i) {
+        splines[i].update_render_data();
+    }
+}
+
 void SplineEditor::init(const Entity* parent_, Spline* splines_,
-                        const char* spline_path_) {
+                        const Bone* limb_bones_[4][2],
+                        const char* spline_path) {
     SDL_assert(parent_ != nullptr);
     parent = parent_;
     splines = splines_;
-    save_path = spline_path_;
+
+    size_t path_length = strnlen_s(spline_path, MAX_SAVE_PATH_LENGTH) + 1;
+
+    if (save_path)
+        delete[] save_path;
+    save_path = new char[path_length];
+
+    strcpy_s(save_path, path_length, spline_path);
+
+    for (size_t i = 0; i < 4; ++i) {
+        limb_bones[i][0] = limb_bones_[i][0];
+        limb_bones[i][1] = limb_bones_[i][1];
+    }
 
     SDL_RWops* file = SDL_RWFromFile(save_path, "rb");
 
@@ -219,9 +359,17 @@ void SplineEditor::update_gui() {
     if (Button("Replace with new spline") && !creating_new_spline) {
         creating_new_spline = true;
     }
+
+    if (Button("Open...")) {
+        load_splines();
+    }
     SameLine();
-    if (Button("Save all")) {
+    if (Button("Save")) {
         save_splines();
+    }
+    SameLine();
+    if (Button("Save as...")) {
+        save_splines(true);
     }
 
     NewLine();
