@@ -334,19 +334,39 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
     }
 
     if (selected_point_index < 4) {
-        auto& p = splines[selected_spline_index].points[selected_point_index];
-        // If P1 or P2 is selected, also move T1 or T2, respectively
-        if (selected_point_index == 0) {
-            glm::vec2 move = mouse_pos - p;
-            splines[selected_spline_index].points[1] += move;
-        } else if (selected_point_index == 4) {
-            glm::vec2 move = mouse_pos - p;
-            splines[selected_spline_index].points[2] += move;
+        auto move_points = [mouse_pos](Spline& spline, size_t point_index) {
+            auto& p = spline.points[point_index];
+            // If P1 or P2 is selected, also move T1 or T2, respectively
+            if (point_index == 0) {
+                glm::vec2 move = mouse_pos - p;
+                spline.points[1] += move;
+            } else if (point_index == 4) {
+                glm::vec2 move = mouse_pos - p;
+                spline.points[2] += move;
+            }
+
+            p = mouse_pos;
+
+            spline.update_render_data();
+        };
+
+        move_points(splines[selected_spline_index], selected_point_index);
+
+        if (connect_point_pairs) {
+            if (!connect_tangent_pairs &&
+                (selected_point_index == 1 || selected_point_index == 2))
+                return;
+
+            // Also move partner points/tangents
+            size_t partner_spline_index;
+            if (selected_spline_index % 2 == 0) {
+                partner_spline_index = selected_spline_index + 1;
+            } else {
+                partner_spline_index = selected_spline_index - 1;
+            }
+            move_points(splines[partner_spline_index],
+                        3 - selected_point_index);
         }
-
-        p = mouse_pos;
-
-        splines[selected_spline_index].update_render_data();
     }
 }
 
@@ -385,6 +405,8 @@ void SplineEditor::update_gui() {
     }
 
     NewLine();
+    Checkbox("Connect point pairs", &connect_point_pairs);
+    Checkbox("Connect tangent pairs", &connect_tangent_pairs);
 
     if (selected > -1) {
         auto& points = splines[selected_spline_index].points;
@@ -412,6 +434,8 @@ void SplineEditor::update_gui() {
 void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     renderer.debug_shader.use();
     glLineWidth(1.0f);
+
+    static_cast<bool>(spline_edit_mode);
 
     // Draw circle for selected limb
     renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
@@ -443,20 +467,28 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
 
     // Draw splines
     renderer.debug_shader.set_color(&Colors::GREEN);
-    for (size_t i = 0; i < num_splines; ++i) {
-        if (i == selected_spline_index && creating_new_spline &&
-            !first_point_set)
-            continue;
 
-        splines[i].line_vao.draw(GL_LINE_STRIP);
+    if (renderer.draw_splines) {
+        // Draw all splines (except selected)
+        for (size_t i = 0; i < num_splines; ++i) {
+            if (i == selected_spline_index && creating_new_spline &&
+                !first_point_set)
+                continue;
+
+            splines[i].line_vao.draw(GL_LINE_STRIP);
+        }
     }
 
-    if (spline_edit_mode && selected_spline_index < num_splines &&
+    if (selected_spline_index < num_splines &&
         (!creating_new_spline && !first_point_set)) {
+        // Draw selected spline (with points)
+        auto& s = splines[selected_spline_index];
+        s.line_vao.draw(GL_LINE_STRIP);
+
         renderer.debug_shader.set_color(&Colors::LIGHT_PURPLE);
-        splines[selected_spline_index].point_vao.draw(GL_LINES);
+        s.point_vao.draw(GL_LINES);
 
         renderer.debug_shader.set_color(&Colors::PURPLE);
-        splines[selected_spline_index].point_vao.draw(GL_POINTS);
+        s.point_vao.draw(GL_POINTS);
     }
 }

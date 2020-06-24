@@ -43,6 +43,8 @@ class SplineEditor {
 
     bool creating_new_spline = false;
     bool first_point_set = false;
+    bool connect_point_pairs = true;
+    bool connect_tangent_pairs = false;
 
     static const size_t MAX_SPLINE_NAME_LENGTH = 32;
     std::vector<std::string> spline_names;
