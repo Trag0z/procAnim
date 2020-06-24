@@ -341,7 +341,7 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
             if (point_index == 0) {
                 glm::vec2 move = mouse_pos - p;
                 spline.points[1] += move;
-            } else if (point_index == 4) {
+            } else if (point_index == 3) {
                 glm::vec2 move = mouse_pos - p;
                 spline.points[2] += move;
             }
@@ -410,23 +410,41 @@ void SplineEditor::update_gui() {
     Checkbox("Connect tangent pairs", &connect_tangent_pairs);
 
     if (selected > -1) {
-        auto& points = splines[selected_spline_index].points;
-
-        bool value_changed = false;
         const float sensitivity = 0.1f;
 
-        value_changed |= DragFloat2("P1", value_ptr(points[0]), sensitivity,
-                                    0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("T1", value_ptr(points[1]), sensitivity,
-                                    0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("T2", value_ptr(points[2]), sensitivity,
-                                    0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("P2", value_ptr(points[3]), sensitivity,
-                                    0.0f, 0.0f, "% .2f");
+        size_t spline_index = selected_spline_index;
+        spline_index -= spline_index % 2;
+        glm::vec2* points = splines[spline_index].points;
+        bool value_changed = false;
 
-        if (value_changed) {
-            splines[selected_spline_index].update_render_data();
-        }
+        value_changed |= DragFloat2("P1 (forward)", value_ptr(points[0]),
+                                    sensitivity, 0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("T1 (forward)", value_ptr(points[1]),
+                                    sensitivity, 0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("T2 (forward)", value_ptr(points[2]),
+                                    sensitivity, 0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("P2 (forward)", value_ptr(points[3]),
+                                    sensitivity, 0.0f, 0.0f, "% .2f");
+
+        if (value_changed)
+            splines[spline_index].update_render_data();
+
+        NewLine();
+
+        points = splines[spline_index + 1].points;
+        value_changed = false;
+
+        value_changed |= DragFloat2("P1 (backward)", value_ptr(points[0]),
+                                    sensitivity, 0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("T1 (backward)", value_ptr(points[1]),
+                                    sensitivity, 0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("T2 (backward)", value_ptr(points[2]),
+                                    sensitivity, 0.0f, 0.0f, "% .2f");
+        value_changed |= DragFloat2("P2 (backward)", value_ptr(points[3]),
+                                    sensitivity, 0.0f, 0.0f, "% .2f");
+
+        if (value_changed)
+            splines[spline_index + 1].update_render_data();
     }
 
     End();

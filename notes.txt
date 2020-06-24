@@ -1,6 +1,7 @@
 NEXT:
 
 TODO:
+- why are partner splines not exactly the same?
 - revert laptop compat changes
 - apply bone restrictions
 - find target points in a good way
