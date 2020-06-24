@@ -317,23 +317,35 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
     }
 
     if (input.mouse_button_up(1)) {
-        selected_point = nullptr;
+        selected_point_index = static_cast<size_t>(-1);
         return;
     }
 
     if (input.mouse_button_down(1)) {
-        for (size_t i = 0; i < num_splines; ++i) {
-            for (auto& p : splines[i].points) {
-                if (glm::length(p - mouse_pos) < 0.2f) {
-                    selected_point = &p;
-                    selected_spline_index = i;
+        for (size_t n_spline = 0; n_spline < num_splines; ++n_spline) {
+            for (size_t n_point = 0; n_point < Spline::num_points; ++n_point) {
+                if (glm::length(splines[n_spline].points[n_point] - mouse_pos) <
+                    0.2f) {
+                    selected_point_index = n_point;
+                    selected_spline_index = n_spline;
                 }
             }
         }
     }
 
-    if (selected_point) {
-        *selected_point = mouse_pos;
+    if (selected_point_index < 4) {
+        auto& p = splines[selected_spline_index].points[selected_point_index];
+        // If P1 or P2 is selected, also move T1 or T2, respectively
+        if (selected_point_index == 0) {
+            glm::vec2 move = mouse_pos - p;
+            splines[selected_spline_index].points[1] += move;
+        } else if (selected_point_index == 4) {
+            glm::vec2 move = mouse_pos - p;
+            splines[selected_spline_index].points[2] += move;
+        }
+
+        p = mouse_pos;
+
         splines[selected_spline_index].update_render_data();
     }
 }

@@ -38,7 +38,7 @@ class SplineEditor {
     Spline* splines = nullptr;
     size_t num_splines;
 
-    glm::vec2* selected_point = nullptr;
+    size_t selected_point_index;
     size_t selected_spline_index;
 
     bool creating_new_spline = false;
