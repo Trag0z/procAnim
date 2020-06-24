@@ -80,6 +80,16 @@ glm::vec4 Spline::get_point_on_spline(float t) const {
 /////           SplineEditor            /////
 /////                                   /////
 
+static size_t partner_index(size_t spline_index) {
+    size_t result;
+    if (spline_index % 2 == 0) {
+        result = spline_index + 1;
+    } else {
+        result = spline_index - 1;
+    }
+    return result;
+}
+
 void SplineEditor::save_splines(bool get_new_file_path) {
     if (get_new_file_path || save_path == nullptr) {
         HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
@@ -294,6 +304,16 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
                 p = mouse_pos;
             }
             selected_spline.update_render_data();
+
+            if (connect_point_pairs) {
+                // Also set partner points
+                for (auto& p :
+                     splines[partner_index(selected_spline_index)].points) {
+                    p = mouse_pos;
+                }
+                splines[partner_index(selected_spline_index)]
+                    .update_render_data();
+            }
             first_point_set = true;
             return;
         }
@@ -309,6 +329,19 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
         selected_spline.points[2] =
             selected_spline.points[3] - start_to_end * 0.3f;
         selected_spline.update_render_data();
+
+        if (connect_point_pairs) {
+            auto& partner_spline =
+                splines[partner_index(selected_spline_index)];
+            partner_spline.points[0] = mouse_pos;
+
+            partner_spline.points[1] =
+                partner_spline.points[0] + start_to_end * 0.3f;
+            partner_spline.points[2] =
+                partner_spline.points[3] - start_to_end * 0.3f;
+
+            partner_spline.update_render_data();
+        }
 
         if (input.mouse_button_down(1)) {
             creating_new_spline = false;
@@ -359,13 +392,7 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
                 return;
 
             // Also move partner points/tangents
-            size_t partner_spline_index;
-            if (selected_spline_index % 2 == 0) {
-                partner_spline_index = selected_spline_index + 1;
-            } else {
-                partner_spline_index = selected_spline_index - 1;
-            }
-            move_points(splines[partner_spline_index],
+            move_points(splines[partner_index(selected_spline_index)],
                         3 - selected_point_index);
         }
     }
@@ -415,36 +442,62 @@ void SplineEditor::update_gui() {
         size_t spline_index = selected_spline_index;
         spline_index -= spline_index % 2;
         glm::vec2* points = splines[spline_index].points;
-        bool value_changed = false;
+        bool point_changed = false;
+        bool tangent_changed = false;
 
-        value_changed |= DragFloat2("P1 (forward)", value_ptr(points[0]),
+        point_changed |= DragFloat2("P1 (forward)", value_ptr(points[0]),
                                     sensitivity, 0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("T1 (forward)", value_ptr(points[1]),
-                                    sensitivity, 0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("T2 (forward)", value_ptr(points[2]),
-                                    sensitivity, 0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("P2 (forward)", value_ptr(points[3]),
+        tangent_changed |= DragFloat2("T1 (forward)", value_ptr(points[1]),
+                                      sensitivity, 0.0f, 0.0f, "% .2f");
+        tangent_changed |= DragFloat2("T2 (forward)", value_ptr(points[2]),
+                                      sensitivity, 0.0f, 0.0f, "% .2f");
+        point_changed |= DragFloat2("P2 (forward)", value_ptr(points[3]),
                                     sensitivity, 0.0f, 0.0f, "% .2f");
 
-        if (value_changed)
+        if (point_changed || tangent_changed) {
             splines[spline_index].update_render_data();
+
+            if (point_changed && connect_point_pairs) {
+                splines[spline_index + 1].points[0] = points[0];
+                splines[spline_index + 1].points[3] = points[3];
+                splines[spline_index + 1].update_render_data();
+            }
+            if (tangent_changed && connect_tangent_pairs) {
+                splines[spline_index + 1].points[1] = points[1];
+                splines[spline_index + 1].points[2] = points[2];
+                splines[spline_index + 1].update_render_data();
+            }
+        }
 
         NewLine();
 
         points = splines[spline_index + 1].points;
-        value_changed = false;
+        point_changed = false;
+        tangent_changed = false;
 
-        value_changed |= DragFloat2("P1 (backward)", value_ptr(points[0]),
+        point_changed |= DragFloat2("P1 (backward)", value_ptr(points[0]),
                                     sensitivity, 0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("T1 (backward)", value_ptr(points[1]),
-                                    sensitivity, 0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("T2 (backward)", value_ptr(points[2]),
-                                    sensitivity, 0.0f, 0.0f, "% .2f");
-        value_changed |= DragFloat2("P2 (backward)", value_ptr(points[3]),
+        tangent_changed |= DragFloat2("T1 (backward)", value_ptr(points[1]),
+                                      sensitivity, 0.0f, 0.0f, "% .2f");
+        tangent_changed |= DragFloat2("T2 (backward)", value_ptr(points[2]),
+                                      sensitivity, 0.0f, 0.0f, "% .2f");
+        point_changed |= DragFloat2("P2 (backward)", value_ptr(points[3]),
                                     sensitivity, 0.0f, 0.0f, "% .2f");
 
-        if (value_changed)
+        if (point_changed || tangent_changed) {
             splines[spline_index + 1].update_render_data();
+
+            if (point_changed && connect_point_pairs) {
+                splines[spline_index].points[0] = points[0];
+                splines[spline_index].points[3] = points[3];
+                splines[spline_index].update_render_data();
+            }
+            if (tangent_changed && connect_tangent_pairs) {
+                splines[spline_index].points[1] = points[1];
+                splines[spline_index].points[2] = points[2];
+                splines[spline_index].update_render_data();
+            }
+        }
     }
 
     End();
