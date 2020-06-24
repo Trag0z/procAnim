@@ -67,5 +67,5 @@ class SplineEditor {
               const std::string* spline_names_, const Bone* limb_bones_[4][2]);
     void update(const MouseKeyboardInput& input);
     void render(const Renderer& renderer, bool spline_edit_mode);
-    void update_gui();
+    void update_gui(bool& spline_edit_mode);
 };

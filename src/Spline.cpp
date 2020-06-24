@@ -262,6 +262,14 @@ void SplineEditor::init(const Entity* parent_, Spline* splines_,
     }
 
     SDL_RWclose(file);
+
+    // Init render data for rendering circle
+    GLuint circle_indices[CIRCLE_SEGMENTS];
+    for (size_t i = 0; i < CIRCLE_SEGMENTS; ++i) {
+        circle_indices[i] = static_cast<GLuint>(i);
+    }
+
+    circle_vao.init(circle_indices, CIRCLE_SEGMENTS, nullptr, CIRCLE_SEGMENTS);
 }
 
 void SplineEditor::init(const Entity* parent_, Spline* splines_,
@@ -398,10 +406,10 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
     }
 }
 
-void SplineEditor::update_gui() {
+void SplineEditor::update_gui(bool& spline_edit_mode) {
     using namespace ImGui;
 
-    Begin("Spline Editor");
+    Begin("Spline Editor", &spline_edit_mode);
     Text("Splines");
 
     const char** names = new const char*[num_splines];
@@ -458,13 +466,13 @@ void SplineEditor::update_gui() {
             splines[spline_index].update_render_data();
 
             if (point_changed && connect_point_pairs) {
-                splines[spline_index + 1].points[0] = points[0];
-                splines[spline_index + 1].points[3] = points[3];
+                splines[spline_index + 1].points[0] = points[3];
+                splines[spline_index + 1].points[3] = points[0];
                 splines[spline_index + 1].update_render_data();
             }
             if (tangent_changed && connect_tangent_pairs) {
-                splines[spline_index + 1].points[1] = points[1];
-                splines[spline_index + 1].points[2] = points[2];
+                splines[spline_index + 1].points[1] = points[2];
+                splines[spline_index + 1].points[2] = points[1];
                 splines[spline_index + 1].update_render_data();
             }
         }
@@ -488,13 +496,13 @@ void SplineEditor::update_gui() {
             splines[spline_index + 1].update_render_data();
 
             if (point_changed && connect_point_pairs) {
-                splines[spline_index].points[0] = points[0];
-                splines[spline_index].points[3] = points[3];
+                splines[spline_index].points[0] = points[3];
+                splines[spline_index].points[3] = points[0];
                 splines[spline_index].update_render_data();
             }
             if (tangent_changed && connect_tangent_pairs) {
-                splines[spline_index].points[1] = points[1];
-                splines[spline_index].points[2] = points[2];
+                splines[spline_index].points[1] = points[2];
+                splines[spline_index].points[2] = points[1];
                 splines[spline_index].update_render_data();
             }
         }
@@ -507,11 +515,9 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     renderer.debug_shader.use();
     glLineWidth(1.0f);
 
-    static_cast<bool>(spline_edit_mode);
-
     // Draw circle for selected limb
-    renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
-    if (selected_spline_index < num_splines) {
+    if (selected_spline_index < num_splines && spline_edit_mode) {
+        renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
         const Bone** selected_limb_bones =
             limb_bones[selected_spline_index / 2];
 
@@ -557,10 +563,12 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         auto& s = splines[selected_spline_index];
         s.line_vao.draw(GL_LINE_STRIP);
 
-        renderer.debug_shader.set_color(&Colors::LIGHT_PURPLE);
-        s.point_vao.draw(GL_LINES);
+        if (spline_edit_mode) {
+            renderer.debug_shader.set_color(&Colors::LIGHT_PURPLE);
+            s.point_vao.draw(GL_LINES);
 
-        renderer.debug_shader.set_color(&Colors::PURPLE);
-        s.point_vao.draw(GL_POINTS);
+            renderer.debug_shader.set_color(&Colors::PURPLE);
+            s.point_vao.draw(GL_POINTS);
+        }
     }
 }

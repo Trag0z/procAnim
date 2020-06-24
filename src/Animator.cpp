@@ -212,8 +212,9 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
         limb_bones[i][1] = limb_animators[i].bones[1];
     }
 
-    spline_editor.init(parent, splines, 8, limb_names, limb_bones);
-    // spline_editor.init(parent, splines, "../assets/player_splines.spl");
+    // spline_editor.init(parent, splines, 8, limb_names, limb_bones);
+    spline_editor.init(parent, splines, limb_bones,
+                       "../assets/player_splines.spl");
 }
 
 void WalkAnimator::update(float delta_time, float walking_speed,

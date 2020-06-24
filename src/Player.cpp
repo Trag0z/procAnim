@@ -21,10 +21,10 @@ void Player::update(float delta_time, const BoxCollider& ground,
                     const MouseKeyboardInput& input) {
     if (spline_edit_mode) {
         animator.spline_editor.update(input);
-        animator.spline_editor
-            .update_gui(); // @BUG: If this function is refactored into
-                           // SplineEditor::update(), the GUI does not work
-                           // correctly anymore.
+        animator.spline_editor.update_gui(
+            spline_edit_mode); // @BUG: If this function is refactored into
+                               // SplineEditor::update(), the GUI does not work
+                               // correctly anymore.
         return;
     }
 

@@ -1,4 +1,5 @@
 NEXT:
+- fix left arm glitching out
 
 TODO:
 - why are partner splines not exactly the same?
