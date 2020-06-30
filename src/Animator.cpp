@@ -106,7 +106,7 @@ static void resolve_ik(Bone* const bones[2],
 
     // NOTE: The following stuff should be covered by
     // clamp_to_closest_restriction()
-    /* // If the target rotation is more than 180 degrees away from the current
+    // If the target rotation is more than 180 degrees away from the current
     // rotation, choose the shorter way around the circle
     if (target_rotations[0] - bones[0]->rotation > PI) {
         target_rotations[0] -= 2.0f * PI;
@@ -118,7 +118,7 @@ static void resolve_ik(Bone* const bones[2],
         target_rotations[1] -= 2.0f * PI;
     } else if (target_rotations[1] - bones[1]->rotation < -PI) {
         target_rotations[1] += 2.0f * PI;
-    } */
+    }
 }
 
 LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* s,
