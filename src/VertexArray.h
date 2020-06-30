@@ -5,7 +5,7 @@
 constexpr size_t MAX_BONES_PER_VERTEX = 2;
 
 struct RiggedVertex {
-    glm::vec3 position;
+    glm::vec2 position;
     glm::vec2 uv_coord;
     GLuint bone_index[MAX_BONES_PER_VERTEX];
     float bone_weight[MAX_BONES_PER_VERTEX];

@@ -11,13 +11,13 @@ namespace {
 class Shader {
   protected:
     GLuint id;
-    GLuint projection_loc, model_loc;
+    GLuint camera_loc, model_loc;
 
     Shader() {}
     Shader(const char* vert_path, const char* frag_path) {
         id = loadAndCompileShaderFromFile(vert_path, frag_path);
 
-        projection_loc = glGetUniformLocation(id, "projection");
+        camera_loc = glGetUniformLocation(id, "camera");
         model_loc = glGetUniformLocation(id, "model");
     }
 
@@ -25,14 +25,14 @@ class Shader {
     // @OPTIMIZATION: use() is called in every single uniform setter every time
     inline void use() const noexcept { glUseProgram(id); }
 
-    inline void set_projection(const glm::mat4* mat) const noexcept {
+    inline void set_camera(const glm::mat3* mat) const noexcept {
         use();
-        glUniformMatrix4fv(projection_loc, 1, 0, (const GLfloat*)mat);
+        glUniformMatrix3fv(camera_loc, 1, 0, (const GLfloat*)mat);
     }
 
-    inline void set_model(const glm::mat4* mat) const noexcept {
+    inline void set_model(const glm::mat3* mat) const noexcept {
         use();
-        glUniformMatrix4fv(model_loc, 1, 0, (const GLfloat*)mat);
+        glUniformMatrix3fv(model_loc, 1, 0, (const GLfloat*)mat);
     }
 };
 } // namespace
@@ -44,7 +44,7 @@ class RiggedShader : public Shader {
         : Shader(vert_path, frag_path) {}
 
     struct Vertex {
-        glm::vec4 pos;
+        glm::vec2 pos;
         glm::vec2 uv_coord;
     };
 };
@@ -65,6 +65,6 @@ class DebugShader : public Shader {
     }
 
     struct Vertex {
-        glm::vec4 pos;
+        glm::vec2 pos;
     };
 };

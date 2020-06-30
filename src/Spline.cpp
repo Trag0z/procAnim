@@ -518,15 +518,12 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     // Draw circle for selected limb
     if (selected_spline_index < num_splines && spline_edit_mode) {
         renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
-        const Bone** selected_limb_bones =
-            limb_bones[selected_spline_index / 2];
+        const Bone** bones = limb_bones[selected_spline_index / 2];
 
         // @OPTIMIZATION: Calculate this stuff less often
-        glm::vec4 limb_root_position =
-            selected_limb_bones[0]->get_transform() *
-            selected_limb_bones[0]->bind_pose_transform[3];
-        float radius =
-            selected_limb_bones[0]->length + selected_limb_bones[1]->length;
+        glm::vec2 limb_root_position = static_cast<glm::vec2>(
+            bones[0]->get_transform() * bones[0]->bind_pose_transform[2]);
+        float radius = bones[0]->length + bones[1]->length;
 
         DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];
 
@@ -535,9 +532,8 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
                           static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
 
             circle_vertices[n_segment].pos =
-                limb_root_position + glm::vec4(radius * cosf(theta),
-                                               radius * sinf(theta), 0.0f,
-                                               0.0f);
+                limb_root_position +
+                glm::vec2(radius * cosf(theta), radius * sinf(theta));
         }
         circle_vao.update_vertex_data(circle_vertices, CIRCLE_SEGMENTS);
         circle_vao.draw(GL_LINE_LOOP);

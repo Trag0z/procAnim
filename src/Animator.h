@@ -23,8 +23,8 @@ struct LimbAnimator {
 
     float lerp_interpolation_factor = 1.0f;
 
-    glm::vec4 target_pos, tip_pos;
-    glm::vec4 last_tip_movement;
+    glm::vec2 target_pos, tip_pos;
+    glm::vec2 last_tip_movement;
 
     float target_rotations[2];
 

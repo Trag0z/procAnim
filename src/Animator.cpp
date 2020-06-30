@@ -10,23 +10,23 @@
 // to) target_pos
 static void resolve_ik(Bone* const bones[2],
                        const BoneRestrictions bone_restrictions[2],
-                       glm::vec4 target_pos, float* target_rotations) {
+                       glm::vec2 target_pos, float* target_rotations) {
     SDL_assert(bones != nullptr && bone_restrictions != nullptr);
 
     // We need the target positions before the bone's rotation is applied to
     // find the new, absolute rotation. Therefore, we use the
     // inverse_bind_pose_transform
-    glm::vec4 target_pos_bone_space[2];
+    glm::vec3 target_pos_bone_space[2];
     target_pos_bone_space[0] = bones[0]->inverse_bind_pose_transform *
                                glm::inverse(bones[0]->parent->get_transform()) *
-                               target_pos;
+                               glm::vec3(target_pos, 1.0f);
 
     target_pos_bone_space[1] = bones[1]->inverse_bind_pose_transform *
                                glm::inverse(bones[0]->get_transform()) *
-                               target_pos;
+                               glm::vec3(target_pos, 1.0f);
 
-    float target_distance = glm::length(
-        static_cast<glm::vec3>(target_pos - bones[0]->bind_pose_transform[3]));
+    float target_distance = glm::length(glm::vec3(target_pos, 1.0f) -
+                                        bones[0]->bind_pose_transform[2]);
 
     // Find out if min_rotation or max_rotation is closer to the
     // target_rotations and set target_rotations to the closer one if it is out
@@ -137,8 +137,8 @@ LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* s,
     }
 
     tip_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
-              bones[1]->tail;
-    last_tip_movement = glm::vec4(0.0f);
+              glm::vec3(bones[1]->tail, 1.0f);
+    last_tip_movement = glm::vec2(0.0f);
 
     // Init render data for rendering target_pos as a point
     GLuint index = 0;
@@ -153,7 +153,7 @@ void LimbAnimator::update(float delta_time, float movement_speed) {
         // @CLEANUP: Maybe save the default bone position somewhere?
 
         target_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
-                     bones[1]->tail;
+                     glm::vec3(bones[1]->tail, 1.0f);
         target_rotations[0] = 0.0f;
         target_rotations[1] = 0.0f;
 
@@ -172,8 +172,9 @@ void LimbAnimator::update(float delta_time, float movement_speed) {
                               lerp_interpolation_factor);
 
     // Update tip_pos
-    glm::vec4 new_tip_pos = bones[1]->get_transform() *
-                            bones[1]->bind_pose_transform * bones[1]->tail;
+    glm::vec2 new_tip_pos = bones[1]->get_transform() *
+                            bones[1]->bind_pose_transform *
+                            glm::vec3(bones[1]->tail, 1.0f);
     last_tip_movement = new_tip_pos - tip_pos;
     tip_pos = new_tip_pos;
 }
@@ -294,12 +295,6 @@ void WalkAnimator::render(const Renderer& renderer) {
     renderer.debug_shader.set_color(&Colors::GREEN);
 
     for (auto& anim : limb_animators) {
-        // @CLEANUP: Maybe remove this?
-        if (anim.target_pos.w == 0.0f) {
-            // target_pos has not yet been set, so there's nothing to do
-            continue;
-        }
-
         anim.target_point_vao.update_vertex_data(
             reinterpret_cast<DebugShader::Vertex*>(&anim.target_pos),
             1); // ugly, but it works

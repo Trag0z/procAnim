@@ -3,17 +3,16 @@
 #include "Mesh.h"
 #include "Util.h"
 
-glm::mat4 Bone::get_transform() const {
+glm::mat3 Bone::get_transform() const {
     // Recurse until there's no parent
     if (parent) {
-        return parent->get_transform() * bind_pose_transform *
-               glm::rotate(glm::mat4(1.0f), rotation,
-                           glm::vec3(0.0f, 0.0f, 1.0f)) *
-               inverse_bind_pose_transform;
+        glm::mat3 this_transform = bind_pose_transform *
+                                   glm::rotate(glm::mat3(1.0f), rotation) *
+                                   inverse_bind_pose_transform;
+        return parent->get_transform() * this_transform;
     }
 
-    return bind_pose_transform *
-           glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0.0f, 0.0f, 1.0f)) *
+    return bind_pose_transform * glm::rotate(glm::mat3(1.0f), rotation) *
            inverse_bind_pose_transform;
 }
 
@@ -45,7 +44,7 @@ void RiggedMesh::load_from_file(const char* file) {
     SDL_assert(uvCoords);
 
     for (size_t i = 0; i < mesh_data.mNumVertices; ++i) {
-        vertices.push_back({{vertData[i].x, vertData[i].y, 0.0f},
+        vertices.push_back({glm::vec2(vertData[i].x, vertData[i].y),
                             {uvCoords[i].x, 1.0f - uvCoords[i].y},
                             {0, 0},
                             {0.0f, 0.0f}}); // Or 0.5f, 0.5f?
@@ -68,12 +67,6 @@ void RiggedMesh::load_from_file(const char* file) {
     };
     std::vector<WeightData> weight_data;
 
-    // TODO: Maybe remove later
-    auto convert_to_column_major = [](glm::mat4& out, aiMatrix4x4& in) {
-        memcpy(&out, &in, sizeof(float) * 4 * 4);
-        out = glm::transpose(out);
-    };
-
     // Create bones and populate weight_data
     bones.reserve(mesh_data.mNumBones);
     bones_shader_vertices.reserve(mesh_data.mNumBones * 2);
@@ -82,8 +75,12 @@ void RiggedMesh::load_from_file(const char* file) {
 
         aiBone& ai_bone = *mesh_data.mBones[i];
         b.name = ai_bone.mName.C_Str();
-        convert_to_column_major(b.inverse_bind_pose_transform,
-                                ai_bone.mOffsetMatrix);
+
+        auto& m = ai_bone.mOffsetMatrix;
+
+        b.inverse_bind_pose_transform =
+            glm::mat3(m.a1, m.b1, m.d1, m.a2, m.b2, m.d2, m.a4, m.b4, m.d4);
+
         b.length = 0.0f;
 
         for (uint j = 0; j < ai_bone.mNumWeights; ++j) {
@@ -105,11 +102,10 @@ void RiggedMesh::load_from_file(const char* file) {
 
         if (node->mNumChildren > 0) {
             auto& child_transform = node->mChildren[0]->mTransformation;
-            b.tail = glm::vec4(child_transform.a4, child_transform.b4,
-                               child_transform.c4, 1.0f);
+            b.tail = glm::vec2(child_transform.a4, child_transform.b4);
 
             b.bind_pose_transform = inverse(b.inverse_bind_pose_transform);
-            b.length = glm::length((glm::vec3)b.tail);
+            b.length = glm::length(b.tail);
         }
     }
 
@@ -131,19 +127,6 @@ void RiggedMesh::load_from_file(const char* file) {
 
     vao.init(indices.data(), static_cast<GLuint>(indices.size()), NULL,
              static_cast<GLuint>(vertices.size()));
-
-#ifndef CPU_RENDERING
-    // boneIndex attribute
-    glVertexAttribIPointer(
-        2, 2, GL_UNSIGNED_INT, sizeof(Vertex),
-        reinterpret_cast<void*>(offsetof(Vertex, bone_index)));
-    glEnableVertexAttribArray(2);
-    // boneWeight attribute
-    glVertexAttribPointer(
-        3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-        reinterpret_cast<void*>(offsetof(Vertex, bone_weight)));
-    glEnableVertexAttribArray(3);
-#endif
 
     // Create and upload bone render data to GPU
     size_t num_bone_indices = bones_shader_vertices.size();

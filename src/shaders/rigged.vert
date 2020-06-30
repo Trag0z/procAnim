@@ -1,14 +1,15 @@
 #version 330 core
-layout (location = 0) in vec4 pos; 
+layout (location = 0) in vec2 pos;
 layout (location = 1) in vec2 in_uv_coord;
 
-uniform mat4 projection;
-uniform mat4 model;
+uniform mat3 camera;
+uniform mat3 model;
 
-out vec2 uv_coord;
+out vec2 uv_coord; // move this to fragment shader
 
 void main()
 {
-    gl_Position = projection * model * pos;
+    vec3 sim_pos = camera * model * vec3(pos, 1.0f);
+    gl_Position = vec4(sim_pos.x, sim_pos.y, 0.0f, sim_pos.z);
     uv_coord = in_uv_coord;
 }

@@ -57,7 +57,7 @@ void Player::update(float delta_time, const BoxCollider& ground,
     //////          Collision Detection         //////
     if (!grounded) {
         // Find closest point on gorund
-        glm::vec4 foot_pos_world[2];
+        glm::vec2 foot_pos_world[2];
         float distance_to_ground[2];
 
         foot_pos_world[0] = local_to_world_space(
@@ -84,10 +84,9 @@ void Player::update(float delta_time, const BoxCollider& ground,
 
     if (grounded) {
         // @CLEANUP: This is so ugly with all the casting
-        glm::vec3 move =
-            scale * static_cast<glm::vec3>(
-                        animator.limb_animators[animator.grounded_leg_index]
-                            .last_tip_movement);
+        glm::vec2 move =
+            scale * animator.limb_animators[animator.grounded_leg_index]
+                        .last_tip_movement;
         pos -= move;
     }
 
@@ -100,13 +99,9 @@ void Player::render(const Renderer& renderer) {
 
     // Calculate bone transforms from their rotations
     size_t bone_count = rm.bones.size();
-    glm::mat4* bone_transforms = new glm::mat4[bone_count];
+    glm::mat3* bone_transforms = new glm::mat3[bone_count];
     for (size_t i = 0; i < bone_count; ++i) {
-        auto& b = rm.bones[i];
-        glm::mat4 rotation_matrix =
-            rotate(glm::mat4(1.0f), b.rotation, glm::vec3(0.0f, 0.0f, 1.0f));
-
-        bone_transforms[i] = b.get_transform();
+        bone_transforms[i] = rm.bones[i].get_transform();
     }
 
     // Calculate vertex posistions for rendering
@@ -114,11 +109,11 @@ void Player::render(const Renderer& renderer) {
         RiggedVertex vert = rm.vertices[i];
         rm.shader_vertices[i].uv_coord = vert.uv_coord;
 
-        glm::mat4 bone =
+        glm::mat3 bone =
             bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
             bone_transforms[vert.bone_index[1]] * vert.bone_weight[1];
 
-        rm.shader_vertices[i].pos = bone * glm::vec4(vert.position, 1.0f);
+        rm.shader_vertices[i].pos = bone * glm::vec3(vert.position, 1.0f);
     }
 
     rm.vao.update_vertex_data(rm.shader_vertices);
@@ -152,11 +147,11 @@ void Player::render(const Renderer& renderer) {
             rm.bones_shader_vertices[i * 2].pos =
                 bone_transforms[i] *
                 rm.bones[i]
-                    .bind_pose_transform[3]; // Renders (0.0f, 0.0f, 0.0f)
+                    .bind_pose_transform[2]; // Renders (0.0f, 0.0f, 0.0f)
                                              // in the bones local space
             rm.bones_shader_vertices[i * 2 + 1].pos =
                 bone_transforms[i] * rm.bones[i].bind_pose_transform *
-                rm.bones[i].tail;
+                glm::vec3(rm.bones[i].tail, 1.0f);
         }
 
         rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
@@ -168,6 +163,8 @@ void Player::render(const Renderer& renderer) {
 
         rm.bones_vao.draw(GL_POINTS);
     }
+
+    delete[] bone_transforms;
 
     // Render animator target positions
     animator.render(renderer);

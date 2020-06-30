@@ -6,15 +6,15 @@
 struct Bone {
     std::string name;
     const Bone* parent;
-    glm::mat4 bind_pose_transform;
-    glm::mat4 inverse_bind_pose_transform;
+    glm::mat3 bind_pose_transform;
+    glm::mat3 inverse_bind_pose_transform;
     // Position and length in bone space
-    glm::vec4 tail;
+    glm::vec2 tail;
     float length;
     // Radians around z-Axis
     float rotation = 0.0f;
 
-    glm::mat4 get_transform() const;
+    glm::mat3 get_transform() const;
 };
 
 struct RiggedMesh {

@@ -1,7 +1,5 @@
 #pragma once
 
-#define CPU_RENDERING
-
 #pragma warning(push, 0)
 
 #include <array>
@@ -21,6 +19,7 @@
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/matrix_transform_2d.hpp>
 
 #include <sdl/SDL.h>
 #include <sdl/SDL_image.h>

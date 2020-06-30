@@ -7,9 +7,9 @@ struct BoxCollider {
     glm::vec2 pos;
     glm::vec2 half_ext;
 
-    glm::mat4 model;
+    glm::mat3 model;
 
-    glm::vec4 vertices[4];
+    glm::vec2 vertices[4];
 
     VertexArray<DebugShader::Vertex> vao;
 
