@@ -20,8 +20,9 @@ void Spline::init(glm::vec2 points_[num_points]) {
 
     // Init line render data
     parameter_matrix = glm::mat4(
-        glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f),
-        glm::vec4(points[1], 0.0f, 1.0f), glm::vec4(points[2], 0.0f, 1.0f));
+        glm::vec4(points[P1], 0.0f, 1.0f), glm::vec4(points[P2], 0.0f, 1.0f),
+        glm::vec4(points[T1] - points[P1], 0.0f, 1.0f),
+        glm::vec4(points[P2] - points[T2], 0.0f, 1.0f));
 
     GLuint indices[render_steps];
     glm::vec4 interpolation_vector;
@@ -48,9 +49,9 @@ void Spline::update_render_data() {
     // Line
     // @optimize
     parameter_matrix = glm::mat4(
-        glm::vec4(points[0], 0.0f, 1.0f), glm::vec4(points[3], 0.0f, 1.0f),
-        glm::vec4(points[1], 0.0f, 1.0f),
-        glm::vec4(points[3] + (points[3] - points[2]), 0.0f, 1.0f));
+        glm::vec4(points[P1], 0.0f, 1.0f), glm::vec4(points[P2], 0.0f, 1.0f),
+        glm::vec4(points[T1] - points[P1], 0.0f, 1.0f),
+        glm::vec4(points[P2] - points[T2], 0.0f, 1.0f));
 
     for (size_t i = 0; i < render_steps; ++i) {
         float t = static_cast<float>(i) / static_cast<float>(render_steps - 1);
@@ -554,7 +555,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     }
 
     if (selected_spline_index < num_splines &&
-        (!creating_new_spline && !first_point_set)) {
+        !(creating_new_spline && !first_point_set)) {
         // Draw selected spline (with points)
         auto& s = splines[selected_spline_index];
         s.line_vao.draw(GL_LINE_STRIP);

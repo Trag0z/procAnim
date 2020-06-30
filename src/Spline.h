@@ -11,7 +11,8 @@ struct Spline {
     static const size_t num_points = 4;
     static const size_t render_steps = 50;
 
-    // P1, T1, T2, P2
+    enum { P1 = 0, T1 = 1, T2 = 2, P2 = 3 };
+
     glm::vec2 points[num_points];
     glm::mat4 parameter_matrix;
 
