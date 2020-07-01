@@ -107,6 +107,7 @@ void SplineEditor::save_splines(bool get_new_file_path) {
 
         COMDLG_FILTERSPEC file_type = {L".spl", L"*.spl"};
         pFileSave->SetFileTypes(1, &file_type);
+        pFileSave->SetDefaultExtension(L"spl");
 
         // Show the Open dialog box.
         hr = pFileSave->Show(NULL);
@@ -123,12 +124,11 @@ void SplineEditor::save_splines(bool get_new_file_path) {
         hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 
         // Copy path to save_path
-        size_t length = wcslen(pszFilePath) * sizeof(*pszFilePath);
         if (save_path) {
             delete[] save_path;
         }
-        // @OPTIMIZATION: save_path is probably twice as long as it
-        // needs to be?
+
+        size_t length = wcslen(pszFilePath) + 1;
         save_path = new char[length];
 
         wcstombs_s(nullptr, save_path, length, pszFilePath, length);
@@ -192,9 +192,8 @@ void SplineEditor::load_splines() {
     if (save_path) {
         delete[] save_path;
     }
-    size_t length = wcslen(pszFilePath) * sizeof(*pszFilePath);
-    // @OPTIMIZATION: save_path is probably twice as long as it
-    // needs to be?
+
+    size_t length = wcslen(pszFilePath) + 1;
     save_path = new char[length];
 
     wcstombs_s(nullptr, save_path, length, pszFilePath, length);
