@@ -46,6 +46,8 @@ class MouseKeyboardInput {
     }
 };
 
+enum StickID { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };
+
 class Gamepad {
     static const U32 num_axes = SDL_CONTROLLER_AXIS_MAX;
     static const U32 num_buttons = SDL_CONTROLLER_BUTTON_MAX;
@@ -54,15 +56,19 @@ class Gamepad {
 
     SDL_GameController* sdl_ptr = nullptr;
 
-    float axis[num_axes];
+    float axes[num_axes];
     Uint32 button_map, button_down_map, button_up_map;
 
   public:
-    static const U32 num_pads = 0;
+    static const U32 num_pads = 1;
 
-    static void init(std::array<Gamepad, num_pads> pads);
+    static std::array<Gamepad, num_pads> init();
 
     void update();
+
+    inline glm::vec2 stick(size_t index) const {
+        return glm::vec2(axes[index * 2], axes[index * 2 + 1]);
+    }
 
     // NOTE: These could only be shifted by n-1 if SDL_GAMECONTROLLER_BUTTON
     // starts at 1

@@ -43,7 +43,7 @@ struct Game {
     Renderer renderer;
 
     MouseKeyboardInput mouse_keyboard_input;
-    std::array<Gamepad, Gamepad::num_pads> gamepad_inputs;
+    std::array<Gamepad, Gamepad::num_pads> gamepads;
 
     Player player;
     BoxCollider ground;

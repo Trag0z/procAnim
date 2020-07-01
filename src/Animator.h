@@ -30,6 +30,8 @@ struct LimbAnimator {
 
     VertexArray<DebugShader::Vertex> target_point_vao;
 
+    static const float walking_speed_multiplier;
+
     LimbAnimator() {}
     LimbAnimator(Bone* b1, Bone* b2, Spline* s,
                  BoneRestrictions restrictions[2] = nullptr);

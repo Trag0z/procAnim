@@ -14,13 +14,13 @@ class Player : Entity {
     Texture tex;
     RiggedMesh rigged_mesh;
     WalkAnimator animator;
-    Gamepad* gamepad_input; // currently unused
+    const Gamepad* gamepad;
 
-    bool grounded;
-    float walking_speed = 0.03f;
+    float walking_speed = 1.0f;
     const float gravity = 4.0f;
-    bool facing_right = true;
     AnimState anim_state;
+    bool facing_right = true;
+    bool grounded;
 
     bool spline_edit_mode = false;
 

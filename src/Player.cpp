@@ -5,12 +5,13 @@
 
 void Player::init(glm::vec3 position, glm::vec3 scale_,
                   const char* texture_path, const char* mesh_path,
-                  Gamepad* gamepad) {
+                  Gamepad* pad) {
     Entity::init(position, scale_);
     tex = Texture::load_from_file(texture_path);
     rigged_mesh.load_from_file(mesh_path);
     animator.init(this, rigged_mesh);
-    gamepad_input = gamepad;
+    SDL_assert(pad);
+    gamepad = pad;
 
     anim_state = AnimState::STANDING;
 
@@ -32,19 +33,20 @@ void Player::update(float delta_time, const BoxCollider& ground,
         pos.y -= gravity * delta_time;
     }
 
-    //////          Arm animation           //////
-    // if (input.mouse_button(1)) {
-    //    animator.arm_animators[1].target_pos = glm::vec4(
-    //        world_to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f)),
-    //        1.0f);
-    //    // inverse(model) * glm::vec4(input.mouse_world_pos(), 0.0f, 1.0f);
-    //}
-
     //////          Walking animation           //////
+    auto stick = gamepad->stick(StickID::LEFT);
     if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
         anim_state = WALKING;
         if ((input.key(SDL_SCANCODE_LEFT) && facing_right) ||
             (input.key(SDL_SCANCODE_RIGHT) && !facing_right)) {
+            facing_right = !facing_right;
+            scale.x *= -1.0f;
+        }
+    } else if (stick.x != 0.0f) {
+        anim_state = WALKING;
+        walking_speed = std::abs(stick.x);
+        if ((stick.x < 0.0f && facing_right) ||
+            (stick.x > 0.0f && !facing_right)) {
             facing_right = !facing_right;
             scale.x *= -1.0f;
         }

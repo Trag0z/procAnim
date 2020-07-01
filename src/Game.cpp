@@ -76,12 +76,13 @@ void Game::init() {
 
     mouse_keyboard_input.init(renderer.window_size().y);
 
-    Gamepad::init(gamepad_inputs);
+    gamepads = Gamepad::init();
 
     // Player
     glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
     player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
-                "../assets/playerTexture.png", "../assets/guy.fbx", nullptr);
+                "../assets/playerTexture.png", "../assets/guy.fbx",
+                &gamepads[0]);
 
     // Ground
     ground =
@@ -109,7 +110,7 @@ bool Game::run() {
         }
 
         mouse_keyboard_input.update();
-        for (auto& pad : gamepad_inputs) {
+        for (auto& pad : gamepads) {
             pad.update();
         }
 

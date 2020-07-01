@@ -42,14 +42,16 @@ void MouseKeyboardInput::update() {
     }
 }
 
-void Gamepad::init(std::array<Gamepad, num_pads> pads) {
+std::array<Gamepad, Gamepad::num_pads> Gamepad::init() {
+    std::array<Gamepad, num_pads> ret;
     for (U32 i = 0; i < Gamepad::num_pads; ++i) {
-        pads[i].sdl_ptr = SDL_GameControllerOpen(i);
-        if (!pads[i].sdl_ptr) {
+        ret[i].sdl_ptr = SDL_GameControllerOpen(i);
+        if (!ret[i].sdl_ptr) {
             printf("[Input] Error opening gamepad%I32d: %s\n", i,
                    SDL_GetError());
         }
     }
+    return ret;
 }
 
 void Gamepad::update() {
@@ -63,7 +65,7 @@ void Gamepad::update() {
         // If it's a trigger, normalize and set the value
         if (i == SDL_CONTROLLER_AXIS_TRIGGERLEFT ||
             i == SDL_CONTROLLER_AXIS_TRIGGERRIGHT) {
-            axis[i] = static_cast<float>(SDL_GameControllerGetAxis(
+            axes[i] = static_cast<float>(SDL_GameControllerGetAxis(
                           sdl_ptr, static_cast<SDL_GameControllerAxis>(i))) /
                       32767.0F;
             continue;
@@ -74,19 +76,19 @@ void Gamepad::update() {
             sdl_ptr, static_cast<SDL_GameControllerAxis>(i));
         if (tempAxis > -Gamepad::stick_deadzone_in &&
             tempAxis < Gamepad::stick_deadzone_in) {
-            axis[i] = 0.0F;
+            axes[i] = 0.0F;
         } else if (tempAxis > Gamepad::stick_deadzone_out) {
-            axis[i] = 1.0F;
+            axes[i] = 1.0F;
         } else if (tempAxis < -Gamepad::stick_deadzone_out) {
-            axis[i] = -1.0F;
+            axes[i] = -1.0F;
         } else {
             if (tempAxis > 0) {
-                axis[i] =
+                axes[i] =
                     static_cast<float>(tempAxis - Gamepad::stick_deadzone_in) /
                     static_cast<float>(Gamepad::stick_deadzone_out -
                                        Gamepad::stick_deadzone_in);
             } else {
-                axis[i] =
+                axes[i] =
                     static_cast<float>(tempAxis + Gamepad::stick_deadzone_in) /
                     static_cast<float>(Gamepad::stick_deadzone_out -
                                        Gamepad::stick_deadzone_in);
@@ -94,7 +96,7 @@ void Gamepad::update() {
         }
         // Invert Y axis cause it's the wrong way by default
         if (i == SDL_CONTROLLER_AXIS_LEFTY || i == SDL_CONTROLLER_AXIS_RIGHTY)
-            axis[i] *= -1.0f;
+            axes[i] *= -1.0f;
     }
 
     // Poll all the buttons on this pad
