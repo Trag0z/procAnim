@@ -343,12 +343,12 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
             auto& partner_spline =
                 splines[partner_index(selected_spline_index)];
 
-            partner_spline.points[Spline::P2] = mouse_pos;
+            partner_spline.points[Spline::P1] = mouse_pos;
 
-            partner_spline.points[Spline::T1] =
-                partner_spline.points[Spline::P1] + start_to_end * 0.3f;
             partner_spline.points[Spline::T2] =
-                partner_spline.points[Spline::P2] - start_to_end * 0.3f;
+                partner_spline.points[Spline::P2] + start_to_end * 0.3f;
+            partner_spline.points[Spline::T1] =
+                partner_spline.points[Spline::P1] - start_to_end * 0.3f;
 
             partner_spline.update_render_data();
         }
