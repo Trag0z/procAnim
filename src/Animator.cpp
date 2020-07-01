@@ -8,9 +8,9 @@
 // Takes a target_pos in model space and finds two target_rotations for the
 // bones, so that the tail of bone[1] is at (or at the closest possible point
 // to) target_pos
-static void resolve_ik(Bone* const bones[2],
-                       const BoneRestrictions bone_restrictions[2],
-                       glm::vec2 target_pos, float* target_rotations) {
+static void solve_ik(Bone* const bones[2],
+                     const BoneRestrictions bone_restrictions[2],
+                     glm::vec2 target_pos, float* target_rotations) {
     SDL_assert(bones != nullptr && bone_restrictions != nullptr);
 
     // We need the target positions before the bone's rotation is applied to
@@ -31,29 +31,50 @@ static void resolve_ik(Bone* const bones[2],
     // Find out if min_rotation or max_rotation is closer to the
     // target_rotations and set target_rotations to the closer one if it is out
     // of the restricted range
-    auto clamp_to_closest_restriction = [target_rotations,
-                                         bone_restrictions](size_t bone_index) {
-        if (target_rotations[bone_index] < 0.0f) {
-            if (std::abs(target_rotations[bone_index] -
-                         bone_restrictions[bone_index].min_rotation) >
-                std::abs(target_rotations[bone_index] + 2.0f * PI -
-                         bone_restrictions[bone_index].max_rotation)) {
-                target_rotations[bone_index] += 2.0f * PI;
-            }
-        } else {
-            if (std::abs(target_rotations[bone_index] - 2.0f * PI -
-                         bone_restrictions[bone_index].min_rotation) <
-                std::abs(target_rotations[bone_index] -
-                         bone_restrictions[bone_index].max_rotation)) {
-                target_rotations[bone_index] -= 2.0f * PI;
-            }
-        }
+    // auto clamp_to_closest_restriction = [target_rotations,
+    //                                      bone_restrictions](size_t
+    //                                      bone_index) {
+    //     auto rotation = target_rotations[bone_index];
+    //     auto& restrictions = bone_restrictions[bone_index];
 
-        target_rotations[bone_index] = // Does this actually change the value?
-            clamp(target_rotations[bone_index],
-                  bone_restrictions[bone_index].min_rotation,
-                  bone_restrictions[bone_index].max_rotation);
-    };
+    //     SDL_assert(rotation > -2.0f * PI && rotation < 2.0f * PI);
+
+    //     if (rotation > restrictions.min_rotation &&
+    //         rotation < restrictions.max_rotation)
+    //         return;
+
+    //     float distance_to_min;
+    //     if (rotation < restrictions.min_rotation - PI) {
+    //         distance_to_min =
+    //             std::abs(rotation + 2.0f * PI - restrictions.min_rotation);
+    //         // SDL_TriggerBreakpoint();
+    //     } else if (rotation > restrictions.min_rotation + PI) {
+    //         distance_to_min =
+    //             std::abs(rotation - 2.0f * PI - restrictions.min_rotation);
+    //         // SDL_TriggerBreakpoint();
+    //     } else {
+    //         distance_to_min = std::abs(rotation - restrictions.min_rotation);
+    //     }
+
+    //     float distance_to_max;
+    //     if (rotation < restrictions.max_rotation - PI) {
+    //         distance_to_max =
+    //             std::abs(rotation + 2.0f * PI - restrictions.max_rotation);
+    //         // SDL_TriggerBreakpoint();
+    //     } else if (rotation > restrictions.max_rotation + PI) {
+    //         distance_to_max =
+    //             std::abs(rotation - 2.0f * PI - restrictions.max_rotation);
+    //         // SDL_TriggerBreakpoint();
+    //     } else {
+    //         distance_to_max = std::abs(rotation - restrictions.max_rotation);
+    //     }
+
+    //     if (distance_to_min < distance_to_max) {
+    //         rotation = restrictions.min_rotation;
+    //     } else {
+    //         rotation = restrictions.max_rotation;
+    //     }
+    // };
 
     // NOTE: The resulting rotations here are applied counter clockwise, but
     // why?
@@ -164,7 +185,7 @@ void LimbAnimator::update(float delta_time, float movement_speed) {
         target_pos = splines[animation_state].get_point_on_spline(
             spline_interpolation_factor);
 
-        resolve_ik(bones, bone_restrictions, target_pos, target_rotations);
+        solve_ik(bones, bone_restrictions, target_pos, target_rotations);
     }
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
                               lerp_interpolation_factor);
@@ -219,7 +240,19 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
 }
 
 void WalkAnimator::update(float delta_time, float walking_speed,
-                          AnimState state) {
+                          AnimState state, glm::vec2 mouse_pos,
+                          bool mouse_down) {
+
+    // @CLEANUP: Remove
+    if (arm_follows_mouse && mouse_down) {
+        auto& anim = limb_animators[RIGHT_ARM];
+        anim.target_pos = mouse_pos;
+        solve_ik(anim.bones, anim.bone_restrictions, anim.target_pos,
+                 anim.target_rotations);
+        anim.bones[0]->rotation = anim.target_rotations[0];
+        anim.bones[1]->rotation = anim.target_rotations[1];
+        return;
+    }
 
     auto set_interpolations = [this](float spline_interpolation,
                                      float lerp_interpolation) -> void {

@@ -52,7 +52,9 @@ void Player::update(float delta_time, const BoxCollider& ground,
         anim_state = STANDING;
     }
 
-    animator.update(delta_time, walking_speed, anim_state);
+    glm::vec2 local_mouse_pos = world_to_local_space(input.mouse_world_pos());
+    animator.update(delta_time, walking_speed, anim_state, local_mouse_pos,
+                    input.mouse_button(1));
 
     //////          Collision Detection         //////
     if (!grounded) {
