@@ -27,7 +27,7 @@ struct Spline {
     void init(glm::vec2 points_[num_points] = nullptr);
 
     void update_render_data();
-    glm::vec4 get_point_on_spline(float t) const;
+    glm::vec2 get_point_on_spline(float t) const;
 
     const glm::mat4 hermite_matrix = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
                                       -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
@@ -39,8 +39,8 @@ class SplineEditor {
     Spline* splines = nullptr;
     size_t num_splines;
 
-    size_t selected_point_index;
-    size_t selected_spline_index;
+    size_t selected_point_index = static_cast<size_t>(-1);
+    size_t selected_spline_index = static_cast<size_t>(-1);
 
     bool creating_new_spline = false;
     bool first_point_set = false;

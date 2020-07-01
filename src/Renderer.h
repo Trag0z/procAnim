@@ -14,7 +14,6 @@ glm::mat3 calculate_camera(float left, float right, float top, float bottom) {
 } // namespace
 
 class Renderer {
-
     glm::ivec2 window_size_ = {1920, 1080};
 
   public:

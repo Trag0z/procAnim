@@ -169,8 +169,9 @@ LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* s,
 }
 
 void LimbAnimator::update(float delta_time, float walking_speed) {
-    lerp_interpolation_factor =
-        std::min(lerp_interpolation_factor + delta_time * walking_speed, 1.0f);
+    lerp_interpolation_factor = std::min(
+        lerp_interpolation_factor + delta_time * walking_speed_multiplier,
+        1.0f);
 
     if (animation_state == NEUTRAL) {
         // @CLEANUP: Maybe save the default bone position somewhere?
@@ -180,13 +181,22 @@ void LimbAnimator::update(float delta_time, float walking_speed) {
         target_rotations[1] = 0.0f;
 
     } else {
-        spline_interpolation_factor =
-            std::min(spline_interpolation_factor +
-                         delta_time * walking_speed * walking_speed_multiplier,
-                     1.0f);
+        spline_interpolation_factor = std::min(
+            spline_interpolation_factor + delta_time * walking_speed_multiplier,
+            1.0f);
 
         target_pos = splines[animation_state].get_point_on_spline(
             spline_interpolation_factor);
+
+        glm::vec2 to_fast_spline =
+            splines[animation_state + 2].get_point_on_spline(
+                spline_interpolation_factor) -
+            target_pos;
+
+        // @CLEANUP
+        SDL_assert(walking_speed >= 0.0f && walking_speed <= 1.0f);
+
+        target_pos += to_fast_spline * walking_speed;
 
         solve_ik(bones, bone_restrictions, target_pos, target_rotations);
     }
@@ -215,21 +225,26 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
                      &splines[0], restrictions);
     limb_animators[RIGHT_ARM] =
         LimbAnimator(mesh.find_bone("Arm_R_1"), mesh.find_bone("Arm_R_2"),
-                     &splines[2], restrictions);
+                     &splines[4], restrictions);
 
     restrictions[0] = {0.0f, 0.0f}; //{-0.7f * PI, 0.7f * PI};
     restrictions[1] = {0.0f, 0.0f}; //{degToRad(-120.0f), 0.0f};
     limb_animators[LEFT_LEG] =
         LimbAnimator(mesh.find_bone("Leg_L_1"), mesh.find_bone("Leg_L_2"),
-                     &splines[4], restrictions);
+                     &splines[8], restrictions);
     limb_animators[RIGHT_LEG] =
         LimbAnimator(mesh.find_bone("Leg_R_1"), mesh.find_bone("Leg_R_2"),
-                     &splines[6], restrictions);
+                     &splines[12], restrictions);
 
-    std::string limb_names[8] = {"Left arm forward",  "Left arm backward",
-                                 "Right arm forward", "Right arm backward",
-                                 "Left leg forward",  "Left leg backward",
-                                 "Right leg forward", "Right leg backward"};
+    std::string limb_names[16] = {
+        "Left arm forward slow",  "Left arm backward slow",
+        "Left arm forward fast",  "Left arm backward fast",
+        "Right arm forward slow", "Right arm backward slow",
+        "Right arm forward fast", "Right arm backward fast",
+        "Left leg forward slow",  "Left leg backward slow",
+        "Left leg forward fast",  "Left leg backward fast",
+        "Right leg forward slow", "Right leg backward slow",
+        "Right leg forward fast", "Right leg backward fast"};
 
     const Bone* limb_bones[4][2];
     for (size_t i = 0; i < 4; ++i) {
@@ -237,7 +252,7 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
         limb_bones[i][1] = limb_animators[i].bones[1];
     }
 
-    // spline_editor.init(parent, splines, 8, limb_names, limb_bones);
+    // spline_editor.init(parent, splines, 16, limb_names, limb_bones);
     spline_editor.init(parent, splines, limb_bones,
                        "../assets/player_splines.spl");
 }

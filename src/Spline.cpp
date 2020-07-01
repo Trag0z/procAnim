@@ -72,9 +72,10 @@ void Spline::update_render_data() {
         static_cast<GLuint>(point_shader_vertices.size()));
 }
 
-glm::vec4 Spline::get_point_on_spline(float t) const {
+glm::vec2 Spline::get_point_on_spline(float t) const {
     glm::vec4 interpolation_vector = {t * t * t, t * t, t, 1.0f};
-    return parameter_matrix * hermite_matrix * interpolation_vector;
+    return static_cast<glm::vec2>(parameter_matrix * hermite_matrix *
+                                  interpolation_vector);
 }
 
 /////                                   /////
@@ -328,25 +329,26 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
 
         // Set P2 to mouse position and the others to points along the
         // way from P1 to P2 and return
-        selected_spline.points[3] = mouse_pos;
+        selected_spline.points[Spline::P2] = mouse_pos;
 
-        glm::vec2 start_to_end =
-            selected_spline.points[3] - selected_spline.points[0];
-        selected_spline.points[1] =
-            selected_spline.points[0] + start_to_end * 0.3f;
-        selected_spline.points[2] =
-            selected_spline.points[3] - start_to_end * 0.3f;
+        glm::vec2 start_to_end = selected_spline.points[Spline::P2] -
+                                 selected_spline.points[Spline::P1];
+        selected_spline.points[Spline::T1] =
+            selected_spline.points[Spline::P1] + start_to_end * 0.3f;
+        selected_spline.points[Spline::T2] =
+            selected_spline.points[Spline::P2] - start_to_end * 0.3f;
         selected_spline.update_render_data();
 
         if (connect_point_pairs) {
             auto& partner_spline =
                 splines[partner_index(selected_spline_index)];
-            partner_spline.points[0] = mouse_pos;
 
-            partner_spline.points[1] =
-                partner_spline.points[0] + start_to_end * 0.3f;
-            partner_spline.points[2] =
-                partner_spline.points[3] - start_to_end * 0.3f;
+            partner_spline.points[Spline::P2] = mouse_pos;
+
+            partner_spline.points[Spline::T1] =
+                partner_spline.points[Spline::P1] + start_to_end * 0.3f;
+            partner_spline.points[Spline::T2] =
+                partner_spline.points[Spline::P2] - start_to_end * 0.3f;
 
             partner_spline.update_render_data();
         }
@@ -363,13 +365,14 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
         return;
     }
 
-    if (selected_spline_index > num_splines)
+    if (selected_spline_index > num_splines) {
         return;
+    }
 
     if (input.mouse_button_down(1)) {
         for (size_t n_point = 0; n_point < Spline::num_points; ++n_point) {
             if (glm::length(splines[selected_spline_index].points[n_point] -
-                            mouse_pos) < 0.2f) {
+                            mouse_pos) < 0.1f) {
                 selected_point_index = n_point;
             }
         }
@@ -426,6 +429,16 @@ void SplineEditor::update_gui(bool& spline_edit_mode) {
 
     if (Button("Replace with new spline") && !creating_new_spline) {
         creating_new_spline = true;
+        SDL_assert_always(selected_spline_index < num_splines);
+        for (auto& p : splines[selected_spline_index].points) {
+            p = glm::vec2(0.0f);
+        }
+        if (connect_point_pairs) {
+            for (auto& p :
+                 splines[partner_index(selected_spline_index)].points) {
+                p = glm::vec2(0.0f);
+            }
+        }
     }
 
     if (Button("Open...")) {
@@ -518,7 +531,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     // Draw circle for selected limb
     if (selected_spline_index < num_splines && spline_edit_mode) {
         renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
-        const Bone** bones = limb_bones[selected_spline_index / 2];
+        const Bone** bones = limb_bones[selected_spline_index / 4];
 
         // @OPTIMIZATION: Calculate this stuff less often
         glm::vec2 limb_root_position = static_cast<glm::vec2>(

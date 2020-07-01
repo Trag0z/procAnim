@@ -46,7 +46,7 @@ struct LimbAnimator {
 };
 
 class WalkAnimator {
-    Spline splines[8];
+    Spline splines[16];
 
   public:
     SplineEditor spline_editor;
