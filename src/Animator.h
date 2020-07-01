@@ -20,8 +20,10 @@ struct LimbAnimator {
     // for moving it back
     Spline* splines;
     float spline_interpolation_factor = 0.0f;
-
     float lerp_interpolation_factor = 1.0f;
+
+    static const float walking_speed_multiplier;
+    static const float lerp_speed_multiplier;
 
     glm::vec2 target_pos, tip_pos;
     glm::vec2 last_tip_movement;
@@ -29,8 +31,6 @@ struct LimbAnimator {
     float target_rotations[2];
 
     VertexArray<DebugShader::Vertex> target_point_vao;
-
-    static const float walking_speed_multiplier;
 
     LimbAnimator() {}
     LimbAnimator(Bone* b1, Bone* b2, Spline* s,

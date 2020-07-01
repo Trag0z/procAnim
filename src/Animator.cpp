@@ -142,7 +142,8 @@ static void solve_ik(Bone* const bones[2],
     }
 }
 
-const float LimbAnimator::walking_speed_multiplier = 0.03f;
+const float LimbAnimator::walking_speed_multiplier = 0.3f;
+const float LimbAnimator::lerp_speed_multiplier = 0.02f;
 
 LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* s,
                            BoneRestrictions restrictions[2]) {
@@ -181,9 +182,10 @@ void LimbAnimator::update(float delta_time, float walking_speed) {
         target_rotations[1] = 0.0f;
 
     } else {
-        spline_interpolation_factor = std::min(
-            spline_interpolation_factor + delta_time * walking_speed_multiplier,
-            1.0f);
+        spline_interpolation_factor =
+            std::min(spline_interpolation_factor +
+                         delta_time * walking_speed * walking_speed_multiplier,
+                     1.0f);
 
         target_pos = splines[animation_state].get_point_on_spline(
             spline_interpolation_factor);

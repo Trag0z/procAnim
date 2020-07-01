@@ -1,4 +1,6 @@
 NEXT:
+- decouple player body movement from foot ground movement
+- make the sprinting animation look nicer
 
 TODO:
 - revert laptop compat changes
