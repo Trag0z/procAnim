@@ -16,8 +16,9 @@ class Player : Entity {
     WalkAnimator animator;
     const Gamepad* gamepad;
 
+    glm::vec2 velocity = glm::vec2(0.0f);
     float walking_speed = 1.0f;
-    const float gravity = 4.0f;
+    const float gravity = 0.5f;
     AnimState anim_state;
     bool facing_right = true;
     bool grounded;

@@ -69,6 +69,7 @@ class WalkAnimator {
   public:
     void init(const Entity* parent, RiggedMesh& mesh);
     void update(float delta_time, float walking_speed, AnimState state,
-                glm::vec2 mouse_pos = {0.0f, 0.0f}, bool mouse_down = false);
+                bool& new_grounded_state, glm::vec2 mouse_pos = {0.0f, 0.0f},
+                bool mouse_down = false);
     void render(const Renderer& renderer);
 };

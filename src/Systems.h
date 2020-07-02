@@ -58,7 +58,8 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     Separator();
 
     for (const auto& anim : player.animator.limb_animators) {
-        glm::vec3 target_world_pos = player.model * glm::vec3(anim.target_pos, 1.0f);
+        glm::vec3 target_world_pos =
+            player.model * glm::vec3(anim.target_pos, 1.0f);
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
         Text(label);
@@ -90,7 +91,8 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
         NextColumn();
 
         glm::vec3 tail_world_pos = player.model * bone.get_transform() *
-                                   bone.bind_pose_transform * glm::vec3(bone.tail, 1.0f);
+                                   bone.bind_pose_transform *
+                                   glm::vec3(bone.tail, 1.0f);
         sprintf_s(label, "% 7.1f, % 7.1f", tail_world_pos.x, tail_world_pos.y);
         Text(label);
         NextColumn();
@@ -99,6 +101,9 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     Separator();
 
     End();
+
+    if (player.spline_edit_mode)
+        player.animator.spline_editor.update_gui(player.spline_edit_mode);
 }
 
 inline void render(SDL_Window* window, const Renderer& renderer, Player& player,

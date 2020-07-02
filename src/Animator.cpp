@@ -260,9 +260,8 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
 }
 
 void WalkAnimator::update(float delta_time, float walking_speed,
-                          AnimState state, glm::vec2 mouse_pos,
-                          bool mouse_down) {
-
+                          AnimState state, bool& not_grounded_anymore,
+                          glm::vec2 mouse_pos, bool mouse_down) {
     // @CLEANUP: Remove
     if (arm_follows_mouse && mouse_down) {
         auto& anim = limb_animators[RIGHT_ARM];
@@ -302,6 +301,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
                        1.0f) { // @CLEANUP: They both move at the same speed, so
                                // one check should be enough
             // Is walking and has reached the end of the current spline
+            not_grounded_anymore = true;
             if (leg_state == RIGHT_LEG_UP) {
                 leg_state = LEFT_LEG_UP;
                 limb_animators[LEFT_ARM].animation_state =
@@ -330,6 +330,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
         }
     } else { // Player is standing
         if (leg_state != NEUTRAL) {
+            not_grounded_anymore = true;
             leg_state = NEUTRAL;
             for (auto& anim : limb_animators) {
                 anim.animation_state = LimbAnimator::NEUTRAL;

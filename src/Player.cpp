@@ -22,15 +22,13 @@ void Player::update(float delta_time, const BoxCollider& ground,
                     const MouseKeyboardInput& input) {
     if (spline_edit_mode) {
         animator.spline_editor.update(input);
-        animator.spline_editor.update_gui(
-            spline_edit_mode); // @BUG: If this function is refactored into
-                               // SplineEditor::update(), the GUI does not work
-                               // correctly anymore.
         return;
     }
 
     if (!grounded) {
-        pos.y -= gravity * delta_time;
+        velocity.y -= gravity * delta_time;
+        pos += velocity;
+        update_model_matrix();
     }
 
     //////          Walking animation           //////
@@ -54,12 +52,13 @@ void Player::update(float delta_time, const BoxCollider& ground,
         anim_state = STANDING;
     }
 
+    bool not_grounded_anymore = false;
     glm::vec2 local_mouse_pos = world_to_local_space(input.mouse_world_pos());
-    animator.update(delta_time, walking_speed, anim_state, local_mouse_pos,
-                    input.mouse_button(1));
+    animator.update(delta_time, walking_speed, anim_state, not_grounded_anymore,
+                    local_mouse_pos, input.mouse_button(1));
 
     //////          Collision Detection         //////
-    if (!grounded) {
+    if (not_grounded_anymore || !grounded) {
         // Find closest point on gorund
         glm::vec2 foot_pos_world[2];
         float distance_to_ground[2];
@@ -88,7 +87,13 @@ void Player::update(float delta_time, const BoxCollider& ground,
         glm::vec2 move =
             scale * animator.limb_animators[animator.grounded_leg_index]
                         .last_tip_movement;
-        pos -= move;
+        if (not_grounded_anymore) {
+            grounded = false;
+            velocity = move;
+        } else {
+            velocity = glm::vec2(0.0f);
+            pos -= move;
+        }
     }
 
     update_model_matrix();
