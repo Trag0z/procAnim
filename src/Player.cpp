@@ -81,13 +81,10 @@ void Player::update(float delta_time, const BoxCollider& ground,
         if (distance_to_ground[closer_to_ground] <= 0.0f) {
             pos.y -= distance_to_ground[closer_to_ground];
             grounded = true;
-        } else {
-            grounded = false;
         }
     }
 
     if (grounded) {
-        // @CLEANUP: This is so ugly with all the casting
         glm::vec2 move =
             scale * animator.limb_animators[animator.grounded_leg_index]
                         .last_tip_movement;
