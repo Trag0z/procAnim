@@ -273,6 +273,39 @@ void SplineEditor::init(const Entity* parent_, Spline* splines_,
     circle_vao.init(circle_indices, CIRCLE_SEGMENTS, nullptr, CIRCLE_SEGMENTS);
 }
 
+void SplineEditor::set_spline_point(glm::vec2 p, size_t point_index,
+                                    size_t spline_index) {
+    if (point_index == -1) {
+        SDL_assert(selected_point_index != -1);
+        point_index = selected_point_index;
+    }
+    if (spline_index == -1) {
+        SDL_assert(selected_spline_index != -1);
+        spline_index = selected_spline_index;
+    }
+
+    splines[spline_index].points[point_index] = p;
+    // @OPTIMIZATION: Is called way more often than it needs to be
+    splines[spline_index].update_render_data();
+
+    // Conditionally set points on other splines as well
+    bool updated = false;
+    auto& partner_spline = splines[partner_index(spline_index)];
+    if (connect_point_pairs &&
+        (point_index == Spline::P1 || point_index == Spline::P2)) {
+        partner_spline.points[3 - point_index] = p;
+        updated = true;
+    }
+    if (connect_tangent_pairs &&
+        (point_index == Spline::T1 || point_index == Spline::T2)) {
+        partner_spline.points[3 - point_index] = p;
+        updated = true;
+    }
+
+    if (updated)
+        partner_spline.update_render_data();
+}
+
 void SplineEditor::init(const Entity* parent_, Spline* splines_,
                         size_t num_splines_, const std::string* spline_names_,
                         const Bone* limb_bones_[4][2]) {
@@ -309,19 +342,8 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
 
         if (!first_point_set && input.mouse_button_down(1)) {
             // Set all points to mouse position and return
-            for (auto& p : selected_spline.points) {
-                p = mouse_pos;
-            }
-            selected_spline.update_render_data();
-
-            if (connect_point_pairs) {
-                // Also set partner points
-                for (auto& p :
-                     splines[partner_index(selected_spline_index)].points) {
-                    p = mouse_pos;
-                }
-                splines[partner_index(selected_spline_index)]
-                    .update_render_data();
+            for (size_t i = 0; i < Spline::num_points; ++i) {
+                set_spline_point(mouse_pos, i);
             }
             first_point_set = true;
             return;
@@ -329,29 +351,15 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
 
         // Set P2 to mouse position and the others to points along the
         // way from P1 to P2 and return
-        selected_spline.points[Spline::P2] = mouse_pos;
-
+        set_spline_point(mouse_pos, Spline::P2);
         glm::vec2 start_to_end = selected_spline.points[Spline::P2] -
                                  selected_spline.points[Spline::P1];
-        selected_spline.points[Spline::T1] =
-            selected_spline.points[Spline::P1] + start_to_end * 0.3f;
-        selected_spline.points[Spline::T2] =
-            selected_spline.points[Spline::P2] - start_to_end * 0.3f;
-        selected_spline.update_render_data();
-
-        if (connect_point_pairs) {
-            auto& partner_spline =
-                splines[partner_index(selected_spline_index)];
-
-            partner_spline.points[Spline::P1] = mouse_pos;
-
-            partner_spline.points[Spline::T2] =
-                partner_spline.points[Spline::P2] + start_to_end * 0.3f;
-            partner_spline.points[Spline::T1] =
-                partner_spline.points[Spline::P1] - start_to_end * 0.3f;
-
-            partner_spline.update_render_data();
-        }
+        set_spline_point(selected_spline.points[Spline::P1] +
+                             start_to_end * 0.3f,
+                         Spline::T1);
+        set_spline_point(selected_spline.points[Spline::P2] -
+                             start_to_end * 0.3f,
+                         Spline::T2);
 
         if (input.mouse_button_down(1)) {
             creating_new_spline = false;
@@ -378,34 +386,20 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
         }
     }
 
-    if (selected_point_index < 4) {
-        auto move_points = [mouse_pos](Spline& spline, size_t point_index) {
-            auto& p = spline.points[point_index];
-            // If P1 or P2 is selected, also move T1 or T2, respectively
-            if (point_index == 0) {
-                glm::vec2 move = mouse_pos - p;
-                spline.points[1] += move;
-            } else if (point_index == 3) {
-                glm::vec2 move = mouse_pos - p;
-                spline.points[2] += move;
-            }
+    if (selected_point_index < Spline::num_points) {
+        // Move the selected point (and it's tangent, if it's P1/P2) to the
+        // mouse position
+        auto& spline = splines[selected_spline_index];
+        if (selected_point_index == Spline::P1) {
+            glm::vec2 move = mouse_pos - spline.points[Spline::P1];
+            set_spline_point(spline.points[Spline::T1] + move, Spline::T1);
 
-            p = mouse_pos;
-
-            spline.update_render_data();
-        };
-
-        move_points(splines[selected_spline_index], selected_point_index);
-
-        if (connect_point_pairs) {
-            if (!connect_tangent_pairs &&
-                (selected_point_index == 1 || selected_point_index == 2))
-                return;
-
-            // Also move partner points/tangents
-            move_points(splines[partner_index(selected_spline_index)],
-                        3 - selected_point_index);
+        } else if (selected_point_index == Spline::P2) {
+            glm::vec2 move = mouse_pos - spline.points[Spline::P2];
+            set_spline_point(spline.points[Spline::T2] + move, Spline::T2);
         }
+
+        set_spline_point(mouse_pos);
     }
 }
 
@@ -456,6 +450,7 @@ void SplineEditor::update_gui(bool& spline_edit_mode) {
     NewLine();
     Checkbox("Connect point pairs", &connect_point_pairs);
     Checkbox("Connect tangent pairs", &connect_tangent_pairs);
+    Checkbox("Mirror to opposing limb", &mirror_to_opposing_limb);
 
     if (selected > -1) {
         const float sensitivity = 0.1f;

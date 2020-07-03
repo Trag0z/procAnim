@@ -46,6 +46,7 @@ class SplineEditor {
     bool first_point_set = false;
     bool connect_point_pairs = true;
     bool connect_tangent_pairs = false;
+    bool mirror_to_opposing_limb = false;
 
     static const size_t MAX_SPLINE_NAME_LENGTH = 32;
     std::vector<std::string> spline_names;
@@ -59,6 +60,10 @@ class SplineEditor {
 
     void save_splines(bool get_new_file_path = false);
     void load_splines();
+
+    void set_spline_point(glm::vec2 p,
+                          size_t point_index = static_cast<size_t>(-1),
+                          size_t spline_index = static_cast<size_t>(-1));
 
   public:
     void init(const Entity* parent_, Spline* splines_,
