@@ -38,6 +38,7 @@ class SplineEditor {
     const Entity* parent = nullptr;
     Spline* splines = nullptr;
     size_t num_splines;
+    const Bone* limb_bones[4][2];
 
     size_t selected_point_index = static_cast<size_t>(-1);
     size_t selected_spline_index = static_cast<size_t>(-1);
@@ -54,7 +55,6 @@ class SplineEditor {
     static const size_t MAX_SAVE_PATH_LENGTH = 128;
     char* save_path = nullptr;
 
-    const Bone* limb_bones[4][2];
     static const size_t CIRCLE_SEGMENTS = 30;
     VertexArray<DebugShader::Vertex> circle_vao;
 

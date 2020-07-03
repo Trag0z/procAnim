@@ -289,21 +289,63 @@ void SplineEditor::set_spline_point(glm::vec2 p, size_t point_index,
     splines[spline_index].update_render_data();
 
     // Conditionally set points on other splines as well
-    bool updated = false;
-    auto& partner_spline = splines[partner_index(spline_index)];
-    if (connect_point_pairs &&
-        (point_index == Spline::P1 || point_index == Spline::P2)) {
-        partner_spline.points[3 - point_index] = p;
-        updated = true;
-    }
-    if (connect_tangent_pairs &&
-        (point_index == Spline::T1 || point_index == Spline::T2)) {
-        partner_spline.points[3 - point_index] = p;
-        updated = true;
+    {
+        bool updated = false;
+        auto& partner_spline = splines[partner_index(spline_index)];
+        if (connect_point_pairs &&
+            (point_index == Spline::P1 || point_index == Spline::P2)) {
+            partner_spline.points[3 - point_index] = p;
+            updated = true;
+        }
+        if (connect_tangent_pairs &&
+            (point_index == Spline::T1 || point_index == Spline::T2)) {
+            partner_spline.points[3 - point_index] = p;
+            updated = true;
+        }
+
+        if (updated)
+            partner_spline.update_render_data();
     }
 
-    if (updated)
-        partner_spline.update_render_data();
+    // Same for other limb on other side
+    if (mirror_to_opposing_limb) {
+        size_t mirror_limb_spline_index;
+        if (spline_index < 4 || (spline_index >= 8 && spline_index < 12)) {
+            mirror_limb_spline_index = spline_index + 4;
+        } else {
+            mirror_limb_spline_index = spline_index - 4;
+        }
+
+        glm::vec2 mirrored_limb_point =
+            p +
+            glm::vec2(limb_bones[mirror_limb_spline_index / 4][0]
+                          ->bind_pose_transform[2] -
+                      limb_bones[spline_index / 4][0]->bind_pose_transform[2]);
+
+        // Does the same as above, but with mirror_limb_spline_index instead of
+        // spline_index
+        splines[mirror_limb_spline_index].points[point_index] =
+            mirrored_limb_point;
+        splines[mirror_limb_spline_index].update_render_data();
+
+        // Conditionally set points on other splines as well
+        bool updated = false;
+        auto& other_partner_spline =
+            splines[partner_index(mirror_limb_spline_index)];
+        if (connect_point_pairs &&
+            (point_index == Spline::P1 || point_index == Spline::P2)) {
+            other_partner_spline.points[3 - point_index] = mirrored_limb_point;
+            updated = true;
+        }
+        if (connect_tangent_pairs &&
+            (point_index == Spline::T1 || point_index == Spline::T2)) {
+            other_partner_spline.points[3 - point_index] = mirrored_limb_point;
+            updated = true;
+        }
+
+        if (updated)
+            other_partner_spline.update_render_data();
+    }
 }
 
 void SplineEditor::init(const Entity* parent_, Spline* splines_,
