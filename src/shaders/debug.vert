@@ -7,5 +7,5 @@ uniform mat3 model;
 void main()
 {
     vec3 sim_pos = camera * model * vec3(pos, 1.0f);
-    gl_Position = vec4(sim_pos.x, sim_pos.y, 0.0f, sim_pos.z);
+    gl_Position = vec4(sim_pos.x, sim_pos.y, 0.0f, 1.0f);
 }

@@ -7,7 +7,7 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
                   const char* texture_path, const char* mesh_path,
                   Gamepad* pad) {
     Entity::init(position, scale_);
-    tex = Texture::load_from_file(texture_path);
+    tex.load_from_file(texture_path);
     rigged_mesh.load_from_file(mesh_path);
     animator.init(this, rigged_mesh);
     SDL_assert(pad);

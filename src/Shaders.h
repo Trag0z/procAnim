@@ -49,6 +49,18 @@ class RiggedShader : public Shader {
     };
 };
 
+class TexturedShader : public Shader {
+  public:
+    TexturedShader() {}
+    TexturedShader(const char* vert_path, const char* frag_path)
+        : Shader(vert_path, frag_path) {}
+
+    struct Vertex {
+        glm::vec2 pos;
+        glm::vec2 uv_coord;
+    };
+};
+
 class DebugShader : public Shader {
     GLuint color_loc;
 

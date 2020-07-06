@@ -5,7 +5,7 @@ layout (location = 1) in vec2 in_uv_coord;
 uniform mat3 camera;
 uniform mat3 model;
 
-out vec2 uv_coord;
+out vec2 uv_coord; 
 
 void main()
 {

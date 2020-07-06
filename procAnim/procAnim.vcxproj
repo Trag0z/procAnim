@@ -145,6 +145,7 @@
     <ClCompile Include="..\include\imgui\imgui_impl_sdl.cpp" />
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\src\Animator.cpp" />
+    <ClCompile Include="..\src\Background.cpp" />
     <ClCompile Include="..\src\Collider.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\Input.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
     <ClInclude Include="..\src\Animator.h" />
+    <ClInclude Include="..\src\Background.h" />
     <ClInclude Include="..\src\Collider.h" />
     <ClInclude Include="..\src\Colors.h" />
     <ClInclude Include="..\src\DebugCallback.h" />

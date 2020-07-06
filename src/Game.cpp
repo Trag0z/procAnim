@@ -64,7 +64,7 @@ void Game::init() {
                               nullptr, GL_TRUE);
     }
 
-    // Setup Dear ImGui context
+    // Setup ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
@@ -73,12 +73,13 @@ void Game::init() {
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Initialize member variables
-
     renderer.init();
 
     mouse_keyboard_input.init(window_size.y);
 
     gamepads = Gamepad::init();
+
+    background.init("../assets/background.png");
 
     // Player
     glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
@@ -157,7 +158,7 @@ bool Game::run() {
             player.update(game_config.speed, ground, mouse_keyboard_input);
         }
 
-        renderer.render(window, player, ground);
+        renderer.render(window, background, player, ground);
 
         // Wait for next frame
         U32 last_frame_time = SDL_GetTicks() - frame_start;

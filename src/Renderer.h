@@ -1,10 +1,11 @@
 #pragma once
 #include "pch.h"
 #include "Shaders.h"
-#include "Player.h"
+#include "Texture.h"
 
 class Player;
 struct BoxCollider;
+class Background;
 
 class Renderer {
     glm::vec2 window_size_ = {1920.0f, 1080.0f};
@@ -13,10 +14,12 @@ class Renderer {
 
   public:
     RiggedShader rigged_shader;
+    TexturedShader textured_shader;
     DebugShader debug_shader;
 
     void init();
-    void render(SDL_Window* window, Player& player, BoxCollider& ground);
+    void render(SDL_Window* window, Background& background, Player& player,
+                BoxCollider& ground);
 
     inline glm::vec2 window_size() const { return window_size_; }
 

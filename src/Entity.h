@@ -13,7 +13,8 @@ class Entity {
         model = glm::translate(glm::mat3(1.0f), position_);
         model = glm::scale(model, scale);
     }
-    void init(glm::vec2 pos_, glm::vec2 scale_,
+    void init(glm::vec2 pos_ = glm::vec2(0.0f),
+              glm::vec2 scale_ = glm::vec2(1.0f),
               const Entity* parent_ = nullptr) {
         position_ = pos_;
         scale = scale_;

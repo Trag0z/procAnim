@@ -55,7 +55,6 @@ void VertexArray<RiggedShader::Vertex>::init(
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
 
-    // Upload data to GPU
     glGenVertexArrays(1, &vao_id);
     glBindVertexArray(vao_id);
 
@@ -82,9 +81,40 @@ void VertexArray<RiggedShader::Vertex>::init(
         1, 2, GL_FLOAT, GL_FALSE, sizeof(RiggedShader::Vertex),
         reinterpret_cast<void*>(offsetof(RiggedShader::Vertex, uv_coord)));
     glEnableVertexAttribArray(1);
+}
 
-    // Reset vertex array binding for error safety
-    glBindVertexArray(0);
+void VertexArray<TexturedShader::Vertex>::init(
+    const GLuint* indices, GLuint num_indices,
+    const TexturedShader::Vertex* vertices, GLuint num_vertices) {
+    num_indices_ = num_indices;
+    num_vertices_ = num_vertices;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    // Create index buffer
+    glGenBuffers(1, &ebo_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * num_indices_,
+                 indices, GL_STATIC_DRAW);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(RiggedShader::Vertex) * num_vertices_,
+                 vertices, GL_DYNAMIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(RiggedShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+    // uvCoord attribute
+    glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE, sizeof(RiggedShader::Vertex),
+        reinterpret_cast<void*>(offsetof(RiggedShader::Vertex, uv_coord)));
+    glEnableVertexAttribArray(1);
 }
 
 void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
@@ -94,7 +124,6 @@ void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
 
-    // Upload data to GPU
     glGenVertexArrays(1, &vao_id);
     glBindVertexArray(vao_id);
 
@@ -115,7 +144,4 @@ void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebugShader::Vertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
-
-    // Reset vertex array binding for error safety
-    glBindVertexArray(0);
 }

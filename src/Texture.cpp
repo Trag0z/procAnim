@@ -2,20 +2,19 @@
 #include "pch.h"
 #include "Texture.h"
 
-Texture Texture::load_from_file(const char* path) {
+void Texture::load_from_file(const char* path) {
     SDL_Surface* img = IMG_Load(path);
     SDL_assert(img);
 
-    Texture ret;
-    ret.w = img->w;
-    ret.h = img->h;
+    w = img->w;
+    h = img->h;
 
-    ret.dimensions = {static_cast<float>(ret.w), static_cast<float>(ret.h)};
+    dimensions = {static_cast<float>(w), static_cast<float>(h)};
 
-    glGenTextures(1, &ret.id);
-    glBindTexture(GL_TEXTURE_2D, ret.id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ret.w, ret.h, 0, GL_RGBA,
-                 GL_UNSIGNED_BYTE, img->pixels);
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 img->pixels);
     // NOTE: Is this actually useful?
     // glGenerateMipmap(GL_TEXTURE_2D);
     SDL_FreeSurface(img);
@@ -30,6 +29,4 @@ Texture Texture::load_from_file(const char* path) {
     // @OPTIMIZATION: delete this
     // Unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
-
-    return ret;
 }

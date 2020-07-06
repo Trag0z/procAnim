@@ -8,6 +8,8 @@
 #include "Collider.h"
 #include "Player.h"
 #include "Input.h"
+#include "Background.h"
+#include "Renderer.h"
 
 class Player;
 
@@ -47,6 +49,7 @@ struct Game {
 
     Player player;
     BoxCollider ground;
+    Background background;
 
     void init();
     bool run();
