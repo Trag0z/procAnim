@@ -88,8 +88,7 @@ void Game::init() {
                 &gamepads[0]);
 
     // Ground
-    ground =
-        BoxCollider({position.x, position.y - 400.0f}, {1920.0f / 2.1f, 10.0f});
+    ground = BoxCollider({position.x, position.y - 400.0f}, {10000.0f, 10.0f});
 
     frame_start = SDL_GetTicks();
     running = true;
