@@ -3,7 +3,8 @@
 #include "Animator.h"
 #include "Util.h"
 #include "Mesh.h"
-#include "Game.h"
+// #include "Game.h"
+#include "Renderer.h"
 
 // Takes a target_pos in model space and finds two target_rotations for the
 // bones, so that the tail of bone[1] is at (or at the closest possible point

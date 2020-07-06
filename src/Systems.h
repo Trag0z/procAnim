@@ -105,21 +105,3 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     if (player.spline_edit_mode)
         player.animator.spline_editor.update_gui(player.spline_edit_mode);
 }
-
-inline void render(SDL_Window* window, const Renderer& renderer, Player& player,
-                   BoxCollider& ground) {
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    ground.render(renderer);
-
-    player.render(renderer);
-
-    // Unbind vao for error safety
-    glBindVertexArray(0);
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    SDL_GL_SwapWindow(window);
-};

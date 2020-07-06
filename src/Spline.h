@@ -3,9 +3,10 @@
 #include "Input.h"
 #include "VertexArray.h"
 #include "Entity.h"
-#include "Renderer.h"
+// #include "Renderer.h"
 
 struct Bone;
+class Renderer;
 
 struct Spline {
     static const size_t num_points = 4;

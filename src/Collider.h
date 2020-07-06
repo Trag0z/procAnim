@@ -3,6 +3,8 @@
 #include "VertexArray.h"
 #include "Renderer.h"
 
+class Renderer;
+
 struct BoxCollider {
     glm::vec2 pos;
     glm::vec2 half_ext;

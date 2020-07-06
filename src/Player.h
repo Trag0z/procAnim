@@ -9,8 +9,9 @@
 
 class Gamepad;
 struct GameConfig;
+struct BoxCollider;
 
-class Player : Entity {
+class Player : public Entity {
     Texture tex;
     RiggedMesh rigged_mesh;
     WalkAnimator animator;

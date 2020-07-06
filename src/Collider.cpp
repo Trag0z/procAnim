@@ -25,6 +25,4 @@ void BoxCollider::render(const Renderer& renderer) {
     renderer.debug_shader.set_color(&Colors::ORANGE);
 
     vao.draw(GL_TRIANGLES);
-
-    glm::vec3 sim_pos = renderer.camera * model * glm::vec3(half_ext, 1.0f);
 }

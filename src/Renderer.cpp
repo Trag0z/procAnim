@@ -2,24 +2,36 @@
 #include "pch.h"
 #include "Renderer.h"
 
-// glm::mat3 calculate_camera(float left, float right, float top,
-//                                   float bottom) {
-//     glm::mat3 ret =
-//         glm::translate(glm::mat3(1.0f),
-//                        glm::vec2((left + right) * 0.5f, (top + bottom) *
-//                        0.5f));
-//     ret = glm::scale(ret,
-//                      glm::vec2(2.0f / (left + right), 2.0f / (top +
-//                      bottom)));
-//     return ret;
-// }
+void Renderer::update_camera(const glm::vec2& center) {
+    glm::mat3 cam =
+        glm::scale(glm::mat3(1.0f),
+                   glm::vec2(2.0f / window_size_.x, 2.0f / window_size_.y));
+    cam = glm::translate(cam, -center);
+
+    rigged_shader.set_camera(&cam);
+    debug_shader.set_camera(&cam);
+}
 
 void Renderer::init() {
     rigged_shader = RiggedShader("../src/shaders/rigged.vert",
                                  "../src/shaders/rigged.frag");
-    rigged_shader.set_camera(&camera);
 
     debug_shader =
         DebugShader("../src/shaders/debug.vert", "../src/shaders/debug.frag");
-    debug_shader.set_camera(&camera);
+}
+
+void Renderer::render(SDL_Window* window, Player& player, BoxCollider& ground) {
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    update_camera(player.position() + glm::vec2(0.0f, 200.0f));
+
+    ground.render(*this);
+
+    player.render(*this);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    SDL_GL_SwapWindow(window);
 }

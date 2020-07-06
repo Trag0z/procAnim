@@ -13,9 +13,11 @@ void Game::init() {
     SDL_assert_always(IMG_Init(IMG_INIT_PNG) != 0);
     SDL_assert_always(TTF_Init() == 0);
 
-    window = SDL_CreateWindow(
-        "procAnim", SDL_WINDOWPOS_CENTERED, 0, renderer.window_size().x,
-        renderer.window_size().y, game_config.window_flags);
+    glm::ivec2 window_size = static_cast<glm::ivec2>(renderer.window_size());
+
+    window =
+        SDL_CreateWindow("procAnim", SDL_WINDOWPOS_CENTERED, 0, window_size.x,
+                         window_size.y, game_config.window_flags);
     SDL_assert_always(window);
 
     sdl_renderer = SDL_CreateRenderer(window, -1, 0);
@@ -48,7 +50,7 @@ void Game::init() {
     if (SDL_GL_SetSwapInterval(1) < 0) {
         printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
     }
-    glViewport(0, 0, renderer.window_size().x, renderer.window_size().y);
+    glViewport(0, 0, window_size.x, window_size.y);
     // glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -74,7 +76,7 @@ void Game::init() {
 
     renderer.init();
 
-    mouse_keyboard_input.init(renderer.window_size().y);
+    mouse_keyboard_input.init(window_size.y);
 
     gamepads = Gamepad::init();
 
@@ -155,7 +157,7 @@ bool Game::run() {
             player.update(game_config.speed, ground, mouse_keyboard_input);
         }
 
-        render(window, renderer, player, ground);
+        renderer.render(window, player, ground);
 
         // Wait for next frame
         U32 last_frame_time = SDL_GetTicks() - frame_start;
