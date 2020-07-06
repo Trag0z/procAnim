@@ -27,7 +27,7 @@ void Player::update(float delta_time, const BoxCollider& ground,
 
     if (!grounded) {
         velocity.y -= gravity * delta_time;
-        pos += velocity;
+        position_ += velocity;
         update_model_matrix();
     }
 
@@ -78,7 +78,7 @@ void Player::update(float delta_time, const BoxCollider& ground,
 
         // Set grounded status
         if (distance_to_ground[closer_to_ground] <= 0.0f) {
-            pos.y -= distance_to_ground[closer_to_ground];
+            position_.y -= distance_to_ground[closer_to_ground];
             grounded = true;
         }
     }
@@ -92,7 +92,7 @@ void Player::update(float delta_time, const BoxCollider& ground,
             velocity = move;
         } else {
             velocity = glm::vec2(0.0f);
-            pos -= move;
+            position_ -= move;
         }
     }
 

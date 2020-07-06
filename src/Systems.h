@@ -35,11 +35,12 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
 
     char label[64];
 
-    sprintf_s(label, "% 6.1f, % 6.1f", player.pos.x, player.pos.y);
+    sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x, player.position_.y);
     Text("Player position: ");
     SameLine();
-    bool changed_value = DragFloat2("Player position", value_ptr(player.pos),
-                                    1.0f, 0.0f, 0.0f, "% .2f");
+    bool changed_value =
+        DragFloat2("Player position", value_ptr(player.position_), 1.0f, 0.0f,
+                   0.0f, "% .2f");
     if (changed_value) {
         player.grounded = false;
     }
