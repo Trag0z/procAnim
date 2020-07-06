@@ -1,6 +1,7 @@
 NEXT:
-- decouple player body movement from foot ground movement
-- make the sprinting animation look nicer
+- background, player stays centered
+- fix arm spastics
+
 
 TODO:
 - revert laptop compat changes

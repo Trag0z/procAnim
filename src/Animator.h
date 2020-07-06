@@ -22,8 +22,11 @@ struct LimbAnimator {
     float spline_interpolation_factor = 0.0f;
     float lerp_interpolation_factor = 1.0f;
 
-    static const float walking_speed_multiplier;
     static const float lerp_speed_multiplier;
+    // @CLEANUP: Rename this?
+    static const struct WalkSpeedMultiplier {
+        float min, max;
+    } walking_speed_multiplier;
 
     glm::vec2 target_pos, tip_pos;
     glm::vec2 last_tip_movement;
@@ -47,6 +50,9 @@ struct LimbAnimator {
 
 class WalkAnimator {
     Spline splines[16];
+    Bone* spine;
+
+    static const float max_spine_rotation;
 
   public:
     SplineEditor spline_editor;

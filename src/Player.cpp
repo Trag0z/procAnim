@@ -100,7 +100,6 @@ void Player::update(float delta_time, const BoxCollider& ground,
 }
 
 void Player::render(const Renderer& renderer) {
-
     RiggedMesh& rm = rigged_mesh;
 
     // Calculate bone transforms from their rotations

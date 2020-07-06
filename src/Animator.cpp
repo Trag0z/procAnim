@@ -142,8 +142,9 @@ static void solve_ik(Bone* const bones[2],
     }
 }
 
-const float LimbAnimator::walking_speed_multiplier = 0.3f;
 const float LimbAnimator::lerp_speed_multiplier = 0.02f;
+const LimbAnimator::WalkSpeedMultiplier LimbAnimator::walking_speed_multiplier =
+    {0.02f, 0.1f};
 
 LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* s,
                            BoneRestrictions restrictions[2]) {
@@ -170,9 +171,12 @@ LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* s,
 }
 
 void LimbAnimator::update(float delta_time, float walking_speed) {
+    float interpolation_speed = walking_speed_multiplier.min +
+                                walking_speed * (walking_speed_multiplier.max -
+                                                 walking_speed_multiplier.min);
+
     lerp_interpolation_factor = std::min(
-        lerp_interpolation_factor + delta_time * walking_speed_multiplier,
-        1.0f);
+        lerp_interpolation_factor + delta_time * interpolation_speed, 1.0f);
 
     if (animation_state == NEUTRAL) {
         // @CLEANUP: Maybe save the default bone position somewhere?
@@ -182,10 +186,9 @@ void LimbAnimator::update(float delta_time, float walking_speed) {
         target_rotations[1] = 0.0f;
 
     } else {
-        spline_interpolation_factor =
-            std::min(spline_interpolation_factor +
-                         delta_time * walking_speed * walking_speed_multiplier,
-                     1.0f);
+        spline_interpolation_factor = std::min(
+            spline_interpolation_factor + delta_time * interpolation_speed,
+            1.0f);
 
         target_pos = splines[animation_state].get_point_on_spline(
             spline_interpolation_factor);
@@ -215,10 +218,18 @@ void LimbAnimator::update(float delta_time, float walking_speed) {
     tip_pos = new_tip_pos;
 }
 
+//                              //
+//          WalkAnimator        //
+//                              //
+
+const float WalkAnimator::max_spine_rotation = -0.25 * PI;
+
 void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
     for (auto& s : splines) {
         s.init();
     }
+
+    spine = mesh.find_bone("Spine");
 
     BoneRestrictions restrictions[2] = {{-0.5f * PI, 0.5 * PI},
                                         {0.0f, 0.75f * PI}};
@@ -282,6 +293,8 @@ void WalkAnimator::update(float delta_time, float walking_speed,
     };
 
     if (state == AnimState::WALKING) {
+        spine->rotation = walking_speed * max_spine_rotation;
+
         if (leg_state == NEUTRAL) {
             // Starting to walk
             leg_state = RIGHT_LEG_UP;
@@ -330,6 +343,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
         }
     } else { // Player is standing
         if (leg_state != NEUTRAL) {
+            spine->rotation = 0.0f;
             not_grounded_anymore = true;
             leg_state = NEUTRAL;
             for (auto& anim : limb_animators) {
