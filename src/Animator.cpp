@@ -3,7 +3,6 @@
 #include "Animator.h"
 #include "Util.h"
 #include "Mesh.h"
-// #include "Game.h"
 #include "Renderer.h"
 
 // Takes a target_pos in model space and finds two target_rotations for the
@@ -27,7 +26,8 @@ static void solve_ik(Bone* const bones[2],
                                glm::vec3(target_pos, 1.0f);
 
     float target_distance = glm::length(glm::vec3(target_pos, 1.0f) -
-                                        bones[0]->bind_pose_transform[2]);
+                                        bones[0]->get_transform() *
+                                            bones[0]->bind_pose_transform[2]);
 
     // Find out if min_rotation or max_rotation is closer to the
     // target_rotations and set target_rotations to the closer one if it is out

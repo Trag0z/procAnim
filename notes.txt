@@ -1,6 +1,4 @@
 NEXT:
-- background, player stays centered
-- fix arm spastics
 
 
 TODO:
