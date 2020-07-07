@@ -1,5 +1,6 @@
 NEXT:
-
+- leans forward too much on slow speeds
+- right arm spastics
 
 TODO:
 - revert laptop compat changes

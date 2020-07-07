@@ -42,9 +42,9 @@ class MouseKeyboardInput {
     inline bool key_up(SDL_Scancode key) const { return key_up_[key]; }
     inline bool key_down(SDL_Scancode key) const { return key_down_[key]; }
 
-     glm::vec2 mouse_world_pos() const;
+    glm::vec2 mouse_world_pos() const;
 
-     glm::vec2 mouse_screen_pos() const;
+    glm::vec2 mouse_screen_pos() const;
 };
 
 enum StickID { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };
