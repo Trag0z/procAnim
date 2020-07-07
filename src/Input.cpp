@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Input.h"
+#include "Renderer.h"
 
 void MouseKeyboardInput::update() {
     // Update mouse
@@ -52,6 +53,16 @@ std::array<Gamepad, Gamepad::num_pads> Gamepad::init() {
         }
     }
     return ret;
+}
+
+glm::vec2 MouseKeyboardInput::mouse_world_pos() const {
+    return renderer->camera_position() + mouse_screen_pos();
+}
+
+glm::vec2 MouseKeyboardInput::mouse_screen_pos() const {
+    return glm::vec2(static_cast<float>(mouse_pos.x),
+                     renderer->window_size().y -
+                         static_cast<float>(mouse_pos.y));
 }
 
 void Gamepad::update() {

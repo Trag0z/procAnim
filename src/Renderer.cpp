@@ -31,11 +31,11 @@ void Renderer::render(SDL_Window* window, Background& background,
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glm::vec2 camera_position = player.position() + glm::vec2(0.0f, 200.0f);
+    camera_center = player.position() + glm::vec2(0.0f, 200.0f);
 
-    update_camera(camera_position);
+    update_camera(camera_center);
 
-    background.render(*this, camera_position);
+    background.render(*this, camera_center);
 
     ground.render(*this);
 
@@ -45,4 +45,10 @@ void Renderer::render(SDL_Window* window, Background& background,
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     SDL_GL_SwapWindow(window);
+}
+
+glm::vec2 Renderer::window_size() const noexcept { return window_size_; }
+
+glm::vec2 Renderer::camera_position() const noexcept {
+    return camera_center - window_size_ * 0.5f;
 }

@@ -75,7 +75,7 @@ void Game::init() {
     // Initialize member variables
     renderer.init();
 
-    mouse_keyboard_input.init(window_size.y);
+    mouse_keyboard_input.init(&renderer);
 
     gamepads = Gamepad::init();
 

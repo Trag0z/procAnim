@@ -3,6 +3,8 @@
 #include "Types.h"
 #include "Util.h"
 
+class Renderer;
+
 class MouseKeyboardInput {
     const static uint num_mouse_buttons = 3;
     const Uint8* sdl_keyboard;
@@ -12,16 +14,16 @@ class MouseKeyboardInput {
     uint mouse_button_map, mouse_button_down_map, mouse_button_up_map;
     glm::ivec2 mouse_pos;
 
-    int window_height;
+    const Renderer* renderer;
 
   public:
-    inline void init(int window_height_) {
+    inline void init(const Renderer* renderer_) {
         sdl_keyboard = SDL_GetKeyboardState(&num_keys);
         key_ = (bool*)malloc(sizeof(bool) * (num_keys * 3));
         key_down_ = key_ + num_keys;
         key_up_ = key_down_ + num_keys;
 
-        window_height = window_height_;
+        renderer = renderer_;
     }
 
     void update();
@@ -40,10 +42,9 @@ class MouseKeyboardInput {
     inline bool key_up(SDL_Scancode key) const { return key_up_[key]; }
     inline bool key_down(SDL_Scancode key) const { return key_down_[key]; }
 
-    inline glm::vec2 mouse_world_pos() const {
-        return glm::vec2(static_cast<float>(mouse_pos.x),
-                         static_cast<float>(window_height - mouse_pos.y));
-    }
+     glm::vec2 mouse_world_pos() const;
+
+     glm::vec2 mouse_screen_pos() const;
 };
 
 enum StickID { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };
