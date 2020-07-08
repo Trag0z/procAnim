@@ -15,7 +15,7 @@ void Game::init() {
 
     glm::ivec2 window_size = static_cast<glm::ivec2>(renderer.window_size());
 
-    window = SDL_CreateWindow("procAnim", 3840, 700, window_size.x,
+    window = SDL_CreateWindow("procAnim", 3840, 956, window_size.x,
                               window_size.y, game_config.window_flags);
     SDL_assert_always(window);
 

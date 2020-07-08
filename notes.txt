@@ -1,5 +1,8 @@
 NEXT:
-- right arm spastics?
+- idle position (or even animation?)
+- uneven ground
+    > ground editor?
+    > find good point on ground
 
 TODO:
 - revert laptop compat changes
