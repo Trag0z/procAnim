@@ -346,12 +346,15 @@ void WalkAnimator::update(float delta_time, float walking_speed,
     } else { // Player is standing
         if (leg_state != NEUTRAL) {
             spine->rotation = 0.0f;
-            not_grounded_anymore = true;
             leg_state = NEUTRAL;
             for (auto& anim : limb_animators) {
                 anim.animation_state = LimbAnimator::NEUTRAL;
             }
             set_interpolations(0.0f, 0.0f);
+        } else if (limb_animators[0].lerp_interpolation_factor != 1.0f) {
+            // Keep player not grounded until the legs have fully returned to
+            // their neutral position
+            not_grounded_anymore = true;
         }
     }
 

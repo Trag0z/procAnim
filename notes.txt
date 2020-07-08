@@ -1,6 +1,4 @@
 NEXT:
-- bug: floats sometimes after running
-
 - right arm spastics?
 
 TODO:
