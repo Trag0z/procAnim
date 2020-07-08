@@ -1,6 +1,7 @@
 NEXT:
-- right arm spastics
 - bug: floats sometimes after running
+
+- right arm spastics?
 
 TODO:
 - revert laptop compat changes

@@ -8,7 +8,7 @@ struct BoxCollider;
 class Background;
 
 class Renderer {
-    glm::vec2 window_size_ = {1920.0f, 1080.0f};
+    glm::vec2 window_size_ = {1920.0f, 1200.0f};
     glm::vec2 camera_center = {0.0f, 0.0f};
 
     void update_camera(const glm::vec2& center);
