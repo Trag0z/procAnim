@@ -1,6 +1,6 @@
 NEXT:
-- leans forward too much on slow speeds
 - right arm spastics
+- bug: floats sometimes after running
 
 TODO:
 - revert laptop compat changes

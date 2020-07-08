@@ -294,7 +294,8 @@ void WalkAnimator::update(float delta_time, float walking_speed,
     };
 
     if (state == AnimState::WALKING) {
-        spine->rotation = walking_speed * max_spine_rotation;
+        spine->rotation =
+            std::max(walking_speed - 0.2f, 0.0f) * max_spine_rotation;
 
         if (leg_state == NEUTRAL) {
             // Starting to walk
