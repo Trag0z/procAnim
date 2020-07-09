@@ -1,5 +1,4 @@
 NEXT:
-- idle position (or even animation?)
 - uneven ground
     > ground editor?
     > find good point on ground

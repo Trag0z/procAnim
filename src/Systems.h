@@ -16,7 +16,7 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     Checkbox("Render player model", &renderer.draw_models);
     Checkbox("Render wireframes", &renderer.draw_wireframes);
     Checkbox("Render bones", &renderer.draw_bones);
-    Checkbox("Render splines", &renderer.draw_splines);
+    Checkbox("Render all splines", &renderer.draw_all_splines);
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
@@ -33,7 +33,7 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     //////          Limb data display window            //////
     Begin("Limb data", NULL);
 
-    char label[64];
+    char label[128];
 
     sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x, player.position_.y);
     Text("Player position: ");

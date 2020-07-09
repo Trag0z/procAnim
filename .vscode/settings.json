@@ -34,6 +34,8 @@
         "map": "cpp",
         "set": "cpp",
         "unordered_map": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "limits": "cpp",
+        "xloctime": "cpp"
     }
 }

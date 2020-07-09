@@ -28,5 +28,5 @@ class Renderer {
     bool draw_models = true;
     bool draw_bones = true;
     bool draw_wireframes = false;
-    bool draw_splines = false;
+    bool draw_all_splines = false;
 };

@@ -12,44 +12,66 @@ struct BoneRestrictions {
     float min_rotation, max_rotation;
 };
 
+struct Animation {
+    static const size_t MAX_NAME_LENGTH = 32;
+    static const size_t NUM_SPLINES = 8;
+
+    char name[MAX_NAME_LENGTH];
+    Spline splines[NUM_SPLINES];
+
+    enum SplineIndex {
+        LEFT_ARM_FORWARD = 0,
+        LEFT_ARM_BACKWARD = 1,
+        RIGHT_ARM_FORWARD = 2,
+        RIGHT_ARM_BACKWARD = 3,
+        LEFT_LEG_FORWARD = 4,
+        LEFT_LEG_BACKWARD = 5,
+        RIGHT_LEG_FORWARD = 6,
+        RIGHT_LEG_BACKWARD = 7
+    };
+};
+
+enum AnimationIndex { IDLE = 0, WALK = 1, RUN = 2 };
+
 struct LimbAnimator {
     Bone* bones[2];
     BoneRestrictions bone_restrictions[2];
 
-    // Points to array of two splines, one for moving the limb forward and one
-    // for moving it back
-    Spline* splines;
+    // 3 different animations, consisting of 2 splines each (forward/backward)
+    Spline* splines[3];
     float spline_interpolation_factor = 0.0f;
     float lerp_interpolation_factor = 1.0f;
 
-    static const float lerp_speed_multiplier;
+    static const float LERP_SPEED_MULTIPLIER;
     // @CLEANUP: Rename this?
-    static const struct WalkSpeedMultiplier {
-        float min, max;
-    } walking_speed_multiplier;
+    static const struct WalkingSpeedMultiplier {
+        float MIN, MAX;
+    } WALKING_SPEED_MULTIPLIER;
+
+    static const float IDLE_LERP_SPEED_MULTIPLIER;
 
     glm::vec2 target_pos, tip_pos;
     glm::vec2 last_tip_movement;
 
     float target_rotations[2];
 
+    bool is_walking = false;
+    enum AnimationState {
+        MOVE_FORWARD = 0,
+        MOVE_BACKWARD = 1
+    } animation_state = MOVE_FORWARD;
+
     VertexArray<DebugShader::Vertex> target_point_vao;
 
     LimbAnimator() {}
-    LimbAnimator(Bone* b1, Bone* b2, Spline* s,
+    LimbAnimator(Bone* b1, Bone* b2, Spline* splines_[3],
                  BoneRestrictions restrictions[2] = nullptr);
 
     void update(float delta_time, float movement_speed);
-
-    enum AnimationState {
-        MOVE_FORWARD = 0,
-        MOVE_BACKWARD = 1,
-        NEUTRAL = 2
-    } animation_state = NEUTRAL;
 };
 
 class WalkAnimator {
-    Spline splines[16];
+    Animation animations[3];
     Bone* spine;
 
     static const float max_spine_rotation;

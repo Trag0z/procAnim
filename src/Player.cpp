@@ -175,6 +175,6 @@ void Player::render(const Renderer& renderer) {
     animator.render(renderer);
 
     // Render Splines
-    if (renderer.draw_splines || spline_edit_mode)
+    if (renderer.draw_all_splines || spline_edit_mode)
         animator.spline_editor.render(renderer, spline_edit_mode);
 }

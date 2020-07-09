@@ -143,15 +143,19 @@ static void solve_ik(Bone* const bones[2],
     }
 }
 
-const float LimbAnimator::lerp_speed_multiplier = 0.02f;
-const LimbAnimator::WalkSpeedMultiplier LimbAnimator::walking_speed_multiplier =
-    {0.02f, 0.1f};
+const float LimbAnimator::LERP_SPEED_MULTIPLIER = 0.02f;
+const LimbAnimator::WalkingSpeedMultiplier
+    LimbAnimator::WALKING_SPEED_MULTIPLIER = {0.02f, 0.1f};
+const float LimbAnimator::IDLE_LERP_SPEED_MULTIPLIER = 0.02f;
 
-LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* s,
+LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* splines_[3],
                            BoneRestrictions restrictions[2]) {
     bones[0] = b1;
     bones[1] = b2;
-    splines = s;
+
+    splines[0] = splines_[0];
+    splines[1] = splines_[1];
+    splines[2] = splines_[2];
 
     if (restrictions == nullptr) {
         bone_restrictions[0] = {std::numeric_limits<float>::min(),
@@ -172,30 +176,23 @@ LimbAnimator::LimbAnimator(Bone* b1, Bone* b2, Spline* s,
 }
 
 void LimbAnimator::update(float delta_time, float walking_speed) {
-    float interpolation_speed = walking_speed_multiplier.min +
-                                walking_speed * (walking_speed_multiplier.max -
-                                                 walking_speed_multiplier.min);
-
+    float interpolation_speed = WALKING_SPEED_MULTIPLIER.MIN +
+                                walking_speed * (WALKING_SPEED_MULTIPLIER.MAX -
+                                                 WALKING_SPEED_MULTIPLIER.MIN);
     lerp_interpolation_factor = std::min(
         lerp_interpolation_factor + delta_time * interpolation_speed, 1.0f);
 
-    if (animation_state == NEUTRAL) {
-        // @CLEANUP: Maybe save the default bone position somewhere?
-        target_pos = bones[1]->get_transform() * bones[1]->bind_pose_transform *
-                     glm::vec3(bones[1]->tail, 1.0f);
-        target_rotations[0] = 0.0f;
-        target_rotations[1] = 0.0f;
-
-    } else {
+    if (is_walking) {
         spline_interpolation_factor = std::min(
             spline_interpolation_factor + delta_time * interpolation_speed,
             1.0f);
 
-        target_pos = splines[animation_state].get_point_on_spline(
-            spline_interpolation_factor);
+        target_pos =
+            splines[AnimationIndex::WALK][animation_state].get_point_on_spline(
+                spline_interpolation_factor);
 
         glm::vec2 to_fast_spline =
-            splines[animation_state + 2].get_point_on_spline(
+            splines[AnimationIndex::RUN][animation_state].get_point_on_spline(
                 spline_interpolation_factor) -
             target_pos;
 
@@ -203,9 +200,28 @@ void LimbAnimator::update(float delta_time, float walking_speed) {
         SDL_assert(walking_speed >= 0.0f && walking_speed <= 1.0f);
 
         target_pos += to_fast_spline * walking_speed;
+    } else {
+        spline_interpolation_factor =
+            std::min(spline_interpolation_factor +
+                         delta_time * IDLE_LERP_SPEED_MULTIPLIER,
+                     1.0f);
 
-        solve_ik(bones, bone_restrictions, target_pos, target_rotations);
+        target_pos =
+            splines[AnimationIndex::IDLE][animation_state].get_point_on_spline(
+                spline_interpolation_factor);
+        if (spline_interpolation_factor == 1.0f) {
+            // Switch animation direction
+            spline_interpolation_factor = 0.0f;
+            if (animation_state == MOVE_FORWARD) {
+                animation_state = MOVE_BACKWARD;
+            } else {
+                animation_state = MOVE_FORWARD;
+            }
+        }
     }
+
+    solve_ik(bones, bone_restrictions, target_pos, target_rotations);
+
     bones[0]->rotation = lerp(bones[0]->rotation, target_rotations[0],
                               lerp_interpolation_factor);
     bones[1]->rotation = lerp(bones[1]->rotation, target_rotations[1],
@@ -226,39 +242,40 @@ void LimbAnimator::update(float delta_time, float walking_speed) {
 const float WalkAnimator::max_spine_rotation = -0.25 * PI;
 
 void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
-    for (auto& s : splines) {
-        s.init();
-    }
-
     spine = mesh.find_bone("Spine");
+
+    Spline* animator_splines[3];
+    auto set_animator_splines = [&animator_splines, &anims = animations](
+                                    Animation::SplineIndex spline_index) {
+        animator_splines[0] = &anims[0].splines[spline_index];
+        animator_splines[1] = &anims[1].splines[spline_index];
+        animator_splines[2] = &anims[2].splines[spline_index];
+    };
 
     BoneRestrictions restrictions[2] = {{-0.5f * PI, 0.5 * PI},
                                         {0.0f, 0.75f * PI}};
+    set_animator_splines(Animation::LEFT_ARM_FORWARD);
     limb_animators[LEFT_ARM] =
         LimbAnimator(mesh.find_bone("Arm_L_1"), mesh.find_bone("Arm_L_2"),
-                     &splines[0], restrictions);
+                     animator_splines, restrictions);
+
+    set_animator_splines(Animation::RIGHT_ARM_FORWARD);
     limb_animators[RIGHT_ARM] =
         LimbAnimator(mesh.find_bone("Arm_R_1"), mesh.find_bone("Arm_R_2"),
-                     &splines[4], restrictions);
+                     animator_splines, restrictions);
 
     restrictions[0] = {0.0f, 0.0f}; //{-0.7f * PI, 0.7f * PI};
     restrictions[1] = {0.0f, 0.0f}; //{degToRad(-120.0f), 0.0f};
+
+    set_animator_splines(Animation::LEFT_LEG_FORWARD);
     limb_animators[LEFT_LEG] =
         LimbAnimator(mesh.find_bone("Leg_L_1"), mesh.find_bone("Leg_L_2"),
-                     &splines[8], restrictions);
+                     animator_splines, restrictions);
+
+    set_animator_splines(Animation::RIGHT_LEG_FORWARD);
     limb_animators[RIGHT_LEG] =
         LimbAnimator(mesh.find_bone("Leg_R_1"), mesh.find_bone("Leg_R_2"),
-                     &splines[12], restrictions);
-
-    std::string limb_names[16] = {
-        "Left arm forward slow",  "Left arm backward slow",
-        "Left arm forward fast",  "Left arm backward fast",
-        "Right arm forward slow", "Right arm backward slow",
-        "Right arm forward fast", "Right arm backward fast",
-        "Left leg forward slow",  "Left leg backward slow",
-        "Left leg forward fast",  "Left leg backward fast",
-        "Right leg forward slow", "Right leg backward slow",
-        "Right leg forward fast", "Right leg backward fast"};
+                     animator_splines, restrictions);
 
     const Bone* limb_bones[4][2];
     for (size_t i = 0; i < 4; ++i) {
@@ -266,8 +283,7 @@ void WalkAnimator::init(const Entity* parent, RiggedMesh& mesh) {
         limb_bones[i][1] = limb_animators[i].bones[1];
     }
 
-    // spline_editor.init(parent, splines, 16, limb_names, limb_bones);
-    spline_editor.init(parent, splines, limb_bones,
+    spline_editor.init(parent, animations, limb_bones,
                        "../assets/player_splines.spl");
 }
 
@@ -300,6 +316,9 @@ void WalkAnimator::update(float delta_time, float walking_speed,
         if (leg_state == NEUTRAL) {
             // Starting to walk
             leg_state = RIGHT_LEG_UP;
+            for (auto& anim : limb_animators) {
+                anim.is_walking = true;
+            }
             limb_animators[LEFT_ARM].animation_state =
                 LimbAnimator::MOVE_FORWARD;
             limb_animators[RIGHT_ARM].animation_state =
@@ -313,8 +332,8 @@ void WalkAnimator::update(float delta_time, float walking_speed,
         } else if (limb_animators[LEFT_LEG].spline_interpolation_factor ==
                        1.0f &&
                    limb_animators[RIGHT_LEG].spline_interpolation_factor ==
-                       1.0f) { // @CLEANUP: They both move at the same speed, so
-                               // one check should be enough
+                       1.0f) { // @CLEANUP: They both move at the same
+                               // speed, so one check should be enough
             // Is walking and has reached the end of the current spline
             not_grounded_anymore = true;
             if (leg_state == RIGHT_LEG_UP) {
@@ -348,12 +367,13 @@ void WalkAnimator::update(float delta_time, float walking_speed,
             spine->rotation = 0.0f;
             leg_state = NEUTRAL;
             for (auto& anim : limb_animators) {
-                anim.animation_state = LimbAnimator::NEUTRAL;
+                anim.animation_state = LimbAnimator::MOVE_FORWARD;
+                anim.is_walking = false;
             }
             set_interpolations(0.0f, 0.0f);
         } else if (limb_animators[0].lerp_interpolation_factor != 1.0f) {
-            // Keep player not grounded until the legs have fully returned to
-            // their neutral position
+            // Keep player not grounded until the legs have fully returned
+            // to their neutral position
             not_grounded_anymore = true;
         }
     }
