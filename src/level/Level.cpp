@@ -11,12 +11,7 @@ struct BoxColliderSaveFormat {
 };
 
 void Level::load_from_file(const char* path) {
-    if (path == nullptr) {
-        colliders_.emplace_front(
-            glm::vec2(1920.0f / 2.0f, 1080.0f / 2.0f - 400.0f),
-            glm::vec2(10000.0f, 10.0f));
-        return;
-    }
+    SDL_assert_always(path);
 
     colliders_.clear();
 

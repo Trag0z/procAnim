@@ -89,7 +89,7 @@ void Game::init() {
                 &gamepads[0]);
 
     // Level
-    level.load_from_file();
+    level.load_from_file("../assets/default.level");
     level_editor.init(&level);
 
     frame_start = SDL_GetTicks();
