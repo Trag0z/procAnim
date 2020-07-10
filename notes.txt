@@ -1,6 +1,8 @@
 NEXT:
+- player falls through ground while running
+- all modes are selected in radio button menu
+
 - uneven ground
-    > ground editor?
     > find good point on ground
 
 TODO:

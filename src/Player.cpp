@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Player.h"
 #include "Game.h"
+#include "level/Collider.h"
 
 void Player::init(glm::vec3 position, glm::vec3 scale_,
                   const char* texture_path, const char* mesh_path,
@@ -18,13 +19,8 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
     grounded = false;
 }
 
-void Player::update(float delta_time, const BoxCollider& ground,
+void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
                     const MouseKeyboardInput& input) {
-    if (spline_edit_mode) {
-        animator.spline_editor.update(input);
-        return;
-    }
-
     if (!grounded) {
         velocity.y -= gravity * delta_time;
         position_ += velocity;
@@ -53,7 +49,7 @@ void Player::update(float delta_time, const BoxCollider& ground,
     }
 
     bool not_grounded_anymore = false;
-    glm::vec2 local_mouse_pos = world_to_local_space(input.mouse_world_pos());
+    glm::vec2 local_mouse_pos = world_to_local_space(input.mouse_pos_world());
     animator.update(delta_time, walking_speed, anim_state, not_grounded_anymore,
                     local_mouse_pos, input.mouse_button(1));
 
@@ -61,24 +57,26 @@ void Player::update(float delta_time, const BoxCollider& ground,
     if (not_grounded_anymore || !grounded) {
         // Find closest point on gorund
         glm::vec2 foot_pos_world[2];
-        float distance_to_ground[2];
 
         foot_pos_world[0] = local_to_world_space(
             animator.limb_animators[WalkAnimator::LEFT_LEG].tip_pos);
         foot_pos_world[1] = local_to_world_space(
             animator.limb_animators[WalkAnimator::RIGHT_LEG].tip_pos);
 
-        for (size_t i = 0; i < 2; ++i) {
-            distance_to_ground[i] =
-                foot_pos_world[i].y - ground.pos.y - ground.half_ext.y;
+        float distance_to_ground = 0.0f;
+        for (auto& coll : colliders) {
+            for (size_t i = 0; i < 2; ++i) {
+                if (coll.is_inside_rect(foot_pos_world[i])) {
+                    auto coll_top = (coll.position.y + coll.half_ext.y);
+                    distance_to_ground = std::min(
+                        distance_to_ground, foot_pos_world[i].y - coll_top);
+                }
+            }
         }
 
-        size_t closer_to_ground =
-            distance_to_ground[0] < distance_to_ground[1] ? 0 : 1;
-
         // Set grounded status
-        if (distance_to_ground[closer_to_ground] <= 0.0f) {
-            position_.y -= distance_to_ground[closer_to_ground];
+        if (distance_to_ground < 0.0f) {
+            position_.y -= distance_to_ground;
             grounded = true;
         }
     }
@@ -173,8 +171,4 @@ void Player::render(const Renderer& renderer) {
 
     // Render animator target positions
     animator.render(renderer);
-
-    // Render Splines
-    if (renderer.draw_all_splines || spline_edit_mode)
-        animator.spline_editor.render(renderer, spline_edit_mode);
 }

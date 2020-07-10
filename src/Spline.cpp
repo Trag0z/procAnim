@@ -2,7 +2,8 @@
 #include "pch.h"
 #include "Spline.h"
 #include "Game.h"
-#include <shobjidl.h>
+#include "Util.h"
+// #include <shobjidl.h>
 
 /////                                   /////
 /////               Spline              /////
@@ -102,54 +103,8 @@ static size_t opposite_direction(size_t spline_index) {
 
 void SplineEditor::save_splines(bool get_new_file_path) {
     if (get_new_file_path || save_path == nullptr) {
-        HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
-                                              COINIT_DISABLE_OLE1DDE);
-
-        SDL_assert_always(SUCCEEDED(hr));
-        IFileSaveDialog* pFileSave;
-
-        hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
-                              IID_IFileSaveDialog,
-                              reinterpret_cast<void**>(&pFileSave));
-
-        SDL_assert_always(SUCCEEDED(hr));
-
-        COMDLG_FILTERSPEC file_type = {L".spl", L"*.spl"};
-        pFileSave->SetFileTypes(1, &file_type);
-        pFileSave->SetDefaultExtension(L"spl");
-
-        // Show the Open dialog box.
-        hr = pFileSave->Show(NULL);
-
-        // Get the file name from the dialog box.
-        if (!SUCCEEDED(hr))
-            return;
-
-        IShellItem* pItem;
-        hr = pFileSave->GetResult(&pItem);
-
-        SDL_assert_always(SUCCEEDED(hr));
-        PWSTR pszFilePath;
-        hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-
-        // Copy path to save_path
-        if (save_path) {
-            delete[] save_path;
-        }
-
-        size_t length = wcslen(pszFilePath) + 1;
-        save_path = new char[length];
-
-        wcstombs_s(nullptr, save_path, length, pszFilePath, length);
-
-        CoTaskMemFree(pszFilePath);
-
-        SDL_assert_always(SUCCEEDED(hr));
-
-        pItem->Release();
-        pFileSave->Release();
-
-        CoUninitialize();
+        bool success = !get_save_path(save_path, L".spl", L"*.spl", L"spl");
+        SDL_assert_always(success);
     }
 
     // Write data
@@ -172,53 +127,8 @@ void SplineEditor::save_splines(bool get_new_file_path) {
 
 void SplineEditor::load_splines(const char* path) {
     if (path == nullptr) {
-        HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
-                                              COINIT_DISABLE_OLE1DDE);
-
-        SDL_assert_always(SUCCEEDED(hr));
-        IFileOpenDialog* pFileOpen;
-
-        hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
-                              IID_IFileOpenDialog,
-                              reinterpret_cast<void**>(&pFileOpen));
-
-        SDL_assert_always(SUCCEEDED(hr));
-
-        COMDLG_FILTERSPEC file_type = {L".spl", L"*.spl"};
-        pFileOpen->SetFileTypes(1, &file_type);
-
-        // Show the Open dialog box.
-        hr = pFileOpen->Show(NULL);
-
-        if (!SUCCEEDED(hr)) {
-            return;
-        }
-
-        // Get the file name from the dialog box.
-        IShellItem* pItem;
-        hr = pFileOpen->GetResult(&pItem);
-
-        SDL_assert_always(SUCCEEDED(hr));
-        PWSTR pszFilePath;
-        hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-
-        if (save_path) {
-            delete[] save_path;
-        }
-
-        size_t length = wcslen(pszFilePath) + 1;
-        save_path = new char[length];
-
-        wcstombs_s(nullptr, save_path, length, pszFilePath, length);
-
-        CoTaskMemFree(pszFilePath);
-
-        SDL_assert_always(SUCCEEDED(hr));
-
-        pItem->Release();
-        pFileOpen->Release();
-
-        CoUninitialize();
+        bool success = get_load_path(save_path, L".spl", L"*.spl");
+        SDL_assert_always(success);
     } else {
         if (save_path) {
             delete[] save_path;
@@ -354,9 +264,11 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
     }
 }
 
-void SplineEditor::update(const MouseKeyboardInput& input) {
+bool SplineEditor::update(const MouseKeyboardInput& input) {
+    bool keep_open = update_gui();
+
     glm::vec2 mouse_pos =
-        parent->world_to_local_space(glm::vec3(input.mouse_world_pos(), 0.0f));
+        parent->world_to_local_space(glm::vec3(input.mouse_pos_world(), 0.0f));
 
     if (creating_new_spline) {
         // Set the points and return
@@ -372,7 +284,7 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
                 set_spline_point(mouse_pos, i);
             }
             first_point_set = true;
-            return;
+            return keep_open;
         }
 
         // Set P2 to mouse position and the others to points along the
@@ -391,17 +303,17 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
             creating_new_spline = false;
             first_point_set = false;
         }
-        return;
+        return keep_open;
     }
 
     if (input.mouse_button_up(1)) {
         selected_point_index = static_cast<size_t>(-1);
-        return;
+        return keep_open;
     }
 
     if (selected_spline_index >= Animation::NUM_SPLINES ||
         selected_animation_index >= num_animations) {
-        return;
+        return keep_open;
     }
 
     auto& spline =
@@ -429,12 +341,16 @@ void SplineEditor::update(const MouseKeyboardInput& input) {
 
         set_spline_point(mouse_pos);
     }
+
+    return keep_open;
 }
 
-void SplineEditor::update_gui(bool& spline_edit_mode) {
+bool SplineEditor::update_gui() {
+    bool keep_open = true;
+
     using namespace ImGui;
 
-    Begin("Spline Editor", &spline_edit_mode);
+    Begin("Spline Editor", &keep_open);
     Text("Animatons");
 
     const char** animation_names = new const char*[num_animations];
@@ -552,6 +468,8 @@ void SplineEditor::update_gui(bool& spline_edit_mode) {
     }
 
     End();
+
+    return keep_open;
 }
 
 void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {

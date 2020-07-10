@@ -2,7 +2,6 @@
 #include "pch.h"
 #include "Game.h"
 #include "DebugCallback.h"
-#include "Systems.h"
 #include "Shaders.h"
 
 constexpr bool DEBUG_MODE = true;
@@ -89,8 +88,9 @@ void Game::init() {
                 "../assets/playerTexture.png", "../assets/guy.fbx",
                 &gamepads[0]);
 
-    // Ground
-    ground = BoxCollider({position.x, position.y - 400.0f}, {10000.0f, 10.0f});
+    // Level
+    level.load_from_file();
+    level_editor.init(&level);
 
     frame_start = SDL_GetTicks();
     running = true;
@@ -102,20 +102,23 @@ bool Game::run() {
         frame_start = SDL_GetTicks();
 
         SDL_PumpEvents();
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT)
-                running = false;
-            if (event.type == SDL_WINDOWEVENT &&
-                event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                event.window.windowID == SDL_GetWindowID(window))
-                running = false;
-        }
 
         mouse_keyboard_input.update();
         for (auto& pad : gamepads) {
             pad.update();
+        }
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT ||
+                (event.type == SDL_WINDOWEVENT &&
+                 event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                 event.window.windowID == SDL_GetWindowID(window))) {
+                running = false;
+            } else if (event.type == SDL_MOUSEWHEEL) {
+                mouse_keyboard_input.mouse_wheel_scroll = event.wheel.y;
+            }
         }
 
         // Handle general keyboard inputs
@@ -135,31 +138,73 @@ bool Game::run() {
             game_config.speed *= 2.0f;
         }
         if (mouse_keyboard_input.key_down(SDL_SCANCODE_ESCAPE)) {
-            running = false;
+            if (game_mode == PLAY) {
+                running = false;
+            } else if (game_mode == SPLINE_EDITOR ||
+                       game_mode == LEVEL_EDITOR) {
+                game_mode = PLAY;
+            }
         }
 
-        update_gui(window, renderer, game_config, player);
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(window);
+        ImGui::NewFrame();
+
+        update_gui();
 
         float last_frame_duration =
             static_cast<float>(frame_start - last_frame_start);
         float frame_delay = static_cast<float>(game_config.frame_delay);
 
-        if (!game_config.step_mode) {
-            float delta_time;
-            if (game_config.use_const_delta_time) {
-                delta_time = game_config.speed;
-            } else {
-                delta_time =
-                    last_frame_duration / frame_delay * game_config.speed;
-            }
+        // Update stuff based on the current game_mode
+        if (game_mode == PLAY) {
+            if (!game_config.step_mode) {
+                float delta_time;
+                if (game_config.use_const_delta_time) {
+                    delta_time = game_config.speed;
+                } else {
+                    delta_time =
+                        last_frame_duration / frame_delay * game_config.speed;
+                }
 
-            player.update(delta_time, ground, mouse_keyboard_input);
-        } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
-                   mouse_keyboard_input.key(SDL_SCANCODE_M)) {
-            player.update(game_config.speed, ground, mouse_keyboard_input);
+                player.update(delta_time, level.colliders(),
+                              mouse_keyboard_input);
+
+            } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
+                       mouse_keyboard_input.key(SDL_SCANCODE_M)) {
+                player.update(game_config.speed, level.colliders(),
+                              mouse_keyboard_input);
+            }
+        } else if (game_mode == SPLINE_EDITOR) {
+            if (!player.animator.spline_editor.update(mouse_keyboard_input)) {
+                game_mode = PLAY;
+            }
+        } else if (game_mode == LEVEL_EDITOR) {
+            if (!level_editor.update(renderer, mouse_keyboard_input)) {
+                game_mode = PLAY;
+            }
         }
 
-        renderer.render(window, background, player, ground);
+        // Render
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        renderer.update_camera(player.position() + glm::vec2(0.0f, 200.0f));
+
+        background.render(renderer, renderer.camera_center());
+
+        level.render(renderer);
+
+        player.render(renderer);
+
+        if (game_mode == SPLINE_EDITOR || renderer.draw_all_splines) {
+            player.animator.spline_editor.render(renderer, true);
+        }
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        SDL_GL_SwapWindow(window);
 
         // Wait for next frame
         U32 last_frame_time = SDL_GetTicks() - frame_start;
@@ -171,4 +216,104 @@ bool Game::run() {
     IMG_Quit();
     SDL_Quit();
     return 0;
+}
+
+void Game::update_gui() {
+    using namespace ImGui;
+
+    //////          Debug controls window           //////
+    Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
+    Checkbox("Render player model", &renderer.draw_models);
+    Checkbox("Render wireframes", &renderer.draw_wireframes);
+    Checkbox("Render bones", &renderer.draw_bones);
+    Checkbox("Render all splines", &renderer.draw_all_splines);
+
+    NewLine();
+    Checkbox("Use constant delta time", &game_config.use_const_delta_time);
+    SetNextItemWidth(100);
+    DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
+
+    NewLine();
+    Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);
+    Checkbox("Step mode", &game_config.step_mode);
+
+    Text("Mode");
+    RadioButton("Play", (int*)&game_mode, GameMode::PLAY);
+    RadioButton("Spline editor", (int*)&game_mode, GameMode::SPLINE_EDITOR);
+    RadioButton("Level editor", (int*)&game_mode, GameMode::LEVEL_EDITOR);
+
+    End();
+
+    //////          Limb data display window            //////
+    Begin("Limb data", NULL);
+
+    char label[128];
+
+    sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x, player.position_.y);
+    Text("Player position: ");
+    SameLine();
+    bool changed_value =
+        DragFloat2("Player position", value_ptr(player.position_), 1.0f, 0.0f,
+                   0.0f, "% .2f");
+    if (changed_value) {
+        player.grounded = false;
+    }
+
+    Text("Target Positions");
+    Columns(4);
+    Separator();
+    Text("Arm_L");
+    NextColumn();
+    Text("Arm_R");
+    NextColumn();
+    Text("Leg_L");
+    NextColumn();
+    Text("Leg_R");
+    NextColumn();
+    Separator();
+
+    for (const auto& anim : player.animator.limb_animators) {
+        glm::vec3 target_world_pos =
+            player.model * glm::vec3(anim.target_pos, 1.0f);
+        sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
+                  target_world_pos.y);
+        Text(label);
+        NextColumn();
+    }
+
+    Columns(1);
+    Separator();
+
+    NewLine();
+    Text("Limb data");
+    Columns(3);
+    Separator();
+    Text("Name");
+    NextColumn();
+    Text("Rotation deg/rad");
+    NextColumn();
+    Text("Tail Position");
+    NextColumn();
+    Separator();
+
+    for (const auto& bone : player.rigged_mesh.bones) {
+        Text(bone.name.c_str());
+        NextColumn();
+
+        sprintf_s(label, "% 6.1f /% 1.2f", radToDeg(bone.rotation),
+                  bone.rotation);
+        Text(label);
+        NextColumn();
+
+        glm::vec3 tail_world_pos = player.model * bone.get_transform() *
+                                   bone.bind_pose_transform *
+                                   glm::vec3(bone.tail, 1.0f);
+        sprintf_s(label, "% 7.1f, % 7.1f", tail_world_pos.x, tail_world_pos.y);
+        Text(label);
+        NextColumn();
+    }
+    Columns(1);
+    Separator();
+
+    End();
 }

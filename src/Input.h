@@ -6,17 +6,19 @@
 class Renderer;
 
 class MouseKeyboardInput {
-    const static uint num_mouse_buttons = 3;
+    const static uint NUM_MOUSE_BUTTONS = 3;
     const Uint8* sdl_keyboard;
     int num_keys;
 
     bool *key_, *key_up_, *key_down_;
     uint mouse_button_map, mouse_button_down_map, mouse_button_up_map;
-    glm::ivec2 mouse_pos;
+    glm::ivec2 mouse_pos, last_mouse_pos;
 
     const Renderer* renderer;
 
   public:
+    int mouse_wheel_scroll;
+
     inline void init(const Renderer* renderer_) {
         sdl_keyboard = SDL_GetKeyboardState(&num_keys);
         key_ = (bool*)malloc(sizeof(bool) * (num_keys * 3));
@@ -42,9 +44,10 @@ class MouseKeyboardInput {
     inline bool key_up(SDL_Scancode key) const { return key_up_[key]; }
     inline bool key_down(SDL_Scancode key) const { return key_down_[key]; }
 
-    glm::vec2 mouse_world_pos() const;
+    glm::vec2 mouse_pos_world() const noexcept;
+    glm::vec2 mouse_screen_pos() const noexcept;
 
-    glm::vec2 mouse_screen_pos() const;
+    glm::vec2 mouse_move() const noexcept;
 };
 
 enum StickID { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };
@@ -61,9 +64,9 @@ class Gamepad {
     Uint32 button_map, button_down_map, button_up_map;
 
   public:
-    static const U32 num_pads = 1;
+    static const U32 NUM_PADS = 1;
 
-    static std::array<Gamepad, num_pads> init();
+    static std::array<Gamepad, NUM_PADS> init();
 
     void update();
 

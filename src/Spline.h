@@ -64,12 +64,13 @@ class SplineEditor {
     VertexArray<DebugShader::Vertex> circle_vao;
 
     void save_splines(bool get_new_file_path = false);
-    // void save_splines_new();
     void load_splines(const char* path = nullptr);
 
     void set_spline_point(glm::vec2 p,
                           size_t point_index = static_cast<size_t>(-1),
                           size_t spline_index = static_cast<size_t>(-1));
+
+    bool update_gui();
 
   public:
     void init(const Entity* parent_, Animation* animations_,
@@ -77,7 +78,6 @@ class SplineEditor {
     // Only used for first setup of splines
     void init(const Entity* parent_, Spline* splines_, size_t num_splines_,
               const std::string* spline_names_, const Bone* limb_bones_[4][2]);
-    void update(const MouseKeyboardInput& input);
+    bool update(const MouseKeyboardInput& input);
     void render(const Renderer& renderer, bool spline_edit_mode);
-    void update_gui(bool& spline_edit_mode);
 };

@@ -27,6 +27,7 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);
     Checkbox("Step mode", &game_config.step_mode);
     Checkbox("Spline edit mode", &player.spline_edit_mode);
+    Checkbox("Level editor", &game_config.level_edit_mode);
 
     End();
 

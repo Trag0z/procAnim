@@ -11,6 +11,7 @@
 #include <vector>
 #include <limits.h>
 #include <list>
+#include <forward_list>
 
 #include <shobjidl.h>
 

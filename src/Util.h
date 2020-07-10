@@ -32,3 +32,10 @@ inline float clamp(float val, float min, float max) {
         return val;
     }
 }
+
+typedef const wchar_t * cwstrptr_t;
+bool get_save_path(char* path, cwstrptr_t filter_name = nullptr,
+                   cwstrptr_t filter_pattern = nullptr,
+                   cwstrptr_t default_extension = nullptr);
+bool get_load_path(char* path, cwstrptr_t filter_name = nullptr,
+                   cwstrptr_t filter_pattern = nullptr);

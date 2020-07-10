@@ -5,11 +5,11 @@
 #include "Texture.h"
 #include "Util.h"
 #include "Mesh.h"
-#include "Collider.h"
 #include "Player.h"
 #include "Input.h"
 #include "Background.h"
 #include "Renderer.h"
+#include "level/Level.h"
 
 class Player;
 
@@ -33,7 +33,8 @@ struct GameConfig {
 //----------Game struct----------//
 //-------------------------------//
 
-struct Game {
+class Game {
+public:
     bool running = false;
     U32 frame_start, last_frame_start;
 
@@ -45,12 +46,19 @@ struct Game {
     Renderer renderer;
 
     MouseKeyboardInput mouse_keyboard_input;
-    std::array<Gamepad, Gamepad::num_pads> gamepads;
+    std::array<Gamepad, Gamepad::NUM_PADS> gamepads;
 
     Player player;
-    BoxCollider ground;
     Background background;
+
+    Level level;
+    LevelEditor level_editor;
+
+    enum GameMode { PLAY = 0, SPLINE_EDITOR = 1, LEVEL_EDITOR = 2 } game_mode;
 
     void init();
     bool run();
+
+  private:
+    void update_gui();
 };

@@ -5,8 +5,9 @@
 
 void MouseKeyboardInput::update() {
     // Update mouse
+    last_mouse_pos = mouse_pos;
     Uint32 newMouseButton = SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
-    for (size_t i = 0; i < num_mouse_buttons; ++i) {
+    for (size_t i = 0; i < NUM_MOUSE_BUTTONS; ++i) {
         if (newMouseButton & SDL_BUTTON(i)) {
             if (!(mouse_button_map & SDL_BUTTON(i))) {
                 mouse_button_down_map |= SDL_BUTTON(i);
@@ -41,11 +42,14 @@ void MouseKeyboardInput::update() {
             key_up_[i] = false;
         }
     }
+
+    // Game::run() sets this to a value later if there was a scroll event
+    mouse_wheel_scroll = 0;
 }
 
-std::array<Gamepad, Gamepad::num_pads> Gamepad::init() {
-    std::array<Gamepad, num_pads> ret;
-    for (U32 i = 0; i < Gamepad::num_pads; ++i) {
+std::array<Gamepad, Gamepad::NUM_PADS> Gamepad::init() {
+    std::array<Gamepad, NUM_PADS> ret;
+    for (U32 i = 0; i < Gamepad::NUM_PADS; ++i) {
         ret[i].sdl_ptr = SDL_GameControllerOpen(i);
         if (!ret[i].sdl_ptr) {
             printf("[Input] Error opening gamepad%I32d: %s\n", i,
@@ -55,14 +59,18 @@ std::array<Gamepad, Gamepad::num_pads> Gamepad::init() {
     return ret;
 }
 
-glm::vec2 MouseKeyboardInput::mouse_world_pos() const {
+glm::vec2 MouseKeyboardInput::mouse_pos_world() const noexcept {
     return renderer->camera_position() + mouse_screen_pos();
 }
 
-glm::vec2 MouseKeyboardInput::mouse_screen_pos() const {
+glm::vec2 MouseKeyboardInput::mouse_screen_pos() const noexcept {
     return glm::vec2(static_cast<float>(mouse_pos.x),
                      renderer->window_size().y -
                          static_cast<float>(mouse_pos.y));
+}
+
+glm::vec2 MouseKeyboardInput::mouse_move() const noexcept {
+    return static_cast<glm::vec2>(mouse_pos - last_mouse_pos);
 }
 
 void Gamepad::update() {
