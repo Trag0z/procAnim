@@ -24,6 +24,8 @@ class LevelEditor {
 
     BoxCollider* selected_collider = nullptr;
 
+    bool dragging_collider = false;
+
   public:
     void init(Level* level_);
     bool update(const Renderer& renderer, const MouseKeyboardInput& input);

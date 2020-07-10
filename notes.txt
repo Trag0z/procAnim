@@ -1,7 +1,4 @@
 NEXT:
-- player falls through ground while running
-- all modes are selected in radio button menu
-
 - uneven ground
     > find good point on ground
 

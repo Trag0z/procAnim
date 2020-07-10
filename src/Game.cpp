@@ -237,6 +237,7 @@ void Game::update_gui() {
     Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);
     Checkbox("Step mode", &game_config.step_mode);
 
+    NewLine();
     Text("Mode");
     RadioButton("Play", (int*)&game_mode, GameMode::PLAY);
     RadioButton("Spline editor", (int*)&game_mode, GameMode::SPLINE_EDITOR);

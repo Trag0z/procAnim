@@ -96,20 +96,25 @@ bool LevelEditor::update(const Renderer& renderer,
     }
 
     if (input.mouse_button_down(1)) {
-        glm::vec2 mouse_pos = input.mouse_screen_pos();
+        glm::vec2 mouse_pos = input.mouse_pos_world();
 
         for (auto& coll : colliders) {
             if (coll.is_inside_rect(mouse_pos)) {
+                dragging_collider = true;
                 selected_collider = &coll;
                 break;
             }
         }
     }
 
+    if (input.mouse_button_up(1)) {
+        dragging_collider = false;
+    }
+
     if (selected_collider) {
         selected_collider->half_ext += input.mouse_wheel_scroll * SCROLL_SPEED;
 
-        if (input.mouse_button(1)) {
+        if (dragging_collider) {
             selected_collider->position += input.mouse_move();
         }
 

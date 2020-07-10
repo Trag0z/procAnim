@@ -70,7 +70,9 @@ glm::vec2 MouseKeyboardInput::mouse_screen_pos() const noexcept {
 }
 
 glm::vec2 MouseKeyboardInput::mouse_move() const noexcept {
-    return static_cast<glm::vec2>(mouse_pos - last_mouse_pos);
+    glm::vec2 move = static_cast<glm::vec2>(mouse_pos - last_mouse_pos);
+    move.y *= -1.0f;
+    return move;
 }
 
 void Gamepad::update() {

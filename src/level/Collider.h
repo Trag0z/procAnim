@@ -11,7 +11,7 @@ struct BoxCollider {
     glm::mat3 model;
 
   private:
-    glm::vec2 vertices[4];
+    DebugShader::Vertex vertices[4];
     VertexArray<DebugShader::Vertex> vao;
 
   public:
