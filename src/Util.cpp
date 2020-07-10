@@ -14,7 +14,7 @@ void printGlm(const glm::mat4& m) {
            m[2][3], m[3][3]);
 }
 
-bool get_save_path(char* path, cwstrptr_t filter_name,
+bool get_save_path(char*& path, cwstrptr_t filter_name,
                    cwstrptr_t filter_pattern, cwstrptr_t default_extension) {
     HRESULT hr =
         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
@@ -72,7 +72,7 @@ bool get_save_path(char* path, cwstrptr_t filter_name,
     return true;
 }
 
-bool get_load_path(char* path, cwstrptr_t filter_name,
+bool get_load_path(char*& path, cwstrptr_t filter_name,
                    cwstrptr_t filter_pattern) {
     HRESULT hr =
         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);

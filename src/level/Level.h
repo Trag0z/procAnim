@@ -11,7 +11,7 @@ class Level {
     std::list<BoxCollider> colliders_;
 
   public:
-    void load_from_file(char* path = nullptr);
+    void load_from_file(const char* path = nullptr);
     void render(const Renderer& renderer) const;
 
     const std::list<BoxCollider> colliders() const noexcept;
@@ -21,8 +21,10 @@ class Level {
 
 class LevelEditor {
     Level* level;
+    BoxCollider* selected_collider;
+    char* opened_path;
 
-    BoxCollider* selected_collider = nullptr;
+    glm::vec2 new_collider_dimensions = glm::vec2(100.0f);
 
     bool dragging_collider = false;
 
@@ -30,5 +32,6 @@ class LevelEditor {
     void init(Level* level_);
     bool update(const Renderer& renderer, const MouseKeyboardInput& input);
 
-    void save_level(char* path = nullptr) const;
+    void save_to_file(bool new_file_name = false);
+    void load_from_file(bool new_file_name = false);
 };

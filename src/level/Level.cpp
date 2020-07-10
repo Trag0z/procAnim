@@ -10,23 +10,18 @@ struct BoxColliderSaveFormat {
     glm::vec2 half_ext;
 };
 
-void Level::load_from_file(char* path) {
+void Level::load_from_file(const char* path) {
     if (path == nullptr) {
-        bool success = get_load_path(path, L".level", L"*.level");
-
-        if (!success) {
-            // Default ground object
-            colliders_.emplace_front(
-                glm::vec2(1920.0f / 2.0f, 1080.0f / 2.0f - 400.0f),
-                glm::vec2(10000.0f, 10.0f));
-            return;
-        }
+        colliders_.emplace_front(
+            glm::vec2(1920.0f / 2.0f, 1080.0f / 2.0f - 400.0f),
+            glm::vec2(10000.0f, 10.0f));
+        return;
     }
 
     colliders_.clear();
 
     // Read data from file
-    SDL_RWops* file = SDL_RWFromFile(path, "wb");
+    SDL_RWops* file = SDL_RWFromFile(path, "rb");
 
     size_t num_colliders;
     SDL_RWread(file, &num_colliders, sizeof(num_colliders), 1);
@@ -66,15 +61,28 @@ bool LevelEditor::update(const Renderer& renderer,
     { // UI
         using namespace ImGui;
         Begin("Level Editor", &keep_open);
+        if (Button("Open...")) {
+            load_from_file(true);
+        }
+        SameLine();
+        if (Button("Save")) {
+            save_to_file();
+        }
+        if (Button("Save as...")) {
+            save_to_file(true);
+        }
 
         if (Button("New collider")) {
             colliders.emplace_front(renderer.camera_position() +
                                         renderer.window_size() * 0.5f,
-                                    glm::vec2(1.0f));
+                                    new_collider_dimensions);
 
             selected_collider = &colliders.front();
         }
+        DragFloat2("Dimensions", value_ptr(new_collider_dimensions), 1.0f, 0.0f,
+                   0.0f, "% 6.1f");
 
+        NewLine();
         Text("Selected Collider");
         if (selected_collider) {
             bool needs_update = false;
@@ -124,9 +132,10 @@ bool LevelEditor::update(const Renderer& renderer,
     return keep_open;
 }
 
-void LevelEditor::save_level(char* path) const {
-    if (path == nullptr) {
-        bool success = get_save_path(path, L".level", L"*.level", L"level");
+void LevelEditor::save_to_file(bool new_file_name) {
+    if (new_file_name || opened_path == nullptr) {
+        bool success =
+            get_save_path(opened_path, L".level", L"*.level", L"level");
         SDL_assert_always(success);
     }
 
@@ -142,10 +151,21 @@ void LevelEditor::save_level(char* path) const {
         ++i;
     }
 
-    SDL_RWops* file = SDL_RWFromFile(path, "wb");
+    SDL_RWops* file = SDL_RWFromFile(opened_path, "wb");
     SDL_RWwrite(file, &num_colliders, sizeof(num_colliders), 1);
     SDL_RWwrite(file, save_data, sizeof(*save_data), num_colliders);
     SDL_RWclose(file);
 
     delete[] save_data;
+}
+
+void LevelEditor::load_from_file(bool new_file_name) {
+    if (new_file_name || opened_path == nullptr) {
+        if (!get_load_path(opened_path, L".level", L"*.level")) {
+            return;
+        }
+    }
+
+    SDL_assert(level);
+    level->load_from_file(opened_path);
 }
