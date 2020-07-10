@@ -2,6 +2,9 @@ NEXT:
 - uneven ground
     > find good point on ground
 
+- ground texture
+    > mark selected collider
+
 TODO:
 - revert laptop compat changes
 - apply bone restrictions

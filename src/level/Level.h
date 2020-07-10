@@ -31,6 +31,7 @@ class LevelEditor {
   public:
     void init(Level* level_);
     bool update(const Renderer& renderer, const MouseKeyboardInput& input);
+    void render(const Renderer& renderer);
 
     void save_to_file(bool new_file_name = false);
     void load_from_file(bool new_file_name = false);

@@ -1,6 +1,7 @@
 #pragma once
 #include "../pch.h"
 #include "../VertexArray.h"
+#include "../Colors.h"
 
 class Renderer;
 
@@ -9,6 +10,9 @@ struct BoxCollider {
     glm::vec2 half_ext;
 
     glm::mat3 model;
+
+    static const Color DEFAULT_COLOR;
+    Color color = DEFAULT_COLOR;
 
   private:
     DebugShader::Vertex vertices[4];

@@ -3,6 +3,8 @@
 #include "Collider.h"
 #include "../Renderer.h"
 
+const Color BoxCollider::DEFAULT_COLOR = Colors::ORANGE;
+
 BoxCollider::BoxCollider(glm::vec2 position_, glm::vec2 half_extents) {
     position = position_;
     half_ext = half_extents;
@@ -32,7 +34,7 @@ void BoxCollider::update_vertex_data() {
 
 void BoxCollider::render(const Renderer& renderer) const {
     renderer.debug_shader.set_model(&model);
-    renderer.debug_shader.set_color(&Colors::ORANGE);
+    renderer.debug_shader.set_color(&color);
     vao.draw(GL_TRIANGLES);
 }
 
