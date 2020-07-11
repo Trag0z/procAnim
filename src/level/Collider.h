@@ -1,7 +1,7 @@
 #pragma once
 #include "../pch.h"
 #include "../VertexArray.h"
-#include "../Colors.h"
+#include "../Color.h"
 
 class Renderer;
 
@@ -14,12 +14,9 @@ struct BoxCollider {
     static const Color DEFAULT_COLOR;
     Color color = DEFAULT_COLOR;
 
-  private:
     DebugShader::Vertex vertices[4];
     VertexArray<DebugShader::Vertex> vao;
 
-  public:
-    // BoxCollider() {}
     BoxCollider(glm::vec2 pos, glm::vec2 half_ext);
 
     void update_vertex_data();

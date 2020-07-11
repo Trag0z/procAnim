@@ -385,7 +385,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
 
 void WalkAnimator::render(const Renderer& renderer) {
     renderer.debug_shader.use();
-    renderer.debug_shader.set_color(&Colors::GREEN);
+    renderer.debug_shader.set_color(&Color::GREEN);
 
     for (auto& anim : limb_animators) {
         anim.target_point_vao.update_vertex_data(

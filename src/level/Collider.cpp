@@ -3,7 +3,7 @@
 #include "Collider.h"
 #include "../Renderer.h"
 
-const Color BoxCollider::DEFAULT_COLOR = Colors::ORANGE;
+const Color BoxCollider::DEFAULT_COLOR = Color::ORANGE;
 
 BoxCollider::BoxCollider(glm::vec2 position_, glm::vec2 half_extents) {
     position = position_;

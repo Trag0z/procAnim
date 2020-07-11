@@ -199,6 +199,8 @@ bool Game::run() {
 
         if (game_mode == SPLINE_EDITOR || renderer.draw_all_splines) {
             player.animator.spline_editor.render(renderer, true);
+        } else if (game_mode == LEVEL_EDITOR) {
+            level_editor.render(renderer);
         }
 
         ImGui::Render();

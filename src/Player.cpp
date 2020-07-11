@@ -51,7 +51,7 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
     bool not_grounded_anymore = false;
     glm::vec2 local_mouse_pos = world_to_local_space(input.mouse_pos_world());
     animator.update(delta_time, walking_speed, anim_state, not_grounded_anymore,
-                    local_mouse_pos, input.mouse_button(1));
+                    local_mouse_pos, input.mouse_button(MouseButton::LEFT));
 
     //////          Collision Detection         //////
     if (not_grounded_anymore || !grounded) {
@@ -137,7 +137,7 @@ void Player::render(const Renderer& renderer) {
 
     // Render wireframes
     if (renderer.draw_wireframes) {
-        renderer.debug_shader.set_color(&Colors::RED);
+        renderer.debug_shader.set_color(&Color::RED);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         rm.vao.draw(GL_TRIANGLES);
@@ -159,7 +159,7 @@ void Player::render(const Renderer& renderer) {
 
         rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
 
-        renderer.debug_shader.set_color(&Colors::BLUE);
+        renderer.debug_shader.set_color(&Color::BLUE);
 
         glLineWidth(2.0f);
         rm.bones_vao.draw(GL_LINES);

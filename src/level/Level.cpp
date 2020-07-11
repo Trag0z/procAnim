@@ -98,32 +98,25 @@ bool LevelEditor::update(const Renderer& renderer,
         End();
     }
 
-    if (input.mouse_button_down(1)) {
+    // Select collider
+    if (input.mouse_button_down(MouseButton::LEFT)) {
         glm::vec2 mouse_pos = input.mouse_pos_world();
 
-        bool hit_one = false;
         for (auto& coll : colliders) {
             if (coll.is_inside_rect(mouse_pos)) {
-                hit_one = true;
                 dragging_collider = true;
-                if (selected_collider) {
-                    selected_collider->color = BoxCollider::DEFAULT_COLOR;
-                }
                 selected_collider = &coll;
-                selected_collider->color = Colors::LIGHT_PURPLE;
                 break;
             }
         }
-        if (!hit_one) {
-            if (selected_collider) {
-                selected_collider->color = BoxCollider::DEFAULT_COLOR;
-                selected_collider = nullptr;
-            }
-        }
+    }
+    if (input.mouse_button_up(MouseButton::LEFT)) {
+        dragging_collider = false;
     }
 
-    if (input.mouse_button_up(1)) {
-        dragging_collider = false;
+    // Deselect collider
+    if (input.mouse_button_down(MouseButton::RIGHT)) {
+        selected_collider = nullptr;
     }
 
     if (selected_collider) {
@@ -137,6 +130,14 @@ bool LevelEditor::update(const Renderer& renderer,
     }
 
     return keep_open;
+}
+
+void LevelEditor::render(const Renderer& renderer) {
+    if (selected_collider) {
+        renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
+        renderer.debug_shader.set_model(&selected_collider->model);
+        selected_collider->vao.draw(GL_LINE_LOOP);
+    }
 }
 
 void LevelEditor::save_to_file(bool new_file_name) {

@@ -278,7 +278,7 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
         Spline& selected_spline =
             animations[selected_animation_index].splines[selected_spline_index];
 
-        if (!first_point_set && input.mouse_button_down(1)) {
+        if (!first_point_set && input.mouse_button_down(MouseButton::LEFT)) {
             // Set all points to mouse position and return
             for (size_t i = 0; i < Spline::NUM_POINTS; ++i) {
                 set_spline_point(mouse_pos, i);
@@ -299,14 +299,14 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
                              start_to_end * 0.3f,
                          Spline::T2);
 
-        if (input.mouse_button_down(1)) {
+        if (input.mouse_button_down(MouseButton::LEFT)) {
             creating_new_spline = false;
             first_point_set = false;
         }
         return keep_open;
     }
 
-    if (input.mouse_button_up(1)) {
+    if (input.mouse_button_up(MouseButton::LEFT)) {
         selected_point_index = static_cast<size_t>(-1);
         return keep_open;
     }
@@ -319,7 +319,7 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
     auto& spline =
         animations[selected_animation_index].splines[selected_spline_index];
 
-    if (input.mouse_button_down(1)) {
+    if (input.mouse_button_down(MouseButton::LEFT)) {
         for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
             if (glm::length(spline.points[n_point] - mouse_pos) < 0.1f) {
                 selected_point_index = n_point;
@@ -496,13 +496,13 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
                 glm::vec2(radius * cosf(theta), radius * sinf(theta));
         }
 
-        renderer.debug_shader.set_color(&Colors::LIGHT_BLUE);
+        renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
         circle_vao.update_vertex_data(circle_vertices, CIRCLE_SEGMENTS);
         circle_vao.draw(GL_LINE_LOOP);
     }
 
     // Draw splines
-    renderer.debug_shader.set_color(&Colors::GREEN);
+    renderer.debug_shader.set_color(&Color::GREEN);
 
     if (renderer.draw_all_splines) {
         // Draw all splines (except selected)
@@ -531,10 +531,10 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         spline.line_vao.draw(GL_LINE_STRIP);
 
         if (spline_edit_mode) {
-            renderer.debug_shader.set_color(&Colors::LIGHT_PURPLE);
+            renderer.debug_shader.set_color(&Color::LIGHT_PURPLE);
             spline.point_vao.draw(GL_LINES);
 
-            renderer.debug_shader.set_color(&Colors::PURPLE);
+            renderer.debug_shader.set_color(&Color::PURPLE);
             spline.point_vao.draw(GL_POINTS);
         }
     }

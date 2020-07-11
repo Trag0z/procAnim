@@ -6,9 +6,9 @@
 void MouseKeyboardInput::update() {
     // Update mouse
     last_mouse_pos = mouse_pos;
-    Uint32 newMouseButton = SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
-    for (size_t i = 0; i < NUM_MOUSE_BUTTONS; ++i) {
-        if (newMouseButton & SDL_BUTTON(i)) {
+    Uint32 new_mouse_button = SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
+    for (size_t i = 0; i <= NUM_MOUSE_BUTTONS; ++i) {
+        if (new_mouse_button & SDL_BUTTON(i)) {
             if (!(mouse_button_map & SDL_BUTTON(i))) {
                 mouse_button_down_map |= SDL_BUTTON(i);
             } else {

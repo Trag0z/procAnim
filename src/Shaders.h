@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "Colors.h"
+#include "Color.h"
 
 static bool checkCompileErrors(GLuint object, bool program);
 
@@ -71,7 +71,7 @@ class DebugShader : public Shader {
         color_loc = glGetUniformLocation(id, "color");
     }
 
-    inline void set_color(const glm::vec4* color) const noexcept {
+    inline void set_color(const Color* color) const noexcept {
         use();
         glUniform4fv(color_loc, 1, (const GLfloat*)color);
     }
