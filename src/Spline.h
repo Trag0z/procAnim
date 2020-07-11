@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Input.h"
-#include "VertexArray.h"
+#include "Shaders.h"
 #include "Entity.h"
 
 struct Bone;

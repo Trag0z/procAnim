@@ -91,6 +91,7 @@ void Game::init() {
     // Level
     level.load_from_file("../assets/default.level");
     level_editor.init(&level);
+    BoxCollider::TEXTURE.load_from_file("../assets/ground.png");
 
     frame_start = SDL_GetTicks();
     running = true;

@@ -35,6 +35,7 @@ void Level::load_from_file(const char* path) {
 }
 
 void Level::render(const Renderer& renderer) const {
+    renderer.textured_shader.set_texture(BoxCollider::TEXTURE);
     for (auto& coll : colliders_) {
         coll.render(renderer);
     }
@@ -89,7 +90,7 @@ bool LevelEditor::update(const Renderer& renderer,
                            0.1f, 0.0f, 0.0f, "% 6.1f");
 
             if (needs_update) {
-                selected_collider->update_vertex_data();
+                selected_collider->update_model_matrix();
             }
         } else {
             Text("None");
@@ -126,7 +127,7 @@ bool LevelEditor::update(const Renderer& renderer,
             selected_collider->position += input.mouse_move();
         }
 
-        selected_collider->update_vertex_data();
+        selected_collider->update_model_matrix();
     }
 
     return keep_open;
@@ -136,7 +137,7 @@ void LevelEditor::render(const Renderer& renderer) {
     if (selected_collider) {
         renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
         renderer.debug_shader.set_model(&selected_collider->model);
-        selected_collider->vao.draw(GL_LINE_LOOP);
+        renderer.debug_shader.DEFAULT_VAO.draw(GL_LINE_LOOP);
     }
 }
 

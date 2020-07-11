@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Texture.h"
 #include "Entity.h"
-#include "VertexArray.h"
+#include "Shaders.h"
 
 class Renderer;
 

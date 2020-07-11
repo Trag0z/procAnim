@@ -3,39 +3,23 @@
 #include "Collider.h"
 #include "../Renderer.h"
 
-const Color BoxCollider::DEFAULT_COLOR = Color::ORANGE;
+Texture BoxCollider::TEXTURE;
 
 BoxCollider::BoxCollider(glm::vec2 position_, glm::vec2 half_extents) {
     position = position_;
     half_ext = half_extents;
 
-    model = glm::translate(glm::mat3(1.0f), position);
-
-    GLuint indices[6] = {0, 1, 2, 1, 3, 2};
-
-    vertices[0].pos = {-half_ext.x, half_ext.y};
-    vertices[1].pos = {half_ext.x, half_ext.y};
-    vertices[2].pos = {-half_ext.x, -half_ext.y};
-    vertices[3].pos = {half_ext.x, -half_ext.y};
-
-    vao.init(indices, 6, vertices, 4);
+    update_model_matrix();
 }
 
-void BoxCollider::update_vertex_data() {
+void BoxCollider::update_model_matrix() {
     model = glm::translate(glm::mat3(1.0f), position);
-
-    vertices[0].pos = {-half_ext.x, half_ext.y};
-    vertices[1].pos = {half_ext.x, half_ext.y};
-    vertices[2].pos = {-half_ext.x, -half_ext.y};
-    vertices[3].pos = {half_ext.x, -half_ext.y};
-
-    vao.update_vertex_data(vertices, 4);
+    model = glm::scale(model, half_ext);
 }
 
 void BoxCollider::render(const Renderer& renderer) const {
-    renderer.debug_shader.set_model(&model);
-    renderer.debug_shader.set_color(&color);
-    vao.draw(GL_TRIANGLES);
+    renderer.textured_shader.set_model(&model);
+    renderer.textured_shader.DEFAULT_VAO.draw(GL_TRIANGLES);
 }
 
 bool BoxCollider::is_inside_rect(glm::vec2 point) const noexcept {

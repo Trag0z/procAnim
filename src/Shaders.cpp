@@ -78,3 +78,45 @@ GLuint loadAndCompileShaderFromFile(const char* vShaderPath,
 
     return id;
 }
+
+VertexArray<TexturedShader::Vertex> TexturedShader::DEFAULT_VAO;
+
+TexturedShader::TexturedShader(const char* vert_path, const char* frag_path)
+    : Shader(vert_path, frag_path) {
+    GLuint indices[6] = {0, 1, 2, 2, 3, 0};
+
+    Vertex vertices[4];
+    vertices[0] = {{-1.0f, 1.0f}, {0.0f, 0.0f}};
+    vertices[1] = {{-1.0f, -1.0f}, {0.0f, 1.0f}};
+    vertices[2] = {{1.0f, -1.0f}, {1.0f, 1.0f}};
+    vertices[3] = {{1.0f, 1.0f}, {1.0f, 0.0f}};
+
+    DEFAULT_VAO.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
+}
+
+void TexturedShader::set_texture(const Texture& texture) const {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture.id);
+}
+
+VertexArray<DebugShader::Vertex> DebugShader::DEFAULT_VAO;
+
+DebugShader::DebugShader(const char* vert_path, const char* frag_path)
+    : Shader(vert_path, frag_path) {
+    color_loc = glGetUniformLocation(id, "color");
+
+    GLuint indices[6] = {0, 1, 2, 2, 3, 0};
+
+    Vertex vertices[4];
+    vertices[0] = {{-1.0f, 1.0f}};
+    vertices[1] = {{-1.0f, -1.0f}};
+    vertices[2] = {{1.0f, -1.0f}};
+    vertices[3] = {{1.0f, 1.0f}};
+
+    DEFAULT_VAO.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
+}
+
+void DebugShader::set_color(const Color* color) const {
+    use();
+    glUniform4fv(color_loc, 1, (const GLfloat*)color);
+}
