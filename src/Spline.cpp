@@ -265,6 +265,7 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
 }
 
 bool SplineEditor::update(const MouseKeyboardInput& input) {
+    // This value is returned at the end
     bool keep_open = update_gui();
 
     glm::vec2 mouse_pos =
@@ -279,67 +280,61 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
             animations[selected_animation_index].splines[selected_spline_index];
 
         if (!first_point_set && input.mouse_button_down(MouseButton::LEFT)) {
-            // Set all points to mouse position and return
+            // Set all points to mouse position
             for (size_t i = 0; i < Spline::NUM_POINTS; ++i) {
                 set_spline_point(mouse_pos, i);
             }
             first_point_set = true;
-            return keep_open;
-        }
 
-        // Set P2 to mouse position and the others to points along the
-        // way from P1 to P2 and return
-        set_spline_point(mouse_pos, Spline::P2);
-        glm::vec2 start_to_end = selected_spline.points[Spline::P2] -
-                                 selected_spline.points[Spline::P1];
-        set_spline_point(selected_spline.points[Spline::P1] +
-                             start_to_end * 0.3f,
-                         Spline::T1);
-        set_spline_point(selected_spline.points[Spline::P2] -
-                             start_to_end * 0.3f,
-                         Spline::T2);
+        } else {
+            // Set P2 to mouse position and the others to points along the
+            // way from P1 to P2 and return
+            set_spline_point(mouse_pos, Spline::P2);
+            glm::vec2 start_to_end = selected_spline.points[Spline::P2] -
+                                     selected_spline.points[Spline::P1];
+            set_spline_point(selected_spline.points[Spline::P1] +
+                                 start_to_end * 0.3f,
+                             Spline::T1);
+            set_spline_point(selected_spline.points[Spline::P2] -
+                                 start_to_end * 0.3f,
+                             Spline::T2);
 
-        if (input.mouse_button_down(MouseButton::LEFT)) {
-            creating_new_spline = false;
-            first_point_set = false;
-        }
-        return keep_open;
-    }
-
-    if (input.mouse_button_up(MouseButton::LEFT)) {
-        selected_point_index = static_cast<size_t>(-1);
-        return keep_open;
-    }
-
-    if (selected_spline_index >= Animation::NUM_SPLINES ||
-        selected_animation_index >= num_animations) {
-        return keep_open;
-    }
-
-    auto& spline =
-        animations[selected_animation_index].splines[selected_spline_index];
-
-    if (input.mouse_button_down(MouseButton::LEFT)) {
-        for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
-            if (glm::length(spline.points[n_point] - mouse_pos) < 0.1f) {
-                selected_point_index = n_point;
+            if (input.mouse_button_down(MouseButton::LEFT)) {
+                creating_new_spline = false;
+                first_point_set = false;
             }
         }
-    }
+    } else if (input.mouse_button_up(MouseButton::LEFT)) {
+        // No point selected anymore
+        selected_point_index = static_cast<size_t>(-1);
 
-    if (selected_point_index < Spline::NUM_POINTS) {
-        // Move the selected point (and it's tangent, if it's P1/P2) to the
-        // mouse position
-        if (selected_point_index == Spline::P1) {
-            glm::vec2 move = mouse_pos - spline.points[Spline::P1];
-            set_spline_point(spline.points[Spline::T1] + move, Spline::T1);
+    } else if (!(selected_spline_index >= Animation::NUM_SPLINES ||
+                 selected_animation_index >= num_animations)) {
+        // A valid animation/spline is selected
+        auto& spline =
+            animations[selected_animation_index].splines[selected_spline_index];
 
-        } else if (selected_point_index == Spline::P2) {
-            glm::vec2 move = mouse_pos - spline.points[Spline::P2];
-            set_spline_point(spline.points[Spline::T2] + move, Spline::T2);
+        if (input.mouse_button_down(MouseButton::LEFT)) {
+            // If a point was clicked, select it
+            for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
+                if (glm::length(spline.points[n_point] - mouse_pos) < 0.1f) {
+                    selected_point_index = n_point;
+                }
+            }
+        } else if (selected_point_index < Spline::NUM_POINTS) {
+            // Move the selected point (and it's tangent, if it's P1/P2) to the
+            // mouse position
+            if (selected_point_index == Spline::P1) {
+                glm::vec2 move = mouse_pos - spline.points[Spline::P1];
+                set_spline_point(spline.points[Spline::T1] + move, Spline::T1);
+
+            } else if (selected_point_index == Spline::P2) {
+                glm::vec2 move = mouse_pos - spline.points[Spline::P2];
+                set_spline_point(spline.points[Spline::T2] + move, Spline::T2);
+            }
+
+            set_spline_point(mouse_pos);
         }
-
-        set_spline_point(mouse_pos);
     }
 
     return keep_open;
@@ -415,8 +410,8 @@ bool SplineEditor::update_gui() {
                                 .splines[forward_spline_index]
                                 .points;
 
-        // NOTE: Calling set_spline_point ever time might be inefficient, but
-        // it's a big hassle otherwise
+        // NOTE: Calling set_spline_point ever time might be inefficient,
+        // but it's a big hassle otherwise
         if (DragFloat2("P1 (forward)", value_ptr(points[0]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
             set_spline_point(points[Spline::P1], Spline::P1,

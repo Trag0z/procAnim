@@ -46,7 +46,7 @@ class SplineEditor {
     // @CLEANUP: Does it ever use the second bone?
     const Bone* limb_bones[4][2];
 
-    size_t selected_animation_index = static_cast<size_t>(-1);
+    size_t selected_animation_index = 0;
     size_t selected_spline_index = static_cast<size_t>(-1);
     size_t selected_point_index = static_cast<size_t>(-1);
 
