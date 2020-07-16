@@ -9,6 +9,7 @@ class LevelEditor;
 
 class Level {
     std::list<BoxCollider> colliders_;
+    char* opened_path;
 
   public:
     void load_from_file(const char* path = nullptr);
@@ -22,7 +23,6 @@ class Level {
 class LevelEditor {
     Level* level;
     BoxCollider* selected_collider;
-    char* opened_path;
 
     glm::vec2 new_collider_dimensions = glm::vec2(100.0f);
 
