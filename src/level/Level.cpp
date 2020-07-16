@@ -72,9 +72,13 @@ bool LevelEditor::update(const Renderer& renderer,
         if (Button("Save")) {
             save_to_file();
         }
+        SameLine();
         if (Button("Save as...")) {
             save_to_file(true);
         }
+        Text("Opened file: %s", level->opened_path);
+
+        NewLine();
 
         if (Button("New collider")) {
             colliders.emplace_front(renderer.camera_position() +
