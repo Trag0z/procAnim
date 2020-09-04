@@ -11,7 +11,17 @@
 #include "Renderer.h"
 #include "level/Level.h"
 
-class Player;
+//----------------------------------//
+//----------Keybindings-------------//
+//----------------------------------//
+namespace Keybinds {
+constexpr SDL_Scancode DRAW_WIREFRAEMS = SDL_SCANCODE_F1;
+constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F2;
+constexpr SDL_Scancode STEP_MODE = SDL_SCANCODE_P;
+constexpr SDL_Scancode SPEED_UP = SDL_SCANCODE_COMMA;
+constexpr SDL_Scancode SPEED_DOWN = SDL_SCANCODE_PERIOD;
+constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
+}; // namespace Keybinds
 
 //----------------------------------//
 //----------Member structs----------//
@@ -34,8 +44,8 @@ struct GameConfig {
 //-------------------------------//
 
 class Game {
-public:
-    bool running = false;
+  public:
+    bool is_running = false;
     U32 frame_start, last_frame_start;
 
     SDL_Window* window;
@@ -57,7 +67,7 @@ public:
     enum GameMode { PLAY = 0, SPLINE_EDITOR = 1, LEVEL_EDITOR = 2 } game_mode;
 
     void init();
-    bool run();
+    void run();
 
   private:
     void update_gui();

@@ -7,7 +7,14 @@
 int main(int argc, char* argv[]) {
     Game game;
     game.init();
-    return game.run();
+    while (game.is_running) {
+        game.run();
+    }
+
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
+    return 0;
 }
 
 #pragma warning(pop)
