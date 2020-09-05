@@ -310,6 +310,7 @@ void WalkAnimator::update(float delta_time, float walking_speed,
     };
 
     if (state == AnimState::WALKING) {
+        // Lean in walking direction when walking fast/running
         spine->rotation =
             std::max(walking_speed - 0.2f, 0.0f) * max_spine_rotation;
 

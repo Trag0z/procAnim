@@ -37,7 +37,6 @@ struct LimbAnimator {
     Bone* bones[2];
     BoneRestrictions bone_restrictions[2];
 
-    // 3 different animations, consisting of 2 splines each (forward/backward)
     Spline* splines[3];
     float spline_interpolation_factor = 0.0f;
     float lerp_interpolation_factor = 1.0f;
@@ -71,6 +70,7 @@ struct LimbAnimator {
 };
 
 class WalkAnimator {
+    // 3 different animations, consisting of 2 splines each (forward/backward)
     Animation animations[3];
     Bone* spine;
 
