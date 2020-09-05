@@ -49,7 +49,7 @@ void MouseKeyboardInput::update() {
 
 std::array<Gamepad, Gamepad::NUM_PADS> Gamepad::init() {
     std::array<Gamepad, NUM_PADS> ret;
-    for (U32 i = 0; i < Gamepad::NUM_PADS; ++i) {
+    for (u32 i = 0; i < Gamepad::NUM_PADS; ++i) {
         ret[i].sdl_ptr = SDL_GameControllerOpen(i);
         if (!ret[i].sdl_ptr) {
             printf("[Input] Error opening gamepad%I32d: %s\n", i,
@@ -121,7 +121,7 @@ void Gamepad::update() {
     }
 
     // Poll all the buttons on this pad
-    for (U32 i = 0; i < Gamepad::num_buttons; ++i) {
+    for (u32 i = 0; i < Gamepad::num_buttons; ++i) {
         if (SDL_GameControllerGetButton(
                 sdl_ptr, static_cast<SDL_GameControllerButton>(i))) {
             if (!button(i)) {

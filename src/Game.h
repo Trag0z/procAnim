@@ -11,9 +11,6 @@
 #include "Renderer.h"
 #include "level/Level.h"
 
-//----------------------------------//
-//----------Keybindings-------------//
-//----------------------------------//
 namespace Keybinds {
 constexpr SDL_Scancode DRAW_WIREFRAEMS = SDL_SCANCODE_F1;
 constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F2;
@@ -28,11 +25,11 @@ constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
 //----------------------------------//
 
 struct GameConfig {
-    const U32 window_flags =
+    const u32 window_flags =
         SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
 
-    const U32 fps = 60;
-    const U32 frame_delay = 1000 / fps;
+    const u32 fps = 60;
+    const u32 frame_delay = 1000 / fps;
 
     float speed = 1.0f;
     bool step_mode = false;
@@ -46,7 +43,7 @@ struct GameConfig {
 class Game {
   public:
     bool is_running = false;
-    U32 frame_start, last_frame_start;
+    u32 frame_start, last_frame_start;
 
     SDL_Window* window;
     SDL_Renderer* sdl_renderer;

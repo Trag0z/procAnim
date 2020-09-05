@@ -19,3 +19,4 @@ Cleanup:            (@CLEANUP)
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time
 - set some vertex arrays as static if they don't change
+- move IK calculations to shader

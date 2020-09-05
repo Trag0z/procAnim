@@ -55,10 +55,10 @@ class MouseKeyboardInput {
 enum class StickID : size_t { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };
 
 class Gamepad {
-    static const U32 num_axes = SDL_CONTROLLER_AXIS_MAX;
-    static const U32 num_buttons = SDL_CONTROLLER_BUTTON_MAX;
-    static const S32 stick_deadzone_in = 8000;
-    static const S32 stick_deadzone_out = 32767 - 1000;
+    static const u32 num_axes = SDL_CONTROLLER_AXIS_MAX;
+    static const u32 num_buttons = SDL_CONTROLLER_BUTTON_MAX;
+    static const s32 stick_deadzone_in = 8000;
+    static const s32 stick_deadzone_out = 32767 - 1000;
 
     SDL_GameController* sdl_ptr = nullptr;
 
@@ -66,7 +66,7 @@ class Gamepad {
     Uint32 button_map, button_down_map, button_up_map;
 
   public:
-    static const U32 NUM_PADS = 1;
+    static const u32 NUM_PADS = 1;
 
     static std::array<Gamepad, NUM_PADS> init();
 
@@ -79,7 +79,7 @@ class Gamepad {
 
     // NOTE: These could only be shifted by n-1 if SDL_GAMECONTROLLER_BUTTON
     // starts at 1
-    inline bool button(U32 n) const { return button_map & BIT(n); };
-    inline bool button_down(U32 n) const { return button_down_map & BIT(n); };
-    inline bool button_up(U32 n) const { return button_up_map & BIT(n); };
+    inline bool button(u32 n) const { return button_map & BIT(n); };
+    inline bool button_down(u32 n) const { return button_down_map & BIT(n); };
+    inline bool button_up(u32 n) const { return button_up_map & BIT(n); };
 };
