@@ -162,7 +162,8 @@ void Animator::init(const Entity* parent_, RiggedMesh& mesh) {
     GLuint indices[] = {0, 1, 2, 3};
     target_points_vao.init(indices, 4, nullptr, 4, GL_DYNAMIC_DRAW);
 
-    leg_state = last_leg_state = NEUTRAL;
+    leg_state = NEUTRAL;
+    last_leg_state = RIGHT_LEG_UP;
 
     interpolation_factor_between_splines = interpolation_factor_on_spline =
         0.0f;
@@ -171,6 +172,7 @@ void Animator::init(const Entity* parent_, RiggedMesh& mesh) {
 
     for (size_t i = 0; i < 4; ++i) {
         auto& limb = limbs[i];
+        limb.spline.init(nullptr);
 
         // @CLEANUP: are these already zeroed?
         limb.target_rotations[0] = 0.0f;
