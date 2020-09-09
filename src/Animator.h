@@ -2,102 +2,91 @@
 #include "pch.h"
 #include "VertexArray.h"
 #include "Spline.h"
+#include "level/Collider.h"
 
 struct Bone;
 struct RiggedMesh;
+class Game;
 
-enum AnimState { STANDING, WALKING };
-
+// @TODO: Rename to AnimationState
 struct BoneRestrictions {
     float min_rotation, max_rotation;
 };
 
-struct Animation {
-    static const size_t MAX_NAME_LENGTH = 32;
-    static const size_t NUM_SPLINES = 8;
-
-    char name[MAX_NAME_LENGTH];
-    Spline splines[NUM_SPLINES];
-
-    enum SplineIndex {
-        LEFT_ARM_FORWARD = 0,
-        LEFT_ARM_BACKWARD = 1,
-        RIGHT_ARM_FORWARD = 2,
-        RIGHT_ARM_BACKWARD = 3,
-        LEFT_LEG_FORWARD = 4,
-        LEFT_LEG_BACKWARD = 5,
-        RIGHT_LEG_FORWARD = 6,
-        RIGHT_LEG_BACKWARD = 7
-    };
+struct SplineSet {
+    Spline walk[4];
+    Spline run[4];
+    Spline idle[4];
 };
 
-enum AnimationIndex { IDLE = 0, WALK = 1, RUN = 2 };
+struct Limb {
+    float target_rotations[2];
+    Spline spline; // In parent's local space
 
-struct LimbAnimator {
     Bone* bones[2];
     BoneRestrictions bone_restrictions[2];
 
-    Spline* splines[3];
-    float spline_interpolation_factor = 0.0f;
-    float lerp_interpolation_factor = 1.0f;
-
-    static const float LERP_SPEED_MULTIPLIER;
-    // @CLEANUP: Rename this?
-    static const struct WalkingSpeedMultiplier {
-        float MIN, MAX;
-    } WALKING_SPEED_MULTIPLIER;
-
-    static const float IDLE_LERP_SPEED_MULTIPLIER;
-
-    glm::vec2 target_pos, tip_pos;
-    glm::vec2 last_tip_movement;
-
-    float target_rotations[2];
-
-    bool is_walking = false;
-    enum AnimationState {
-        MOVE_FORWARD = 0,
-        MOVE_BACKWARD = 1
-    } animation_state = MOVE_FORWARD;
-
-    VertexArray<DebugShader::Vertex> target_point_vao;
-
-    LimbAnimator() {}
-    LimbAnimator(Bone* b1, Bone* b2, Spline* splines_[3],
-                 BoneRestrictions restrictions[2] = nullptr);
-
-    void update(float delta_time, float movement_speed);
+    glm::vec2 tip_pos, last_tip_pos;
 };
 
-class WalkAnimator {
-    // 3 different animations, consisting of 2 splines each (forward/backward)
-    Animation animations[3];
-    Bone* spine;
-
-    static const float max_spine_rotation;
-
+class Animator {
   public:
-    SplineEditor spline_editor;
-    LimbAnimator limb_animators[4];
-    bool arm_follows_mouse = false;
-
-    enum Limb { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
-    Limb grounded_leg_index = LEFT_LEG;
-
-  private:
-    enum {
+    enum SplineIndex {
         LEG_FORWARD = 0,
         LEG_BACKWARD = 1,
         ARM_FORWARD = 2,
         ARM_BACKWARD = 3
     };
+    enum LimbIndex { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
 
-    enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state;
-
-  public:
-    void init(const Entity* parent, RiggedMesh& mesh);
-    void update(float delta_time, float walking_speed, AnimState state,
-                bool& new_grounded_state, glm::vec2 mouse_pos = {0.0f, 0.0f},
-                bool mouse_down = false);
+    void init(const Entity* parent_, RiggedMesh& mesh);
+    void update(float delta_time, float walking_speed,
+                const MouseKeyboardInput& input,
+                const std::list<BoxCollider>& colliders);
     void render(const Renderer& renderer);
+
+    glm::vec2 get_tip_pos(LimbIndex limb_index) const;
+
+    glm::vec2 get_last_ground_movement() const;
+
+  private:
+    const Entity* parent;
+    SplineEditor* spline_editor;
+    Bone* spine;
+
+    // The splines' coordinate systems originate at the head of the first bone
+    // they control (i.e. the shoulder or the hip)
+    SplineSet splines;
+
+    Limb limbs[4];
+
+    VertexArray<DebugShader::Vertex> target_points_vao;
+
+    float interpolation_factor_between_splines;
+    float interpolation_factor_on_spline;
+
+    glm::vec2 last_ground_movement;
+
+    bool arm_follows_mouse = false;
+
+    static const float MAX_SPINE_ROTATION;
+
+    // @CLEANUP: Rename this?
+    static const struct WalkingSpeedMultiplier {
+        float MIN, MAX;
+    } WALKING_SPEED_MULTIPLIER;
+
+    enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state, last_leg_state;
+
+    glm::vec2
+    find_interpolated_target_point(SplineIndex spline_index) const noexcept;
+
+    // Creates a new spline for the limb using an interpolation of walk and run
+    // splines with the target position as an end point. If leg_state is
+    // neutral, it just uses the idle spline.
+    void set_limb_spline(
+        LimbIndex limb, SplineIndex spline,
+        glm::vec2 target_pos_world_space = glm::vec2(0.0f)) noexcept;
+
+    friend Game;
 };

@@ -36,6 +36,7 @@
         "unordered_map": "cpp",
         "chrono": "cpp",
         "limits": "cpp",
-        "xloctime": "cpp"
+        "xloctime": "cpp",
+        "forward_list": "cpp"
     }
 }

@@ -21,3 +21,6 @@ struct BoxCollider {
 
     bool is_inside_rect(glm::vec2 point) const noexcept;
 };
+
+const std::list<const BoxCollider>
+find_colliders_around_point(const std::list<BoxCollider>& colliders);

@@ -3,7 +3,6 @@
 #include "Spline.h"
 #include "Game.h"
 #include "Util.h"
-// #include <shobjidl.h>
 
 /////                                   /////
 /////               Spline              /////
@@ -52,7 +51,17 @@ void Spline::init(glm::vec2 points_[NUM_POINTS]) {
     }
 }
 
+const glm::vec2 Spline::point(PointName p) const { return points[p]; }
+
+void Spline::set_points(const glm::vec2 new_points[NUM_POINTS]) {
+    for (size_t i = 0; i < NUM_POINTS; ++i) {
+        points[i] = new_points[i];
+    }
+    update_render_data();
+}
+
 void Spline::update_render_data() {
+    SDL_assert(vertices_initialized);
     // Line
     // @optimize
     parameter_matrix = glm::mat4(
@@ -102,80 +111,80 @@ static size_t opposite_direction(size_t spline_index) {
 }
 
 void SplineEditor::save_splines(bool get_new_file_path) {
-    if (get_new_file_path || save_path == nullptr) {
+    if (get_new_file_path || save_path.empty()) {
         bool success = !get_save_path(save_path, L".spl", L"*.spl", L"spl");
         SDL_assert_always(success);
     }
 
-    // Write data
-    SDL_RWops* file = SDL_RWFromFile(save_path, "wb");
+    // Construct an array of all the spline points
+    const size_t num_splines_total = 4 * 3;
+    glm::vec2 all_points[num_splines_total * Spline::NUM_POINTS];
 
-    SDL_RWwrite(file, &num_animations, sizeof(num_animations), 1);
-
-    for (size_t n_anim = 0; n_anim < num_animations; ++n_anim) {
-        auto& anim = animations[n_anim];
-        SDL_RWwrite(file, anim.name, sizeof(char), Animation::MAX_NAME_LENGTH);
-
-        for (auto& spline : anim.splines) {
-            SDL_RWwrite(file, spline.points, sizeof(*spline.points),
-                        Spline::NUM_POINTS);
+    size_t num_copied = 0;
+    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+        for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
+            all_points[num_copied++] =
+                spline_set->walk[n_spline].points[n_point];
+        }
+    }
+    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+        for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
+            all_points[num_copied++] =
+                spline_set->run[n_spline].points[n_point];
+        }
+    }
+    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+        for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
+            all_points[num_copied++] =
+                spline_set->idle[n_spline].points[n_point];
         }
     }
 
+    // Write data
+    SDL_RWops* file = SDL_RWFromFile(save_path.c_str(), "wb");
+    SDL_RWwrite(file, all_points, sizeof(all_points), 1);
     SDL_RWclose(file);
 }
 
-void SplineEditor::load_splines(const char* path) {
-    if (path == nullptr) {
+void SplineEditor::load_splines(const std::string& path) {
+    if (path.empty()) {
         bool success = get_load_path(save_path, L".spl", L"*.spl");
         SDL_assert_always(success);
-    } else {
-        if (save_path) {
-            delete[] save_path;
-        }
-        size_t length = strlen(path) + 1;
-        save_path = new char[length];
-        strcpy_s(save_path, length, path);
     }
 
     // Read data
-    SDL_RWops* file = SDL_RWFromFile(save_path, "rb");
+    const size_t num_splines_total = 4 * 3;
+    const size_t num_points_total = num_splines_total * Spline::NUM_POINTS;
+    glm::vec2 all_points[num_points_total];
 
-    SDL_RWread(file, &num_animations, sizeof(num_animations), 1);
-
-    for (size_t n_anim = 0; n_anim < num_animations; ++n_anim) {
-        auto& anim = animations[n_anim];
-        SDL_RWread(file, &anim, sizeof(char), Animation::MAX_NAME_LENGTH);
-
-        glm::vec2 point_buf[Spline::NUM_POINTS];
-        for (auto& spline : anim.splines) {
-            SDL_RWread(file, point_buf, sizeof(*point_buf), Spline::NUM_POINTS);
-            spline.init(point_buf);
-        }
-    }
-
+    SDL_RWops* file = SDL_RWFromFile(save_path.c_str(), "rb");
+    SDL_RWread(file, all_points, sizeof(all_points), 1);
     SDL_RWclose(file);
+
+    // Initialize the splines from the point data
+    size_t num_copied = 0;
+    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+        spline_set->walk[n_spline].init(&all_points[num_copied]);
+        num_copied += Spline::NUM_POINTS;
+    }
+    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+        spline_set->run[n_spline].init(&all_points[num_copied]);
+        num_copied += Spline::NUM_POINTS;
+    }
+    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+        spline_set->idle[n_spline].init(&all_points[num_copied]);
+        num_copied += Spline::NUM_POINTS;
+    }
 }
 
-void SplineEditor::init(const Entity* parent_, Animation* animations_,
-                        const Bone* limb_bones_[4][2],
-                        const char* spline_path) {
+void SplineEditor::init(const Entity* parent_, SplineSet* splines_,
+                        Limb* limbs_, const char* spline_path) {
     SDL_assert(parent_ != nullptr);
     parent = parent_;
-    animations = animations_;
+    spline_set = splines_;
+    limbs = limbs_;
 
-    size_t path_length = strnlen_s(spline_path, MAX_SAVE_PATH_LENGTH) + 1;
-
-    if (save_path)
-        delete[] save_path;
-    save_path = new char[path_length];
-
-    strcpy_s(save_path, path_length, spline_path);
-
-    for (size_t i = 0; i < 4; ++i) {
-        limb_bones[i][0] = limb_bones_[i][0];
-        limb_bones[i][1] = limb_bones_[i][1];
-    }
+    save_path = std::string{spline_path};
 
     load_splines(spline_path);
 
@@ -199,15 +208,25 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
         spline_index = selected_spline_index;
     }
 
-    Animation& anim = animations[selected_animation_index];
+    Spline* splines = nullptr;
+    if (selected_animation == WALK) {
+        splines = spline_set->walk;
+    } else if (selected_animation == RUN) {
+        splines = spline_set->run;
+    } else if (selected_animation == IDLE) {
+        splines = spline_set->idle;
+    }
+    else {
+        SDL_TriggerBreakpoint();
+    }
 
-    anim.splines[spline_index].points[point_index] = new_point;
+    splines[spline_index].points[point_index] = new_point;
     // @OPTIMIZATION: Is called way more often than it needs to be
-    anim.splines[spline_index].update_render_data();
+    splines[spline_index].update_render_data();
 
     { // Conditionally set points on other splines as well
         bool updated = false;
-        auto& partner_spline = anim.splines[opposite_direction(spline_index)];
+        auto& partner_spline = splines[opposite_direction(spline_index)];
         if (connect_point_pairs &&
             (point_index == Spline::P1 || point_index == Spline::P2)) {
             partner_spline.points[3 - point_index] = new_point;
@@ -222,46 +241,6 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
         if (updated)
             partner_spline.update_render_data();
     }
-
-    // Same for other limb on other side
-    if (mirror_to_opposing_limb) {
-        size_t mirror_limb_spline_index;
-        if (spline_index < 2 || (spline_index >= 4 && spline_index < 6)) {
-            mirror_limb_spline_index = spline_index + 2;
-        } else {
-            mirror_limb_spline_index = spline_index - 2;
-        }
-
-        glm::vec2 mirrored_limb_point =
-            new_point +
-            glm::vec2(limb_bones[mirror_limb_spline_index / 2][0]
-                          ->bind_pose_transform[2] -
-                      limb_bones[spline_index / 2][0]->bind_pose_transform[2]);
-
-        // Does the same as above, but with mirror_limb_spline_index instead of
-        // spline_index
-        anim.splines[mirror_limb_spline_index].points[point_index] =
-            mirrored_limb_point;
-        anim.splines[mirror_limb_spline_index].update_render_data();
-
-        // Conditionally set points on other splines as well
-        bool updated = false;
-        auto& other_partner_spline =
-            anim.splines[opposite_direction(mirror_limb_spline_index)];
-        if (connect_point_pairs &&
-            (point_index == Spline::P1 || point_index == Spline::P2)) {
-            other_partner_spline.points[3 - point_index] = mirrored_limb_point;
-            updated = true;
-        }
-        if (connect_tangent_pairs &&
-            (point_index == Spline::T1 || point_index == Spline::T2)) {
-            other_partner_spline.points[3 - point_index] = mirrored_limb_point;
-            updated = true;
-        }
-
-        if (updated)
-            other_partner_spline.update_render_data();
-    }
 }
 
 bool SplineEditor::update(const MouseKeyboardInput& input) {
@@ -272,12 +251,21 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
         parent->world_to_local_space(glm::vec3(input.mouse_pos_world(), 0.0f));
 
     if (creating_new_spline) {
-        // Set the points and return
-        SDL_assert_always(selected_animation_index < num_animations &&
-                          selected_spline_index < Animation::NUM_SPLINES);
+        // Set the points
+        SDL_assert_always(selected_animation != NONE &&
+                          selected_spline_index < NUM_SPLINES_PER_ANIMATION);
 
-        Spline& selected_spline =
-            animations[selected_animation_index].splines[selected_spline_index];
+        Spline* splines = nullptr;
+        if (selected_animation == WALK) {
+            splines = spline_set->walk;
+        } else if (selected_animation == RUN) {
+            splines = spline_set->run;
+        } else if (selected_animation == IDLE) {
+            splines = spline_set->idle;
+        }
+        else {
+            SDL_TriggerBreakpoint();
+        }
 
         if (!first_point_set && input.mouse_button_down(MouseButton::LEFT)) {
             // Set all points to mouse position
@@ -290,6 +278,8 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
             // Set P2 to mouse position and the others to points along the
             // way from P1 to P2 and return
             set_spline_point(mouse_pos, Spline::P2);
+            auto& selected_spline = splines[selected_spline_index];
+
             glm::vec2 start_to_end = selected_spline.points[Spline::P2] -
                                      selected_spline.points[Spline::P1];
             set_spline_point(selected_spline.points[Spline::P1] +
@@ -308,16 +298,25 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
         // No point selected anymore
         selected_point_index = static_cast<size_t>(-1);
 
-    } else if (!(selected_spline_index >= Animation::NUM_SPLINES ||
-                 selected_animation_index >= num_animations)) {
+    } else if (selected_spline_index < NUM_SPLINES_PER_ANIMATION ||
+               selected_animation != NONE) {
         // A valid animation/spline is selected
-        auto& spline =
-            animations[selected_animation_index].splines[selected_spline_index];
+        Spline* spline = nullptr;
+        if (selected_animation == WALK) {
+            spline = &spline_set->walk[selected_spline_index];
+        } else if (selected_animation == RUN) {
+            spline = &spline_set->run[selected_spline_index];
+        } else if (selected_animation == IDLE) {
+            spline = &spline_set->idle[selected_spline_index];
+        }
+        else {
+            SDL_TriggerBreakpoint();
+        }
 
         if (input.mouse_button_down(MouseButton::LEFT)) {
             // If a point was clicked, select it
             for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
-                if (glm::length(spline.points[n_point] - mouse_pos) < 0.1f) {
+                if (glm::length(spline->points[n_point] - mouse_pos) < 0.1f) {
                     selected_point_index = n_point;
                 }
             }
@@ -325,12 +324,12 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
             // Move the selected point (and it's tangent, if it's P1/P2) to the
             // mouse position
             if (selected_point_index == Spline::P1) {
-                glm::vec2 move = mouse_pos - spline.points[Spline::P1];
-                set_spline_point(spline.points[Spline::T1] + move, Spline::T1);
+                glm::vec2 move = mouse_pos - spline->points[Spline::P1];
+                set_spline_point(spline->points[Spline::T1] + move, Spline::T1);
 
             } else if (selected_point_index == Spline::P2) {
-                glm::vec2 move = mouse_pos - spline.points[Spline::P2];
-                set_spline_point(spline.points[Spline::T2] + move, Spline::T2);
+                glm::vec2 move = mouse_pos - spline->points[Spline::P2];
+                set_spline_point(spline->points[Spline::T2] + move, Spline::T2);
             }
 
             set_spline_point(mouse_pos);
@@ -348,35 +347,31 @@ bool SplineEditor::update_gui() {
     Begin("Spline Editor", &keep_open);
     Text("Animatons");
 
-    const char** animation_names = new const char*[num_animations];
-    for (size_t i = 0; i < num_animations; ++i) {
-        animation_names[i] = animations[i].name;
-    }
+    const size_t num_animations = 3;
+    const char* animation_names[num_animations] = {"Walk", "Run", "Idle"};
 
-    int selected = static_cast<int>(selected_animation_index);
+    int selected = static_cast<int>(selected_animation);
     ListBox("Animations", &selected, animation_names,
             static_cast<int>(num_animations), static_cast<int>(num_animations));
-    selected_animation_index = static_cast<size_t>(selected);
-
-    delete[] animation_names;
+    SDL_assert(selected > -1 && selected < 4);
+    selected_animation = static_cast<SelectedAnimation>(selected);
 
     NewLine();
     Text("Splines");
 
-    const char* spline_names[Animation::NUM_SPLINES] = {
-        "Left_Arm_Forward",   "Left_Arm_Backward", "Right_Arm_Forward",
-        "Right_Arm_Backward", "Left_Leg_Forward",  "Left_Leg_Backward",
-        "Right_Leg_Forward",  "Right_Leg_Backward"};
+    const char* spline_names[NUM_SPLINES_PER_ANIMATION] = {
+        "Leg_Forward", "Leg_Backward", "Arm_Forward", "Arm_Backward"};
 
     selected = static_cast<int>(selected_spline_index);
     ListBox("Splines", &selected, spline_names,
-            static_cast<int>(Animation::NUM_SPLINES),
-            static_cast<int>(Animation::NUM_SPLINES));
+            static_cast<int>(NUM_SPLINES_PER_ANIMATION),
+            static_cast<int>(NUM_SPLINES_PER_ANIMATION));
     selected_spline_index = static_cast<size_t>(selected);
 
     if (Button("Replace with new spline") && !creating_new_spline) {
-        SDL_assert_always(selected_animation_index < num_animations &&
-                          selected_spline_index < Animation::NUM_SPLINES);
+        // @CLEANUP: Is this necessary?
+        SDL_assert_always(selected_animation < num_animations &&
+                          selected_spline_index < NUM_SPLINES_PER_ANIMATION);
 
         // Just set this, update() handles the rest
         creating_new_spline = true;
@@ -384,7 +379,7 @@ bool SplineEditor::update_gui() {
     }
 
     if (Button("Open...")) {
-        load_splines();
+        load_splines(save_path);
     }
     SameLine();
     if (Button("Save")) {
@@ -398,17 +393,24 @@ bool SplineEditor::update_gui() {
     NewLine();
     Checkbox("Connect point pairs", &connect_point_pairs);
     Checkbox("Connect tangent pairs", &connect_tangent_pairs);
-    Checkbox("Mirror to opposing limb", &mirror_to_opposing_limb);
 
-    if (selected_spline_index < Animation::NUM_SPLINES) {
+    if (selected_spline_index < NUM_SPLINES_PER_ANIMATION) {
         const float sensitivity = 0.1f;
 
         size_t forward_spline_index = selected_spline_index;
         forward_spline_index -= forward_spline_index % 2;
 
-        glm::vec2* points = animations[selected_animation_index]
-                                .splines[forward_spline_index]
-                                .points;
+        glm::vec2* points = nullptr;
+        if (selected_animation == WALK) {
+            spline_set->walk[forward_spline_index].points;
+        } else if (selected_animation == RUN) {
+            spline_set->run[forward_spline_index].points;
+        } else if (selected_animation == IDLE) {
+            spline_set->idle[forward_spline_index].points;
+        }
+        else {
+            SDL_TriggerBreakpoint();
+        }
 
         // NOTE: Calling set_spline_point ever time might be inefficient,
         // but it's a big hassle otherwise
@@ -436,9 +438,13 @@ bool SplineEditor::update_gui() {
         NewLine();
 
         size_t backward_spline_index = forward_spline_index + 1;
-        points = animations[selected_animation_index]
-                     .splines[backward_spline_index]
-                     .points;
+        if (selected_animation == WALK) {
+            spline_set->walk[backward_spline_index].points;
+        } else if (selected_animation == RUN) {
+            spline_set->run[backward_spline_index].points;
+        } else if (selected_animation == IDLE) {
+            spline_set->idle[backward_spline_index].points;
+        }
 
         if (DragFloat2("P1 (backward)", value_ptr(points[0]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
@@ -472,10 +478,20 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     glLineWidth(1.0f);
 
     // Draw circle for selected limb
-    if (selected_spline_index < Animation::NUM_SPLINES && spline_edit_mode) {
-        const Bone** bones = limb_bones[selected_spline_index / 2];
+    if (selected_spline_index < NUM_SPLINES_PER_ANIMATION && spline_edit_mode) {
+        // const Bone** bones = limb_bones[selected_spline_index / 2];
 
         // @OPTIMIZATION: Calculate this stuff less often
+        Bone** bones;
+        if (selected_spline_index == Animator::LEG_FORWARD ||
+            selected_spline_index == Animator::LEG_BACKWARD) {
+
+            bones = &limbs[Animator::LEFT_LEG].bones[0];
+        } else {
+            bones = &limbs[Animator::LEFT_ARM].bones[0];
+        }
+
+        // @CLEANUP: Why bind_pose_transform[2]? Can't this be clearer?
         glm::vec2 limb_root_position = static_cast<glm::vec2>(
             bones[0]->get_transform() * bones[0]->bind_pose_transform[2]);
         float radius = bones[0]->length + bones[1]->length;
@@ -501,36 +517,52 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
 
     if (renderer.draw_all_splines) {
         // Draw all splines (except selected)
-        for (size_t n_anim = 0; n_anim < num_animations; ++n_anim) {
-            for (size_t n_spline = 0; n_spline < Animation::NUM_SPLINES;
-                 ++n_spline) {
+        for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
+             ++n_spline) {
 
-                if (n_anim == selected_animation_index &&
-                    n_spline == selected_spline_index && creating_new_spline &&
-                    !first_point_set) {
-                    continue;
+            if (n_spline == selected_spline_index && creating_new_spline &&
+                !first_point_set) {
+                // Only draw the splines that do not belong to the selected
+                // animation
+                if (selected_animation != WALK) {
+                    spline_set->walk[n_spline].line_vao.draw(GL_LINE_STRIP);
                 }
-
-                animations[n_anim].splines[n_spline].line_vao.draw(
-                    GL_LINE_STRIP);
+                if (selected_animation != RUN) {
+                    spline_set->run[n_spline].line_vao.draw(GL_LINE_STRIP);
+                }
+                if (selected_animation != IDLE) {
+                    spline_set->idle[n_spline].line_vao.draw(GL_LINE_STRIP);
+                }
+                continue;
             }
+
+            spline_set->walk[n_spline].line_vao.draw(GL_LINE_STRIP);
         }
     }
 
-    if (selected_animation_index < num_animations &&
-        selected_spline_index < Animation::NUM_SPLINES &&
+    if (selected_animation != NONE &&
+        selected_spline_index < NUM_SPLINES_PER_ANIMATION &&
         !(creating_new_spline && !first_point_set)) {
         // Draw selected spline (with points)
-        auto& spline =
-            animations[selected_animation_index].splines[selected_spline_index];
-        spline.line_vao.draw(GL_LINE_STRIP);
+        const Spline* spline = nullptr;
+        if (selected_animation != WALK) {
+            spline = &spline_set->walk[selected_spline_index];
+        } else if (selected_animation != RUN) {
+            spline = &spline_set->run[selected_spline_index];
+        } else if (selected_animation != IDLE) {
+            spline = &spline_set->idle[selected_spline_index];
+        }
+        else {
+            SDL_TriggerBreakpoint();
+        }
+        spline->line_vao.draw(GL_LINE_STRIP);
 
         if (spline_edit_mode) {
             renderer.debug_shader.set_color(&Color::LIGHT_PURPLE);
-            spline.point_vao.draw(GL_LINES);
+            spline->point_vao.draw(GL_LINES);
 
             renderer.debug_shader.set_color(&Color::PURPLE);
-            spline.point_vao.draw(GL_POINTS);
+            spline->point_vao.draw(GL_POINTS);
         }
     }
 }

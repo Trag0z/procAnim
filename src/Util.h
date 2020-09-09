@@ -21,7 +21,7 @@ template <typename T> void printGlm(const char* title, const T& t) {
     printGlm(t);
 }
 
-inline float lerp(float a, float b, float t) { return a + (b - a) * t; }
+template <typename T> T lerp(T a, T b, float t) { return a + (b - a) * t; }
 
 inline float clamp(float val, float min, float max) {
     if (val < min) {
@@ -34,8 +34,8 @@ inline float clamp(float val, float min, float max) {
 }
 
 typedef const wchar_t* cwstrptr_t;
-bool get_save_path(char*& path, cwstrptr_t filter_name = nullptr,
+bool get_save_path(std::string& path, cwstrptr_t filter_name = nullptr,
                    cwstrptr_t filter_pattern = nullptr,
                    cwstrptr_t default_extension = nullptr);
-bool get_load_path(char*& path, cwstrptr_t filter_name = nullptr,
+bool get_load_path(std::string& path, cwstrptr_t filter_name = nullptr,
                    cwstrptr_t filter_pattern = nullptr);

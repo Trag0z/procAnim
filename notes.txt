@@ -9,6 +9,7 @@ TODO:
 
 - longer bone chains, multiple parents?
 - more polygons, nicer texture
+- test utf8 chars in save/load strings
 
 Bugs:               (@BUG)
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely

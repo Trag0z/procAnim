@@ -4,17 +4,15 @@
 #include "Game.h"
 #include "level/Collider.h"
 
-void Player::init(glm::vec3 position, glm::vec3 scale_,
+void Player::init(glm::vec3 position_, glm::vec3 scale_,
                   const char* texture_path, const char* mesh_path,
                   Gamepad* pad) {
-    Entity::init(position, scale_);
+    Entity::init(position_, scale_);
     tex.load_from_file(texture_path);
     rigged_mesh.load_from_file(mesh_path);
     animator.init(this, rigged_mesh);
     SDL_assert(pad);
     gamepad = pad;
-
-    anim_state = AnimState::STANDING;
 
     grounded = false;
 }
@@ -23,21 +21,21 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
                     const MouseKeyboardInput& input) {
     if (!grounded) {
         velocity.y -= gravity * delta_time;
-        position_ += velocity;
+        position += velocity;
         update_model_matrix();
     }
 
     //////          Walking animation           //////
     auto stick = gamepad->stick(StickID::LEFT);
+
     if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
-        anim_state = WALKING;
         if ((input.key(SDL_SCANCODE_LEFT) && facing_right) ||
             (input.key(SDL_SCANCODE_RIGHT) && !facing_right)) {
+            walking_speed = 1.0f;
             facing_right = !facing_right;
             scale.x *= -1.0f;
         }
     } else if (stick.x != 0.0f) {
-        anim_state = WALKING;
         walking_speed = std::abs(stick.x);
         if ((stick.x < 0.0f && facing_right) ||
             (stick.x > 0.0f && !facing_right)) {
@@ -45,23 +43,21 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
             scale.x *= -1.0f;
         }
     } else {
-        anim_state = STANDING;
+        walking_speed = 0.0f;
     }
 
-    bool not_grounded_anymore = false;
     glm::vec2 local_mouse_pos = world_to_local_space(input.mouse_pos_world());
-    animator.update(delta_time, walking_speed, anim_state, not_grounded_anymore,
-                    local_mouse_pos, input.mouse_button(MouseButton::LEFT));
+    animator.update(delta_time, walking_speed, input, colliders);
 
     //////          Collision Detection         //////
-    if (not_grounded_anymore || !grounded) {
+    if (!grounded) {
         // Find closest point on gorund
         glm::vec2 foot_pos_world[2];
 
-        foot_pos_world[0] = local_to_world_space(
-            animator.limb_animators[WalkAnimator::LEFT_LEG].tip_pos);
-        foot_pos_world[1] = local_to_world_space(
-            animator.limb_animators[WalkAnimator::RIGHT_LEG].tip_pos);
+        foot_pos_world[0] =
+            local_to_world_space(animator.get_tip_pos(Animator::LEFT_LEG));
+        foot_pos_world[1] =
+            local_to_world_space(animator.get_tip_pos(Animator::RIGHT_LEG));
 
         float distance_to_ground = 0.0f;
         for (auto& coll : colliders) {
@@ -76,22 +72,14 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 
         // Set grounded status
         if (distance_to_ground < 0.0f) {
-            position_.y -= distance_to_ground;
+            position.y -= distance_to_ground;
             grounded = true;
         }
     }
 
     if (grounded) {
-        glm::vec2 move =
-            scale * animator.limb_animators[animator.grounded_leg_index]
-                        .last_tip_movement;
-        if (not_grounded_anymore) {
-            grounded = false;
-            velocity = move;
-        } else {
-            velocity = glm::vec2(0.0f);
-            position_ -= move;
-        }
+        velocity = glm::vec2(0.0f);
+        position += animator.get_last_ground_movement();
     }
 
     update_model_matrix();

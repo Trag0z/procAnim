@@ -165,7 +165,7 @@ void Game::run() {
                           mouse_keyboard_input);
         }
     } else if (game_mode == SPLINE_EDITOR) {
-        if (!player.animator.spline_editor.update(mouse_keyboard_input)) {
+        if (!player.animator.spline_editor->update(mouse_keyboard_input)) {
             game_mode = PLAY;
         }
     } else if (game_mode == LEVEL_EDITOR) {
@@ -178,7 +178,7 @@ void Game::run() {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    renderer.update_camera(player.position() + glm::vec2(0.0f, 200.0f));
+    renderer.update_camera(player.get_position() + glm::vec2(0.0f, 200.0f));
 
     background.render(renderer, renderer.camera_center());
 
@@ -187,7 +187,7 @@ void Game::run() {
     player.render(renderer);
 
     if (game_mode == SPLINE_EDITOR || renderer.draw_all_splines) {
-        player.animator.spline_editor.render(renderer, true);
+        player.animator.spline_editor->render(renderer, true);
     } else if (game_mode == LEVEL_EDITOR) {
         level_editor.render(renderer);
     }
@@ -236,11 +236,11 @@ void Game::update_gui() {
 
     char label[128];
 
-    sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x, player.position_.y);
+    sprintf_s(label, "% 6.1f, % 6.1f", player.position.x, player.position.y);
     Text("Player position: ");
     SameLine();
     bool changed_value =
-        DragFloat2("Player position", value_ptr(player.position_), 1.0f, 0.0f,
+        DragFloat2("Player position", value_ptr(player.position), 1.0f, 0.0f,
                    0.0f, "% .2f");
     if (changed_value) {
         player.grounded = false;
@@ -259,9 +259,9 @@ void Game::update_gui() {
     NextColumn();
     Separator();
 
-    for (const auto& anim : player.animator.limb_animators) {
+    for (const auto& limb : player.animator.limbs) {
         glm::vec3 target_world_pos =
-            player.model * glm::vec3(anim.target_pos, 1.0f);
+            player.model * glm::vec3(limb.spline.point(Spline::P2), 1.0f);
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
         Text(label);

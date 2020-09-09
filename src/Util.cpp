@@ -14,7 +14,7 @@ void printGlm(const glm::mat4& m) {
            m[2][3], m[3][3]);
 }
 
-bool get_save_path(char*& path, cwstrptr_t filter_name,
+bool get_save_path(std::string& out_path, cwstrptr_t filter_name,
                    cwstrptr_t filter_pattern, cwstrptr_t default_extension) {
     HRESULT hr =
         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
@@ -41,8 +41,9 @@ bool get_save_path(char*& path, cwstrptr_t filter_name,
     hr = pFileSave->Show(NULL);
 
     // Get the file name from the dialog box.
-    if (!SUCCEEDED(hr))
+    if (!SUCCEEDED(hr)) {
         return false;
+    }
 
     IShellItem* pItem;
     hr = pFileSave->GetResult(&pItem);
@@ -51,15 +52,9 @@ bool get_save_path(char*& path, cwstrptr_t filter_name,
     PWSTR pszFilePath;
     hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 
-    // Copy path to parameter, delete if there is already something there
-    if (path) {
-        delete[] path;
-    }
-
-    size_t length = wcslen(pszFilePath) + 1;
-    path = new char[length];
-
-    wcstombs_s(nullptr, path, length, pszFilePath, length);
+    std::wstring w_string(pszFilePath);
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+    out_path = converter.to_bytes(w_string);
 
     CoTaskMemFree(pszFilePath);
 
@@ -72,7 +67,7 @@ bool get_save_path(char*& path, cwstrptr_t filter_name,
     return true;
 }
 
-bool get_load_path(char*& path, cwstrptr_t filter_name,
+bool get_load_path(std::string& out_path, cwstrptr_t filter_name,
                    cwstrptr_t filter_pattern) {
     HRESULT hr =
         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
@@ -106,14 +101,9 @@ bool get_load_path(char*& path, cwstrptr_t filter_name,
     PWSTR pszFilePath;
     hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 
-    if (path) {
-        delete[] path;
-    }
-
-    size_t length = wcslen(pszFilePath) + 1;
-    path = new char[length];
-
-    wcstombs_s(nullptr, path, length, pszFilePath, length);
+    std::wstring w_string(pszFilePath);
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+    out_path = converter.to_bytes(w_string);
 
     CoTaskMemFree(pszFilePath);
 

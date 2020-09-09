@@ -9,10 +9,10 @@ class LevelEditor;
 
 class Level {
     std::list<BoxCollider> colliders_;
-    char* opened_path;
+    std::string opened_path;
 
   public:
-    void load_from_file(const char* path = nullptr);
+    void load_from_file(const char* path);
     void render(const Renderer& renderer) const;
 
     const std::list<BoxCollider> colliders() const noexcept;

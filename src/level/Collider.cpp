@@ -28,3 +28,15 @@ bool BoxCollider::is_inside_rect(glm::vec2 point) const noexcept {
            point.y > position.y - half_ext.y &&
            point.y < position.y + half_ext.y;
 }
+
+std::vector<BoxCollider>
+find_colliders_around_point(glm::vec2 point, float max_distance,
+                            const std::list<BoxCollider>& colliders) {
+    std::vector<BoxCollider> ret;
+    for (auto& coll : colliders) {
+        if (glm::length(coll.position - point) > max_distance) {
+            ret.push_back(coll);
+        }
+    }
+    return ret;
+}

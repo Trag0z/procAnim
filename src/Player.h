@@ -14,13 +14,13 @@ class Game;
 class Player : public Entity {
     Texture tex;
     RiggedMesh rigged_mesh;
-    WalkAnimator animator;
+    // WalkAnimator animator;
+    Animator animator;
     const Gamepad* gamepad;
 
     glm::vec2 velocity = glm::vec2(0.0f);
-    float walking_speed = 1.0f;
+    float walking_speed;
     const float gravity = 0.5f;
-    AnimState anim_state;
     bool facing_right = true;
     bool grounded;
 

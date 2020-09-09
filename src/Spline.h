@@ -6,14 +6,31 @@
 
 struct Bone;
 class Renderer;
-struct Animation;
+class SplineEditor;
+class Animator;
+struct SplineSet;
+struct Limb;
 
-struct Spline {
+class Spline {
+  public:
     static const size_t NUM_POINTS = 4;
+
+    enum PointName { P1 = 0, T1 = 1, T2 = 2, P2 = 3 };
+
+    // Points in format P1, T1, T2, P2
+    void init(glm::vec2 points_[NUM_POINTS] = nullptr);
+
+    const glm::vec2 point(PointName p) const;
+    void set_points(const glm::vec2 new_points[NUM_POINTS]);
+    void update_render_data();
+    glm::vec2 get_point_on_spline(float t) const;
+
+    const glm::mat4 hermite_matrix = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
+                                      -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
+                                      1.0f,  0.0f,  0.0f, 0.0f};
+
+  private:
     static const size_t RENDER_STEPS = 50;
-
-    enum { P1 = 0, T1 = 1, T2 = 2, P2 = 3 };
-
     glm::vec2 points[NUM_POINTS];
     glm::mat4 parameter_matrix;
 
@@ -25,28 +42,30 @@ struct Spline {
 
     bool vertices_initialized = false;
 
-  public:
-    // Points in format P1, T1, T2, P2
-    void init(glm::vec2 points_[NUM_POINTS] = nullptr);
-
-    void update_render_data();
-    glm::vec2 get_point_on_spline(float t) const;
-
-    const glm::mat4 hermite_matrix = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
-                                      -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
-                                      1.0f,  0.0f,  0.0f, 0.0f};
+    friend SplineEditor;
 };
 
 class SplineEditor {
-    const Entity* parent = nullptr;
+  public:
+    void init(const Entity* parent_, SplineSet* splines_, Limb* limbs_,
+              const char* spline_path);
+    bool update(const MouseKeyboardInput& input);
+    void render(const Renderer& renderer, bool spline_edit_mode);
 
-    Animation* animations = nullptr;
-    size_t num_animations;
+  private:
+    const Entity* parent;
 
-    // @CLEANUP: Does it ever use the second bone?
-    const Bone* limb_bones[4][2];
+    static const size_t NUM_SPLINES_PER_ANIMATION = 4;
+    SplineSet* spline_set;
+    Limb* limbs;
 
-    size_t selected_animation_index = 0;
+    enum SelectedAnimation {
+        WALK = 0,
+        RUN = 1,
+        IDLE = 2,
+        NONE = 3
+    } selected_animation;
+
     size_t selected_spline_index = static_cast<size_t>(-1);
     size_t selected_point_index = static_cast<size_t>(-1);
 
@@ -55,29 +74,18 @@ class SplineEditor {
 
     bool connect_point_pairs = true;
     bool connect_tangent_pairs = false;
-    bool mirror_to_opposing_limb = false;
 
-    static const size_t MAX_SAVE_PATH_LENGTH = 128;
-    char* save_path = nullptr;
+    std::string save_path;
 
     static const size_t CIRCLE_SEGMENTS = 30;
     VertexArray<DebugShader::Vertex> circle_vao;
 
     void save_splines(bool get_new_file_path = false);
-    void load_splines(const char* path = nullptr);
+    void load_splines(const std::string& path);
 
     void set_spline_point(glm::vec2 p,
                           size_t point_index = static_cast<size_t>(-1),
                           size_t spline_index = static_cast<size_t>(-1));
 
     bool update_gui();
-
-  public:
-    void init(const Entity* parent_, Animation* animations_,
-              const Bone* limb_bones_[4][2], const char* spline_path);
-    // Only used for first setup of splines
-    void init(const Entity* parent_, Spline* splines_, size_t num_splines_,
-              const std::string* spline_names_, const Bone* limb_bones_[4][2]);
-    bool update(const MouseKeyboardInput& input);
-    void render(const Renderer& renderer, bool spline_edit_mode);
 };

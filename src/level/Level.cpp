@@ -11,15 +11,9 @@ struct BoxColliderSaveFormat {
 };
 
 void Level::load_from_file(const char* path) {
-    SDL_assert_always(path);
-    SDL_assert_always(path != opened_path);
+    SDL_assert_always(path != nullptr);
 
-    if (opened_path) {
-        delete[] opened_path;
-    }
-    size_t length = strnlen_s(path, 256) + 1;
-    opened_path = new char[length];
-    strcpy_s(opened_path, length, path);
+    opened_path = std::string(path);
 
     colliders_.clear();
 
@@ -76,7 +70,7 @@ bool LevelEditor::update(const Renderer& renderer,
         if (Button("Save as...")) {
             save_to_file(true);
         }
-        Text("Opened file: %s", level->opened_path);
+        Text("Opened file: %s", level->opened_path.c_str());
 
         NewLine();
 
@@ -154,7 +148,7 @@ void LevelEditor::render(const Renderer& renderer) {
 }
 
 void LevelEditor::save_to_file(bool new_file_name) {
-    if (new_file_name || level->opened_path == nullptr) {
+    if (new_file_name || !level->opened_path.empty()) {
         bool success =
             get_save_path(level->opened_path, L".level", L"*.level", L"level");
         SDL_assert_always(success);
@@ -172,7 +166,7 @@ void LevelEditor::save_to_file(bool new_file_name) {
         ++i;
     }
 
-    SDL_RWops* file = SDL_RWFromFile(level->opened_path, "wb");
+    SDL_RWops* file = SDL_RWFromFile(level->opened_path.c_str(), "wb");
     SDL_RWwrite(file, &num_colliders, sizeof(num_colliders), 1);
     SDL_RWwrite(file, save_data, sizeof(*save_data), num_colliders);
     SDL_RWclose(file);
@@ -181,13 +175,13 @@ void LevelEditor::save_to_file(bool new_file_name) {
 }
 
 void LevelEditor::load_from_file(bool new_file_name) {
-    char* new_path = nullptr;
-    if (new_file_name || level->opened_path == nullptr) {
+    std::string new_path;
+    if (new_file_name || !level->opened_path.empty()) {
         if (!get_load_path(new_path, L".level", L"*.level")) {
             return;
         }
     }
 
     SDL_assert(level);
-    level->load_from_file(new_path);
+    level->load_from_file(new_path.c_str());
 }

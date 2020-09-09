@@ -3,20 +3,20 @@
 
 class Entity {
   protected:
-    glm::vec2 position_ = glm::vec2(1.0f);
+    glm::vec2 position = glm::vec2(1.0f);
     glm::vec2 scale = glm::vec2(1.0f);
     glm::mat3 model = glm::mat3(1.0f);
 
     const Entity* parent = nullptr;
 
     void update_model_matrix() {
-        model = glm::translate(glm::mat3(1.0f), position_);
+        model = glm::translate(glm::mat3(1.0f), position);
         model = glm::scale(model, scale);
     }
     void init(glm::vec2 pos_ = glm::vec2(0.0f),
               glm::vec2 scale_ = glm::vec2(1.0f),
               const Entity* parent_ = nullptr) {
-        position_ = pos_;
+        position = pos_;
         scale = scale_;
         update_model_matrix();
         parent = parent_;
@@ -31,5 +31,5 @@ class Entity {
         return model * glm::vec3(local_pos, 1.0f);
     }
 
-    glm::vec2 position() const { return position_; }
+    glm::vec2 get_position() const { return position; }
 };

@@ -16,6 +16,11 @@ glm::mat3 Bone::get_transform() const {
            inverse_bind_pose_transform;
 }
 
+glm::vec2 Bone::head() const {
+    // NOTE: Is this the correct point?
+    return inverse_bind_pose_transform[2];
+}
+
 void RiggedMesh::load_from_file(const char* file) {
     // Load data from file
     Assimp::Importer importer;
@@ -93,7 +98,7 @@ void RiggedMesh::load_from_file(const char* file) {
         bones_shader_vertices.push_back({glm::vec4()});
     }
 
-    // Find bone parents, calculate length and head/tail positions
+    // Find bone parents, calculate length and tail positions
     aiNode* root = scene->mRootNode;
 
     for (auto& b : bones) {
