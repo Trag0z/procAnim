@@ -112,7 +112,7 @@ static size_t opposite_direction(size_t spline_index) {
 
 void SplineEditor::save_splines(bool get_new_file_path) {
     if (get_new_file_path || save_path.empty()) {
-        bool success = !get_save_path(save_path, L".spl", L"*.spl", L"spl");
+        bool success = get_save_path(save_path, L".spl", L"*.spl", L"spl");
         SDL_assert_always(success);
     }
 
@@ -402,13 +402,12 @@ bool SplineEditor::update_gui() {
 
         glm::vec2* points = nullptr;
         if (selected_animation == WALK) {
-            spline_set->walk[forward_spline_index].points;
+            points = spline_set->walk[forward_spline_index].points;
         } else if (selected_animation == RUN) {
-            spline_set->run[forward_spline_index].points;
+            points = spline_set->run[forward_spline_index].points;
         } else if (selected_animation == IDLE) {
-            spline_set->idle[forward_spline_index].points;
-        }
-        else {
+            points = spline_set->idle[forward_spline_index].points;
+        } else {
             SDL_TriggerBreakpoint();
         }
 
@@ -545,14 +544,13 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         !(creating_new_spline && !first_point_set)) {
         // Draw selected spline (with points)
         const Spline* spline = nullptr;
-        if (selected_animation != WALK) {
+        if (selected_animation == WALK) {
             spline = &spline_set->walk[selected_spline_index];
-        } else if (selected_animation != RUN) {
+        } else if (selected_animation == RUN) {
             spline = &spline_set->run[selected_spline_index];
-        } else if (selected_animation != IDLE) {
+        } else if (selected_animation == IDLE) {
             spline = &spline_set->idle[selected_spline_index];
-        }
-        else {
+        } else {
             SDL_TriggerBreakpoint();
         }
         spline->line_vao.draw(GL_LINE_STRIP);
