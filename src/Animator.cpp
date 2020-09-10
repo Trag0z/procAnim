@@ -293,15 +293,34 @@ void Animator::update(float delta_time, float walking_speed,
         }
 
     } else {
+            static bool moving_forward;
         // Player is standing
         if (leg_state != NEUTRAL) {
             spine->rotation = 0.0f;
             last_leg_state = leg_state;
             leg_state = NEUTRAL;
-            set_limb_spline(LEFT_ARM, ARM_FORWARD);
+
+            moving_forward = false;
+            set_limb_spline(LEFT_ARM, ARM_BACKWARD);
             set_limb_spline(RIGHT_ARM, ARM_BACKWARD);
             set_limb_spline(LEFT_LEG, LEG_BACKWARD);
-            set_limb_spline(RIGHT_LEG, LEG_FORWARD);
+            set_limb_spline(RIGHT_LEG, LEG_BACKWARD);
+        } else if (interpolation_factor_on_spline == 1.0f) {
+            interpolation_factor_on_spline = 0.0f;
+
+            if (moving_forward) {
+                moving_forward = false;
+                set_limb_spline(LEFT_ARM, ARM_BACKWARD);
+                set_limb_spline(RIGHT_ARM, ARM_BACKWARD);
+                set_limb_spline(LEFT_LEG, LEG_BACKWARD);
+                set_limb_spline(RIGHT_LEG, LEG_BACKWARD);
+            } else {
+                moving_forward = true;
+                set_limb_spline(LEFT_ARM, ARM_FORWARD);
+                set_limb_spline(RIGHT_ARM, ARM_FORWARD);
+                set_limb_spline(LEFT_LEG, LEG_FORWARD);
+                set_limb_spline(RIGHT_LEG, LEG_FORWARD);
+            }
         }
     }
 

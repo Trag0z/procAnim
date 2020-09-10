@@ -1,4 +1,6 @@
 NEXT:
+- somethign wrong with the splines and how the rig follows them
+
 - uneven ground
     > find good point on ground
 
