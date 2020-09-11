@@ -186,6 +186,15 @@ void Animator::init(const Entity* parent_, RiggedMesh& mesh) {
 
         limb.tip_pos = limb.last_tip_pos = glm::vec2(0.0f);
 
+        if (i == LEFT_ARM || i == RIGHT_ARM) {
+            limb.bone_restrictions[0] = {-0.5f * PI, 0.5 * PI};
+            limb.bone_restrictions[1] = {0.0f, 0.75f * PI};
+        } else {
+            limb.bone_restrictions[0] = {0.0f, 0.0f}; //{-0.7f * PI, 0.7f * PI};
+            limb.bone_restrictions[1] = {0.0f,
+                                         0.0f}; //{degToRad(-120.0f), 0.0f};
+        }
+
         if (i == LEFT_ARM) {
             limb.bones[0] = mesh.find_bone("Arm_L_1");
             limb.bones[1] = mesh.find_bone("Arm_L_2");
@@ -246,8 +255,8 @@ void Animator::update(float delta_time, float walking_speed,
             // Start to walk
             last_leg_state = leg_state;
             leg_state = RIGHT_LEG_UP;
-            interpolation_factor_between_splines = 0.4f;
-            interpolation_factor_on_spline = 0.0f;
+            interpolation_factor_between_splines = 0.0f;
+            interpolation_factor_on_spline = 0.4f;
 
             // Find and set target points for limbs
             set_limb_spline(LEFT_ARM, ARM_FORWARD);
@@ -273,7 +282,7 @@ void Animator::update(float delta_time, float walking_speed,
             static_cast<const std::list<BoxCollider>&>(colliders);
         } else if (interpolation_factor_on_spline == 1.0f) {
             // Is walking and has reached the end of the current spline
-            interpolation_factor_between_splines = 0.0f;
+            interpolation_factor_between_splines = walking_speed;
             interpolation_factor_on_spline = 0.0f;
             if (leg_state == LEFT_LEG_UP) {
                 last_leg_state = leg_state;
@@ -423,8 +432,8 @@ void Animator::set_limb_spline(LimbIndex limb_index, SplineIndex spline_index,
             // T1 has to be calculated differently
             spline_points[name] = lerp(splines.walk[spline_index].point(name),
                                        splines.run[spline_index].point(name),
-                                       interpolation_factor_between_splines) +
-                                  limb.bones[0]->head();
+                                       interpolation_factor_between_splines);
+            spline_points[name] += limb.bones[0]->head();
         }
         // TODO: remove this and the default argument value
         target_pos_local_space = spline_points[Spline::P2];

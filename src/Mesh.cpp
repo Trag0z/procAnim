@@ -17,8 +17,7 @@ glm::mat3 Bone::get_transform() const {
 }
 
 glm::vec2 Bone::head() const {
-    // NOTE: Is this the correct point?
-    return bind_pose_transform[2];
+    return get_transform() * bind_pose_transform[2];
 }
 
 void RiggedMesh::load_from_file(const char* file) {
