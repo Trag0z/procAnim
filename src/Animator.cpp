@@ -193,7 +193,7 @@ void Animator::init(const Entity* parent_, RiggedMesh& mesh) {
         } else if (i == RIGHT_ARM) {
             limb.bones[0] = mesh.find_bone("Arm_R_1");
             limb.bones[1] = mesh.find_bone("Arm_R_2");
-            set_limb_spline(static_cast<LimbIndex>(i), ARM_BACKWARD);
+            set_limb_spline(static_cast<LimbIndex>(i), ARM_FORWARD);
         } else if (i == LEFT_LEG) {
             limb.bones[0] = mesh.find_bone("Leg_L_1");
             limb.bones[1] = mesh.find_bone("Leg_L_2");
@@ -201,7 +201,7 @@ void Animator::init(const Entity* parent_, RiggedMesh& mesh) {
         } else {
             limb.bones[0] = mesh.find_bone("Leg_R_1");
             limb.bones[1] = mesh.find_bone("Leg_R_2");
-            set_limb_spline(static_cast<LimbIndex>(i), LEG_BACKWARD);
+            set_limb_spline(static_cast<LimbIndex>(i), LEG_FORWARD);
         }
     }
 }
@@ -293,7 +293,7 @@ void Animator::update(float delta_time, float walking_speed,
         }
 
     } else {
-            static bool moving_forward;
+        static bool moving_forward;
         // Player is standing
         if (leg_state != NEUTRAL) {
             spine->rotation = 0.0f;

@@ -215,8 +215,7 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
         splines = spline_set->run;
     } else if (selected_animation == IDLE) {
         splines = spline_set->idle;
-    }
-    else {
+    } else {
         SDL_TriggerBreakpoint();
     }
 
@@ -262,8 +261,7 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
             splines = spline_set->run;
         } else if (selected_animation == IDLE) {
             splines = spline_set->idle;
-        }
-        else {
+        } else {
             SDL_TriggerBreakpoint();
         }
 
@@ -308,8 +306,7 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
             spline = &spline_set->run[selected_spline_index];
         } else if (selected_animation == IDLE) {
             spline = &spline_set->idle[selected_spline_index];
-        }
-        else {
+        } else {
             SDL_TriggerBreakpoint();
         }
 
@@ -478,7 +475,6 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
 
     // Draw circle for selected limb
     if (selected_spline_index < NUM_SPLINES_PER_ANIMATION && spline_edit_mode) {
-        // const Bone** bones = limb_bones[selected_spline_index / 2];
 
         // @OPTIMIZATION: Calculate this stuff less often
         Bone** bones;
@@ -491,8 +487,8 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         }
 
         // @CLEANUP: Why bind_pose_transform[2]? Can't this be clearer?
-        glm::vec2 limb_root_position = static_cast<glm::vec2>(
-            bones[0]->get_transform() * bones[0]->bind_pose_transform[2]);
+        // glm::vec2 limb_root_position = static_cast<glm::vec2>(
+        //     bones[0]->get_transform() * bones[0]->bind_pose_transform[2]);
         float radius = bones[0]->length + bones[1]->length;
 
         DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];
@@ -502,7 +498,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
                           static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
 
             circle_vertices[n_segment].pos =
-                limb_root_position +
+                // limb_root_position +
                 glm::vec2(radius * cosf(theta), radius * sinf(theta));
         }
 

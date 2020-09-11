@@ -14,6 +14,8 @@ TODO:
 - test utf8 chars in save/load strings
 
 Bugs:               (@BUG)
+- render_all_splines only renders walk splines
+
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely
 - why does merging SplineEditor::update() and SplineEditor::update_gui() break the gui functionality?
 
