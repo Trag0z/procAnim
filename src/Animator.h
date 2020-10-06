@@ -7,8 +7,9 @@
 struct Bone;
 struct RiggedMesh;
 class Game;
+class Player;
 
-// @TODO: Rename to AnimationState
+// @TODO: Rename to AnimationState // @CLEANUP: What?
 struct BoneRestrictions {
     float min_rotation, max_rotation;
 };
@@ -27,6 +28,9 @@ struct Limb {
     BoneRestrictions bone_restrictions[2];
 
     glm::vec2 tip_pos, last_tip_pos;
+
+    glm::vec2 origin() const;
+    float length() const;
 };
 
 class Animator {
@@ -39,7 +43,7 @@ class Animator {
     };
     enum LimbIndex { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
 
-    void init(const Entity* parent_, RiggedMesh& mesh);
+    void init(const Player* parent_, RiggedMesh& mesh);
     void update(float delta_time, float walking_speed,
                 const MouseKeyboardInput& input,
                 const std::list<BoxCollider>& colliders);
@@ -50,7 +54,7 @@ class Animator {
     glm::vec2 get_last_ground_movement() const;
 
   private:
-    const Entity* parent;
+    const Player* parent;
     SplineEditor* spline_editor;
     Bone* spine;
 
@@ -80,6 +84,11 @@ class Animator {
 
     glm::vec2
     find_interpolated_target_point(SplineIndex spline_index) const noexcept;
+
+    // Scans the colliders for the highest top edge that's lower than the leg's
+    // hip and less far away than the current spline's target position. CAUTION:
+    // The limbs' splines should be set before calling this method!
+    void find_point_to_step_on(const std::list<BoxCollider>& colliders);
 
     // Creates a new spline for the limb using an interpolation of walk and run
     // splines with the target position as an end point. If leg_state is

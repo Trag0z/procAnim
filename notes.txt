@@ -1,9 +1,8 @@
 NEXT:
-- behaves weirdly on first aniamtion loop
-- slips into ground sometimes
+- display active spline on leading foot
+- test ascending stairs
+- "crouch" when there is a lower ground to step on
 
-- uneven ground
-    > find good point on ground
 
 TODO:
 - revert laptop compat changes
@@ -15,12 +14,17 @@ TODO:
 - test utf8 chars in save/load strings
 
 Bugs:               (@BUG)
+- behaves weirdly on first aniamtion loop
+- leans in while mid-step
+- sometimes turns around due to stick snap-back?
+
 - render_all_splines only renders walk splines
 
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely
 - why does merging SplineEditor::update() and SplineEditor::update_gui() break the gui functionality?
 
 Cleanup:            (@CLEANUP)
+- unify naming scheme for getter methods
 
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time

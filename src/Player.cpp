@@ -41,6 +41,7 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
             (stick.x > 0.0f && !facing_right)) {
             facing_right = !facing_right;
             scale.x *= -1.0f;
+            update_model_matrix();
         }
     } else {
         walking_speed = 0.0f;
@@ -50,7 +51,7 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
     animator.update(delta_time, walking_speed, input, colliders);
 
     //////          Collision Detection         //////
-    if (!grounded) {
+    if (!grounded) { // NOTE: grounded never gets set to false once it's true
         // Find closest point on gorund
         glm::vec2 foot_pos_world[2];
 
@@ -62,10 +63,10 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
         float distance_to_ground = 0.0f;
         for (auto& coll : colliders) {
             for (size_t i = 0; i < 2; ++i) {
-                if (coll.is_inside_rect(foot_pos_world[i])) {
-                    auto coll_top = (coll.position.y + coll.half_ext.y);
-                    distance_to_ground = std::min(
-                        distance_to_ground, foot_pos_world[i].y - coll_top);
+                if (coll.encloses_point(foot_pos_world[i])) {
+                    distance_to_ground =
+                        std::min(distance_to_ground,
+                                 foot_pos_world[i].y - coll.top_edge());
                 }
             }
         }
@@ -160,3 +161,5 @@ void Player::render(const Renderer& renderer) {
     // Render animator target positions
     animator.render(renderer);
 }
+
+bool Player::is_facing_right() const noexcept { return facing_right; }

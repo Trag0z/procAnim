@@ -4,6 +4,7 @@
 #include "Util.h"
 #include "Mesh.h"
 #include "Renderer.h"
+#include "Player.h"
 
 // Takes a target_pos in model space and finds two target_rotations for the
 // bones, so that the tail of bone[1] is at (or at the closest possible point
@@ -143,6 +144,9 @@ static void solve_ik(Bone* const bones[2],
     }
 }
 
+glm::vec2 Limb::origin() const { return bones[0]->head(); }
+float Limb::length() const { return bones[0]->length + bones[1]->length; }
+
 //                          //
 //          Animator        //
 //                          //
@@ -152,7 +156,7 @@ const float Animator::MAX_SPINE_ROTATION = -0.25 * PI;
 const Animator::WalkingSpeedMultiplier Animator::WALKING_SPEED_MULTIPLIER = {
     0.02f, 0.1f};
 
-void Animator::init(const Entity* parent_, RiggedMesh& mesh) {
+void Animator::init(const Player* parent_, RiggedMesh& mesh) {
     parent = parent_;
     spine = mesh.find_bone("Spine");
     spline_editor = new SplineEditor();
@@ -255,7 +259,7 @@ void Animator::update(float delta_time, float walking_speed,
             // Start to walk
             last_leg_state = leg_state;
             leg_state = RIGHT_LEG_UP;
-            interpolation_factor_between_splines = 0.0f;
+            interpolation_factor_between_splines = walking_speed;
             interpolation_factor_on_spline = 0.4f;
 
             // Find and set target points for limbs
@@ -279,7 +283,9 @@ void Animator::update(float delta_time, float walking_speed,
 
             // TODO: Find a point in the level that's close to the target
             // point and makes sense to step on
-            static_cast<const std::list<BoxCollider>&>(colliders);
+
+            find_point_to_step_on(colliders);
+
         } else if (interpolation_factor_on_spline == 1.0f) {
             // Is walking and has reached the end of the current spline
             interpolation_factor_between_splines = walking_speed;
@@ -299,6 +305,7 @@ void Animator::update(float delta_time, float walking_speed,
                 set_limb_spline(LEFT_LEG, LEG_FORWARD);
                 set_limb_spline(RIGHT_LEG, LEG_BACKWARD);
             }
+            find_point_to_step_on(colliders);
         }
 
     } else {
@@ -413,6 +420,125 @@ glm::vec2 Animator::find_interpolated_target_point(
                 interpolation_factor_between_splines);
 }
 
+void Animator::find_point_to_step_on(const std::list<BoxCollider>& colliders) {
+    SDL_assert(leg_state != NEUTRAL);
+
+    Limb* front_leg;
+    const Limb* back_leg;
+    if (leg_state == LEFT_LEG_UP) {
+        front_leg = &limbs[LEFT_LEG];
+        back_leg = &limbs[RIGHT_LEG];
+    } else {
+        front_leg = &limbs[RIGHT_LEG];
+        back_leg = &limbs[LEFT_LEG];
+    }
+
+    glm::vec2 front_leg_origin_at_end_of_step =
+        front_leg->origin() +
+        (back_leg->tip_pos - back_leg->spline.point(Spline::P2));
+
+    glm::vec2 front_leg_origin_world_space =
+        parent->local_to_world_space(front_leg_origin_at_end_of_step);
+
+    // Find all colliders with a top edge that the front leg could reach at the
+    // end of the step
+    // @CLEANUP: This should be a list of const references, not copies
+    std::vector<BoxCollider> colliders_in_reach;
+
+    for (auto& coll : colliders) {
+        glm::vec2 test_pos;
+
+        if (front_leg_origin_world_space.y < coll.top_edge()) {
+            // Don't step on anything that's higher up than our own hip!
+            continue;
+        }
+        test_pos.y = coll.top_edge();
+
+        // Find the closest horizontal edge
+        if (front_leg_origin_world_space.x <= coll.left_edge()) {
+            test_pos.x = coll.left_edge();
+        } else if (front_leg_origin_world_space.x >= coll.right_edge()) {
+            test_pos.x = coll.right_edge();
+        } else {
+            // Leg origin is straight above the collider
+            test_pos.x = front_leg_origin_world_space.x;
+        }
+
+        glm::vec2 distance = test_pos - front_leg_origin_world_space;
+        if (glm::length(distance) <=
+            parent->local_to_world_space(front_leg->length())) {
+            colliders_in_reach.push_back(coll);
+        }
+    }
+    SDL_assert(!colliders_in_reach.empty());
+
+    // Find the highest collider that's at the desired step length or closer
+    const BoxCollider* candidate = &colliders_in_reach.front();
+
+    const glm::vec2& spline_target_pos_world_space =
+        front_leg_origin_world_space +
+        parent->local_to_world_space(front_leg->spline.point(Spline::P2));
+
+    for (size_t i = 1; i < colliders_in_reach.size(); ++i) {
+        const auto& coll = colliders_in_reach[i];
+        if (parent->is_facing_right()) {
+            if (coll.left_edge() >= spline_target_pos_world_space.x) {
+                // Collider is further away than our desired step length
+                continue;
+            } else if (coll.right_edge() <= spline_target_pos_world_space.x) {
+                // Is closer than the desired step length, olly use it if it's
+                // higher up
+                if (coll.top_edge() > candidate->top_edge()) {
+                    candidate = &coll;
+                }
+            } else {
+                if (coll.top_edge() > candidate->top_edge()) {
+                    candidate = &coll;
+                }
+            }
+        } else { // Player is facing left
+            if (coll.right_edge() <= spline_target_pos_world_space.x) {
+                // Collider is further away than our desired step length
+                continue;
+            } else if (coll.left_edge() >= spline_target_pos_world_space.x) {
+                // Is closer than the desired step length, only use it if it's
+                // higher up
+                if (coll.top_edge() > candidate->top_edge()) {
+                    candidate = &coll;
+                }
+            } else {
+                if (coll.top_edge() > candidate->top_edge()) {
+                    candidate = &coll;
+                }
+            }
+        }
+    }
+
+    glm::vec2 result;
+    if (parent->is_facing_right()) {
+        SDL_assert(candidate->left_edge() <= spline_target_pos_world_space.x);
+
+        if (candidate->right_edge() >= spline_target_pos_world_space.x) {
+            // Right above collider
+            result = glm::vec2(spline_target_pos_world_space.x,
+                               candidate->top_edge());
+        } else {
+            result = glm::vec2(candidate->right_edge(), candidate->top_edge());
+        }
+    } else {
+        SDL_assert(candidate->right_edge() >= spline_target_pos_world_space.x);
+
+        if (candidate->left_edge() <= spline_target_pos_world_space.x) {
+            // Right above collider
+            result = glm::vec2(spline_target_pos_world_space.x,
+                               candidate->top_edge());
+        } else {
+            result = glm::vec2(candidate->left_edge(), candidate->top_edge());
+        }
+    }
+    front_leg->spline.set_point(Spline::P2, result);
+}
+
 void Animator::set_limb_spline(LimbIndex limb_index, SplineIndex spline_index,
                                glm::vec2 target_pos_local_space) noexcept {
     auto& limb = limbs[limb_index];
@@ -423,7 +549,7 @@ void Animator::set_limb_spline(LimbIndex limb_index, SplineIndex spline_index,
         for (size_t i = 0; i < Spline::NUM_POINTS; ++i) {
             Spline::PointName name = static_cast<Spline::PointName>(i);
             spline_points[name] =
-                splines.idle[spline_index].point(name) + limb.bones[0]->head();
+                splines.idle[spline_index].point(name) + limb.origin();
         }
     } else {
         for (size_t i = 0; i < Spline::NUM_POINTS; ++i) {
@@ -433,7 +559,7 @@ void Animator::set_limb_spline(LimbIndex limb_index, SplineIndex spline_index,
             spline_points[name] = lerp(splines.walk[spline_index].point(name),
                                        splines.run[spline_index].point(name),
                                        interpolation_factor_between_splines);
-            spline_points[name] += limb.bones[0]->head();
+            spline_points[name] += limb.origin();
         }
         // TODO: remove this and the default argument value
         target_pos_local_space = spline_points[Spline::P2];

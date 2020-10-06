@@ -110,7 +110,7 @@ bool LevelEditor::update(const Renderer& renderer,
         glm::vec2 mouse_pos = input.mouse_pos_world();
 
         for (auto& coll : colliders) {
-            if (coll.is_inside_rect(mouse_pos)) {
+            if (coll.encloses_point(mouse_pos)) {
                 dragging_collider = true;
                 selected_collider = &coll;
                 break;

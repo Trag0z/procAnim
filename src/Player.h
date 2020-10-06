@@ -34,6 +34,8 @@ class Player : public Entity {
 
     void render(const Renderer& renderer);
 
+    bool is_facing_right() const noexcept;
+
     // The general UI displays the player's private members, so it needs to
     // access them. This feels cleaner than writing a bunch of getters.
     friend Game;

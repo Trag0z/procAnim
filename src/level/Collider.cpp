@@ -22,21 +22,41 @@ void BoxCollider::render(const Renderer& renderer) const {
     renderer.textured_shader.DEFAULT_VAO.draw(GL_TRIANGLES);
 }
 
-bool BoxCollider::is_inside_rect(glm::vec2 point) const noexcept {
+bool BoxCollider::encloses_point(glm::vec2 point) const noexcept {
     return point.x > position.x - half_ext.x &&
            point.x < position.x + half_ext.x &&
            point.y > position.y - half_ext.y &&
            point.y < position.y + half_ext.y;
 }
 
-std::vector<BoxCollider>
-find_colliders_around_point(glm::vec2 point, float max_distance,
-                            const std::list<BoxCollider>& colliders) {
-    std::vector<BoxCollider> ret;
-    for (auto& coll : colliders) {
-        if (glm::length(coll.position - point) > max_distance) {
-            ret.push_back(coll);
-        }
-    }
-    return ret;
+float BoxCollider::left_edge() const noexcept {
+    SDL_assert(half_ext.x > 0.0f);
+    return position.x - half_ext.x;
 }
+
+float BoxCollider::right_edge() const noexcept {
+    SDL_assert(half_ext.x > 0.0f);
+    return position.x + half_ext.x;
+}
+
+float BoxCollider::top_edge() const noexcept {
+    SDL_assert(half_ext.y > 0.0f);
+    return position.y + half_ext.y;
+}
+
+float BoxCollider::bottom_edge() const noexcept {
+    SDL_assert(half_ext.y > 0.0f);
+    return position.y - half_ext.y;
+}
+
+// std::vector<BoxCollider>
+// find_colliders_around_point(glm::vec2 point, float max_distance,
+//                             const std::list<BoxCollider>& colliders) {
+//     std::vector<BoxCollider> ret;
+//     for (auto& coll : colliders) {
+//         if (glm::length(coll.position - point) > max_distance) {
+//             ret.push_back(coll);
+//         }
+//     }
+//     return ret;
+// }

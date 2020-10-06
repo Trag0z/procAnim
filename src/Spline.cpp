@@ -51,13 +51,28 @@ void Spline::init(glm::vec2 points_[NUM_POINTS]) {
     }
 }
 
-const glm::vec2 Spline::point(PointName p) const { return points[p]; }
+const glm::vec2& Spline::point(PointName p) const { return points[p]; }
 
 void Spline::set_points(const glm::vec2 new_points[NUM_POINTS]) {
     for (size_t i = 0; i < NUM_POINTS; ++i) {
         points[i] = new_points[i];
     }
     update_render_data();
+}
+
+void Spline::set_point(PointName name, glm::vec2 point) {
+    if (name == T1 || name == T2) {
+        points[name] = point;
+        return;
+    }
+
+    glm::vec2 point_delta = point - points[name];
+    points[name] = point;
+    if (name == P1) {
+        points[T1] += point_delta;
+    } else {
+        points[T2] += point_delta;
+    }
 }
 
 void Spline::update_render_data() {
