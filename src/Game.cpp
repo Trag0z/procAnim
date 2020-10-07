@@ -47,14 +47,14 @@ void Game::init() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glPointSize(5.0f);
 
-    if (_DEBUG) {
-        printf("DEBUG MODE");
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageCallback(handle_gl_debug_output, nullptr);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0,
-                              nullptr, GL_TRUE);
-    }
+#ifdef _DEBUG
+    printf("DEBUG MODE\n");
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(handle_gl_debug_output, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
+                          GL_TRUE);
+#endif
 
     // Setup ImGui context
     IMGUI_CHECKVERSION();
@@ -260,8 +260,8 @@ void Game::update_gui() {
     Separator();
 
     for (const auto& limb : player.animator.limbs) {
-        glm::vec3 target_world_pos =
-            player.model * glm::vec3(limb.spline.point(Spline::P2), 1.0f);
+        glm::vec2 target_world_pos =
+            player.local_to_world_space(limb.spline.point(Spline::P2));
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
         Text(label);
@@ -273,11 +273,13 @@ void Game::update_gui() {
 
     NewLine();
     Text("Limb data");
-    Columns(3);
+    Columns(4);
     Separator();
     Text("Name");
     NextColumn();
     Text("Rotation deg/rad");
+    NextColumn();
+    Text("Head Position");
     NextColumn();
     Text("Tail Position");
     NextColumn();
@@ -292,9 +294,16 @@ void Game::update_gui() {
         Text(label);
         NextColumn();
 
-        glm::vec3 tail_world_pos = player.model * bone.get_transform() *
-                                   bone.bind_pose_transform *
-                                   glm::vec3(bone.tail, 1.0f);
+        glm::vec2 head_world_pos = player.local_to_world_space(
+            bone.get_transform() * bone.bind_pose_transform *
+            glm::vec3(bone.head(), 1.0f));
+        sprintf_s(label, "% 7.1f, % 7.1f", head_world_pos.x, head_world_pos.y);
+        Text(label);
+        NextColumn();
+
+        glm::vec2 tail_world_pos = player.local_to_world_space(
+            glm::vec2(bone.get_transform() * bone.bind_pose_transform *
+                      glm::vec3(bone.tail, 1.0f)));
         sprintf_s(label, "% 7.1f, % 7.1f", tail_world_pos.x, tail_world_pos.y);
         Text(label);
         NextColumn();

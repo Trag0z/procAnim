@@ -73,6 +73,7 @@ void Spline::set_point(PointName name, glm::vec2 point) {
     } else {
         points[T2] += point_delta;
     }
+    update_render_data();
 }
 
 void Spline::update_render_data() {

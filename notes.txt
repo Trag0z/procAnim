@@ -1,20 +1,19 @@
 NEXT:
 - display active spline on leading foot
-- test ascending stairs
+- fix glitch into ground bug
 - "crouch" when there is a lower ground to step on
+    > find point around the target foot position with a variable for maximum delta to higher/lower edge
 
 
 TODO:
 - revert laptop compat changes
 - apply bone restrictions
-- find target points in a good way
 
 - longer bone chains, multiple parents?
 - more polygons, nicer texture
 - test utf8 chars in save/load strings
 
 Bugs:               (@BUG)
-- behaves weirdly on first aniamtion loop
 - leans in while mid-step
 - sometimes turns around due to stick snap-back?
 
