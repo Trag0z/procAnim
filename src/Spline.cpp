@@ -51,6 +51,13 @@ void Spline::init(glm::vec2 points_[NUM_POINTS]) {
     }
 }
 
+void Spline::render(const Renderer& renderer) const {
+    renderer.debug_shader.use();
+    renderer.debug_shader.set_color(&Color::GREEN);
+
+    line_vao.draw(GL_LINE_STRIP);
+}
+
 const glm::vec2& Spline::point(PointName p) const { return points[p]; }
 
 void Spline::set_points(const glm::vec2 new_points[NUM_POINTS]) {
@@ -525,31 +532,6 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
 
     // Draw splines
     renderer.debug_shader.set_color(&Color::GREEN);
-
-    if (renderer.draw_all_splines) {
-        // Draw all splines (except selected)
-        for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
-             ++n_spline) {
-
-            if (n_spline == selected_spline_index && creating_new_spline &&
-                !first_point_set) {
-                // Only draw the splines that do not belong to the selected
-                // animation
-                if (selected_animation != WALK) {
-                    spline_set->walk[n_spline].line_vao.draw(GL_LINE_STRIP);
-                }
-                if (selected_animation != RUN) {
-                    spline_set->run[n_spline].line_vao.draw(GL_LINE_STRIP);
-                }
-                if (selected_animation != IDLE) {
-                    spline_set->idle[n_spline].line_vao.draw(GL_LINE_STRIP);
-                }
-                continue;
-            }
-
-            spline_set->walk[n_spline].line_vao.draw(GL_LINE_STRIP);
-        }
-    }
 
     if (selected_animation != NONE &&
         selected_spline_index < NUM_SPLINES_PER_ANIMATION &&

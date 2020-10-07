@@ -185,13 +185,9 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh) {
         limb.target_rotations[0] = 0.0f;
         limb.target_rotations[1] = 0.0f;
 
-        limb.tip_pos = limb.last_tip_pos = glm::vec2(0.0f);
-
         limb.bone_restrictions[0] = {std::numeric_limits<float>::min(),
                                      std::numeric_limits<float>::max()};
         limb.bone_restrictions[1] = limb.bone_restrictions[0];
-
-        limb.tip_pos = limb.last_tip_pos = glm::vec2(0.0f);
 
         if (i == LEFT_ARM || i == RIGHT_ARM) {
             limb.bone_restrictions[0] = {-0.5f * PI, 0.5 * PI};
@@ -339,9 +335,6 @@ void Animator::update(float delta_time, float walking_speed,
     interpolation_factor_on_spline = std::min(
         interpolation_factor_on_spline + delta_time * interpolation_speed,
         1.0f);
-    // if (leg_state != NEUTRAL) {
-    //     SDL_assert(interpolation_factor_on_spline != 1.0f);
-    // }
 
     for (size_t i = 0; i < 4; ++i) {
         auto& limb = limbs[i];
@@ -360,10 +353,6 @@ void Animator::update(float delta_time, float walking_speed,
         limb.bones[1]->rotation =
             lerp(limb.bones[1]->rotation, limb.target_rotations[1],
                  interpolation_factor_on_spline);
-
-        glm::vec2 new_tip_pos = get_tip_pos(static_cast<LimbIndex>(i));
-        limb.last_tip_pos = limb.tip_pos;
-        limb.tip_pos = new_tip_pos;
     }
 
     // Player movement
@@ -385,8 +374,6 @@ void Animator::update(float delta_time, float walking_speed,
                                interpolation_factor_on_spline) -
                            grounded_limb->spline.get_point_on_spline(
                                last_interpolation_factor_on_spline);
-    // last_ground_movement = grounded_limb->tip_pos -
-    // grounded_limb->last_tip_pos;
 }
 
 void Animator::render(const Renderer& renderer) {
@@ -400,12 +387,16 @@ void Animator::render(const Renderer& renderer) {
     }
     target_points_vao.update_vertex_data(target_points, 4);
     target_points_vao.draw(GL_POINTS);
+
+    if (renderer.draw_walk_splines) {
+        limbs[LEFT_LEG].spline.render(renderer);
+        limbs[RIGHT_LEG].spline.render(renderer);
+    }
 }
 
 glm::vec2 Animator::get_tip_pos(LimbIndex limb_index) const {
-    const auto& limb = limbs[static_cast<size_t>(limb_index)];
-    return limb.bones[1]->get_transform() * limb.bones[1]->bind_pose_transform *
-           glm::vec3(limb.bones[1]->tail, 1.0f);
+    return limbs[limb_index].spline.get_point_on_spline(
+        interpolation_factor_on_spline);
 }
 
 glm::vec2 Animator::get_last_ground_movement() const {
@@ -433,11 +424,8 @@ void Animator::find_point_to_step_on(const std::list<BoxCollider>& colliders) {
     }
 
     const glm::vec2 movement_till_end_of_step = glm::vec2(0.0f);
-    // back_leg->spline.get_point_on_spline(interpolation_factor_on_spline)
-    // - back_leg->spline.point(Spline::P2);
 
-    const glm::vec2 front_leg_target_pos =
-        front_leg->spline.point(Spline::P2) + movement_till_end_of_step;
+    const glm::vec2 front_leg_target_pos = front_leg->spline.point(Spline::P2);
 
     const glm::vec2 front_leg_target_pos_world =
         parent->local_to_world_space(front_leg_target_pos);

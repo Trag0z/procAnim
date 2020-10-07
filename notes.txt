@@ -1,5 +1,4 @@
 NEXT:
-- display active spline on leading foot
 - fix glitch into ground bug
 - "crouch" when there is a lower ground to step on
     > find point around the target foot position with a variable for maximum delta to higher/lower edge

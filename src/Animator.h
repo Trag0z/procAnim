@@ -27,8 +27,6 @@ struct Limb {
     Bone* bones[2];
     BoneRestrictions bone_restrictions[2];
 
-    glm::vec2 tip_pos, last_tip_pos;
-
     glm::vec2 origin() const;
     float length() const;
 };

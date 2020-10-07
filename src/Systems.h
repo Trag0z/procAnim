@@ -16,7 +16,7 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     Checkbox("Render player model", &renderer.draw_models);
     Checkbox("Render wireframes", &renderer.draw_wireframes);
     Checkbox("Render bones", &renderer.draw_bones);
-    Checkbox("Render all splines", &renderer.draw_all_splines);
+    Checkbox("Render all splines", &renderer.draw_walk_splines);
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);

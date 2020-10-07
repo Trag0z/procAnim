@@ -119,6 +119,9 @@ void Game::run() {
     if (mouse_keyboard_input.key_down(Keybinds::DRAW_BONES)) {
         renderer.draw_bones = !renderer.draw_bones;
     }
+    if (mouse_keyboard_input.key_down(Keybinds::DRAW_WALK_SPLINES)) {
+        renderer.draw_walk_splines = !renderer.draw_walk_splines;
+    }
     if (mouse_keyboard_input.key_down(Keybinds::STEP_MODE)) {
         game_config.step_mode = !game_config.step_mode;
     }
@@ -186,7 +189,7 @@ void Game::run() {
 
     player.render(renderer);
 
-    if (game_mode == SPLINE_EDITOR || renderer.draw_all_splines) {
+    if (game_mode == SPLINE_EDITOR) {
         player.animator.spline_editor->render(renderer, true);
     } else if (game_mode == LEVEL_EDITOR) {
         level_editor.render(renderer);
@@ -212,7 +215,7 @@ void Game::update_gui() {
     Checkbox("Render player model", &renderer.draw_models);
     Checkbox("Render wireframes", &renderer.draw_wireframes);
     Checkbox("Render bones", &renderer.draw_bones);
-    Checkbox("Render all splines", &renderer.draw_all_splines);
+    Checkbox("Render walk splines", &renderer.draw_walk_splines);
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
