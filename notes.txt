@@ -1,10 +1,12 @@
 NEXT:
-- fix glitch into ground bug
+- loses ground contact on animation switching
 - "crouch" when there is a lower ground to step on
     > find point around the target foot position with a variable for maximum delta to higher/lower edge
 
 
 TODO:
+- make T1/T2 be relative coordinates again?
+
 - revert laptop compat changes
 - apply bone restrictions
 

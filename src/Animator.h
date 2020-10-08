@@ -65,7 +65,7 @@ class Animator {
     VertexArray<DebugShader::Vertex> target_points_vao;
 
     float interpolation_factor_between_splines;
-    float interpolation_factor_on_spline;
+    float interpolation_factor_on_spline, last_interpolation_factor_on_spline;
 
     glm::vec2 last_ground_movement;
 
@@ -96,6 +96,9 @@ class Animator {
         glm::vec2 target_pos_world_space = glm::vec2(0.0f)) noexcept;
 
     void set_new_limb_splines(const std::list<BoxCollider>& colliders);
+
+    void interpolate_splines(glm::vec2 out[Spline::NUM_POINTS],
+                             SplineIndex spline_index) const;
 
     friend Game;
 };
