@@ -58,7 +58,7 @@ class Animator {
 
     // The splines' coordinate systems originate at the head of the first bone
     // they control (i.e. the shoulder or the hip)
-    SplineSet splines;
+    SplineSet spline_prototypes;
 
     Limb limbs[4];
 
@@ -94,6 +94,8 @@ class Animator {
     void set_limb_spline(
         LimbIndex limb, SplineIndex spline,
         glm::vec2 target_pos_world_space = glm::vec2(0.0f)) noexcept;
+
+    void set_new_limb_splines(const std::list<BoxCollider>& colliders);
 
     friend Game;
 };
