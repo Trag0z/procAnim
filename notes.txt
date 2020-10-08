@@ -1,5 +1,4 @@
 NEXT:
-- loses ground contact on animation switching
 - "crouch" when there is a lower ground to step on
     > find point around the target foot position with a variable for maximum delta to higher/lower edge
 
