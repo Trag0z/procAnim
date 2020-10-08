@@ -83,11 +83,6 @@ class Animator {
     glm::vec2
     find_interpolated_target_point(SplineIndex spline_index) const noexcept;
 
-    // Scans the colliders for the highest top edge that's lower than the leg's
-    // hip and less far away than the current spline's target position. CAUTION:
-    // The limbs' splines should be set before calling this method!
-    void find_point_to_step_on(const std::list<BoxCollider>& colliders);
-
     // Creates a new spline for the limb using an interpolation of walk and run
     // splines with the target position as an end point. If leg_state is
     // neutral, it just uses the idle spline.
