@@ -6,6 +6,14 @@
 #include "Renderer.h"
 #include "Player.h"
 
+// Moves all points in src by move. src and dst can be the same array
+static void move_spline_points(glm::vec2* dst, const glm::vec2* src,
+                               glm::vec2 move) {
+    for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
+        dst[n_point] = src[n_point] + move;
+    }
+}
+
 // Takes a target_pos in model space and finds two target_rotations for the
 // bones, so that the tail of bone[1] is at (or at the closest possible point
 // to) target_pos.
@@ -148,6 +156,7 @@ static void solve_ik(Bone* const bones[2],
 }
 
 glm::vec2 Limb::origin() const { return bones[0]->head(); }
+
 float Limb::length() const { return bones[0]->length + bones[1]->length; }
 
 //                          //
@@ -198,23 +207,33 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh) {
                                          0.0f}; //{degToRad(-120.0f), 0.0f};
         }
 
+        glm::vec2 spline_points[Spline::NUM_POINTS];
         if (i == LEFT_ARM) {
             limb.bones[0] = mesh.find_bone("Arm_L_1");
             limb.bones[1] = mesh.find_bone("Arm_L_2");
-            set_limb_spline(static_cast<LimbIndex>(i), ARM_FORWARD);
+            move_spline_points(spline_points,
+                               spline_prototypes.idle[ARM_FORWARD].get_points(),
+                               limb.origin());
         } else if (i == RIGHT_ARM) {
             limb.bones[0] = mesh.find_bone("Arm_R_1");
             limb.bones[1] = mesh.find_bone("Arm_R_2");
-            set_limb_spline(static_cast<LimbIndex>(i), ARM_FORWARD);
+            move_spline_points(spline_points,
+                               spline_prototypes.idle[ARM_FORWARD].get_points(),
+                               limb.origin());
         } else if (i == LEFT_LEG) {
             limb.bones[0] = mesh.find_bone("Leg_L_1");
             limb.bones[1] = mesh.find_bone("Leg_L_2");
-            set_limb_spline(static_cast<LimbIndex>(i), LEG_FORWARD);
+            move_spline_points(spline_points,
+                               spline_prototypes.idle[LEG_FORWARD].get_points(),
+                               limb.origin());
         } else {
             limb.bones[0] = mesh.find_bone("Leg_R_1");
             limb.bones[1] = mesh.find_bone("Leg_R_2");
-            set_limb_spline(static_cast<LimbIndex>(i), LEG_FORWARD);
+            move_spline_points(spline_points,
+                               spline_prototypes.idle[LEG_FORWARD].get_points(),
+                               limb.origin());
         }
+        limb.spline.set_points(spline_points);
     }
 }
 
@@ -362,7 +381,7 @@ void Animator::render(const Renderer& renderer) {
     // @CLEANUP: Calculate this less often
     DebugShader::Vertex target_points[4];
     for (size_t i = 0; i < 4; ++i) {
-        target_points[i].pos = limbs[i].spline.point(Spline::P2);
+        target_points[i].pos = limbs[i].spline.get_point(Spline::P2);
     }
     target_points_vao.update_vertex_data(target_points, 4);
     target_points_vao.draw(GL_POINTS);
@@ -382,13 +401,6 @@ glm::vec2 Animator::get_last_ground_movement() const {
     return last_ground_movement;
 }
 
-glm::vec2 Animator::find_interpolated_target_point(
-    SplineIndex spline_index) const noexcept {
-    return lerp(spline_prototypes.walk[spline_index].point(Spline::P2),
-                spline_prototypes.run[spline_index].point(Spline::P2),
-                interpolation_factor_between_splines);
-}
-
 void Animator::set_limb_spline(LimbIndex limb_index, SplineIndex spline_index,
                                glm::vec2 target_pos_local_space) noexcept {
     auto& limb = limbs[limb_index];
@@ -399,7 +411,7 @@ void Animator::set_limb_spline(LimbIndex limb_index, SplineIndex spline_index,
         for (size_t i = 0; i < Spline::NUM_POINTS; ++i) {
             Spline::PointName name = static_cast<Spline::PointName>(i);
             spline_points[name] =
-                spline_prototypes.idle[spline_index].point(name) +
+                spline_prototypes.idle[spline_index].get_point(name) +
                 limb.origin();
         }
     } else {
@@ -408,8 +420,8 @@ void Animator::set_limb_spline(LimbIndex limb_index, SplineIndex spline_index,
             // NOTE: Maybe this interpolation doesn't "just work" and at least
             // T1 has to be calculated differently
             spline_points[name] =
-                lerp(spline_prototypes.walk[spline_index].point(name),
-                     spline_prototypes.run[spline_index].point(name),
+                lerp(spline_prototypes.walk[spline_index].get_point(name),
+                     spline_prototypes.run[spline_index].get_point(name),
                      interpolation_factor_between_splines);
             spline_points[name] += limb.origin();
         }
@@ -459,18 +471,12 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
                                 : &spline_prototypes.idle[ARM_BACKWARD];
 
         glm::vec2 spline_points[Spline::NUM_POINTS];
-        for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
-            spline_points[n_point] =
-                prototype->point(static_cast<Spline::PointName>(n_point)) +
-                limbs[LEFT_ARM].origin();
-        }
+        move_spline_points(spline_points, prototype->get_points(),
+                           limbs[LEFT_ARM].origin());
         limbs[LEFT_ARM].spline.set_points(spline_points);
 
-        for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
-            spline_points[n_point] =
-                prototype->point(static_cast<Spline::PointName>(n_point)) +
-                limbs[RIGHT_ARM].origin();
-        }
+        move_spline_points(spline_points, prototype->get_points(),
+                           limbs[RIGHT_ARM].origin());
         limbs[RIGHT_ARM].spline.set_points(spline_points);
 
         // Legs
@@ -480,14 +486,10 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
         glm::vec2 spline_points_left[4];
         glm::vec2 spline_points_right[4];
 
-        for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
-            spline_points_left[n_point] =
-                prototype->point(static_cast<Spline::PointName>(n_point)) +
-                limbs[LEFT_LEG].origin();
-            spline_points_right[n_point] =
-                prototype->point(static_cast<Spline::PointName>(n_point)) +
-                limbs[RIGHT_LEG].origin();
-        }
+        move_spline_points(spline_points_left, prototype->get_points(),
+                           limbs[LEFT_LEG].origin());
+        move_spline_points(spline_points_right, prototype->get_points(),
+                           limbs[RIGHT_LEG].origin());
 
         // Find out which foot stands on higher ground and move it's spline up
         // accordingly
@@ -687,8 +689,8 @@ void Animator::interpolate_splines(glm::vec2 out_points[Spline::NUM_POINTS],
     for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
         auto point_name = static_cast<Spline::PointName>(n_point);
         out_points[n_point] =
-            lerp(spline_prototypes.walk[spline_index].point(point_name),
-                 spline_prototypes.run[spline_index].point(point_name),
+            lerp(spline_prototypes.walk[spline_index].get_point(point_name),
+                 spline_prototypes.run[spline_index].get_point(point_name),
                  interpolation_factor_between_splines);
     }
 }

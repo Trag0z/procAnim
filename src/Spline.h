@@ -21,7 +21,8 @@ class Spline {
     void init(glm::vec2 points_[NUM_POINTS] = nullptr);
     void render(const Renderer& renderer) const;
 
-    const glm::vec2& point(PointName p) const;
+    const glm::vec2& get_point(PointName p) const;
+    const glm::vec2* get_points() const;
 
     // If P1 or P2 are set, T1 or T2 are moved with them
     void set_point(PointName name, glm::vec2 point);

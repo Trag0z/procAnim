@@ -80,9 +80,6 @@ class Animator {
 
     enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state, last_leg_state;
 
-    glm::vec2
-    find_interpolated_target_point(SplineIndex spline_index) const noexcept;
-
     // Creates a new spline for the limb using an interpolation of walk and run
     // splines with the target position as an end point. If leg_state is
     // neutral, it just uses the idle spline.

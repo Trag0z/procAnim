@@ -58,7 +58,9 @@ void Spline::render(const Renderer& renderer) const {
     line_vao.draw(GL_LINE_STRIP);
 }
 
-const glm::vec2& Spline::point(PointName p) const { return points[p]; }
+const glm::vec2& Spline::get_point(PointName p) const { return points[p]; }
+
+const glm::vec2* Spline::get_points() const { return points; }
 
 void Spline::set_points(const glm::vec2 new_points[NUM_POINTS]) {
     for (size_t i = 0; i < NUM_POINTS; ++i) {
