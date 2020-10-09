@@ -80,13 +80,6 @@ class Animator {
 
     enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state, last_leg_state;
 
-    // Creates a new spline for the limb using an interpolation of walk and run
-    // splines with the target position as an end point. If leg_state is
-    // neutral, it just uses the idle spline.
-    void set_limb_spline(
-        LimbIndex limb, SplineIndex spline,
-        glm::vec2 target_pos_world_space = glm::vec2(0.0f)) noexcept;
-
     void set_new_limb_splines(const std::list<BoxCollider>& colliders);
 
     void interpolate_splines(glm::vec2 out[Spline::NUM_POINTS],

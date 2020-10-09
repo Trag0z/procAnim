@@ -401,44 +401,6 @@ glm::vec2 Animator::get_last_ground_movement() const {
     return last_ground_movement;
 }
 
-void Animator::set_limb_spline(LimbIndex limb_index, SplineIndex spline_index,
-                               glm::vec2 target_pos_local_space) noexcept {
-    auto& limb = limbs[limb_index];
-
-    glm::vec2 spline_points[Spline::NUM_POINTS];
-
-    if (leg_state == NEUTRAL) {
-        for (size_t i = 0; i < Spline::NUM_POINTS; ++i) {
-            Spline::PointName name = static_cast<Spline::PointName>(i);
-            spline_points[name] =
-                spline_prototypes.idle[spline_index].get_point(name) +
-                limb.origin();
-        }
-    } else {
-        for (size_t i = 0; i < Spline::NUM_POINTS; ++i) {
-            Spline::PointName name = static_cast<Spline::PointName>(i);
-            // NOTE: Maybe this interpolation doesn't "just work" and at least
-            // T1 has to be calculated differently
-            spline_points[name] =
-                lerp(spline_prototypes.walk[spline_index].get_point(name),
-                     spline_prototypes.run[spline_index].get_point(name),
-                     interpolation_factor_between_splines);
-            spline_points[name] += limb.origin();
-        }
-        // TODO: remove this and the default argument value
-        target_pos_local_space = spline_points[Spline::P2];
-
-        // T2 is in absolute local coordinates and has to be moved to be
-        // relative to the target point to keep a good spline shape
-        spline_points[Spline::T2] = spline_points[Spline::T2] -
-                                    spline_points[Spline::P2] +
-                                    target_pos_local_space;
-        spline_points[Spline::P2] = target_pos_local_space;
-    }
-
-    limb.spline.set_points(spline_points);
-}
-
 void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
 
     auto find_highest_ground_at = [&colliders,
