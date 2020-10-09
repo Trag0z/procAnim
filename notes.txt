@@ -1,5 +1,5 @@
 NEXT:
-- still glitches into ground sometimes
+- move back to neutral stance faster
 
 TODO:
 - make T1/T2 be relative coordinates again?

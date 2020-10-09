@@ -67,6 +67,8 @@ class Animator {
     float interpolation_factor_between_splines;
     float interpolation_factor_on_spline, last_interpolation_factor_on_spline;
 
+    glm::vec2 last_foot_pos_left, last_foot_pos_right;
+
     glm::vec2 last_ground_movement;
 
     bool arm_follows_mouse = false;

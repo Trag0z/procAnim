@@ -282,23 +282,30 @@ void Animator::update(float delta_time, float walking_speed,
 
     // Player movement
     const Limb* grounded_limb;
+    glm::vec2 last_foot_pos;
     if (leg_state == LEFT_LEG_UP) {
         grounded_limb = &limbs[RIGHT_LEG];
+        last_foot_pos = last_foot_pos_right;
     } else if (leg_state == RIGHT_LEG_UP) {
         grounded_limb = &limbs[LEFT_LEG];
+        last_foot_pos = last_foot_pos_left;
     } else {
         // Leg state is NEUTRAL
         if (last_leg_state == LEFT_LEG_UP) {
             grounded_limb = &limbs[RIGHT_LEG];
+            last_foot_pos = last_foot_pos_right;
         } else {
             SDL_assert(last_leg_state == RIGHT_LEG_UP);
             grounded_limb = &limbs[LEFT_LEG];
+            last_foot_pos = last_foot_pos_left;
         }
     }
     last_ground_movement = grounded_limb->spline.get_point_on_spline(
                                interpolation_factor_on_spline) -
-                           grounded_limb->spline.get_point_on_spline(
-                               last_interpolation_factor_on_spline);
+                           last_foot_pos;
+
+    last_foot_pos_left = get_tip_pos(LEFT_LEG);
+    last_foot_pos_right = get_tip_pos(RIGHT_LEG);
 
     /*
     NOTE:
@@ -329,18 +336,15 @@ void Animator::update(float delta_time, float walking_speed,
             last_leg_state = leg_state;
             leg_state = RIGHT_LEG_UP;
             interpolation_factor_between_splines = walking_speed;
+            set_new_limb_splines(colliders);
+
             last_interpolation_factor_on_spline =
                 interpolation_factor_on_spline;
             interpolation_factor_on_spline = 0.4f;
 
-            set_new_limb_splines(colliders);
-
         } else if (interpolation_factor_on_spline == 1.0f) {
             // Is walking and has reached the end of the current spline
             interpolation_factor_between_splines = walking_speed;
-            last_interpolation_factor_on_spline =
-                interpolation_factor_on_spline;
-            interpolation_factor_on_spline = 0.0f;
             if (leg_state == LEFT_LEG_UP) {
                 last_leg_state = leg_state;
                 leg_state = RIGHT_LEG_UP;
@@ -351,25 +355,29 @@ void Animator::update(float delta_time, float walking_speed,
                 leg_state = LEFT_LEG_UP;
                 set_new_limb_splines(colliders);
             }
+            last_interpolation_factor_on_spline =
+                interpolation_factor_on_spline;
+            interpolation_factor_on_spline = 0.0f;
         }
     } else {
         // Player is standing
         if (leg_state != NEUTRAL) {
+            last_leg_state = leg_state;
+            leg_state = NEUTRAL;
+
+            set_new_limb_splines(colliders);
+
             last_interpolation_factor_on_spline =
                 interpolation_factor_on_spline;
             interpolation_factor_on_spline = 0.0f;
 
             spine->rotation = 0.0f;
-            last_leg_state = leg_state;
-            leg_state = NEUTRAL;
-
-            set_new_limb_splines(colliders);
         } else if (interpolation_factor_on_spline == 1.0f) {
+            set_new_limb_splines(colliders);
+
             last_interpolation_factor_on_spline =
                 interpolation_factor_on_spline;
             interpolation_factor_on_spline = 0.0f;
-
-            set_new_limb_splines(colliders);
         }
     }
 }
@@ -422,7 +430,7 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
     if (leg_state == NEUTRAL) {
         static bool moving_forward = true;
 
-        if (interpolation_factor_on_spline == 0.0f) {
+        if (interpolation_factor_on_spline == 1.0f) {
             moving_forward = !moving_forward;
         }
 
@@ -475,9 +483,8 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
         }
 
         // Always start the new spline at the current point of the last spline
-        glm::vec2 current_spline_point_left =
-            limbs[LEFT_LEG].spline.get_point_on_spline(
-                last_interpolation_factor_on_spline);
+        // TODO: make a function for this?
+        glm::vec2 current_spline_point_left = last_foot_pos_left;
         spline_points_left[Spline::T1] +=
             current_spline_point_left - spline_points_left[Spline::P1];
 
@@ -485,7 +492,7 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
 
         glm::vec2 current_spline_point_right =
             limbs[RIGHT_LEG].spline.get_point_on_spline(
-                last_interpolation_factor_on_spline);
+                interpolation_factor_on_spline);
         spline_points_right[Spline::T1] +=
             current_spline_point_right - spline_points_right[Spline::P1];
 
@@ -573,16 +580,13 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
         }
 
         // Always start the new spline at the current point of the last spline
-        glm::vec2 current_spline_point =
-            limbs[LEFT_LEG].spline.get_point_on_spline(
-                last_interpolation_factor_on_spline);
+        glm::vec2 current_spline_point = last_foot_pos_left;
         interpolated_points_left[Spline::T1] +=
             current_spline_point - interpolated_points_left[Spline::P1];
 
         interpolated_points_left[Spline::P1] = current_spline_point;
 
-        current_spline_point = limbs[RIGHT_LEG].spline.get_point_on_spline(
-            last_interpolation_factor_on_spline);
+        current_spline_point = last_foot_pos_right;
         interpolated_points_right[Spline::T1] +=
             current_spline_point - interpolated_points_right[Spline::P1];
 
@@ -598,7 +602,7 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
 #endif
             glm::vec2 body_movement_till_end_of_step =
                 limbs[RIGHT_LEG].spline.get_point_on_spline(
-                    last_interpolation_factor_on_spline) -
+                    interpolation_factor_on_spline) -
                 interpolated_points_right[Spline::P2];
 
             glm::vec2 target_foot_pos =
@@ -635,7 +639,7 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
 #endif
             glm::vec2 body_movement_till_end_of_step =
                 limbs[LEFT_LEG].spline.get_point_on_spline(
-                    last_interpolation_factor_on_spline) -
+                    interpolation_factor_on_spline) -
                 interpolated_points_left[Spline::P2];
 
             glm::vec2 target_foot_pos =
