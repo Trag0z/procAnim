@@ -40,5 +40,13 @@
         "forward_list": "cpp",
         "codecvt": "cpp",
         "xlocmon": "cpp"
-    }
+    },
+    "spellright.language": [
+        "de",
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex"
+    ]
 }
