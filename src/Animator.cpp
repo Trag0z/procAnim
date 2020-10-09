@@ -534,7 +534,7 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
         limbs[LEFT_LEG].spline.set_points(spline_points_left);
         limbs[RIGHT_LEG].spline.set_points(spline_points_right);
 
-    } else {
+    } else { // leg_state != NEUTRAL
         glm::vec2 interpolated_points_left[Spline::NUM_POINTS];
         glm::vec2 interpolated_points_right[Spline::NUM_POINTS];
 
@@ -606,16 +606,27 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
                                        body_movement_till_end_of_step) -
                 body_movement_till_end_of_step;
 
-#ifdef _DEBUG
-            glm::vec2 origin = limbs[LEFT_LEG].origin();
-            SDL_assert(glm::length(target_foot_pos - origin) <
-                       limbs[LEFT_LEG].length());
-#endif
+            float height_difference =
+                target_foot_pos.y - interpolated_points_left[Spline::P2].y;
+            if (height_difference < 0.0f) {
 
-            interpolated_points_left[Spline::T2] +=
-                target_foot_pos - interpolated_points_left[Spline::P2];
-            interpolated_points_left[Spline::P2] = target_foot_pos;
-        } else {
+                if (interpolated_points_right[Spline::P2].y -
+                        height_difference <
+                    limbs[RIGHT_LEG].origin().x +
+                        limbs[RIGHT_LEG].length() * 0.5f) {
+
+                    interpolated_points_right[Spline::T2].y -=
+                        height_difference;
+                    interpolated_points_right[Spline::P2].y -=
+                        height_difference;
+                }
+            } else {
+                interpolated_points_left[Spline::T2] +=
+                    target_foot_pos - interpolated_points_left[Spline::P2];
+                interpolated_points_left[Spline::P2] = target_foot_pos;
+            }
+
+        } else { // leg_state == RIGHT_LEG_UP
 #ifdef _DEBUG
             glm::vec2 ground =
                 find_highest_ground_at(interpolated_points_left[Spline::P1]);
@@ -631,14 +642,23 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
                 find_highest_ground_at(interpolated_points_right[Spline::P2] +
                                        body_movement_till_end_of_step) -
                 body_movement_till_end_of_step;
-#ifdef _DEBUG
-            glm::vec2 origin = limbs[RIGHT_LEG].origin();
-            SDL_assert(glm::length(target_foot_pos - origin) <
-                       limbs[RIGHT_LEG].length());
-#endif
-            interpolated_points_right[Spline::T2] +=
-                target_foot_pos - interpolated_points_right[Spline::P2];
-            interpolated_points_right[Spline::P2] = target_foot_pos;
+
+            float height_difference =
+                target_foot_pos.y - interpolated_points_right[Spline::P2].y;
+            if (height_difference < 0.0f) {
+
+                if (interpolated_points_left[Spline::P2].y - height_difference <
+                    limbs[LEFT_LEG].origin().x +
+                        limbs[LEFT_LEG].length() * 0.5f) {
+
+                    interpolated_points_left[Spline::T2].y -= height_difference;
+                    interpolated_points_left[Spline::P2].y -= height_difference;
+                }
+            } else {
+                interpolated_points_right[Spline::T2] +=
+                    target_foot_pos - interpolated_points_right[Spline::P2];
+                interpolated_points_right[Spline::P2] = target_foot_pos;
+            }
         }
 
         limbs[LEFT_LEG].spline.set_points(interpolated_points_left);

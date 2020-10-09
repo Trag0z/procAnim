@@ -1,7 +1,5 @@
 NEXT:
-- "crouch" when there is a lower ground to step on
-    > find point around the target foot position with a variable for maximum delta to higher/lower edge
-
+- still glitches into ground sometimes
 
 TODO:
 - make T1/T2 be relative coordinates again?
@@ -16,8 +14,6 @@ TODO:
 Bugs:               (@BUG)
 - leans in while mid-step
 - sometimes turns around due to stick snap-back?
-
-- render_all_splines only renders walk splines
 
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely
 - why does merging SplineEditor::update() and SplineEditor::update_gui() break the gui functionality?
