@@ -38,6 +38,10 @@ void Level::load_from_file(const char* path) {
 
 void Level::render(const Renderer& renderer) const {
     renderer.textured_shader.set_texture(BoxCollider::TEXTURE);
+
+    glm::mat3 model(1.0f);
+    renderer.textured_shader.set_model(&model);
+
     for (auto& coll : colliders_) {
         coll.render(renderer);
     }
