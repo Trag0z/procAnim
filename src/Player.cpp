@@ -90,28 +90,17 @@ void Player::render(const Renderer& renderer) {
     RiggedMesh& rm = rigged_mesh;
 
     // Calculate bone transforms from their rotations
-    size_t bone_count = rm.bones.size();
-    glm::mat3* bone_transforms = new glm::mat3[bone_count];
-    for (size_t i = 0; i < bone_count; ++i) {
-        bone_transforms[i] = rm.bones[i].get_transform();
-    }
-
-    // Calculate vertex posistions for rendering
-    for (size_t i = 0; i < rm.vertices.size(); ++i) {
-        RiggedVertex vert = rm.vertices[i];
-        rm.shader_vertices[i].uv_coord = vert.uv_coord;
-
-        glm::mat3 bone =
-            bone_transforms[vert.bone_index[0]] * vert.bone_weight[0] +
-            bone_transforms[vert.bone_index[1]] * vert.bone_weight[1];
-
-        rm.shader_vertices[i].pos = bone * glm::vec3(vert.position, 1.0f);
+    glm::mat3 bone_transforms[RiggedShader::NUMBER_OF_BONES];
+    SDL_assert(rigged_mesh.bones.size() < RiggedShader::NUMBER_OF_BONES);
+    for (size_t i = 0; i < rigged_mesh.bones.size(); ++i) {
+        bone_transforms[i] = rigged_mesh.bones[i].get_transform();
     }
 
     rm.vao.update_vertex_data(rm.shader_vertices);
 
     renderer.rigged_shader.use();
     renderer.rigged_shader.set_model(&model);
+    renderer.rigged_shader.set_bone_transforms(bone_transforms);
 
     // Render player model
     if (renderer.draw_models) {
@@ -125,6 +114,7 @@ void Player::render(const Renderer& renderer) {
     renderer.debug_shader.set_model(&model);
 
     // Render wireframes
+    // TODO: This doesn't adjust to bone movements
     if (renderer.draw_wireframes) {
         renderer.debug_shader.set_color(&Color::RED);
 
@@ -155,8 +145,6 @@ void Player::render(const Renderer& renderer) {
 
         rm.bones_vao.draw(GL_POINTS);
     }
-
-    delete[] bone_transforms;
 
     // Render animator target positions
     animator.render(renderer);

@@ -20,8 +20,9 @@ void Background::init(const char* texture_path) {
 
 void Background::render(const Renderer& renderer, glm::vec2 camera_position) {
     renderer.textured_shader.use();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex.id);
+    renderer.textured_shader.set_texture(tex);
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, tex.id);
 
     // Render the background 9 times, for the quadrant that the camera is in and
     // all the ones around it

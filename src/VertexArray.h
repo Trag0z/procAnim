@@ -1,15 +1,6 @@
 #pragma once
 #include "pch.h"
 
-constexpr size_t MAX_BONES_PER_VERTEX = 2;
-
-struct RiggedVertex {
-    glm::vec2 position;
-    glm::vec2 uv_coord;
-    GLuint bone_index[MAX_BONES_PER_VERTEX];
-    float bone_weight[MAX_BONES_PER_VERTEX];
-};
-
 template <typename vertex_t> class VertexArray {
     GLuint vao_id, ebo_id, vbo_id;
     GLuint num_indices_, num_vertices_;
@@ -30,8 +21,6 @@ template <typename vertex_t> class VertexArray {
         glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_t) * data.size(),
                         data.data());
-        // glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * data.size(),
-        //                      data.data());
     }
 
     void update_vertex_data(vertex_t* data, GLuint num_vertices) {
@@ -39,11 +28,9 @@ template <typename vertex_t> class VertexArray {
         glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_t) * num_vertices,
                         data);
-        // glNamedBufferSubData(vbo_id, 0, sizeof(vertex_t) * num_vertices,
-        // data);
     }
 
-    inline void draw(GLenum mode) const {
+    void draw(GLenum mode) const {
         glBindVertexArray(vao_id);
         glDrawElements(mode, num_indices_, GL_UNSIGNED_INT, 0);
     }

@@ -7,7 +7,6 @@ TODO:
 - revert laptop compat changes
 - apply bone restrictions
 
-- longer bone chains, multiple parents?
 - more polygons, nicer texture
 - test utf8 chars in save/load strings
 

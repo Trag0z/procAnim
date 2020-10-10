@@ -79,6 +79,17 @@ GLuint loadAndCompileShaderFromFile(const char* vShaderPath,
     return id;
 }
 
+RiggedShader::RiggedShader(const char* vert_path, const char* frag_path)
+    : Shader(vert_path, frag_path) {
+    bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
+}
+
+void RiggedShader::set_bone_transforms(const glm::mat3* transforms) const {
+    use();
+    glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
+                       (const GLfloat*)transforms);
+}
+
 VertexArray<TexturedShader::Vertex> TexturedShader::DEFAULT_VAO;
 
 TexturedShader::TexturedShader(const char* vert_path, const char* frag_path)

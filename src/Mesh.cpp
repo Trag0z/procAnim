@@ -40,19 +40,18 @@ void RiggedMesh::load_from_file(const char* file) {
     // Import vertex data
     RiggedMesh result;
 
-    vertices.reserve(mesh_data.mNumVertices);
     shader_vertices.reserve(mesh_data.mNumVertices);
 
-    aiVector3D* vertData = mesh_data.mVertices;
-    aiVector3D* uvCoords = mesh_data.mTextureCoords[0];
-    SDL_assert(uvCoords);
+    aiVector3D* vertex_data = mesh_data.mVertices;
+    aiVector3D* uv_coords = mesh_data.mTextureCoords[0];
+    SDL_assert(uv_coords);
 
     for (size_t i = 0; i < mesh_data.mNumVertices; ++i) {
-        vertices.push_back({glm::vec2(vertData[i].x, vertData[i].y),
-                            {uvCoords[i].x, 1.0f - uvCoords[i].y},
-                            {0, 0},
-                            {0.0f, 0.0f}}); // Or 0.5f, 0.5f?
-        shader_vertices.push_back({});
+        shader_vertices.push_back(
+            {glm::vec2(vertex_data[i].x, vertex_data[i].y),
+             {uv_coords[i].x, 1.0f - uv_coords[i].y},
+             {0, 0},
+             {0.0f, 0.0f}}); // Or 0.5f, 0.5f?
     }
 
     std::vector<GLuint> indices;
@@ -74,10 +73,10 @@ void RiggedMesh::load_from_file(const char* file) {
     // Create bones and populate weight_data
     bones.reserve(mesh_data.mNumBones);
     bones_shader_vertices.reserve(mesh_data.mNumBones * 2);
-    for (uint i = 0; i < mesh_data.mNumBones; ++i) {
+    for (uint n_bone = 0; n_bone < mesh_data.mNumBones; ++n_bone) {
         Bone b;
 
-        aiBone& ai_bone = *mesh_data.mBones[i];
+        aiBone& ai_bone = *mesh_data.mBones[n_bone];
         b.name = ai_bone.mName.C_Str();
 
         auto& m = ai_bone.mOffsetMatrix;
@@ -87,9 +86,9 @@ void RiggedMesh::load_from_file(const char* file) {
 
         b.length = 0.0f;
 
-        for (uint j = 0; j < ai_bone.mNumWeights; ++j) {
-            weight_data.push_back({ai_bone.mWeights[j].mVertexId, i,
-                                   ai_bone.mWeights[j].mWeight});
+        for (uint n_weight = 0; n_weight < ai_bone.mNumWeights; ++n_weight) {
+            weight_data.push_back({ai_bone.mWeights[n_weight].mVertexId, n_bone,
+                                   ai_bone.mWeights[n_weight].mWeight});
         }
 
         bones.push_back(b);
@@ -113,24 +112,25 @@ void RiggedMesh::load_from_file(const char* file) {
         }
     }
 
-    // Assign bones and weights to vertices
-    size_t* vertex_bone_counts = new size_t[vertices.size()];
-    memset(vertex_bone_counts, 0, vertices.size() * sizeof(size_t));
+    // Assign bones and weights to shader_vertices
+    size_t* vertex_bone_counts = new size_t[shader_vertices.size()];
+    memset(vertex_bone_counts, 0, shader_vertices.size() * sizeof(size_t));
 
     for (auto w : weight_data) {
         size_t bone_count = vertex_bone_counts[w.vert_index];
-        if (bone_count == MAX_BONES_PER_VERTEX)
+        if (bone_count == RiggedShader::MAX_BONES_PER_VERTEX)
             continue;
 
-        vertices[w.vert_index].bone_index[bone_count] =
+        shader_vertices[w.vert_index].bone_indices[bone_count] =
             static_cast<GLuint>(w.bone_index);
-        vertices[w.vert_index].bone_weight[bone_count] = w.weight;
+        shader_vertices[w.vert_index].bone_weights[bone_count] = w.weight;
         ++bone_count;
     }
     delete[] vertex_bone_counts;
 
-    vao.init(indices.data(), static_cast<GLuint>(indices.size()), NULL,
-             static_cast<GLuint>(vertices.size()));
+    vao.init(indices.data(), static_cast<GLuint>(indices.size()),
+        shader_vertices.data(),
+        static_cast<GLuint>(shader_vertices.size())); //, GL_STATIC_DRAW);
 
     // Create and upload bone render data to GPU
     size_t num_bone_indices = bones_shader_vertices.size();

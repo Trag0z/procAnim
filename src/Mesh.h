@@ -19,8 +19,6 @@ struct Bone {
 };
 
 struct RiggedMesh {
-    std::vector<RiggedVertex> vertices;
-
     VertexArray<RiggedShader::Vertex> vao;
     std::vector<RiggedShader::Vertex> shader_vertices;
 
