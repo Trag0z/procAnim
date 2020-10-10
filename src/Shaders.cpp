@@ -79,6 +79,25 @@ GLuint loadAndCompileShaderFromFile(const char* vShaderPath,
     return id;
 }
 
+ShaderDetail::Shader::Shader(const char* vert_path, const char* frag_path) {
+    id = loadAndCompileShaderFromFile(vert_path, frag_path);
+
+    camera_loc = glGetUniformLocation(id, "camera");
+    model_loc = glGetUniformLocation(id, "model");
+}
+
+void ShaderDetail::Shader::use() const { glUseProgram(id); };
+
+void ShaderDetail::Shader::set_camera(const glm::mat3* mat) const {
+    use();
+    glUniformMatrix3fv(camera_loc, 1, 0, (const GLfloat*)mat);
+}
+
+void ShaderDetail::Shader::set_model(const glm::mat3* mat) const {
+    use();
+    glUniformMatrix3fv(model_loc, 1, 0, (const GLfloat*)mat);
+};
+
 RiggedShader::RiggedShader(const char* vert_path, const char* frag_path)
     : Shader(vert_path, frag_path) {
     bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");

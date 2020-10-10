@@ -10,39 +10,24 @@ static bool checkCompileErrors(GLuint object, bool program);
 GLuint loadAndCompileShaderFromFile(const char* vShaderPath,
                                     const char* fShaderPath);
 
-namespace {
-// The shader base class should never be accessed by anyone outside
-// of this file. Only the shaders themselves inherit from it.
+namespace ShaderDetail {
+// This class should never be instantiated, only derived from
 class Shader {
   protected:
     GLuint id;
     GLuint camera_loc, model_loc;
 
     Shader() {}
-    Shader(const char* vert_path, const char* frag_path) {
-        id = loadAndCompileShaderFromFile(vert_path, frag_path);
-
-        camera_loc = glGetUniformLocation(id, "camera");
-        model_loc = glGetUniformLocation(id, "model");
-    }
+    Shader(const char* vert_path, const char* frag_path);
 
   public:
-    // @OPTIMIZATION: use() is called in every single uniform setter every time
-    void use() const { glUseProgram(id); };
-
-    void set_camera(const glm::mat3* mat) const {
-        use();
-        glUniformMatrix3fv(camera_loc, 1, 0, (const GLfloat*)mat);
-    }
-
-    inline void set_model(const glm::mat3* mat) const {
-        use();
-        glUniformMatrix3fv(model_loc, 1, 0, (const GLfloat*)mat);
-    };
+    void use() const;
+    void set_camera(const glm::mat3* mat) const;
+    void set_model(const glm::mat3* mat) const;
 };
-} // namespace
+} // namespace ShaderDetail
 
-class RiggedShader : public Shader {
+class RiggedShader : public ShaderDetail::Shader {
     GLuint bone_transforms_loc;
 
   public:
@@ -62,7 +47,7 @@ class RiggedShader : public Shader {
     };
 };
 
-class TexturedShader : public Shader {
+class TexturedShader : public ShaderDetail::Shader {
   public:
     TexturedShader() {}
     TexturedShader(const char* vert_path, const char* frag_path);
@@ -77,7 +62,7 @@ class TexturedShader : public Shader {
     static VertexArray<Vertex> DEFAULT_VAO;
 };
 
-class DebugShader : public Shader {
+class DebugShader : public ShaderDetail::Shader {
     GLuint color_loc;
 
   public:
@@ -92,6 +77,10 @@ class DebugShader : public Shader {
 
     static VertexArray<Vertex> DEFAULT_VAO;
 };
+
+//                                                              //
+//          Template specifications for VertexArray<>           //
+//                                                              //
 
 void VertexArray<RiggedShader::Vertex>::init(
     const GLuint* indices, GLuint num_indices,
