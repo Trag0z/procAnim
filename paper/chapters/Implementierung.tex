@@ -1,0 +1,25 @@
+\chapter{Implementierung}
+In diesem Kapitel wird der Vorgang der Implementierung erläutert. Dabei wird zuerst...
+
+
+\section{Konzeption}
+Da der hauptsächliche Anwendungsbereich des in dieser Arbeit beschriebenen Animationssystems Videospiele sind, werden zur Implementierung auch Werkzeuge verwendet, die in der Spieleindustrie gängig sind. Programmiert wird deshalb in C++ unter Windows und mit einem x64-Prozessor als Zielplatform. Um gute Performance des Programms zu gewährleisten soll ein möglichst großer Teil der Berechnungen auf der Grafikkarte ausgeführt werden. Dafür kommt OpenGL als Grafikbibliothek zum Einsatz und es werden Shader in GLSL geschrieben.
+
+
+\section{Verwendete Bibliotheken}
+Um viele der grundlegenden Prozesse im Programm zu vereinfachen und schon gut gelöste Probleme wie z.B. das Erstellen eines OpenGL-Kontexts oder das Laden der Modelldaten nicht erneut lösen zu müssen, werden einige Bibliotheken verwendet. Diese werden im Folgenden im Detail erläutert.
+
+\subsection{OpenGL}
+\href{https://www.opengl.org/}{OpenGL} ist eins der meist verwendeten Grafik-APIs und bietet als solches diverse Funktionen, um mit der Grafikkarte zu interagieren. Es bietet außerdem die Shading-Language GLSL, die zur Programmierung der Shader verwendet wird. In dieser Anwendung kommt die Version 3.3 Core zum Einsatz.
+
+\subsection{OpenGL Mathematics (GLM)}
+Bei \href{https://glm.g-truc.net/0.9.9/index.html}{GLM} handelt es sich um eine Mathematik-Bibliothek für C++, die der Namensgebung und Funktionalität von GLSL entspricht und deren Datenformate so aufgebaut sind, dass sie den von GLSL erwarteten Formaten entsprechen. Die von GLM bereitgestellten Matrix- und Vektorklassen und die Funktionen, die mit ihnen arbeiten, werden für Berechnungen auf der CPU sowie zum Hochladen von Daten in den GPU-Speicher verwendet.
+
+\subsection{Simple DirectMedia Layer (SDL)}
+\href{https://www.libsdl.org/index.php}{SDL} ist eine leichtgewichtige C-Bibliothek, die das Erstellen und Verwalten eines Fensters und dazugehörigen OpenGL-Kontexts unter Windows stark vereinfacht. Außerdem bietet sie mit simplen Funktionen Zugang zu Maus-, Tastatur- und Gamepad-Inputs. Des Weiteren wird die dazugehörige Bibliothek \href{https://www.libsdl.org/projects/SDL_image/}{SDL_image} zum Laden von Bildern im PNG-Format verwendet.
+
+\subsection{Open Asset Import Library (Assimp)}
+Das Skelett des zu animierenden Charakters und damit zusammenhängend auch das Mesh sowie die UV-Koordinaten und Bone-Weights liegen dem Programm im FBX-Format vor.\href{http://assimp.org/}{Assimp} ermöglicht es, dieses Dateiformat zu parsen und dabei einige Post-Processing Operationen wie das Vereinigen identischer Vertices durchzuführen.
+
+\subsection{Dear ImGui}
+Bei \href{https://github.com/ocornut/imgui}{Dear ImGui} handelt es sich um eine Implementierung des Immediate Mode GUI Paradigmas. Es ermöglicht die Darstellung von grafischen Interfaces im bestehenden OpenGL-Kontext und wird hier verwendet, um ein Debug-Informationen anzuzeigen, die erstellten Tools zu kontrollieren und einige Variablen der Simulation zur Laufzeit ändern zu können.
