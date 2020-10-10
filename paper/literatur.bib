@@ -61,6 +61,39 @@
 %% Optional fields:
 %% volume, number, pages, month, note
 
+@article{burtnyk1976interactive,
+  title     = {Interactive skeleton techniques for enhancing motion dynamics in key frame animation},
+  author    = {Burtnyk, Nestor and Wein, Marceli},
+  journal   = {Communications of the ACM},
+  volume    = {19},
+  number    = {10},
+  pages     = {564--569},
+  year      = {1976},
+  publisher = {ACM New York, NY, USA}
+}
+
+@article{van1990technique,
+  title     = {A technique for motion specification in computer animation},
+  author    = {van Overveld, Cornelius WAM},
+  journal   = {The Visual Computer},
+  volume    = {6},
+  number    = {2},
+  pages     = {106--116},
+  year      = {1990},
+  publisher = {Springer}
+}
+
+@article{bruderlin1994procedural,
+  title     = {Procedural movement for articulated figure animation},
+  author    = {Bruderlin, Armin and Teo, Chor Guan and Calvert, Tom},
+  journal   = {Computers \& Graphics},
+  volume    = {18},
+  number    = {4},
+  pages     = {453--461},
+  year      = {1994},
+  publisher = {Elsevier}
+}
+
 
 %%%%%%%% book
 %%
@@ -71,28 +104,7 @@
 %%
 %% Optional fields:
 %% volume or number, series, address, edition, month, isbn, note
-@book{Coulouris:02,
-  author       = {George Coulouris and Jean Dollimore and Tim Kindberg},
-  title        = {{Verteilte Systeme: Konzepte und Design}},
-  publisher    = {Addison-Wesley-Verlag},
-  howpublished = {3. �berarbeitete Auflage},
-  year         = 2002,
-  isbn         = {3-8273-7022-1}
-}
 
-@book{Cormen:90,
-  author = {Thomas H. Cormen and Charles E. Leiserson and Ronald L. Rivest},
-  title  = {{Introduction to Algorithms}},
-  year   = 1990,
-  isbn   = {0-262-03141-8}
-}
-
-@book{Heckenthaler:96,
-  author    = {Thomas Heckenthaler},
-  title     = {{Systematischer Entwurf fast-zeitoptimaler Fuzzy-Regelungen.}},
-  publisher = {Shaker Verlag, Aachen},
-  year      = 1996
-}
 
 
 %%%%%%%% booklet
@@ -146,16 +158,31 @@
 %% editor, volume or number, series, pages, address, month, organization, 
 %% publisher, note
 
-@misc{Cheriton:85,
-  author       = {David R. Cheriton},
-  title        = {
-    {Preliminary Thoughts on Problem-oriented Shared Memory: A Decentralized Approach to Distributed Systems}
-    },
-  editor       = {ACM Operating Systems Review},
-  organization = {Stanford University},
-  year         = 1985,
-  number       = {4, Vol. 19},
-  pages        = {26-33}
+@inproceedings{litwinowicz1994animating,
+  title     = {Animating images with drawings},
+  author    = {Litwinowicz, Peter and Williams, Lance},
+  booktitle = {Proceedings of the 21st annual conference on Computer graphics and interactive techniques},
+  pages     = {409--412},
+  year      = {1994}
+}
+
+@inproceedings{van1996integrating,
+  title        = {Integrating 2 1/2-D computer animation techniques for supporting traditional animation},
+  author       = {Van Reeth, Frank},
+  booktitle    = {Proceedings Computer Animation'96},
+  pages        = {118--125},
+  year         = {1996},
+  organization = {IEEE}
+}
+
+@inproceedings{aoki1999dynamic,
+  title     = {Dynamic texture: Physically-based 2D animation},
+  author    = {Aoki, Masakastsu and Shinya, Mikio and Tsutsuguchi, Ken and Kotani, Naoya},
+  booktitle = {ACM SIGGRAPH 1999 Conference Sketches and Applications},
+  volume    = {239},
+  number    = {10.1145},
+  pages     = {311625--312130},
+  year      = {1999}
 }
 
 %%%%%%%% manual
@@ -179,25 +206,6 @@
 %% type, address, month, note
 
 
-@mastersthesis{Gottwald:03,
-  author = {Tim Gottwald and Rainer Oechsle},
-  title  = {
-    {DisASTer (Distributed Algorithms Simulation Terrain) A Platform for the Implementation of Distributed Algorithms}
-    },
-  school = {Fachhochschule Trier Fachbereich Angewandte Informatik},
-  year   = 2003,
-  type   = {Diplomarbeit}
-}
-
-@mastersthesis{Weinhold:03,
-  author = {Jens-Ole Weinhold and Andreas Meister},
-  title  = {
-    {Effiziente L�sung restrigierter Least-Squares-Probleme zur Parameteroptimierung in TSK-Fuzzy-Systemen}
-    },
-  school = {Universit�t zu L�beck},
-  year   = 2003,
-  type   = {Diplomarbeit}
-}
 %%%%%%%% misc
 %%
 %% Use this type when nothing else fits.
@@ -207,40 +215,6 @@
 %%
 %% Optional fields:
 %% author, title, url, month, year, note
-
-@misc{ogl:00,
-  title   = {OpenGL - The Industry's Foundation for High Performance Graphics},
-  url     = {https://www.opengl.org/},
-  urldate = {10.10.2020}
-}
-
-@misc{Wikipedia:00,
-  title = {{Wikipedia - Online Lexikon}},
-  url   = {de.wikipedia.org/wiki/Speicherseite},
-  note  = {\\ {\url{de.wikipedia.org/wiki/Speicherseite}}}
-}
-
-@misc{Zeller:03,
-  author = {Andreas Zeller},
-  title  = {{Software-Metriken}},
-  url    = {www.st.cs.uni-sb.de/edu/se/2003/metriken.pdf},
-  note   = {Lehrstuhl Softwaretechnik, Universit�t des Saarlandes, Saarbr�cken
-						\\ \url{http://www.st.cs.uni-sb.de/edu/se/2003/metriken.pdf}},
-  year   = {2003}
-}
-
-
-@misc{Janko:04,
-  author = {Wolfgang H. Janko and Stefan Koch},
-  title  = {{Informationswirtschaft 3, Software-Metriken}},
-  url    = {wwwai.wu-wien.ac.at/~koch/lehre/inf-wirt-3-pi-ws-05/metriken.pdf},
-  note   = {Institut f�r Informationsverarbeitung und Informationswirtschaft,
-Wirtschaftsuniversit�t Wien
-						\\
-\url{http://wwwai.wu-wien.ac.at/~koch/lehre/inf-wirt-3-pi-ws-05/metriken.pdf}},
-  year   = {2004}
-}
-
 
 
 %%%%%%%% phdthesis
@@ -274,72 +248,3 @@ Wirtschaftsuniversit�t Wien
 %% Optional fields:
 %% type, number, address, month, note
 
-
-@techreport{Mosberger:93,
-  author      = {David Mosberger},
-  title       = {{Memory Consistency Models}},
-  year        = 1993,
-  month       = Nov,
-  type        = {Technical Report 93/11},
-  institution = {University of Arizona}
-}
-
-@techreport{Malte:97,
-  author      = {Peter Malte},
-  title       = {{Replikation in Mobil Computing}},
-  institution = {Institut f{\"u}r Telematik der Universit{\"a}t Karlsruhe},
-  year        = 1997,
-  type        = {Seminar},
-  address     = {Karsruhe},
-  number      = {No 31/1997},
-  url         = {http://www.ubka.uni-karlsruhe.de/cgi-bin/psview?document=/ira/1997/31},
-  note        = {\\{\url{http://www.ubka.uni-karlsruhe.de/cgi-bin/psview?document=/ira/1997/31}}
-}
-}
-
-@techreport{Moser:97,
-  author      = {Boris Moser},
-  title       = {{Memory Consistency Modelle}},
-  institution = {Institut f{\"u}r Telematik der Universit{\"a}t Karlsruhe},
-  year        = 1997,
-  type        = {Seminar},
-  address     = {Karsruhe},
-  number      = {No 31/1997},
-  url         = {http://www.ubka.uni-karlsruhe.de/cgi-bin/psview?document=/ira/1997/31},
-  note        = {\\ {\url{http://www.ubka.uni-karlsruhe.de/cgi-bin/psview?document=/ira/1997/31}}}
-}
-
-@techreport{Bastian:02,
-  author      = {Peter Bastian},
-  title       = {{Paralleles Rechnen}},
-  year        = 2002,
-  type        = {Vorlesungsskript},
-  institution = {Uni Heidelberg},
-  url         = {http://hal.iwr.uni-heidelberg.de/~peter/Papers/pr1.pdf},
-  note        = {\\ {\url{http://hal.iwr.uni-heidelberg.de/~peter/Papers/pr1.pdf}}}
-}
-
-@techreport{Becker:01,
-  author      = {Christoph Becker},
-  title       = {{Rechenorganisation der AG Betriebssysteme}},
-  type        = {Proseminar},
-  year        = 2001,
-  institution = {Uni Magdeburg},
-  url         = {http://ivs.cs.uni-magdeburg.de/bs/lehre/wise0001/proro/sm.html},
-  note        = {\\ {\url{http://ivs.cs.uni-magdeburg.de/bs/lehre/wise0001/proro/sm.html}}}
-}
-
-@techreport{Nguyen:03,
-  author      = {Van-Phai Nguyen},
-  title       = {{Fenite Elemente Methode}},
-  year        = 2003,
-  type        = {Vorlesungsskript},
-  institution = {FH-Trier}
-}
-  @techreport{Schmitz:05,
-  author      = {Heinz Schmitz},
-  title       = {{Optimierungsprobleme und Approximation}},
-  year        = 2005,
-  type        = {Vorlesungsskript},
-  institution = {FH-Trier}
-}

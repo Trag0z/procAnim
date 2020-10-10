@@ -1,0 +1,17 @@
+\chapter{Related Work}
+
+Obwohl die Idee des hier vorgestellten Animationssystems nicht gerade revolutionär wirkt und ihre Vorteile zumindest auf den ersten Blick auf der Hand zu liegen scheinen, konnten kaum wissenschaftlichen Arbeiten gefunden werden, die sich speziell mit dem Thema der skelettbasierten Animation von 2D-Charakteren in Videospielen beschäftigen.
+
+\section{Skelettale Animation}
+Einen der frühen Versuche, skelettbasierte Animation für die Bewegungen zweidimensionaler Charaktere zu verwenden, stellten Burtnyk und Wein \cite{burtnyk1976interactive} vor. Bis dahin wurden häufig Keyframes von Animationen gezeichnet und die restlichen Bilder durch Interpolation dieser Keyframes erzeugt. Dieses System erlaubte jedoch nur geradlinige Bewegung in gleich großen Schritten zwischen den Keyframes. Die Autoren führten ein Skelett in das Animationssystem ein, das es erlaubte, mit verhältnismäßig wenig Aufwand eine hohe Anzahl von Keyframes zu erstellen, da nur die simple Strichmännchen-Repräsentation dieser Knochen neu gezeichnet werden musste. Das finale Bild wird dann anhand dieser Knochen in entsprechende Posen verzerrt.
+
+Van Overveld \cite{van1990technique} beschreibt ein Verfahren zur 2D-Animation vor, bei dem das Skelett vom Rest des Objekts getrennt wird. Das Skelett bzw. einige seiner Punkte werden dann prozedural in Echtzeit animiert und die Bewegungen der restlichen Punkte dynamisch simuliert. Die beschränkenden Kräfte auf das Skelett werden bei dieser Simulation erst nur approximiert und später dann korrigiert, um eine Performance zu erreichen, die schnell genug für eine Darstellung in Echtzeit ist.
+
+Auf diesem Artikel aufbauend entwickelten Aoki et al. \cite{aoki1999dynamic} ein Verfahren zur realistischen Animation von Pflanzen, die vom Wind bewegt werden. Sie verwendeten dazu digital erstellte Bilder von Pflanzen und versahen sie per Hand mit Skeletten. Diesen Skeletten wurden dann mechanische Eigenschaften zugewiesen, mit denen die Simulation im letzten Schritt arbeitete. Sie beschreiben ihre Ergebnisse als sehr realistisch, mehr als zwei im Artikel enthaltene Beispielbilder konnten aber nicht gefunden werden.
+
+Bruderlin et al. \cite{bruderlin1994procedural} entwickelten das \textit{Life Forms} System zur Animation von menschlichen Figuren im dreidimensionalen Raum. Sie verwenden dabei Inverse Kinematics, um die Figuren mit ihren Händen nach Objekten greifen zu lassen. Die Bewegungen der anderen daran beteiligten Körperteile wie Arm und Schulter werden dabei durch die Knochen und die für diese zuvor festgelegte Beschränkungen errechnet. Außerdem bietet ihre Anwendung die Möglichkeit zur prozeduralen Erstellung von Laufbewegungen. Dabei werden als Hauptparameter die Schrittweite und Schrittfrequenz (und daraus resultieren die Laufgeschwindigkeit) vom Nutzer angegeben. Das Programm erstellt dann vier Kontrollpunkte für einen Schritt in der Laufbewegung: Den Anfang, das Ende und dazwischen die beiden Zeitpunkte, an denen die Hüfte am höchsten bzw. am niedrigsten ist. Daraufhin wird eine kubische Spline-Kurve berechnet, die durch diese vier Punkte verläuft. Die Position der Hüfte des Modells wird dann entlang dieser Kurve interpoliert und die Stellung der Beine dazu passend berechnet.
+
+
+
+
+In existierenden Spielen kommt die Technik jedoch bereits zur Anwendung.
