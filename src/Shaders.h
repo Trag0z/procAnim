@@ -98,6 +98,7 @@ void VertexArray<RiggedShader::Vertex>::init(
     const RiggedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
+    usage_ = usage;
 
     glGenVertexArrays(1, &vao_id);
     glBindVertexArray(vao_id);
@@ -141,6 +142,7 @@ void VertexArray<TexturedShader::Vertex>::init(
     const TexturedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
+    usage_ = usage;
 
     glGenVertexArrays(1, &vao_id);
     glBindVertexArray(vao_id);
@@ -176,6 +178,7 @@ void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
                                             GLuint num_vertices, GLenum usage) {
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
+    usage_ = usage;
 
     glGenVertexArrays(1, &vao_id);
     glBindVertexArray(vao_id);

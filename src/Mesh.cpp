@@ -40,6 +40,7 @@ void RiggedMesh::load_from_file(const char* file) {
     // Import vertex data
     RiggedMesh result;
 
+    std::vector<RiggedShader::Vertex> shader_vertices;
     shader_vertices.reserve(mesh_data.mNumVertices);
 
     aiVector3D* vertex_data = mesh_data.mVertices;
@@ -129,8 +130,8 @@ void RiggedMesh::load_from_file(const char* file) {
     delete[] vertex_bone_counts;
 
     vao.init(indices.data(), static_cast<GLuint>(indices.size()),
-        shader_vertices.data(),
-        static_cast<GLuint>(shader_vertices.size())); //, GL_STATIC_DRAW);
+             shader_vertices.data(),
+             static_cast<GLuint>(shader_vertices.size()), GL_STATIC_DRAW);
 
     // Create and upload bone render data to GPU
     size_t num_bone_indices = bones_shader_vertices.size();

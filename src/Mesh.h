@@ -20,7 +20,6 @@ struct Bone {
 
 struct RiggedMesh {
     VertexArray<RiggedShader::Vertex> vao;
-    std::vector<RiggedShader::Vertex> shader_vertices;
 
     VertexArray<DebugShader::Vertex> bones_vao;
     std::vector<DebugShader::Vertex> bones_shader_vertices;

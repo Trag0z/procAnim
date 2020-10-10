@@ -4,6 +4,7 @@
 template <typename vertex_t> class VertexArray {
     GLuint vao_id, ebo_id, vbo_id;
     GLuint num_indices_, num_vertices_;
+    GLenum usage_;
 
   public:
     void init(const GLuint* indices, GLuint num_indices,
@@ -17,14 +18,15 @@ template <typename vertex_t> class VertexArray {
     }
 
     void update_vertex_data(std::vector<vertex_t> data) {
-        SDL_assert(data.size() <= num_vertices_);
+        SDL_assert(usage_ == GL_DYNAMIC_DRAW && data.size() <= num_vertices_);
+
         glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_t) * data.size(),
                         data.data());
     }
 
     void update_vertex_data(vertex_t* data, GLuint num_vertices) {
-        SDL_assert(num_vertices <= num_vertices_);
+        SDL_assert(usage_ == GL_DYNAMIC_DRAW && num_vertices <= num_vertices_);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_t) * num_vertices,
                         data);

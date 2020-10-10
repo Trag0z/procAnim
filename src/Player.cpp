@@ -96,8 +96,6 @@ void Player::render(const Renderer& renderer) {
         bone_transforms[i] = rigged_mesh.bones[i].get_transform();
     }
 
-    rm.vao.update_vertex_data(rm.shader_vertices);
-
     renderer.rigged_shader.use();
     renderer.rigged_shader.set_model(&model);
     renderer.rigged_shader.set_bone_transforms(bone_transforms);
