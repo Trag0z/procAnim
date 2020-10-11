@@ -6,7 +6,7 @@
 
 void Player::init(glm::vec3 position_, glm::vec3 scale_,
                   const char* texture_path, const char* mesh_path,
-                  Gamepad* pad) {
+                  const Gamepad* pad) {
     Entity::init(position_, scale_);
     tex.load_from_file(texture_path);
     rigged_mesh.load_from_file(mesh_path);

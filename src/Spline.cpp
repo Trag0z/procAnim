@@ -33,7 +33,7 @@ void Spline::init(glm::vec2 points_[NUM_POINTS]) {
             float t = static_cast<float>(i) / static_cast<float>(RENDER_STEPS);
             interpolation_vector = {t * t * t, t * t, t, 1.0f};
             line_shader_vertices[i].pos =
-                parameter_matrix * hermite_matrix * interpolation_vector;
+                parameter_matrix * HERMITE_MATRIX * interpolation_vector;
 
             indices[i] = static_cast<GLuint>(i);
         }
@@ -115,7 +115,7 @@ void Spline::update_render_data() {
 
 glm::vec2 Spline::get_point_on_spline(float t) const {
     glm::vec4 interpolation_vector = {t * t * t, t * t, t, 1.0f};
-    return static_cast<glm::vec2>(parameter_matrix * hermite_matrix *
+    return static_cast<glm::vec2>(parameter_matrix * HERMITE_MATRIX *
                                   interpolation_vector);
 }
 

@@ -27,7 +27,7 @@ class Player : public Entity {
   public:
     void init(glm::vec3 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,
-              Gamepad* gamepad);
+              const Gamepad* gamepad);
 
     void update(float delta_time, const std::list<BoxCollider>& colliders,
                 const MouseKeyboardInput& input);

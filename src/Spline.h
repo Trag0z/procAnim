@@ -31,7 +31,7 @@ class Spline {
     void update_render_data();
     glm::vec2 get_point_on_spline(float t) const;
 
-    const glm::mat4 hermite_matrix = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
+    const glm::mat4 HERMITE_MATRIX = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
                                       -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
                                       1.0f,  0.0f,  0.0f, 0.0f};
 
