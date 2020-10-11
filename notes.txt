@@ -23,3 +23,6 @@ Cleanup:            (@CLEANUP)
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time
 - move IK calculations to shader
+
+Paper:
+- gendering?
