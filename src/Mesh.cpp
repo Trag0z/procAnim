@@ -75,24 +75,24 @@ void RiggedMesh::load_from_file(const char* file) {
     bones.reserve(mesh_data.mNumBones);
     bones_shader_vertices.reserve(mesh_data.mNumBones * 2);
     for (uint n_bone = 0; n_bone < mesh_data.mNumBones; ++n_bone) {
-        Bone b;
+        Bone bone;
 
         aiBone& ai_bone = *mesh_data.mBones[n_bone];
-        b.name = ai_bone.mName.C_Str();
+        bone.name = ai_bone.mName.C_Str();
 
-        auto& m = ai_bone.mOffsetMatrix;
-
-        b.inverse_bind_pose_transform =
-            glm::mat3(m.a1, m.b1, m.d1, m.a2, m.b2, m.d2, m.a4, m.b4, m.d4);
-
-        b.length = 0.0f;
+        auto& matrix = ai_bone.mOffsetMatrix;
+        bone.inverse_bind_pose_transform =
+            glm::mat3(matrix.a1, matrix.b1, matrix.d1, matrix.a2, matrix.b2,
+                      matrix.d2, matrix.a4, matrix.b4, matrix.d4);
+        bone.bind_pose_transform =
+            glm::inverse(bone.inverse_bind_pose_transform);
 
         for (uint n_weight = 0; n_weight < ai_bone.mNumWeights; ++n_weight) {
             weight_data.push_back({ai_bone.mWeights[n_weight].mVertexId, n_bone,
                                    ai_bone.mWeights[n_weight].mWeight});
         }
 
-        bones.push_back(b);
+        bones.push_back(bone);
         bones_shader_vertices.push_back({glm::vec4()});
         bones_shader_vertices.push_back({glm::vec4()});
     }
@@ -108,7 +108,6 @@ void RiggedMesh::load_from_file(const char* file) {
             auto& child_transform = node->mChildren[0]->mTransformation;
             b.tail = glm::vec2(child_transform.a4, child_transform.b4);
 
-            b.bind_pose_transform = inverse(b.inverse_bind_pose_transform);
             b.length = glm::length(b.tail);
         }
     }

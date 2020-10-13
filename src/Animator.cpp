@@ -28,18 +28,45 @@ static void solve_ik(Bone* const bones[2],
     // We need the target positions before the bone's rotation is applied to
     // find the new, absolute rotation. Therefore, we use the
     // inverse_bind_pose_transform
-    glm::vec3 target_pos_bone_space[2];
-    target_pos_bone_space[0] = bones[0]->inverse_bind_pose_transform *
-                               glm::inverse(bones[0]->parent->get_transform()) *
-                               glm::vec3(target_pos, 1.0f);
+    // glm::vec3 target_pos_bone_space[2];
+    // target_pos_bone_space[0] = bones[0]->inverse_bind_pose_transform *
+    //                            glm::inverse(bones[0]->parent->get_transform())
+    //                            * glm::vec3(target_pos, 1.0f);
 
-    target_pos_bone_space[1] = bones[1]->inverse_bind_pose_transform *
-                               glm::inverse(bones[0]->get_transform()) *
-                               glm::vec3(target_pos, 1.0f);
+    // target_pos_bone_space[1] = bones[1]->inverse_bind_pose_transform *
+    //                            glm::inverse(bones[0]->get_transform()) *
+    //                            glm::vec3(target_pos, 1.0f);
 
-    float target_distance = glm::length(glm::vec3(target_pos, 1.0f) -
-                                        bones[0]->get_transform() *
-                                            bones[0]->bind_pose_transform[2]);
+    // float target_distance = glm::length(glm::vec3(target_pos, 1.0f) -
+    //                                     bones[0]->get_transform() *
+    //                                         bones[0]->bind_pose_transform[2]);
+
+    float target_distance = glm::length(bones[0]->head() - target_pos);
+
+    if (target_distance > bones[0]->length + bones[1]->length) {
+        auto parent_transform = bones[0]->parent->get_transform();
+        auto target_pos_bone_space0 = bones[0]->inverse_bind_pose_transform *
+                                      parent_transform *
+                                      glm::vec3(target_pos, 1.0f);
+
+        bones[0]->rotation =
+            atan2f(target_pos_bone_space0.y, target_pos_bone_space0.x) -
+            PI * 0.5f;
+
+        auto new_target_pos_world_space =
+            glm::inverse(bones[0]->get_transform()) *
+            glm::vec3(target_pos, 1.0f);
+
+        auto target_pos_bone_space1 =
+            bones[1]->inverse_bind_pose_transform * new_target_pos_world_space;
+
+        bones[1]->rotation =
+            atan2f(target_pos_bone_space1.y, target_pos_bone_space1.x) -
+            PI * 0.5f;
+
+        target_rotations[0] = bones[0]->rotation;
+        target_rotations[1] = bones[1]->rotation;
+    }
 
     // Find out if min_rotation or max_rotation is closer to the
     // target_rotations and set target_rotations to the closer one if it is out
@@ -91,52 +118,54 @@ static void solve_ik(Bone* const bones[2],
 
     // NOTE: The resulting rotations here are applied counter clockwise, but
     // why?
-    if (target_distance > bones[0]->length + bones[1]->length) {
-        // Target out of reach
-        // Get angle between local up (y-axis) and target position
+    // if (target_distance > bones[0]->length + bones[1]->length) {
+    //     // Target out of reach
+    //     // Get angle between local up (y-axis) and target position
 
-        for (size_t i = 0; i < 2; ++i) {
-            target_rotations[i] =
-                atan2f(target_pos_bone_space[i].y, target_pos_bone_space[i].x) -
-                degToRad(90.0f);
+    //     for (size_t i = 0; i < 2; ++i) {
+    //         target_rotations[i] =
+    //             atan2f(target_pos_bone_space[i].y,
+    //             target_pos_bone_space[i].x) - degToRad(90.0f);
 
-            SDL_assert(target_rotations[i] < 2.0f * PI &&
-                       target_rotations[i] > -2.0f * PI);
+    //         SDL_assert(target_rotations[i] < 2.0f * PI &&
+    //                    target_rotations[i] > -2.0f * PI);
 
-            // clamp_to_closest_restriction(i);
-        }
-    } else {
-        float target_distance2 = target_distance * target_distance;
-        float length2[2] = {bones[0]->length * bones[0]->length,
-                            bones[1]->length * bones[1]->length};
+    //         // clamp_to_closest_restriction(i);
+    //     }
+    // } else {
+    //     float target_distance2 = target_distance * target_distance;
+    //     float length2[2] = {bones[0]->length * bones[0]->length,
+    //                         bones[1]->length * bones[1]->length};
 
-        float cosAngle0 = (target_distance2 + length2[0] - length2[1]) /
-                          (2 * target_distance * bones[0]->length);
+    //     float cosAngle0 = (target_distance2 + length2[0] - length2[1]) /
+    //                       (2 * target_distance * bones[0]->length);
 
-        float atan =
-            atan2f(target_pos_bone_space[0].y, target_pos_bone_space[0].x);
-        float acos = acosf(cosAngle0);
-        target_rotations[0] = atan - acos - PI * 0.5f;
+    //     float atan =
+    //         atan2f(target_pos_bone_space[0].y, target_pos_bone_space[0].x);
+    //     float acos = acosf(cosAngle0);
+    //     target_rotations[0] = atan - acos - PI * 0.5f;
 
-        float cosAngle1 = (length2[0] + length2[1] - target_distance2) /
-                          (2.0f * bones[0]->length * bones[1]->length);
-        float acos1 = acosf(cosAngle1);
-        target_rotations[1] =
-            PI -
-            acos1; // BUG: PI should be the right value here, but then the arm
-                   // overshoots the position by a bit. Find out why that is!
-                   // 175 degrees gives almost pixel perfect results for arms.
+    //     float cosAngle1 = (length2[0] + length2[1] - target_distance2) /
+    //                       (2.0f * bones[0]->length * bones[1]->length);
+    //     float acos1 = acosf(cosAngle1);
+    //     target_rotations[1] =
+    //         PI -
+    //         acos1; // BUG: PI should be the right value here, but then the
+    //         arm
+    //                // overshoots the position by a bit. Find out why that is!
+    //                // 175 degrees gives almost pixel perfect results for
+    //                arms.
 
-        // If the target is unreachable, try rotating bone[0] the other way
-        if ((target_rotations[1] < bone_restrictions[1].min_rotation ||
-             target_rotations[1] > bone_restrictions[1].max_rotation)) {
-            target_rotations[0] += acos * 2.0f;
-            target_rotations[1] *= -1.0f;
-        }
+    //     // If the target is unreachable, try rotating bone[0] the other way
+    //     if ((target_rotations[1] < bone_restrictions[1].min_rotation ||
+    //          target_rotations[1] > bone_restrictions[1].max_rotation)) {
+    //         target_rotations[0] += acos * 2.0f;
+    //         target_rotations[1] *= -1.0f;
+    //     }
 
-        // clamp_to_closest_restriction(0);
-        // clamp_to_closest_restriction(1);
-    }
+    //     // clamp_to_closest_restriction(0);
+    //     // clamp_to_closest_restriction(1);
+    // }
 
     // NOTE: The following stuff should be covered by
     // clamp_to_closest_restriction()
@@ -241,13 +270,13 @@ void Animator::update(float delta_time, float walking_speed,
                       const MouseKeyboardInput& input,
                       const std::list<BoxCollider>& colliders) {
     // @CLEANUP
-    if (arm_follows_mouse && input.mouse_button_down(MouseButton::LEFT)) {
+    if (arm_follows_mouse && input.mouse_button(MouseButton::LEFT)) {
         auto& right_arm = limbs[RIGHT_ARM];
         solve_ik(right_arm.bones, right_arm.bone_restrictions,
                  parent->world_to_local_space(input.mouse_pos_world()),
                  right_arm.target_rotations);
-        right_arm.bones[0]->rotation = right_arm.target_rotations[0];
-        right_arm.bones[1]->rotation = right_arm.target_rotations[1];
+        last_ground_movement = glm::vec2(0.0f);
+        return;
     }
 
     // Update limbs
