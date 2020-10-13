@@ -26,3 +26,4 @@ Optimizations:      (@OPTIMIZE)
 
 Paper:
 - gendering?
+- problem/hypothesis/method/limitations aufzählung in einleitung?
