@@ -44,25 +44,18 @@ static void solve_ik(Bone* const bones[2],
     float target_distance = glm::length(bones[0]->head() - target_pos);
 
     if (target_distance > bones[0]->length + bones[1]->length) {
-        auto parent_transform = bones[0]->parent->get_transform();
-        auto target_pos_bone_space0 = bones[0]->inverse_bind_pose_transform *
-                                      parent_transform *
-                                      glm::vec3(target_pos, 1.0f);
+        for (size_t i = 0; i < 2; ++i) {
+            Bone& b = *bones[i];
 
-        bones[0]->rotation =
-            atan2f(target_pos_bone_space0.y, target_pos_bone_space0.x) -
-            PI * 0.5f;
+            glm::vec3 target_pos_bone_space =
+                b.inverse_bind_pose_transform *
+                glm::inverse(b.parent->get_transform()) *
+                glm::vec3(target_pos, 1.0f);
 
-        auto new_target_pos_world_space =
-            glm::inverse(bones[0]->get_transform()) *
-            glm::vec3(target_pos, 1.0f);
-
-        auto target_pos_bone_space1 =
-            bones[1]->inverse_bind_pose_transform * new_target_pos_world_space;
-
-        bones[1]->rotation =
-            atan2f(target_pos_bone_space1.y, target_pos_bone_space1.x) -
-            PI * 0.5f;
+            bones[i]->rotation =
+                atan2f(target_pos_bone_space.y, target_pos_bone_space.x) -
+                PI * 0.5f;
+        }
 
         target_rotations[0] = bones[0]->rotation;
         target_rotations[1] = bones[1]->rotation;
