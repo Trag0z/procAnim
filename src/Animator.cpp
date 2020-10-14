@@ -59,6 +59,38 @@ static void solve_ik(Bone* const bones[2],
 
         target_rotations[0] = bones[0]->rotation;
         target_rotations[1] = bones[1]->rotation;
+    } else {
+
+        glm::vec2 local_target[2];
+        glm::vec2 local_target2[2];
+        float length2[2];
+        for (size_t i = 0; i < 2; ++i) {
+            Bone& b = *bones[i];
+
+            local_target[i] =
+                glm::vec2(b.inverse_bind_pose_transform *
+                          glm::inverse(b.parent->get_transform()) *
+                          glm::vec3(target_pos, 1.0f));
+            local_target2[i] = local_target[i] * local_target[i];
+
+            length2[i] = b.length * b.length;
+        }
+
+        float long_factor = (local_target2[0].x + local_target2[0].y -
+                             length2[0] - length2[1]) /
+                            (2 * bones[0]->length * bones[1]->length);
+
+        bones[1]->rotation =
+            atan2f(sqrtf(1.0f - long_factor * long_factor), long_factor);
+
+        float gamma = atan2f(bones[1]->length * sinf(bones[1]->rotation),
+                             bones[0]->length +
+                                 bones[1]->length * cosf(bones[1]->rotation));
+
+        bones[0]->rotation =
+            atan2f(local_target[0].y, local_target[0].x) - gamma;
+
+        bones[0]->rotation -= 0.5f * PI;
     }
 
     // Find out if min_rotation or max_rotation is closer to the
@@ -272,6 +304,11 @@ void Animator::update(float delta_time, float walking_speed,
         return;
     }
 
+    static_cast<const std::list<BoxCollider>&>(colliders);
+    static_cast<float>(delta_time);
+    static_cast<float>(walking_speed);
+
+    /*
     // Update limbs
     float interpolation_speed = WALKING_SPEED_MULTIPLIER.MIN +
                                 walking_speed * (WALKING_SPEED_MULTIPLIER.MAX -
@@ -346,7 +383,7 @@ void Animator::update(float delta_time, float walking_speed,
     interpolate between the splines and find the target points. These points
     are then locked in until the step is completed or the player stops
     moving mid step.
-    */
+    */ /*
 
     if (walking_speed > 0.0f) {
         // Lean in walking direction when walking fast/running
@@ -402,6 +439,7 @@ void Animator::update(float delta_time, float walking_speed,
             interpolation_factor_on_spline = 0.0f;
         }
     }
+    */
 }
 
 void Animator::render(const Renderer& renderer) {
