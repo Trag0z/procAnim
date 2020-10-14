@@ -18,8 +18,16 @@ static void move_spline_points(glm::vec2* dst, const glm::vec2* src,
 // bone[1] is at (or at the closest possible point to) target_pos.
 static void solve_ik(Bone* const bones[2], glm::vec2 target_pos) {
     SDL_assert(bones != nullptr);
-    // SDL_assert(glm::dot(bones[0]->tail - bones[0]->head, bones[1]->tail -
-    // bones[1]->head) == 0.0f);
+
+    // This algorithm assumes that the angle between the bones in bind pose is
+    // zero. Check this assumption here, just to be sure.
+    SDL_assert(
+        glm::length(glm::cross(
+            bones[0]->bind_pose_transform[2] -
+                bones[0]->bind_pose_transform * glm::vec3(bones[0]->tail, 1.0f),
+            bones[1]->bind_pose_transform[2] -
+                bones[1]->bind_pose_transform *
+                    glm::vec3(bones[1]->tail, 1.0f))) < 0.1f);
 
     float target_distance = glm::length(bones[0]->head() - target_pos);
 
@@ -66,22 +74,6 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos) {
 
         bones[0]->rotation -= 0.5f * PI;
     }
-
-    // NOTE: The following stuff should be covered by
-    // clamp_to_closest_restriction()
-    // If the target rotation is more than 180 degrees away from the current
-    // rotation, choose the shorter way around the circle
-    // if (target_rotations[0] - bones[0]->rotation > PI) {
-    //     target_rotations[0] -= 2.0f * PI;
-    // } else if (target_rotations[0] - bones[0]->rotation < -PI) {
-    //     target_rotations[0] += 2.0f * PI;
-    // }
-
-    // if (target_rotations[1] - bones[1]->rotation > PI) {
-    //     target_rotations[1] -= 2.0f * PI;
-    // } else if (target_rotations[1] - bones[1]->rotation < -PI) {
-    //     target_rotations[1] += 2.0f * PI;
-    // }
 }
 
 glm::vec2 Limb::origin() const { return bones[0]->head(); }
@@ -361,8 +353,8 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
         move_spline_points(spline_points_right, prototype->get_points(),
                            limbs[RIGHT_LEG].origin());
 
-        // Find out which foot stands on higher ground and move it's spline up
-        // accordingly
+        // Find out which foot stands on higher ground and move it's spline
+        // up accordingly
         glm::vec2 ground_left =
             find_highest_ground_at(spline_points_left[Spline::P2]);
         glm::vec2 ground_right =
@@ -382,7 +374,8 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
             }
         }
 
-        // Always start the new spline at the current point of the last spline
+        // Always start the new spline at the current point of the last
+        // spline
         // TODO: make a function for this?
         glm::vec2 current_spline_point_left = last_foot_pos_left;
         spline_points_left[Spline::T1] +=
@@ -479,7 +472,8 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
             point += limbs[RIGHT_LEG].origin();
         }
 
-        // Always start the new spline at the current point of the last spline
+        // Always start the new spline at the current point of the last
+        // spline
         glm::vec2 current_spline_point = last_foot_pos_left;
         interpolated_points_left[Spline::T1] +=
             current_spline_point - interpolated_points_left[Spline::P1];

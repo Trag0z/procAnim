@@ -126,9 +126,9 @@ void Player::render(const Renderer& renderer) {
         for (size_t i = 0; i < rm.bones.size(); ++i) {
             rm.bones_shader_vertices[i * 2].pos =
                 bone_transforms[i] *
-                rm.bones[i]
-                    .bind_pose_transform[2]; // Renders (0.0f, 0.0f, 0.0f)
-                                             // in the bones local space
+                rm.bones[i].bind_pose_transform[2]; // Renders (0.0f, 0.0f,
+                                                    // 0.0f) in the bones local
+                                                    // space
             rm.bones_shader_vertices[i * 2 + 1].pos =
                 bone_transforms[i] * rm.bones[i].bind_pose_transform *
                 glm::vec3(rm.bones[i].tail, 1.0f);

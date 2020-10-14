@@ -511,9 +511,9 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
             bones = &limbs[Animator::LEFT_ARM].bones[0];
         }
 
-        // @CLEANUP: Why bind_pose_transform[2]? Can't this be clearer?
+        // @CLEANUP: Why bind_pose_transform2[2]? Can't this be clearer?
         // glm::vec2 limb_root_position = static_cast<glm::vec2>(
-        //     bones[0]->get_transform() * bones[0]->bind_pose_transform[2]);
+        //     bones[0]->get_transform() * bones[0]->bind_pose_transform2[2]);
         float radius = bones[0]->length + bones[1]->length;
 
         DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];

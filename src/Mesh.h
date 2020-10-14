@@ -6,17 +6,18 @@
 struct Bone {
     std::string name;
     const Bone* parent;
-    glm::mat3 bind_pose_transform;
-    glm::mat3 inverse_bind_pose_transform;
-    // Position and length in bone space
+    glm::mat3 bind_pose_transform; // Transforms from bone space to mesh space
+    glm::mat3
+        inverse_bind_pose_transform; // Transforms from mesh space to bone space
+
     glm::vec2 tail;
     float length;
+
     // Radians around z-Axis
     float rotation = 0.0f;
 
     glm::mat3 get_transform() const;
-    // With parent bone transform applied to it // TODO: mke this a variable,
-    // let limb calc the current pos in origin()
+    // Current position of the bone's head
     glm::vec2 head() const;
 };
 

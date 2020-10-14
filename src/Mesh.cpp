@@ -12,8 +12,8 @@ glm::mat3 Bone::get_transform() const {
         return parent->get_transform() * this_transform;
     }
 
-    return bind_pose_transform * glm::rotate(glm::mat3(1.0f), rotation) *
-           inverse_bind_pose_transform;
+    return bind_pose_transform *
+           glm::rotate(glm::mat3(1.0f), rotation) * inverse_bind_pose_transform;
 }
 
 glm::vec2 Bone::head() const {
