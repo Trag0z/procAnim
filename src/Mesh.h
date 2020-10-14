@@ -17,7 +17,8 @@ struct Bone {
     float rotation = 0.0f;
 
     glm::mat3 get_transform() const;
-    // Current position of the bone's head
+
+    // Current position of the bone's head (affacted by parent bones)
     glm::vec2 head() const;
 };
 

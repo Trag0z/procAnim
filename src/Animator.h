@@ -79,7 +79,8 @@ class Animator {
 
     enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state, last_leg_state;
 
-    void set_new_limb_splines(const std::list<BoxCollider>& colliders);
+    void set_new_limb_splines(float walking_speed,
+                              const std::list<BoxCollider>& colliders);
 
     void interpolate_splines(glm::vec2 out[Spline::NUM_POINTS],
                              SplineIndex spline_index) const;

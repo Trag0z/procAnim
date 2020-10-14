@@ -6,7 +6,8 @@
 #include "Renderer.h"
 #include "Player.h"
 
-// Moves all points in src by move. src and dst can be the same array
+// Moves all points in src by move and write them to dst. src and dst can point
+// to the same array.
 static void move_spline_points(glm::vec2* dst, const glm::vec2* src,
                                glm::vec2 move) {
     for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
@@ -16,7 +17,7 @@ static void move_spline_points(glm::vec2* dst, const glm::vec2* src,
 
 // Takes a target_pos in model space and sets bone rotations so that the tail of
 // bone[1] is at (or at the closest possible point to) target_pos.
-static void solve_ik(Bone* const bones[2], glm::vec2 target_pos) {
+static void solve_ik(Bone* const bones[2], glm::vec2 target_pos, bool is_leg) {
     SDL_assert(bones != nullptr);
 
     // This algorithm assumes that the angle between the bones in bind pose is
@@ -40,9 +41,8 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos) {
         bones[0]->rotation =
             atan2f(local_target_pos.y, local_target_pos.x) - PI * 0.5f;
         bones[1]->rotation = 0.0f;
-    }
-
-    else {
+    } else {
+        // Target is in reach
         glm::vec2 local_target[2];
         glm::vec2 local_target2[2];
         float length2[2];
@@ -64,6 +64,10 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos) {
 
         bones[1]->rotation =
             atan2f(sqrtf(1.0f - long_factor * long_factor), long_factor);
+
+        if (is_leg) {
+            bones[1]->rotation *= -1.0f;
+        }
 
         float gamma = atan2f(bones[1]->length * sinf(bones[1]->rotation),
                              bones[0]->length +
@@ -148,7 +152,7 @@ void Animator::update(float delta_time, float walking_speed,
     if (arm_follows_mouse && input.mouse_button(MouseButton::LEFT)) {
         auto& right_arm = limbs[RIGHT_ARM];
         solve_ik(right_arm.bones,
-                 parent->world_to_local_space(input.mouse_pos_world()));
+                 parent->world_to_local_space(input.mouse_pos_world()), false);
         last_ground_movement = glm::vec2(0.0f);
         return;
     }
@@ -169,7 +173,12 @@ void Animator::update(float delta_time, float walking_speed,
 
         glm::vec2 target_pos =
             limb.spline.get_point_on_spline(interpolation_factor_on_spline);
-        solve_ik(limb.bones, target_pos);
+
+        if (i == LEFT_LEG || i == RIGHT_LEG) {
+            solve_ik(limb.bones, target_pos, true);
+        } else {
+            solve_ik(limb.bones, target_pos, false);
+        }
     }
 
     // Player movement
@@ -219,16 +228,12 @@ void Animator::update(float delta_time, float walking_speed,
     */
 
     if (walking_speed > 0.0f) {
-        // Lean in walking direction when walking fast/running
-        spine->rotation =
-            std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
-
         if (leg_state == NEUTRAL) {
             // Start to walk
             last_leg_state = leg_state;
             leg_state = RIGHT_LEG_UP;
             interpolation_factor_between_splines = walking_speed;
-            set_new_limb_splines(colliders);
+            set_new_limb_splines(walking_speed, colliders);
 
             last_interpolation_factor_on_spline =
                 interpolation_factor_on_spline;
@@ -240,12 +245,12 @@ void Animator::update(float delta_time, float walking_speed,
             if (leg_state == LEFT_LEG_UP) {
                 last_leg_state = leg_state;
                 leg_state = RIGHT_LEG_UP;
-                set_new_limb_splines(colliders);
+                set_new_limb_splines(walking_speed, colliders);
 
             } else {
                 last_leg_state = leg_state;
                 leg_state = LEFT_LEG_UP;
-                set_new_limb_splines(colliders);
+                set_new_limb_splines(walking_speed, colliders);
             }
             last_interpolation_factor_on_spline =
                 interpolation_factor_on_spline;
@@ -256,16 +261,16 @@ void Animator::update(float delta_time, float walking_speed,
         if (leg_state != NEUTRAL) {
             last_leg_state = leg_state;
             leg_state = NEUTRAL;
+            spine->rotation = 0.0f;
 
-            set_new_limb_splines(colliders);
+            set_new_limb_splines(walking_speed, colliders);
 
             last_interpolation_factor_on_spline =
                 interpolation_factor_on_spline;
             interpolation_factor_on_spline = 0.0f;
 
-            spine->rotation = 0.0f;
         } else if (interpolation_factor_on_spline == 1.0f) {
-            set_new_limb_splines(colliders);
+            set_new_limb_splines(walking_speed, colliders);
 
             last_interpolation_factor_on_spline =
                 interpolation_factor_on_spline;
@@ -301,7 +306,11 @@ glm::vec2 Animator::get_last_ground_movement() const {
     return last_ground_movement;
 }
 
-void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
+void Animator::set_new_limb_splines(float walking_speed,
+                                    const std::list<BoxCollider>& colliders) {
+    // Lean in walking direction when walking fast/running
+    // TODO: Spine should interpolate to move smoothely
+    spine->rotation = std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
 
     auto find_highest_ground_at = [&colliders,
                                    this](glm::vec2 pos) -> glm::vec2 {
@@ -377,23 +386,19 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
         // Always start the new spline at the current point of the last
         // spline
         // TODO: make a function for this?
-        glm::vec2 current_spline_point_left = last_foot_pos_left;
         spline_points_left[Spline::T1] +=
-            current_spline_point_left - spline_points_left[Spline::P1];
+            last_foot_pos_left - spline_points_left[Spline::P1];
 
-        spline_points_left[Spline::P1] = current_spline_point_left;
+        spline_points_left[Spline::P1] = last_foot_pos_left;
 
-        glm::vec2 current_spline_point_right =
-            limbs[RIGHT_LEG].spline.get_point_on_spline(
-                interpolation_factor_on_spline);
         spline_points_right[Spline::T1] +=
-            current_spline_point_right - spline_points_right[Spline::P1];
+            last_foot_pos_right - spline_points_right[Spline::P1];
 
-        spline_points_right[Spline::P1] = current_spline_point_right;
+        spline_points_right[Spline::P1] = last_foot_pos_right;
 
         if (last_leg_state == LEFT_LEG_UP) {
             glm::vec2 body_movement_till_end_of_step =
-                current_spline_point_right - spline_points_right[Spline::P2];
+                last_foot_pos_right - spline_points_right[Spline::P2];
 
             glm::vec2 target_foot_pos =
                 find_highest_ground_at(spline_points_left[Spline::P2] +
@@ -405,7 +410,7 @@ void Animator::set_new_limb_splines(const std::list<BoxCollider>& colliders) {
             spline_points_left[Spline::P2] = target_foot_pos;
         } else {
             glm::vec2 body_movement_till_end_of_step =
-                current_spline_point_left - spline_points_left[Spline::P2];
+                last_foot_pos_left - spline_points_left[Spline::P2];
 
             glm::vec2 target_foot_pos =
                 find_highest_ground_at(spline_points_right[Spline::P2] +
