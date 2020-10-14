@@ -21,11 +21,8 @@ struct SplineSet {
 };
 
 struct Limb {
-    float target_rotations[2];
     Spline spline; // In parent's local space
-
     Bone* bones[2];
-    BoneRestrictions bone_restrictions[2];
 
     glm::vec2 origin() const;
     float length() const;

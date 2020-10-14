@@ -15,6 +15,8 @@ struct Bone {
     float rotation = 0.0f;
 
     glm::mat3 get_transform() const;
+    // With parent bone transform applied to it // TODO: mke this a variable,
+    // let limb calc the current pos in origin()
     glm::vec2 head() const;
 };
 

@@ -14,53 +14,27 @@ static void move_spline_points(glm::vec2* dst, const glm::vec2* src,
     }
 }
 
-// Takes a target_pos in model space and finds two target_rotations for the
-// bones, so that the tail of bone[1] is at (or at the closest possible point
-// to) target_pos.
-static void solve_ik(Bone* const bones[2],
-                     const BoneRestrictions bone_restrictions[2],
-                     glm::vec2 target_pos, float* target_rotations) {
-    SDL_assert(bones != nullptr && bone_restrictions != nullptr);
-
-    // TODO: find out why this is not pointing to the exact spot it should point
-    // to
-
-    // We need the target positions before the bone's rotation is applied to
-    // find the new, absolute rotation. Therefore, we use the
-    // inverse_bind_pose_transform
-    // glm::vec3 target_pos_bone_space[2];
-    // target_pos_bone_space[0] = bones[0]->inverse_bind_pose_transform *
-    //                            glm::inverse(bones[0]->parent->get_transform())
-    //                            * glm::vec3(target_pos, 1.0f);
-
-    // target_pos_bone_space[1] = bones[1]->inverse_bind_pose_transform *
-    //                            glm::inverse(bones[0]->get_transform()) *
-    //                            glm::vec3(target_pos, 1.0f);
-
-    // float target_distance = glm::length(glm::vec3(target_pos, 1.0f) -
-    //                                     bones[0]->get_transform() *
-    //                                         bones[0]->bind_pose_transform[2]);
+// Takes a target_pos in model space and sets bone rotations so that the tail of
+// bone[1] is at (or at the closest possible point to) target_pos.
+static void solve_ik(Bone* const bones[2], glm::vec2 target_pos) {
+    SDL_assert(bones != nullptr);
+    // SDL_assert(glm::dot(bones[0]->tail - bones[0]->head, bones[1]->tail -
+    // bones[1]->head) == 0.0f);
 
     float target_distance = glm::length(bones[0]->head() - target_pos);
 
     if (target_distance > bones[0]->length + bones[1]->length) {
-        for (size_t i = 0; i < 2; ++i) {
-            Bone& b = *bones[i];
+        glm::vec2 local_target_pos =
+            glm::vec2(bones[0]->inverse_bind_pose_transform *
+                      glm::inverse(bones[0]->parent->get_transform()) *
+                      glm::vec3(target_pos, 1.0f));
 
-            glm::vec3 target_pos_bone_space =
-                b.inverse_bind_pose_transform *
-                glm::inverse(b.parent->get_transform()) *
-                glm::vec3(target_pos, 1.0f);
+        bones[0]->rotation =
+            atan2f(local_target_pos.y, local_target_pos.x) - PI * 0.5f;
+        bones[1]->rotation = 0.0f;
+    }
 
-            bones[i]->rotation =
-                atan2f(target_pos_bone_space.y, target_pos_bone_space.x) -
-                PI * 0.5f;
-        }
-
-        target_rotations[0] = bones[0]->rotation;
-        target_rotations[1] = bones[1]->rotation;
-    } else {
-
+    else {
         glm::vec2 local_target[2];
         glm::vec2 local_target2[2];
         float length2[2];
@@ -93,120 +67,21 @@ static void solve_ik(Bone* const bones[2],
         bones[0]->rotation -= 0.5f * PI;
     }
 
-    // Find out if min_rotation or max_rotation is closer to the
-    // target_rotations and set target_rotations to the closer one if it is out
-    // of the restricted range
-    // auto clamp_to_closest_restriction = [target_rotations,
-    //                                      bone_restrictions](size_t
-    //                                      bone_index) {
-    //     auto rotation = target_rotations[bone_index];
-    //     auto& restrictions = bone_restrictions[bone_index];
-
-    //     SDL_assert(rotation > -2.0f * PI && rotation < 2.0f * PI);
-
-    //     if (rotation > restrictions.min_rotation &&
-    //         rotation < restrictions.max_rotation)
-    //         return;
-
-    //     float distance_to_min;
-    //     if (rotation < restrictions.min_rotation - PI) {
-    //         distance_to_min =
-    //             std::abs(rotation + 2.0f * PI - restrictions.min_rotation);
-    //         // SDL_TriggerBreakpoint();
-    //     } else if (rotation > restrictions.min_rotation + PI) {
-    //         distance_to_min =
-    //             std::abs(rotation - 2.0f * PI - restrictions.min_rotation);
-    //         // SDL_TriggerBreakpoint();
-    //     } else {
-    //         distance_to_min = std::abs(rotation - restrictions.min_rotation);
-    //     }
-
-    //     float distance_to_max;
-    //     if (rotation < restrictions.max_rotation - PI) {
-    //         distance_to_max =
-    //             std::abs(rotation + 2.0f * PI - restrictions.max_rotation);
-    //         // SDL_TriggerBreakpoint();
-    //     } else if (rotation > restrictions.max_rotation + PI) {
-    //         distance_to_max =
-    //             std::abs(rotation - 2.0f * PI - restrictions.max_rotation);
-    //         // SDL_TriggerBreakpoint();
-    //     } else {
-    //         distance_to_max = std::abs(rotation - restrictions.max_rotation);
-    //     }
-
-    //     if (distance_to_min < distance_to_max) {
-    //         rotation = restrictions.min_rotation;
-    //     } else {
-    //         rotation = restrictions.max_rotation;
-    //     }
-    // };
-
-    // NOTE: The resulting rotations here are applied counter clockwise, but
-    // why?
-    // if (target_distance > bones[0]->length + bones[1]->length) {
-    //     // Target out of reach
-    //     // Get angle between local up (y-axis) and target position
-
-    //     for (size_t i = 0; i < 2; ++i) {
-    //         target_rotations[i] =
-    //             atan2f(target_pos_bone_space[i].y,
-    //             target_pos_bone_space[i].x) - degToRad(90.0f);
-
-    //         SDL_assert(target_rotations[i] < 2.0f * PI &&
-    //                    target_rotations[i] > -2.0f * PI);
-
-    //         // clamp_to_closest_restriction(i);
-    //     }
-    // } else {
-    //     float target_distance2 = target_distance * target_distance;
-    //     float length2[2] = {bones[0]->length * bones[0]->length,
-    //                         bones[1]->length * bones[1]->length};
-
-    //     float cosAngle0 = (target_distance2 + length2[0] - length2[1]) /
-    //                       (2 * target_distance * bones[0]->length);
-
-    //     float atan =
-    //         atan2f(target_pos_bone_space[0].y, target_pos_bone_space[0].x);
-    //     float acos = acosf(cosAngle0);
-    //     target_rotations[0] = atan - acos - PI * 0.5f;
-
-    //     float cosAngle1 = (length2[0] + length2[1] - target_distance2) /
-    //                       (2.0f * bones[0]->length * bones[1]->length);
-    //     float acos1 = acosf(cosAngle1);
-    //     target_rotations[1] =
-    //         PI -
-    //         acos1; // BUG: PI should be the right value here, but then the
-    //         arm
-    //                // overshoots the position by a bit. Find out why that is!
-    //                // 175 degrees gives almost pixel perfect results for
-    //                arms.
-
-    //     // If the target is unreachable, try rotating bone[0] the other way
-    //     if ((target_rotations[1] < bone_restrictions[1].min_rotation ||
-    //          target_rotations[1] > bone_restrictions[1].max_rotation)) {
-    //         target_rotations[0] += acos * 2.0f;
-    //         target_rotations[1] *= -1.0f;
-    //     }
-
-    //     // clamp_to_closest_restriction(0);
-    //     // clamp_to_closest_restriction(1);
-    // }
-
     // NOTE: The following stuff should be covered by
     // clamp_to_closest_restriction()
     // If the target rotation is more than 180 degrees away from the current
     // rotation, choose the shorter way around the circle
-    if (target_rotations[0] - bones[0]->rotation > PI) {
-        target_rotations[0] -= 2.0f * PI;
-    } else if (target_rotations[0] - bones[0]->rotation < -PI) {
-        target_rotations[0] += 2.0f * PI;
-    }
+    // if (target_rotations[0] - bones[0]->rotation > PI) {
+    //     target_rotations[0] -= 2.0f * PI;
+    // } else if (target_rotations[0] - bones[0]->rotation < -PI) {
+    //     target_rotations[0] += 2.0f * PI;
+    // }
 
-    if (target_rotations[1] - bones[1]->rotation > PI) {
-        target_rotations[1] -= 2.0f * PI;
-    } else if (target_rotations[1] - bones[1]->rotation < -PI) {
-        target_rotations[1] += 2.0f * PI;
-    }
+    // if (target_rotations[1] - bones[1]->rotation > PI) {
+    //     target_rotations[1] -= 2.0f * PI;
+    // } else if (target_rotations[1] - bones[1]->rotation < -PI) {
+    //     target_rotations[1] += 2.0f * PI;
+    // }
 }
 
 glm::vec2 Limb::origin() const { return bones[0]->head(); }
@@ -244,23 +119,6 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh) {
         auto& limb = limbs[i];
         limb.spline.init(nullptr);
 
-        // @CLEANUP: are these already zeroed?
-        limb.target_rotations[0] = 0.0f;
-        limb.target_rotations[1] = 0.0f;
-
-        limb.bone_restrictions[0] = {std::numeric_limits<float>::min(),
-                                     std::numeric_limits<float>::max()};
-        limb.bone_restrictions[1] = limb.bone_restrictions[0];
-
-        if (i == LEFT_ARM || i == RIGHT_ARM) {
-            limb.bone_restrictions[0] = {-0.5f * PI, 0.5 * PI};
-            limb.bone_restrictions[1] = {0.0f, 0.75f * PI};
-        } else {
-            limb.bone_restrictions[0] = {0.0f, 0.0f}; //{-0.7f * PI, 0.7f * PI};
-            limb.bone_restrictions[1] = {0.0f,
-                                         0.0f}; //{degToRad(-120.0f), 0.0f};
-        }
-
         glm::vec2 spline_points[Spline::NUM_POINTS];
         if (i == LEFT_ARM) {
             limb.bones[0] = mesh.find_bone("Arm_L_1");
@@ -297,18 +155,12 @@ void Animator::update(float delta_time, float walking_speed,
     // @CLEANUP
     if (arm_follows_mouse && input.mouse_button(MouseButton::LEFT)) {
         auto& right_arm = limbs[RIGHT_ARM];
-        solve_ik(right_arm.bones, right_arm.bone_restrictions,
-                 parent->world_to_local_space(input.mouse_pos_world()),
-                 right_arm.target_rotations);
+        solve_ik(right_arm.bones,
+                 parent->world_to_local_space(input.mouse_pos_world()));
         last_ground_movement = glm::vec2(0.0f);
         return;
     }
 
-    static_cast<const std::list<BoxCollider>&>(colliders);
-    static_cast<float>(delta_time);
-    static_cast<float>(walking_speed);
-
-    /*
     // Update limbs
     float interpolation_speed = WALKING_SPEED_MULTIPLIER.MIN +
                                 walking_speed * (WALKING_SPEED_MULTIPLIER.MAX -
@@ -325,18 +177,7 @@ void Animator::update(float delta_time, float walking_speed,
 
         glm::vec2 target_pos =
             limb.spline.get_point_on_spline(interpolation_factor_on_spline);
-        solve_ik(limb.bones, limb.bone_restrictions, target_pos,
-                 limb.target_rotations);
-
-        // @CLEANUP: This uses interpolation_factor_on_spline, which does not
-        // really make sense. It probably works, but should be more
-        // understandable.
-        limb.bones[0]->rotation =
-            lerp(limb.bones[0]->rotation, limb.target_rotations[0],
-                 interpolation_factor_on_spline);
-        limb.bones[1]->rotation =
-            lerp(limb.bones[1]->rotation, limb.target_rotations[1],
-                 interpolation_factor_on_spline);
+        solve_ik(limb.bones, target_pos);
     }
 
     // Player movement
@@ -383,7 +224,7 @@ void Animator::update(float delta_time, float walking_speed,
     interpolate between the splines and find the target points. These points
     are then locked in until the step is completed or the player stops
     moving mid step.
-    */ /*
+    */
 
     if (walking_speed > 0.0f) {
         // Lean in walking direction when walking fast/running
@@ -439,7 +280,6 @@ void Animator::update(float delta_time, float walking_speed,
             interpolation_factor_on_spline = 0.0f;
         }
     }
-    */
 }
 
 void Animator::render(const Renderer& renderer) {
