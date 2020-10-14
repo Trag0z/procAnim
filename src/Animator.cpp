@@ -104,7 +104,7 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh) {
     target_points_vao.init(indices, 4, nullptr, 4, GL_DYNAMIC_DRAW);
 
     leg_state = NEUTRAL;
-    last_leg_state = RIGHT_LEG_UP;
+    last_leg_state = NEUTRAL;
 
     interpolation_factor_between_splines = interpolation_factor_on_spline =
         0.0f;
@@ -163,6 +163,11 @@ void Animator::update(float delta_time, float walking_speed,
                                                  WALKING_SPEED_MULTIPLIER.MIN);
 
     last_interpolation_factor_on_spline = interpolation_factor_on_spline;
+
+    if (leg_state == NEUTRAL && last_leg_state != NEUTRAL) {
+        // Transitioning to neutral, make this go extra quick
+        interpolation_speed *= 3.0f;
+    }
 
     interpolation_factor_on_spline = std::min(
         interpolation_factor_on_spline + delta_time * interpolation_speed,
