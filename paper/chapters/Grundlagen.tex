@@ -25,6 +25,7 @@ Der Root-Knochen hat keinen Parent, seine Transformationsmatrix stellt eine Tran
 Dabei stellen $B_{i}^{-1}$ die Inverse Bind-Pose Transformationen der Knochen und $C_{i}$ die Transformationen für die aktuelle Pose dar. Die Gleichung in \ref{bone1} beschreibt das Verfahren beim Rigid Binding. Beim Smooth Binding (\ref{bone2}) werden Joint-Matrizen für alle relevanten Knochen berechnet, die dann mit deinem Gewichtungsfaktor $w_{i}$ auf den Vertex wirken.
 
 \section{Inverse Kinematics}
-Bei Inverse Kinematics handelt es sich um einen mathematischen Prozess zur Berechnung von Gelenkparametern, um das Ende einer kinematischen Kette (hier meist Arme oder Beine) an einem bestimmten Punkt zu positionieren. 
+Bei Inverse Kinematics handelt es sich um mathematische Prozesse zur Berechnung von Gelenkparametern, um das Ende einer kinematischen Kette (wie z.B. eine Hand) an einem bestimmten Punkt zu positionieren. Zur Lösung dieser Problemstellungen gibt es verschiedene analytische und numerische Verfahren. Welches dieser Verfahren gewählt werden sollte, hängt von den Details des vorliegenden Problems ab. Da in dieser Arbeit nur die Hände und Füße des Charakters mittels Inverse Kinematics positioniert werden sollen, wird lediglich ein simples analytisches Verfahren verwendet, das bei der Erläuterung des entsprechenden Programmcodes im Detail erklärt wird.
 
-\section{Hermitekurven}
+\section{Hermite Splines}
+Als kubische Hermitesplines bezeichnet man Splines, die zwischen zwei oder mehr Punkten interpolieren. Sie sind sowohl $C_1$ als auch $C_2$ stetig, was bedeutet, dass die Kurve weich (ohne einen Knick) von Segment zu Segment übergeht. Ein Hermitespline wird dabei durch seine Kontrollpunkte und die Tangenten in den jeweiligen Punkten bestimmt. Der Verlauf des Splines zwischen diesen Punkten ist durch ein Polynom dritten Grades definiert.
