@@ -196,7 +196,7 @@ void Animator::update(float delta_time, float walking_speed,
             grounded_limb = &limbs[RIGHT_LEG];
             last_foot_pos = last_foot_pos_right;
         } else {
-            SDL_assert(last_leg_state == RIGHT_LEG_UP);
+            // SDL_assert(last_leg_state == RIGHT_LEG_UP);
             grounded_limb = &limbs[LEFT_LEG];
             last_foot_pos = last_foot_pos_left;
         }
@@ -270,6 +270,7 @@ void Animator::update(float delta_time, float walking_speed,
             interpolation_factor_on_spline = 0.0f;
 
         } else if (interpolation_factor_on_spline == 1.0f) {
+            last_leg_state = NEUTRAL;
             set_new_limb_splines(walking_speed, colliders);
 
             last_interpolation_factor_on_spline =
@@ -333,6 +334,10 @@ void Animator::set_new_limb_splines(float walking_speed,
 
         if (interpolation_factor_on_spline == 1.0f) {
             moving_forward = !moving_forward;
+        }
+
+        if (last_leg_state != NEUTRAL) {
+            moving_forward = false;
         }
 
         // Arms
@@ -409,6 +414,7 @@ void Animator::set_new_limb_splines(float walking_speed,
                 target_foot_pos - spline_points_left[Spline::P2];
             spline_points_left[Spline::P2] = target_foot_pos;
         } else {
+            // last_leg_state might also be neutral!
             glm::vec2 body_movement_till_end_of_step =
                 last_foot_pos_left - spline_points_left[Spline::P2];
 
