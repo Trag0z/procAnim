@@ -2,7 +2,6 @@ NEXT:
 - when turning around, the search for new animation positions is weird due to scale change in player
 
 TODO:
-- make T1/T2 be relative coordinates again?
 - wireframes don't get modified by bones
 
 - apply bone restrictions

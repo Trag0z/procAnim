@@ -29,6 +29,12 @@ class Entity {
     glm::vec2 local_to_world_space(const glm::vec2& local_pos) const {
         return model * glm::vec3(local_pos, 1.0f);
     }
+    glm::vec2 world_to_world_scale(const glm::vec2& world_vec) const {
+        return {world_vec.x / scale.x, world_vec.y / scale.y};
+    }
+    glm::vec2 local_to_world_scale(const glm::vec2& local_vec) const {
+        return {local_vec.x * scale.x, local_vec.y * scale.y};
+    }
 
     // // TODO: These have to change, can't just scale a float by a vector
     // float world_to_local_space(float world_length) const {

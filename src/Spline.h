@@ -37,6 +37,8 @@ class Spline {
 
   private:
     static const size_t RENDER_STEPS = 50;
+
+    // T1 and T2 are relative to P1/P2
     glm::vec2 points[NUM_POINTS];
     glm::mat4 parameter_matrix;
 
@@ -93,7 +95,8 @@ class SplineEditor {
 
     void set_spline_point(glm::vec2 p,
                           size_t point_index = static_cast<size_t>(-1),
-                          size_t spline_index = static_cast<size_t>(-1));
+                          size_t spline_index = static_cast<size_t>(-1),
+                          bool absolute_tangent_pos = true);
 
     bool update_gui();
 };

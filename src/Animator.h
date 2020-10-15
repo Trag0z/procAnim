@@ -84,8 +84,13 @@ class Animator {
     void set_new_splines(float walking_speed,
                          const std::list<BoxCollider>& colliders);
 
-    void interpolate_splines(glm::vec2 out[Spline::NUM_POINTS],
+    void interpolate_splines(glm::vec2 dst[Spline::NUM_POINTS],
                              SplineIndex spline_index) const;
+
+    // Interpolates between T1 and T2 from the walking and running spline
+    // prototypes. Writes the resulting values in world space to dst.
+    void interpolate_tangents(glm::vec2 dst[Spline::NUM_POINTS],
+                              SplineIndex spline_index);
 
     friend Game;
 };
