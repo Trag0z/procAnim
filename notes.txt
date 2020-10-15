@@ -1,4 +1,5 @@
 NEXT:
+- make pelvis move player pos directly
 - only move upper body after steps?
 - when turning around, the search for new animation positions is weird due to scale change in player
 

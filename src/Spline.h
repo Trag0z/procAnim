@@ -18,7 +18,7 @@ class Spline {
     enum PointName { P1 = 0, T1 = 1, T2 = 2, P2 = 3 };
 
     // Points in format P1, T1, T2, P2
-    void init(glm::vec2 points_[NUM_POINTS] = nullptr);
+    void init(const glm::vec2 points_[NUM_POINTS] = nullptr);
     void render(const Renderer& renderer) const;
 
     const glm::vec2& get_point(PointName p) const;
@@ -61,7 +61,9 @@ class SplineEditor {
   private:
     const Entity* parent;
 
-    static const size_t NUM_SPLINES_PER_ANIMATION = 4;
+    static const size_t NUM_ANIMATIONS = 3;
+    static const size_t NUM_SPLINES_PER_ANIMATION = 5;
+
     SplineSet* spline_set;
     Limb* limbs;
 

@@ -8,7 +8,7 @@
 /////               Spline              /////
 /////                                   /////
 
-void Spline::init(glm::vec2 points_[NUM_POINTS]) {
+void Spline::init(const glm::vec2 points_[NUM_POINTS]) {
     if (points_ != nullptr) {
         memcpy_s(points, 4 * sizeof(glm::vec2), points_, 4 * sizeof(glm::vec2));
     } else {
@@ -200,6 +200,12 @@ void SplineEditor::load_splines(const std::string& path) {
         spline_set->idle[n_spline].init(&all_points[num_copied]);
         num_copied += Spline::NUM_POINTS;
     }
+
+    glm::vec2 new_points[4] = {glm::vec2(0.0f), glm::vec2(0.0f),
+                               glm::vec2(0.0f), glm::vec2(0.0f)};
+    spline_set->walk[4].init(new_points);
+    spline_set->run[4].init(new_points);
+    spline_set->idle[4].init(new_points);
 }
 
 void SplineEditor::init(const Entity* parent_, SplineSet* splines_,
