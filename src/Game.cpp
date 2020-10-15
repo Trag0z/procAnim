@@ -73,16 +73,16 @@ void Game::init() {
 
     background.init("../assets/background.png");
 
-    // Player
-    glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
-    player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
-                "../assets/playerTexture.png", "../assets/guy.fbx",
-                &gamepads[0]);
-
     // Level
     level.load_from_file("../assets/default.level");
     level_editor.init(&level);
     BoxCollider::TEXTURE.load_from_file("../assets/ground.png");
+
+    // Player
+    glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
+    player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
+                "../assets/playerTexture.png", "../assets/guy.fbx",
+                &gamepads[0], level.colliders());
 
     frame_start = SDL_GetTicks();
     is_running = true;
@@ -242,12 +242,8 @@ void Game::update_gui() {
     sprintf_s(label, "% 6.1f, % 6.1f", player.position.x, player.position.y);
     Text("Player position: ");
     SameLine();
-    bool changed_value =
         DragFloat2("Player position", value_ptr(player.position), 1.0f, 0.0f,
                    0.0f, "% .2f");
-    if (changed_value) {
-        player.grounded = false;
-    }
 
     Text("Target Positions");
     Columns(4);

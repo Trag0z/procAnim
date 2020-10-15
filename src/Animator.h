@@ -40,7 +40,8 @@ class Animator {
     };
     enum LimbIndex { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
 
-    void init(const Player* parent_, RiggedMesh& mesh);
+    void init(const Player* parent_, RiggedMesh& mesh,
+              const std::list<BoxCollider>& colliders);
     void update(float delta_time, float walking_speed,
                 const MouseKeyboardInput& input,
                 const std::list<BoxCollider>& colliders);
@@ -48,15 +49,14 @@ class Animator {
 
     glm::vec2 get_tip_pos(LimbIndex limb_index) const;
 
-    glm::vec2 get_last_world_move() const;
+    glm::vec2 get_pelvis_pos() const;
 
   private:
     const Player* parent;
     SplineEditor* spline_editor;
     Bone* spine;
 
-    // The splines' coordinate systems originate at the head of the first bone
-    // they control (i.e. the shoulder or the hip)
+    // The splines are all in players' local space
     SplineSet spline_prototypes;
     Spline pelvis_spline;
 
@@ -68,11 +68,6 @@ class Animator {
     float interpolation_factor_on_spline, last_interpolation_factor_on_spline;
 
     float step_distance;
-
-    glm::vec2 last_foot_pos_left, last_foot_pos_right;
-    glm::vec2 last_pelvis_pos;
-
-    glm::vec2 last_world_move;
 
     bool arm_follows_mouse = false;
 

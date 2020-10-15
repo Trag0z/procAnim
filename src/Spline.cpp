@@ -517,8 +517,10 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     renderer.debug_shader.use();
     glLineWidth(1.0f);
 
-    // Draw circle for selected limb
     if (selected_spline_index < NUM_SPLINES_PER_ANIMATION && spline_edit_mode) {
+        // Draw circle for selected limb
+        renderer.debug_shader.set_model(&parent->get_model_matrix());
+        renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
 
         // @OPTIMIZATION: Calculate this stuff less often
         Bone** bones;
@@ -546,7 +548,6 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
                 glm::vec2(radius * cosf(theta), radius * sinf(theta));
         }
 
-        renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
         circle_vao.update_vertex_data(circle_vertices, CIRCLE_SEGMENTS);
         circle_vao.draw(GL_LINE_LOOP);
     }
