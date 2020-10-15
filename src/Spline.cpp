@@ -178,28 +178,45 @@ void SplineEditor::load_splines(const std::string& path) {
     }
 
     // Read data
-    const size_t num_splines_total = 4 * 3;
+    const size_t num_splines_total =
+        4 * 3; // NUM_SPLINES_PER_ANIMATION * NUM_ANIMATIONS;
     const size_t num_points_total = num_splines_total * Spline::NUM_POINTS;
     glm::vec2 all_points[num_points_total];
 
+    size_t num_bytes_to_read = sizeof(all_points);
+
     SDL_RWops* file = SDL_RWFromFile(save_path.c_str(), "rb");
-    SDL_RWread(file, all_points, sizeof(all_points), 1);
+    size_t num_bytes_read = SDL_RWread(file, all_points, 1, num_bytes_to_read);
     SDL_RWclose(file);
+
+    if (num_bytes_read != num_bytes_to_read) {
+        printf("Error reading data from %s: %s", path.c_str(), SDL_GetError());
+        SDL_TriggerBreakpoint();
+    }
+
+    glm::vec2 pelvis_poitns[4] = {glm::vec2(1.0f), glm::vec2(1.0f),
+                                  glm::vec2(1.0f), glm::vec2(1.0f)};
 
     // Initialize the splines from the point data
     size_t num_copied = 0;
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION - 1;
+         ++n_spline) {
         spline_set->walk[n_spline].init(&all_points[num_copied]);
         num_copied += Spline::NUM_POINTS;
     }
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    spline_set->walk[4].init(pelvis_poitns);
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION - 1;
+         ++n_spline) {
         spline_set->run[n_spline].init(&all_points[num_copied]);
         num_copied += Spline::NUM_POINTS;
     }
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    spline_set->run[4].init(pelvis_poitns);
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION - 1;
+         ++n_spline) {
         spline_set->idle[n_spline].init(&all_points[num_copied]);
         num_copied += Spline::NUM_POINTS;
     }
+    spline_set->idle[4].init(pelvis_poitns);
 }
 
 void SplineEditor::init(const Entity* parent_, SplineSet* splines_,

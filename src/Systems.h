@@ -22,6 +22,8 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
     SetNextItemWidth(100);
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
+    SetNextItemWidth(100);
+    DragFloat(&player.animator.STEP_DISTANCE_MULTIPLIER);
 
     NewLine();
     Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);
@@ -44,28 +46,6 @@ inline void update_gui(SDL_Window* window, Renderer& renderer,
                    0.0f, "% .2f");
     if (changed_value) {
         player.grounded = false;
-    }
-
-    Text("Target Positions");
-    Columns(4);
-    Separator();
-    Text("Arm_L");
-    NextColumn();
-    Text("Arm_R");
-    NextColumn();
-    Text("Leg_L");
-    NextColumn();
-    Text("Leg_R");
-    NextColumn();
-    Separator();
-
-    for (const auto& anim : player.animator.limb_animators) {
-        glm::vec3 target_world_pos =
-            player.model * glm::vec3(anim.target_pos, 1.0f);
-        sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
-                  target_world_pos.y);
-        Text(label);
-        NextColumn();
     }
 
     Columns(1);

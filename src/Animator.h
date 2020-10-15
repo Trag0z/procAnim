@@ -15,13 +15,14 @@ struct BoneRestrictions {
 };
 
 struct SplineSet {
-    Spline walk[4];
-    Spline run[4];
-    Spline idle[4];
+    Spline walk[5];
+    Spline run[5];
+    Spline idle[5];
 };
 
 struct Limb {
     Spline spline; // In parent's local space
+
     Bone* bones[2];
 
     glm::vec2 origin() const;
@@ -34,7 +35,8 @@ class Animator {
         LEG_FORWARD = 0,
         LEG_BACKWARD = 1,
         ARM_FORWARD = 2,
-        ARM_BACKWARD = 3
+        ARM_BACKWARD = 3,
+        PELVIS = 4
     };
     enum LimbIndex { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
 
@@ -56,6 +58,7 @@ class Animator {
     // The splines' coordinate systems originate at the head of the first bone
     // they control (i.e. the shoulder or the hip)
     SplineSet spline_prototypes;
+    Spline pelvis_spline;
 
     Limb limbs[4];
 
@@ -64,13 +67,17 @@ class Animator {
     float interpolation_factor_between_splines;
     float interpolation_factor_on_spline, last_interpolation_factor_on_spline;
 
+    float step_distance;
+
     glm::vec2 last_foot_pos_left, last_foot_pos_right;
+    glm::vec2 last_pelvis_pos;
 
     glm::vec2 last_ground_movement;
 
     bool arm_follows_mouse = false;
 
     static const float MAX_SPINE_ROTATION;
+    float STEP_DISTANCE_MULTIPLIER = 100.0f;
 
     // @CLEANUP: Rename this?
     static const struct WalkingSpeedMultiplier {
@@ -79,8 +86,8 @@ class Animator {
 
     enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state, last_leg_state;
 
-    void set_new_limb_splines(float walking_speed,
-                              const std::list<BoxCollider>& colliders);
+    void set_new_splines(float walking_speed,
+                         const std::list<BoxCollider>& colliders);
 
     void interpolate_splines(glm::vec2 out[Spline::NUM_POINTS],
                              SplineIndex spline_index) const;

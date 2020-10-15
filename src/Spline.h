@@ -61,7 +61,9 @@ class SplineEditor {
   private:
     const Entity* parent;
 
-    static const size_t NUM_SPLINES_PER_ANIMATION = 4;
+    static const size_t NUM_ANIMATIONS = 3;
+    static const size_t NUM_SPLINES_PER_ANIMATION = 5;
+
     SplineSet* spline_set;
     Limb* limbs;
 
