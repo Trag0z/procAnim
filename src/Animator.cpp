@@ -165,8 +165,8 @@ void Animator::update(float delta_time, float walking_speed,
     for (size_t i = 0; i < 4; ++i) {
         auto& limb = limbs[i];
 
-        glm::vec2 target_pos =
-            limb.spline.get_point_on_spline(interpolation_factor_on_spline);
+        glm::vec2 target_pos = parent->world_to_local_space(
+            limb.spline.get_point_on_spline(interpolation_factor_on_spline));
 
         if (i == LEFT_LEG || i == RIGHT_LEG) {
             solve_ik(limb.bones, target_pos, true);
@@ -319,13 +319,14 @@ void Animator::set_new_splines(float walking_speed,
 
         step_distance = walking_speed * STEP_DISTANCE_MULTIPLIER;
 
+        glm::vec2 spline_points[Spline::NUM_POINTS];
         // Arms
         // @CLEANUP: Remove ? operators?
         Spline* prototype = moving_forward
                                 ? &spline_prototypes.idle[ARM_FORWARD]
                                 : &spline_prototypes.idle[ARM_BACKWARD];
 
-        glm::vec2 spline_points[Spline::NUM_POINTS];
+        spline_points[Spline::NUM_POINTS];
         move_spline_points(spline_points, prototype->get_points(),
                            limbs[LEFT_ARM].origin());
         spline_to_world_space(spline_points);
@@ -342,21 +343,25 @@ void Animator::set_new_splines(float walking_speed,
         glm::vec2 ground_right =
             find_highest_ground_at(limbs[RIGHT_LEG].origin());
 
-        spline_points[Spline::P1] = ground_left;
-        spline_points[Spline::P2] = ground_left;
+        for (auto& point : spline_points) {
+            point = ground_left;
+        }
         limbs[LEFT_LEG].spline.set_points(spline_points);
 
-        spline_points[Spline::P1] = ground_right;
-        spline_points[Spline::P2] = ground_right;
+        for (auto& point : spline_points) {
+            point = ground_right;
+        }
         limbs[RIGHT_LEG].spline.set_points(spline_points);
 
         move_spline_points(spline_points,
                            spline_prototypes.idle[PELVIS].get_points(),
                            glm::vec2(0.0f, limbs[LEFT_LEG].length()));
 
-        glm::vec2 pelvis_origin_world = ground_left + (ground_right - ground_left) * 0.5f;
+        glm::vec2 pelvis_origin_world =
+            ground_left + (ground_right - ground_left) * 0.5f;
         spline_to_world_space(spline_points);
-        move_spline_points(spline_points, spline_points, pelvis_origin_world - parent->get_position());
+        move_spline_points(spline_points, spline_points,
+                           pelvis_origin_world - parent->get_position());
 
         if (!moving_forward) {
             glm::vec2 temp = spline_points[0];
