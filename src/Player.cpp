@@ -80,7 +80,7 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 
     if (grounded) {
         velocity = glm::vec2(0.0f);
-        position -= scale * animator.get_last_ground_movement();
+        position = animator.get_last_world_move();
     }
 
     update_model_matrix();

@@ -89,7 +89,6 @@ float Limb::length() const { return bones[0]->length + bones[1]->length; }
 //                          //
 
 const float Animator::MAX_SPINE_ROTATION = -0.25f * PI;
-// float Animator::STEP_DISTANCE_MULTIPLIER = 100.0f;
 
 const Animator::WalkingSpeedMultiplier Animator::WALKING_SPEED_MULTIPLIER = {
     0.02f, 0.1f};
@@ -110,7 +109,7 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh) {
     interpolation_factor_between_splines = interpolation_factor_on_spline =
         0.0f;
 
-    last_ground_movement = glm::vec2(0.0f);
+    last_world_move = glm::vec2(0.0f);
 
     for (size_t i = 0; i < 4; ++i) {
         auto& limb = limbs[i];
@@ -156,7 +155,7 @@ void Animator::update(float delta_time, float walking_speed,
         auto& right_arm = limbs[RIGHT_ARM];
         solve_ik(right_arm.bones,
                  parent->world_to_local_space(input.mouse_pos_world()), false);
-        last_ground_movement = glm::vec2(0.0f);
+        last_world_move = glm::vec2(0.0f);
         return;
     }
 
@@ -191,7 +190,7 @@ void Animator::update(float delta_time, float walking_speed,
 
     glm::vec2 new_pelvis_pos =
         pelvis_spline.get_point_on_spline(interpolation_factor_on_spline);
-    last_ground_movement = new_pelvis_pos - last_pelvis_pos;
+    last_world_move = new_pelvis_pos - last_pelvis_pos;
     last_pelvis_pos = new_pelvis_pos;
 
     // Player movement
@@ -214,10 +213,6 @@ void Animator::update(float delta_time, float walking_speed,
             last_foot_pos = last_foot_pos_left;
         }
     }
-    last_ground_movement = grounded_limb->spline.get_point_on_spline(
-                               interpolation_factor_on_spline) -
-                           last_foot_pos;
-
     last_foot_pos_left = get_tip_pos(LEFT_LEG);
     last_foot_pos_right = get_tip_pos(RIGHT_LEG);
 
@@ -315,9 +310,7 @@ glm::vec2 Animator::get_tip_pos(LimbIndex limb_index) const {
         interpolation_factor_on_spline);
 }
 
-glm::vec2 Animator::get_last_ground_movement() const {
-    return last_ground_movement;
-}
+glm::vec2 Animator::get_last_world_move() const { return last_world_move; }
 
 void Animator::set_new_splines(float walking_speed,
                                const std::list<BoxCollider>& colliders) {

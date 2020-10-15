@@ -142,33 +142,44 @@ void SplineEditor::save_splines(bool get_new_file_path) {
     }
 
     // Construct an array of all the spline points
-    const size_t num_splines_total = 4 * 3;
+    const size_t num_splines_total = NUM_ANIMATIONS * NUM_SPLINES_PER_ANIMATION;
     glm::vec2 all_points[num_splines_total * Spline::NUM_POINTS];
 
     size_t num_copied = 0;
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
+         ++n_spline) {
         for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
             all_points[num_copied++] =
                 spline_set->walk[n_spline].points[n_point];
         }
     }
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
+         ++n_spline) {
         for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
             all_points[num_copied++] =
                 spline_set->run[n_spline].points[n_point];
         }
     }
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
+         ++n_spline) {
         for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
             all_points[num_copied++] =
                 spline_set->idle[n_spline].points[n_point];
         }
     }
+    SDL_assert(num_copied == num_splines_total * Spline::NUM_POINTS);
 
     // Write data
+    size_t num_bytes_to_write = sizeof(all_points);
     SDL_RWops* file = SDL_RWFromFile(save_path.c_str(), "wb");
-    SDL_RWwrite(file, all_points, sizeof(all_points), 1);
+    size_t num_bytes_written =
+        SDL_RWwrite(file, all_points, 1, num_bytes_to_write);
     SDL_RWclose(file);
+
+    if (num_bytes_written != num_bytes_to_write) {
+        printf("Error writing %s: %s", save_path.c_str(), SDL_GetError());
+        SDL_TriggerBreakpoint();
+    }
 }
 
 void SplineEditor::load_splines(const std::string& path) {
@@ -178,34 +189,37 @@ void SplineEditor::load_splines(const std::string& path) {
     }
 
     // Read data
-    const size_t num_splines_total = 4 * 3;
-    const size_t num_points_total = num_splines_total * Spline::NUM_POINTS;
-    glm::vec2 all_points[num_points_total];
+    const size_t num_splines_total = NUM_ANIMATIONS * NUM_SPLINES_PER_ANIMATION;
+    glm::vec2 all_points[num_splines_total * Spline::NUM_POINTS];
 
+    size_t num_bytes_to_read = sizeof(all_points);
     SDL_RWops* file = SDL_RWFromFile(save_path.c_str(), "rb");
-    SDL_RWread(file, all_points, sizeof(all_points), 1);
+    size_t num_bytes_read = SDL_RWread(file, all_points, 1, num_bytes_to_read);
     SDL_RWclose(file);
+
+    if (num_bytes_read != num_bytes_to_read) {
+        printf("Error reading %s: %s", save_path.c_str(), SDL_GetError());
+        SDL_TriggerBreakpoint();
+    }
 
     // Initialize the splines from the point data
     size_t num_copied = 0;
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
+         ++n_spline) {
         spline_set->walk[n_spline].init(&all_points[num_copied]);
         num_copied += Spline::NUM_POINTS;
     }
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
+         ++n_spline) {
         spline_set->run[n_spline].init(&all_points[num_copied]);
         num_copied += Spline::NUM_POINTS;
     }
-    for (size_t n_spline = 0; n_spline < 4; ++n_spline) {
+    for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
+         ++n_spline) {
         spline_set->idle[n_spline].init(&all_points[num_copied]);
         num_copied += Spline::NUM_POINTS;
     }
-
-    glm::vec2 new_points[4] = {glm::vec2(0.0f), glm::vec2(0.0f),
-                               glm::vec2(0.0f), glm::vec2(0.0f)};
-    spline_set->walk[4].init(new_points);
-    spline_set->run[4].init(new_points);
-    spline_set->idle[4].init(new_points);
+    SDL_assert(num_copied == num_splines_total * Spline::NUM_POINTS);
 }
 
 void SplineEditor::init(const Entity* parent_, SplineSet* splines_,
@@ -375,20 +389,19 @@ bool SplineEditor::update_gui() {
     Begin("Spline Editor", &keep_open);
     Text("Animatons");
 
-    const size_t num_animations = 3;
-    const char* animation_names[num_animations] = {"Walk", "Run", "Idle"};
+    const char* animation_names[NUM_ANIMATIONS] = {"Walk", "Run", "Idle"};
 
     int selected = static_cast<int>(selected_animation);
     ListBox("Animations", &selected, animation_names,
-            static_cast<int>(num_animations), static_cast<int>(num_animations));
-    SDL_assert(selected > -1 && selected < 4);
+            static_cast<int>(NUM_ANIMATIONS), static_cast<int>(NUM_ANIMATIONS));
+    SDL_assert(selected > -1 && selected <= NUM_ANIMATIONS);
     selected_animation = static_cast<SelectedAnimation>(selected);
 
     NewLine();
     Text("Splines");
 
     const char* spline_names[NUM_SPLINES_PER_ANIMATION] = {
-        "Leg_Forward", "Leg_Backward", "Arm_Forward", "Arm_Backward"};
+        "Leg_Forward", "Leg_Backward", "Arm_Forward", "Arm_Backward", "Pelvis"};
 
     selected = static_cast<int>(selected_spline_index);
     ListBox("Splines", &selected, spline_names,
@@ -398,7 +411,7 @@ bool SplineEditor::update_gui() {
 
     if (Button("Replace with new spline") && !creating_new_spline) {
         // @CLEANUP: Is this necessary?
-        SDL_assert_always(selected_animation < num_animations &&
+        SDL_assert_always(selected_animation < NUM_ANIMATIONS &&
                           selected_spline_index < NUM_SPLINES_PER_ANIMATION);
 
         // Just set this, update() handles the rest

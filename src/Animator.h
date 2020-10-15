@@ -48,7 +48,7 @@ class Animator {
 
     glm::vec2 get_tip_pos(LimbIndex limb_index) const;
 
-    glm::vec2 get_last_ground_movement() const;
+    glm::vec2 get_last_world_move() const;
 
   private:
     const Player* parent;
@@ -72,7 +72,7 @@ class Animator {
     glm::vec2 last_foot_pos_left, last_foot_pos_right;
     glm::vec2 last_pelvis_pos;
 
-    glm::vec2 last_ground_movement;
+    glm::vec2 last_world_move;
 
     bool arm_follows_mouse = false;
 
