@@ -350,16 +350,23 @@ void Animator::set_new_splines(float walking_speed,
         spline_points[Spline::P2] = ground_right;
         limbs[RIGHT_LEG].spline.set_points(spline_points);
 
-        // float higher_ground = std::max(ground_left.y, ground_right.y);
-
-        glm::vec2 pelvis_origin_world = ground_left + ground_right * 0.5f;
-
         move_spline_points(spline_points,
                            spline_prototypes.idle[PELVIS].get_points(),
-                           pelvis_origin_world);
-        // spline_to_world_space(spline_points);
-        // move_spline_points(spline_points, spline_points,
-        //                    glm::vec2(0.0f, higher_ground));
+                           glm::vec2(0.0f, limbs[LEFT_LEG].length()));
+
+        glm::vec2 pelvis_origin_world = ground_left + (ground_right - ground_left) * 0.5f;
+        spline_to_world_space(spline_points);
+        move_spline_points(spline_points, spline_points, pelvis_origin_world - parent->get_position());
+
+        if (!moving_forward) {
+            glm::vec2 temp = spline_points[0];
+            spline_points[0] = spline_points[3];
+            spline_points[3] = temp;
+            temp = spline_points[1];
+            spline_points[1] = spline_points[2];
+            spline_points[2] = temp;
+        }
+
         pelvis_spline.set_points(spline_points);
 
     } // else { // leg_state != NEUTRAL
