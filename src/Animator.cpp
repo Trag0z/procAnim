@@ -148,25 +148,6 @@ void Animator::update(float delta_time, float walking_speed,
         return;
     }
 
-    /*
-NOTE:
-When calculating the target points for the players next
-step, there might be two very different results for the walking
-spline and the running spline (since the latter one steps way
-further). For example, if there are stairs in front of the player,
-the walk spline might find a target point in front of the first
-stair while the other finds a point on top of that first stair. I
-originally planned on interpolating between the two splines all the
-time, but then the foot would hit the front of the stair in the
-given example.
-
-A possible solution (that was used here): Whenever we need a new target
-point (i.e. when starting to walk or when a step is completed),
-interpolate between the splines and find the target points. These points
-are then locked in until the step is completed or the player stops
-moving mid step.
-*/
-
     if (walking_speed > 0.0f) {
         if (leg_state == NEUTRAL) {
             // Start to walk
@@ -174,10 +155,6 @@ moving mid step.
             leg_state = RIGHT_LEG_UP;
             interpolation_factor_between_splines = walking_speed;
             set_new_splines(walking_speed, colliders);
-
-            last_interpolation_factor_on_spline =
-                interpolation_factor_on_spline;
-            interpolation_factor_on_spline = 0.0f;
 
         } else if (interpolation_factor_on_spline == 1.0f) {
             // Is walking and has reached the end of the current spline
@@ -192,9 +169,6 @@ moving mid step.
                 leg_state = LEFT_LEG_UP;
                 set_new_splines(walking_speed, colliders);
             }
-            last_interpolation_factor_on_spline =
-                interpolation_factor_on_spline;
-            interpolation_factor_on_spline = 0.0f;
         }
     } else {
         // Player is standing
@@ -204,17 +178,9 @@ moving mid step.
 
             set_new_splines(walking_speed, colliders);
 
-            last_interpolation_factor_on_spline =
-                interpolation_factor_on_spline;
-            interpolation_factor_on_spline = 0.0f;
-
         } else if (interpolation_factor_on_spline == 1.0f) {
             last_leg_state = NEUTRAL;
             set_new_splines(walking_speed, colliders);
-
-            last_interpolation_factor_on_spline =
-                interpolation_factor_on_spline;
-            interpolation_factor_on_spline = 0.0f;
         }
     }
 
@@ -223,8 +189,6 @@ moving mid step.
         INTERPOLATION_SPEED_MULTIPLIER.MIN +
         walking_speed * (INTERPOLATION_SPEED_MULTIPLIER.MAX -
                          INTERPOLATION_SPEED_MULTIPLIER.MIN);
-
-    last_interpolation_factor_on_spline = interpolation_factor_on_spline;
 
     // if (leg_state == NEUTRAL && last_leg_state != NEUTRAL) {
     //     // Transitioning to neutral, make this go extra quick
@@ -334,22 +298,6 @@ void Animator::set_new_splines(float walking_speed,
             moving_forward = false;
         }
 
-        // Arms
-        // @CLEANUP: Remove ? operators?
-        Spline* prototype = moving_forward
-                                ? &spline_prototypes.idle[ARM_FORWARD]
-                                : &spline_prototypes.idle[ARM_BACKWARD];
-
-        move_spline_points(spline_points, prototype->get_points(),
-                           limbs[LEFT_ARM].origin());
-        spline_to_world_space(spline_points);
-        limbs[LEFT_ARM].spline.set_points(spline_points);
-
-        move_spline_points(spline_points, prototype->get_points(),
-                           limbs[RIGHT_ARM].origin());
-        spline_to_world_space(spline_points);
-        limbs[RIGHT_ARM].spline.set_points(spline_points);
-
         // Legs
         glm::vec2 ground_left = find_highest_ground_at(
             parent->local_to_world_space(limbs[LEFT_LEG].origin()));
@@ -382,6 +330,23 @@ void Animator::set_new_splines(float walking_speed,
         }
 
         pelvis_spline.set_points(spline_points);
+
+        // Arms
+        // @CLEANUP: Remove ? operators?
+        Spline* prototype = moving_forward
+                                ? &spline_prototypes.idle[ARM_FORWARD]
+                                : &spline_prototypes.idle[ARM_BACKWARD];
+
+        move_spline_points(spline_points, prototype->get_points(),
+                           limbs[LEFT_ARM].origin());
+        spline_to_world_space(spline_points);
+        limbs[LEFT_ARM].spline.set_points(spline_points);
+
+        move_spline_points(spline_points, prototype->get_points(),
+                           limbs[RIGHT_ARM].origin());
+        spline_to_world_space(spline_points);
+        limbs[RIGHT_ARM].spline.set_points(spline_points);
+
     } else { // leg_state != NEUTRAL
         step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
 
@@ -471,6 +436,8 @@ void Animator::set_new_splines(float walking_speed,
                           glm::vec2(0.0f), backward_leg_target_point);
         limbs[backward_leg].spline.set_points(spline_points);
     }
+
+    interpolation_factor_on_spline = 0.0f;
 }
 
 void Animator::interpolate_splines(glm::vec2 dst[Spline::NUM_POINTS],

@@ -1,7 +1,8 @@
 NEXT:
-- better splines
+- first animation is broken
 - no more "behind foot out of reach"
-- interpolation speed increase/decrease
+- arm snap when idle directio switching
+- sometimes weird arm behaviour, especially when starting/stopping?
 
 
 TODO:

@@ -71,7 +71,7 @@ class Animator {
     VertexArray<DebugShader::Vertex> target_points_vao;
 
     float interpolation_factor_between_splines;
-    float interpolation_factor_on_spline, last_interpolation_factor_on_spline;
+    float interpolation_factor_on_spline;
 
     bool arm_follows_mouse = false;
 
