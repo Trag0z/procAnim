@@ -60,6 +60,7 @@ class Animator {
     SplineSet spline_prototypes;
     Spline pelvis_spline;
     float step_distance_world;
+    float spine_rotation_target;
 
     struct {
         float local, world;

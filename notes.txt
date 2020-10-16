@@ -1,6 +1,11 @@
 NEXT:
+- better splines
+- no more "behind foot out of reach"
+- interpolation speed increase/decrease
+
 
 TODO:
+- one frame leg glitch into ground when starting to move
 - wireframes don't get modified by bones
 
 - more polygons, nicer texture

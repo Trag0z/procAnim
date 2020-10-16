@@ -151,54 +151,24 @@ void Animator::update(float delta_time, float walking_speed,
         return;
     }
 
-    // Update limbs
-    float interpolation_speed =
-        0.03f; // WALKING_SPEED_MULTIPLIER.MIN +
-               // walking_speed * (WALKING_SPEED_MULTIPLIER.MAX -
-               //                  WALKING_SPEED_MULTIPLIER.MIN);
-
-    last_interpolation_factor_on_spline = interpolation_factor_on_spline;
-
-    if (leg_state == NEUTRAL && last_leg_state != NEUTRAL) {
-        // Transitioning to neutral, make this go extra quick
-        interpolation_speed *= 3.0f;
-    }
-
-    interpolation_factor_on_spline = std::min(
-        interpolation_factor_on_spline + delta_time * interpolation_speed,
-        1.0f);
-
-    for (size_t i = 0; i < 4; ++i) {
-        auto& limb = limbs[i];
-
-        glm::vec2 target_pos = parent->world_to_local_space(
-            limb.spline.get_point_on_spline(interpolation_factor_on_spline));
-
-        if (i == LEFT_LEG || i == RIGHT_LEG) {
-            solve_ik(limb.bones, target_pos, true);
-        } else {
-            solve_ik(limb.bones, target_pos, false);
-        }
-    }
-
     /*
-    NOTE:
-    When calculating the target points for the players next
-    step, there might be two very different results for the walking
-    spline and the running spline (since the latter one steps way
-    further). For example, if there are stairs in front of the player,
-    the walk spline might find a target point in front of the first
-    stair while the other finds a point on top of that first stair. I
-    originally planned on interpolating between the two splines all the
-    time, but then the foot would hit the front of the stair in the
-    given example.
+NOTE:
+When calculating the target points for the players next
+step, there might be two very different results for the walking
+spline and the running spline (since the latter one steps way
+further). For example, if there are stairs in front of the player,
+the walk spline might find a target point in front of the first
+stair while the other finds a point on top of that first stair. I
+originally planned on interpolating between the two splines all the
+time, but then the foot would hit the front of the stair in the
+given example.
 
-    A possible solution (that was used here): Whenever we need a new target
-    point (i.e. when starting to walk or when a step is completed),
-    interpolate between the splines and find the target points. These points
-    are then locked in until the step is completed or the player stops
-    moving mid step.
-    */
+A possible solution (that was used here): Whenever we need a new target
+point (i.e. when starting to walk or when a step is completed),
+interpolate between the splines and find the target points. These points
+are then locked in until the step is completed or the player stops
+moving mid step.
+*/
 
     if (walking_speed > 0.0f) {
         if (leg_state == NEUTRAL) {
@@ -250,6 +220,39 @@ void Animator::update(float delta_time, float walking_speed,
             interpolation_factor_on_spline = 0.0f;
         }
     }
+
+    // Update limbs
+    float interpolation_speed =
+        0.03f; // WALKING_SPEED_MULTIPLIER.MIN +
+               // walking_speed * (WALKING_SPEED_MULTIPLIER.MAX -
+               //                  WALKING_SPEED_MULTIPLIER.MIN);
+
+    last_interpolation_factor_on_spline = interpolation_factor_on_spline;
+
+    // if (leg_state == NEUTRAL && last_leg_state != NEUTRAL) {
+    //     // Transitioning to neutral, make this go extra quick
+    //     interpolation_speed *= 3.0f;
+    // }
+
+    interpolation_factor_on_spline = std::min(
+        interpolation_factor_on_spline + delta_time * interpolation_speed,
+        1.0f);
+
+    spine->rotation = lerp(spine->rotation, spine_rotation_target,
+                           interpolation_factor_on_spline);
+
+    for (size_t i = 0; i < 4; ++i) {
+        auto& limb = limbs[i];
+
+        glm::vec2 target_pos = parent->world_to_local_space(
+            limb.spline.get_point_on_spline(interpolation_factor_on_spline));
+
+        if (i == LEFT_LEG || i == RIGHT_LEG) {
+            solve_ik(limb.bones, target_pos, true);
+        } else {
+            solve_ik(limb.bones, target_pos, false);
+        }
+    }
 }
 
 void Animator::render(const Renderer& renderer) {
@@ -287,9 +290,8 @@ glm::vec2 Animator::get_pelvis_pos() const {
 void Animator::set_new_splines(float walking_speed,
                                const std::list<BoxCollider>& colliders) {
     // Lean in walking direction when walking fast/running
-    // TODO: Spine should interpolate to move smoothely
-    // spine->rotation = std::max(walking_speed - 0.2f, 0.0f) *
-    // MAX_SPINE_ROTATION;
+    spine_rotation_target =
+        std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
 
     auto find_highest_ground_at =
         [&colliders](glm::vec2 world_pos) -> glm::vec2 {
@@ -456,7 +458,10 @@ void Animator::set_new_splines(float walking_speed,
 
         spline_points[P2].x =
             parent->local_to_world_space(limbs[forward_leg].origin()).x +
-            step_distance_world * 1.5f;
+            step_distance_world *
+                1.5f; // Moved by 1.5 times the step distance so the target
+                      // position is half a step in front of the body _after_
+                      // the body has moved one step distance
         ground = find_highest_ground_at(spline_points[P2]);
         spline_points[P2].y = ground.y;
 
