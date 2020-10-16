@@ -322,12 +322,14 @@ void Animator::set_new_splines(float walking_speed,
         glm::vec2 ground_right = find_highest_ground_at(
             parent->local_to_world_space(limbs[RIGHT_LEG].origin()));
 
-        set_spline_points(ground_left, glm::vec2(0.0f), glm::vec2(0.0f),
-                          ground_left);
+        set_spline_points(limbs[LEFT_LEG].spline.get_point_on_spline(
+                              interpolation_factor_on_spline),
+                          glm::vec2(0.0f), glm::vec2(0.0f), ground_left);
         limbs[LEFT_LEG].spline.set_points(spline_points);
 
-        set_spline_points(ground_right, glm::vec2(0.0f), glm::vec2(0.0f),
-                          ground_right);
+        set_spline_points(limbs[RIGHT_LEG].spline.get_point_on_spline(
+                              interpolation_factor_on_spline),
+                          glm::vec2(0.0f), glm::vec2(0.0f), ground_right);
         limbs[RIGHT_LEG].spline.set_points(spline_points);
 
         // Pelvis
@@ -346,6 +348,9 @@ void Animator::set_new_splines(float walking_speed,
             set_spline_points(spline_points[3], spline_points[2],
                               spline_points[1], spline_points[0]);
         }
+
+        spline_points[P1] =
+            pelvis_spline.get_point_on_spline(interpolation_factor_on_spline);
 
         pelvis_spline.set_points(spline_points);
 
