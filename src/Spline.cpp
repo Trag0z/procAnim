@@ -54,14 +54,21 @@ void Spline::init(const glm::vec2 points_[NUM_POINTS]) {
     }
 }
 
-void Spline::render(const Renderer& renderer) const {
+void Spline::render(const Renderer& renderer, bool draw_points) const {
+    SDL_assert(vertices_initialized);
     renderer.debug_shader.use();
     renderer.debug_shader.set_color(&Color::GREEN);
 
     line_vao.draw(GL_LINE_STRIP);
+
+    if (draw_points) {
+        point_vao.draw(GL_POINTS);
+    }
 }
 
-const glm::vec2& Spline::get_point(SplinePointName p) const { return points[p]; }
+const glm::vec2& Spline::get_point(SplinePointName p) const {
+    return points[p];
+}
 
 const glm::vec2* Spline::get_points() const { return points; }
 
@@ -287,13 +294,11 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
     // Conditionally set points on other splines as well
     bool updated = false;
     auto& partner_spline = splines[opposite_direction(spline_index)];
-    if (connect_point_pairs &&
-        (point_index == P1 || point_index == P2)) {
+    if (connect_point_pairs && (point_index == P1 || point_index == P2)) {
         partner_spline.points[3 - point_index] = point_to_set;
         updated = true;
     }
-    if (connect_tangent_pairs &&
-        (point_index == T1 || point_index == T2)) {
+    if (connect_tangent_pairs && (point_index == T1 || point_index == T2)) {
         partner_spline.points[3 - point_index] = point_to_set;
         updated = true;
     }
@@ -337,13 +342,11 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
             set_spline_point(mouse_pos, P2);
             auto& selected_spline = splines[selected_spline_index];
 
-            glm::vec2 start_to_end = selected_spline.points[P2] -
-                                     selected_spline.points[P1];
-            set_spline_point(selected_spline.points[P1] +
-                                 start_to_end * 0.3f,
+            glm::vec2 start_to_end =
+                selected_spline.points[P2] - selected_spline.points[P1];
+            set_spline_point(selected_spline.points[P1] + start_to_end * 0.3f,
                              T1);
-            set_spline_point(selected_spline.points[P2] -
-                                 start_to_end * 0.3f,
+            set_spline_point(selected_spline.points[P2] - start_to_end * 0.3f,
                              T2);
 
             if (input.mouse_button_down(MouseButton::LEFT)) {
@@ -374,18 +377,15 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
             if (glm::length(spline->points[P1] - mouse_pos) < 0.1f) {
                 selected_point_index = P1;
 
-            } else if (glm::length(spline->points[P2] - mouse_pos) <
-                       0.1f) {
+            } else if (glm::length(spline->points[P2] - mouse_pos) < 0.1f) {
                 selected_point_index = P2;
 
-            } else if (glm::length(spline->points[P1] +
-                                   spline->points[T1] - mouse_pos) <
-                       0.1f) {
+            } else if (glm::length(spline->points[P1] + spline->points[T1] -
+                                   mouse_pos) < 0.1f) {
                 selected_point_index = T1;
 
-            } else if (glm::length(spline->points[P2] +
-                                   spline->points[T2] - mouse_pos) <
-                       0.1f) {
+            } else if (glm::length(spline->points[P2] + spline->points[T2] -
+                                   mouse_pos) < 0.1f) {
                 selected_point_index = T2;
             }
 
@@ -472,23 +472,19 @@ bool SplineEditor::update_gui() {
         // but it's a big hassle otherwise
         if (DragFloat2("P1 (forward)", value_ptr(points[0]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
-            set_spline_point(points[P1], P1,
-                             forward_spline_index);
+            set_spline_point(points[P1], P1, forward_spline_index);
         }
         if (DragFloat2("T1 (forward)", value_ptr(points[1]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
-            set_spline_point(points[T1], T1,
-                             forward_spline_index, false);
+            set_spline_point(points[T1], T1, forward_spline_index, false);
         }
         if (DragFloat2("T2 (forward)", value_ptr(points[2]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
-            set_spline_point(points[T2], T2,
-                             forward_spline_index, false);
+            set_spline_point(points[T2], T2, forward_spline_index, false);
         }
         if (DragFloat2("P2 (forward)", value_ptr(points[3]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
-            set_spline_point(points[P2], P2,
-                             forward_spline_index);
+            set_spline_point(points[P2], P2, forward_spline_index);
         }
 
         NewLine();
@@ -504,23 +500,19 @@ bool SplineEditor::update_gui() {
 
         if (DragFloat2("P1 (backward)", value_ptr(points[0]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
-            set_spline_point(points[P1], P1,
-                             backward_spline_index);
+            set_spline_point(points[P1], P1, backward_spline_index);
         }
         if (DragFloat2("T1 (backward)", value_ptr(points[1]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
-            set_spline_point(points[T1], T1,
-                             backward_spline_index);
+            set_spline_point(points[T1], T1, backward_spline_index);
         }
         if (DragFloat2("T2 (backward)", value_ptr(points[2]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
-            set_spline_point(points[T2], T2,
-                             backward_spline_index);
+            set_spline_point(points[T2], T2, backward_spline_index);
         }
         if (DragFloat2("P2 (backward)", value_ptr(points[3]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
-            set_spline_point(points[P2], P2,
-                             backward_spline_index);
+            set_spline_point(points[P2], P2, backward_spline_index);
         }
     }
 

@@ -19,7 +19,7 @@ class Spline {
 
     // Points in format P1, T1, T2, P2
     void init(const glm::vec2 points_[NUM_POINTS] = nullptr);
-    void render(const Renderer& renderer) const;
+    void render(const Renderer& renderer, bool draw_points = false) const;
 
     const glm::vec2& get_point(SplinePointName p) const;
     const glm::vec2* get_points() const;

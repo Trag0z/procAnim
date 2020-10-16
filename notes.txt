@@ -10,7 +10,7 @@ TODO:
 - test utf8 chars in save/load strings
 
 Bugs:               (@BUG)
-- leans in while mid-step
+- SplineEditor sets other values even if connect tangents etc. is false
 - sometimes turns around due to stick snap-back?
 
 - IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely

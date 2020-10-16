@@ -59,6 +59,11 @@ class Animator {
     // The splines are all in players' local space
     SplineSet spline_prototypes;
     Spline pelvis_spline;
+    float step_distance_world;
+
+    struct {
+        float local, world;
+    } pelvis_height;
 
     Limb limbs[4];
 
@@ -66,8 +71,6 @@ class Animator {
 
     float interpolation_factor_between_splines;
     float interpolation_factor_on_spline, last_interpolation_factor_on_spline;
-
-    float step_distance;
 
     bool arm_follows_mouse = false;
 
