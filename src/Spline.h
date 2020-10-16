@@ -46,7 +46,7 @@ class Spline {
     std::array<DebugShader::Vertex, RENDER_STEPS> line_shader_vertices;
 
     VertexArray<DebugShader::Vertex> point_vao;
-    std::array<DebugShader::Vertex, NUM_POINTS> point_shader_vertices;
+    std::array<DebugShader::Vertex, 2> point_shader_vertices;
 
     bool vertices_initialized = false;
 

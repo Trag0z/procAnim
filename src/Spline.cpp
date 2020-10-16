@@ -40,14 +40,10 @@ void Spline::init(const glm::vec2 points_[NUM_POINTS]) {
                       static_cast<GLuint>(line_shader_vertices.size()));
 
         // Init point render data
-        point_shader_vertices[P1].pos = glm::vec4(points[P1], 0.0f, 1.0f);
-        point_shader_vertices[T1].pos =
-            glm::vec4(points[T1] - points[P1], 0.0f, 1.0f);
-        point_shader_vertices[T2].pos =
-            glm::vec4(points[T2] - points[P2], 0.0f, 1.0f);
-        point_shader_vertices[P2].pos = glm::vec4(points[P2], 0.0f, 1.0f);
+        point_shader_vertices[0].pos = glm::vec4(points[P1], 0.0f, 1.0f);
+        point_shader_vertices[1].pos = glm::vec4(points[P2], 0.0f, 1.0f);
 
-        point_vao.init(indices, NUM_POINTS, point_shader_vertices.data(),
+        point_vao.init(indices, 2, point_shader_vertices.data(),
                        static_cast<GLuint>(point_shader_vertices.size()));
 
         vertices_initialized = true;
@@ -114,12 +110,8 @@ void Spline::update_render_data() {
         static_cast<GLuint>(line_shader_vertices.size()));
 
     // Points
-    point_shader_vertices[P1].pos = glm::vec4(points[P1], 0.0f, 1.0f);
-    point_shader_vertices[T1].pos =
-        glm::vec4(points[P1] + points[T1], 0.0f, 1.0f);
-    point_shader_vertices[T2].pos =
-        glm::vec4(points[P2] + points[T2], 0.0f, 1.0f);
-    point_shader_vertices[P2].pos = glm::vec4(points[P2], 0.0f, 1.0f);
+    point_shader_vertices[0].pos = glm::vec4(points[P1], 0.0f, 1.0f);
+    point_shader_vertices[1].pos = glm::vec4(points[P2], 0.0f, 1.0f);
 
     point_vao.update_vertex_data(
         point_shader_vertices.data(),

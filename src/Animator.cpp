@@ -269,8 +269,9 @@ void Animator::render(const Renderer& renderer) {
     // target_points_vao.draw(GL_POINTS);
 
     if (renderer.draw_walk_splines) {
-        limbs[LEFT_LEG].spline.render(renderer, true);
-        limbs[RIGHT_LEG].spline.render(renderer, true);
+        for (auto& limb : limbs) {
+            limb.spline.render(renderer, true);
+        }
         pelvis_spline.render(renderer, true);
     }
 }
