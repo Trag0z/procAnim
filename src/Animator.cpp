@@ -298,6 +298,8 @@ void Animator::set_new_splines(float walking_speed,
             moving_forward = false;
         }
 
+        step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
+
         // Arms
         // @CLEANUP: Remove ? operators?
         Spline* prototype = moving_forward
