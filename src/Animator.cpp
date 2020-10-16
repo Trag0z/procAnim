@@ -298,6 +298,22 @@ void Animator::set_new_splines(float walking_speed,
             moving_forward = false;
         }
 
+        // Arms
+        // @CLEANUP: Remove ? operators?
+        Spline* prototype = moving_forward
+                                ? &spline_prototypes.idle[ARM_FORWARD]
+                                : &spline_prototypes.idle[ARM_BACKWARD];
+
+        move_spline_points(spline_points, prototype->get_points(),
+                           limbs[LEFT_ARM].origin());
+        spline_to_world_space(spline_points);
+        limbs[LEFT_ARM].spline.set_points(spline_points);
+
+        move_spline_points(spline_points, prototype->get_points(),
+                           limbs[RIGHT_ARM].origin());
+        spline_to_world_space(spline_points);
+        limbs[RIGHT_ARM].spline.set_points(spline_points);
+
         // Legs
         glm::vec2 ground_left = find_highest_ground_at(
             parent->local_to_world_space(limbs[LEFT_LEG].origin()));
@@ -331,22 +347,6 @@ void Animator::set_new_splines(float walking_speed,
 
         pelvis_spline.set_points(spline_points);
 
-        // Arms
-        // @CLEANUP: Remove ? operators?
-        Spline* prototype = moving_forward
-                                ? &spline_prototypes.idle[ARM_FORWARD]
-                                : &spline_prototypes.idle[ARM_BACKWARD];
-
-        move_spline_points(spline_points, prototype->get_points(),
-                           limbs[LEFT_ARM].origin());
-        spline_to_world_space(spline_points);
-        limbs[LEFT_ARM].spline.set_points(spline_points);
-
-        move_spline_points(spline_points, prototype->get_points(),
-                           limbs[RIGHT_ARM].origin());
-        spline_to_world_space(spline_points);
-        limbs[RIGHT_ARM].spline.set_points(spline_points);
-
     } else { // leg_state != NEUTRAL
         step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
 
@@ -355,28 +355,8 @@ void Animator::set_new_splines(float walking_speed,
         }
 
         if (last_leg_state == NEUTRAL) {
-            // Start to walk
             step_distance_world *= 0.5f;
-            SDL_assert(leg_state == RIGHT_LEG_UP);
-
-            // TODO: move all P1 back half a step
         }
-
-        // Pelvis
-        interpolate_splines(spline_points, PELVIS);
-        spline_to_world_space(spline_points);
-
-        glm::vec2 ground = find_highest_ground_at(spline_points[P1]);
-        spline_points[P1].y +=
-            ground.y + pelvis_height.world - parent->get_position().y;
-
-        spline_points[P2].x = spline_points[P1].x + step_distance_world;
-
-        ground = find_highest_ground_at(spline_points[P2]);
-        spline_points[P2].y +=
-            ground.y + pelvis_height.world - parent->get_position().y;
-
-        pelvis_spline.set_points(spline_points);
 
         // Limbs
         LimbIndex forward_arm, backward_arm;
@@ -424,7 +404,7 @@ void Animator::set_new_splines(float walking_speed,
                 1.5f; // Moved by 1.5 times the step distance so the target
                       // position is half a step in front of the body _after_
                       // the body has moved one step distance
-        ground = find_highest_ground_at(spline_points[P2]);
+        glm::vec2 ground = find_highest_ground_at(spline_points[P2]);
         spline_points[P2].y = ground.y;
 
         limbs[forward_leg].spline.set_points(spline_points);
@@ -435,6 +415,23 @@ void Animator::set_new_splines(float walking_speed,
         set_spline_points(backward_leg_target_point, glm::vec2(0.0f),
                           glm::vec2(0.0f), backward_leg_target_point);
         limbs[backward_leg].spline.set_points(spline_points);
+
+        // Pelvis
+        interpolate_splines(spline_points, PELVIS);
+        spline_to_world_space(spline_points);
+
+        spline_points[P1] = pelvis_spline.get_point(P2);
+
+        spline_points[P2].x = spline_points[P1].x + step_distance_world;
+
+        float average_leg_height = backward_leg_target_point.y +
+                                   (limbs[forward_leg].spline.get_point(P2).y -
+                                    backward_leg_target_point.y) *
+                                       0.5f;
+        spline_points[P2].y +=
+            average_leg_height + pelvis_height.world - parent->get_position().y;
+
+        pelvis_spline.set_points(spline_points);
     }
 
     interpolation_factor_on_spline = 0.0f;

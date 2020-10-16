@@ -1,7 +1,6 @@
 NEXT:
 - first animation is broken
-- no more "behind foot out of reach"
-- arm snap when idle directio switching
+- arm snap when idle direction switching
 - sometimes weird arm behaviour, especially when starting/stopping?
 
 
