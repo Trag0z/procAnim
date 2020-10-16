@@ -152,9 +152,10 @@ void Animator::update(float delta_time, float walking_speed,
     }
 
     // Update limbs
-    float interpolation_speed = WALKING_SPEED_MULTIPLIER.MIN +
-                                walking_speed * (WALKING_SPEED_MULTIPLIER.MAX -
-                                                 WALKING_SPEED_MULTIPLIER.MIN);
+    float interpolation_speed =
+        0.03f; // WALKING_SPEED_MULTIPLIER.MIN +
+               // walking_speed * (WALKING_SPEED_MULTIPLIER.MAX -
+               //                  WALKING_SPEED_MULTIPLIER.MIN);
 
     last_interpolation_factor_on_spline = interpolation_factor_on_spline;
 
@@ -209,7 +210,7 @@ void Animator::update(float delta_time, float walking_speed,
 
             last_interpolation_factor_on_spline =
                 interpolation_factor_on_spline;
-            interpolation_factor_on_spline = 0.5f;
+            interpolation_factor_on_spline = 0.0f;
 
         } else if (interpolation_factor_on_spline == 1.0f) {
             // Is walking and has reached the end of the current spline
@@ -287,7 +288,8 @@ void Animator::set_new_splines(float walking_speed,
                                const std::list<BoxCollider>& colliders) {
     // Lean in walking direction when walking fast/running
     // TODO: Spine should interpolate to move smoothely
-    // spine->rotation = std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
+    // spine->rotation = std::max(walking_speed - 0.2f, 0.0f) *
+    // MAX_SPINE_ROTATION;
 
     auto find_highest_ground_at =
         [&colliders](glm::vec2 world_pos) -> glm::vec2 {
@@ -452,7 +454,9 @@ void Animator::set_new_splines(float walking_speed,
             interpolation_factor_on_spline);
         spline_points[P1] = find_highest_ground_at(spline_points[P1]);
 
-        spline_points[P2].x += step_distance_world;
+        spline_points[P2].x =
+            parent->local_to_world_space(limbs[forward_leg].origin()).x +
+            step_distance_world * 1.5f;
         ground = find_highest_ground_at(spline_points[P2]);
         spline_points[P2].y = ground.y;
 
