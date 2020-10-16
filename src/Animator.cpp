@@ -190,10 +190,10 @@ void Animator::update(float delta_time, float walking_speed,
         walking_speed * (INTERPOLATION_SPEED_MULTIPLIER.MAX -
                          INTERPOLATION_SPEED_MULTIPLIER.MIN);
 
-    // if (leg_state == NEUTRAL && last_leg_state != NEUTRAL) {
-    //     // Transitioning to neutral, make this go extra quick
-    //     interpolation_speed *= 3.0f;
-    // }
+    if (leg_state == NEUTRAL && last_leg_state != NEUTRAL) {
+        // Transitioning to neutral, make this go extra quick
+        interpolation_speed *= 3.0f;
+    }
 
     interpolation_factor_on_spline = std::min(
         interpolation_factor_on_spline + delta_time * interpolation_speed,
