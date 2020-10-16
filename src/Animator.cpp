@@ -307,11 +307,13 @@ void Animator::set_new_splines(float walking_speed,
         move_spline_points(spline_points, prototype->get_points(),
                            limbs[LEFT_ARM].origin());
         spline_to_world_space(spline_points);
+        spline_points[P1] = limbs[LEFT_ARM].spline.get_point(P2);
         limbs[LEFT_ARM].spline.set_points(spline_points);
 
         move_spline_points(spline_points, prototype->get_points(),
                            limbs[RIGHT_ARM].origin());
         spline_to_world_space(spline_points);
+        spline_points[P1] = limbs[RIGHT_ARM].spline.get_point(P2);
         limbs[RIGHT_ARM].spline.set_points(spline_points);
 
         // Legs
@@ -378,6 +380,7 @@ void Animator::set_new_splines(float walking_speed,
         move_spline_points(spline_points, spline_points,
                            limbs[forward_arm].origin());
         spline_to_world_space(spline_points);
+        // spline_points[P1] = limbs[forward_arm].spline.get_point(P2);
         spline_points[P2].x += step_distance_world;
         limbs[forward_arm].spline.set_points(spline_points);
 
@@ -385,6 +388,7 @@ void Animator::set_new_splines(float walking_speed,
         move_spline_points(spline_points, spline_points,
                            limbs[backward_arm].origin());
         spline_to_world_space(spline_points);
+        // spline_points[P1] = limbs[backward_arm].spline.get_point(P2);
         spline_points[P2].x += step_distance_world;
         limbs[backward_arm].spline.set_points(spline_points);
 
