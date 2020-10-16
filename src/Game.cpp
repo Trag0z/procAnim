@@ -236,7 +236,11 @@ void Game::update_gui() {
     SetNextItemWidth(100);
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
     SetNextItemWidth(100);
-    DragFloat("Step distance multiplier", &player.animator.STEP_DISTANCE_MULTIPLIER);
+    DragFloat("Step distance multiplier",
+              &player.animator.STEP_DISTANCE_MULTIPLIER);
+    SetNextItemWidth(100);
+    DragFloat2("Interpolation speed min/max",
+               &player.animator.INTERPOLATION_SPEED_MULTIPLIER.MIN, 0.01f);
 
     NewLine();
     Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);

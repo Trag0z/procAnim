@@ -79,9 +79,9 @@ class Animator {
     float STEP_DISTANCE_MULTIPLIER = 100.0f;
 
     // @CLEANUP: Rename this?
-    static const struct WalkingSpeedMultiplier {
-        float MIN, MAX;
-    } WALKING_SPEED_MULTIPLIER;
+    struct InterpolationSpeedMultiplier {
+        float MIN = 0.02f, MAX = 0.08f;
+    } INTERPOLATION_SPEED_MULTIPLIER;
 
     enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state, last_leg_state;
 

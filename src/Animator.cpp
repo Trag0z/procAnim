@@ -91,9 +91,6 @@ float Limb::length() const { return bones[0]->length + bones[1]->length; }
 
 const float Animator::MAX_SPINE_ROTATION = -0.25f * PI;
 
-const Animator::WalkingSpeedMultiplier Animator::WALKING_SPEED_MULTIPLIER = {
-    0.02f, 0.1f};
-
 void Animator::init(const Player* parent_, RiggedMesh& mesh,
                     const std::list<BoxCollider>& colliders) {
     parent = parent_;
@@ -223,9 +220,9 @@ moving mid step.
 
     // Update limbs
     float interpolation_speed =
-        0.03f; // WALKING_SPEED_MULTIPLIER.MIN +
-               // walking_speed * (WALKING_SPEED_MULTIPLIER.MAX -
-               //                  WALKING_SPEED_MULTIPLIER.MIN);
+        INTERPOLATION_SPEED_MULTIPLIER.MIN +
+        walking_speed * (INTERPOLATION_SPEED_MULTIPLIER.MAX -
+                         INTERPOLATION_SPEED_MULTIPLIER.MIN);
 
     last_interpolation_factor_on_spline = interpolation_factor_on_spline;
 
