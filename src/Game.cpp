@@ -260,7 +260,7 @@ void Game::update_gui() {
 
     for (const auto& limb : player.animator.limbs) {
         glm::vec2 target_world_pos =
-            player.local_to_world_space(limb.spline.get_point(Spline::P2));
+            player.local_to_world_space(limb.spline.get_point(P2));
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
         Text(label);

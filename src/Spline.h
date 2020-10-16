@@ -11,21 +11,21 @@ class Animator;
 struct SplineSet;
 struct Limb;
 
+enum SplinePointName { P1 = 0, T1 = 1, T2 = 2, P2 = 3 };
+
 class Spline {
   public:
     static const size_t NUM_POINTS = 4;
-
-    enum PointName { P1 = 0, T1 = 1, T2 = 2, P2 = 3 };
 
     // Points in format P1, T1, T2, P2
     void init(const glm::vec2 points_[NUM_POINTS] = nullptr);
     void render(const Renderer& renderer) const;
 
-    const glm::vec2& get_point(PointName p) const;
+    const glm::vec2& get_point(SplinePointName p) const;
     const glm::vec2* get_points() const;
 
     // If P1 or P2 are set, T1 or T2 are moved with them
-    void set_point(PointName name, glm::vec2 point);
+    void set_point(SplinePointName name, glm::vec2 point);
 
     void set_points(const glm::vec2 new_points[NUM_POINTS]);
     void update_render_data();
