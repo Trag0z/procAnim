@@ -398,12 +398,6 @@ void Animator::set_new_splines(float walking_speed,
         interpolate_splines(spline_points, PELVIS);
         spline_to_world_space(spline_points);
 
-        // NEXT:
-        // - replace all instances of find_highest_ground_at() because they
-        // don't use local coords anymore
-        // - pelvis needs to be at gound + height - what the spline says (so
-        // maybe work in locals?)
-
         glm::vec2 ground = find_highest_ground_at(spline_points[P1]);
         spline_points[P1].y +=
             ground.y + pelvis_height.world - parent->get_position().y;
@@ -451,6 +445,10 @@ void Animator::set_new_splines(float walking_speed,
         move_spline_points(spline_points, spline_points,
                            limbs[forward_leg].origin());
         spline_to_world_space(spline_points);
+
+        spline_points[P1] = limbs[forward_leg].spline.get_point_on_spline(
+            interpolation_factor_on_spline);
+        spline_points[P1] = find_highest_ground_at(spline_points[P1]);
 
         spline_points[P2].x += step_distance_world;
         ground = find_highest_ground_at(spline_points[P2]);
