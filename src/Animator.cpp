@@ -255,23 +255,21 @@ void Animator::render(const Renderer& renderer) {
     renderer.debug_shader.use();
     renderer.debug_shader.set_color(&Color::GREEN);
 
-    // All the spline positions are in world space, so set the model matrix to
-    // unity
+    // All the spline positions are already in world space, so set the model
+    // matrix to unity
     glm::mat3 model(1.0f);
     renderer.debug_shader.set_model(&model);
 
-    // // @CLEANUP: Calculate this less often
-    // DebugShader::Vertex target_points[4];
-    // for (size_t i = 0; i < 4; ++i) {
-    //     target_points[i].pos = limbs[i].spline.get_point(P2);
-    // }
-    // target_points_vao.update_vertex_data(target_points, 4);
-    // target_points_vao.draw(GL_POINTS);
+    if (renderer.draw_arm_splines) {
+        limbs[LEFT_ARM].spline.render(renderer, true);
+        limbs[RIGHT_ARM].spline.render(renderer, true);
+    }
 
-    if (renderer.draw_walk_splines) {
-        for (auto& limb : limbs) {
-            limb.spline.render(renderer, true);
-        }
+    if (renderer.draw_leg_splines) {
+        limbs[LEFT_LEG].spline.render(renderer, true);
+        limbs[RIGHT_LEG].spline.render(renderer, true);
+    }
+    if (renderer.draw_pelvis_spline) {
         pelvis_spline.render(renderer, true);
     }
 }
@@ -289,7 +287,7 @@ void Animator::set_new_splines(float walking_speed,
                                const std::list<BoxCollider>& colliders) {
     // Lean in walking direction when walking fast/running
     // TODO: Spine should interpolate to move smoothely
-    spine->rotation = std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
+    // spine->rotation = std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
 
     auto find_highest_ground_at =
         [&colliders](glm::vec2 world_pos) -> glm::vec2 {
@@ -384,12 +382,15 @@ void Animator::set_new_splines(float walking_speed,
 
         pelvis_spline.set_points(spline_points);
     } else { // leg_state != NEUTRAL
-
         step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
+
+        if (!parent->is_facing_right()) {
+            step_distance_world *= -1.0f;
+        }
 
         if (last_leg_state == NEUTRAL) {
             // Start to walk
-            step_distance_world = 0.5f;
+            step_distance_world *= 0.5f;
             SDL_assert(leg_state == RIGHT_LEG_UP);
 
             // TODO: move all P1 back half a step

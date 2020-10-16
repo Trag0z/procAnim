@@ -1,20 +1,15 @@
 NEXT:
-- when turning around, the search for new animation positions is weird due to scale change in player
 
 TODO:
 - wireframes don't get modified by bones
-
-- apply bone restrictions
 
 - more polygons, nicer texture
 - test utf8 chars in save/load strings
 
 Bugs:               (@BUG)
-- SplineEditor sets other values even if connect tangents etc. is false
+- SplineEditor sets connected tangents in wrong direction since it still assumes what has been some time ago
+- SplineEditor sometimes sets points of wrong splines when entering number by hand
 - sometimes turns around due to stick snap-back?
-
-- IK bones sometimes rotate >180 degrees quickly if the taret point passes the center point closely
-- why does merging SplineEditor::update() and SplineEditor::update_gui() break the gui functionality?
 
 Cleanup:            (@CLEANUP)
 - unify naming scheme for getter methods
@@ -28,3 +23,5 @@ Paper:
 - problem/hypothesis/method/limitations aufzählung in einleitung?
 
 - responsiveness als ziel
+
+- quellen für grafiken

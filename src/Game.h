@@ -14,7 +14,7 @@
 namespace Keybinds {
 constexpr SDL_Scancode DRAW_WIREFRAEMS = SDL_SCANCODE_F1;
 constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F2;
-constexpr SDL_Scancode DRAW_WALK_SPLINES = SDL_SCANCODE_F3;
+constexpr SDL_Scancode DRAW_SPLINES = SDL_SCANCODE_F3;
 constexpr SDL_Scancode STEP_MODE = SDL_SCANCODE_P;
 constexpr SDL_Scancode SPEED_UP = SDL_SCANCODE_COMMA;
 constexpr SDL_Scancode SPEED_DOWN = SDL_SCANCODE_PERIOD;

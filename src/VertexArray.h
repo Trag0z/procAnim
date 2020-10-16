@@ -17,7 +17,7 @@ template <typename vertex_t> class VertexArray {
         SDL_TriggerBreakpoint();
     }
 
-    void update_vertex_data(std::vector<vertex_t> data) {
+    void update_vertex_data(const std::vector<vertex_t> data) {
         SDL_assert(usage_ == GL_DYNAMIC_DRAW && data.size() <= num_vertices_);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
@@ -25,7 +25,7 @@ template <typename vertex_t> class VertexArray {
                         data.data());
     }
 
-    void update_vertex_data(vertex_t* data, GLuint num_vertices) {
+    void update_vertex_data(const vertex_t* data, GLuint num_vertices) {
         SDL_assert(usage_ == GL_DYNAMIC_DRAW && num_vertices <= num_vertices_);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_t) * num_vertices,

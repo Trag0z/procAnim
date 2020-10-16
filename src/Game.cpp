@@ -119,8 +119,17 @@ void Game::run() {
     if (mouse_keyboard_input.key_down(Keybinds::DRAW_BONES)) {
         renderer.draw_bones = !renderer.draw_bones;
     }
-    if (mouse_keyboard_input.key_down(Keybinds::DRAW_WALK_SPLINES)) {
-        renderer.draw_walk_splines = !renderer.draw_walk_splines;
+    if (mouse_keyboard_input.key_down(Keybinds::DRAW_SPLINES)) {
+        if (renderer.draw_arm_splines || renderer.draw_leg_splines ||
+            renderer.draw_pelvis_spline) {
+            renderer.draw_arm_splines = false;
+            renderer.draw_leg_splines = false;
+            renderer.draw_pelvis_spline = false;
+        } else {
+            renderer.draw_arm_splines = true;
+            renderer.draw_leg_splines = true;
+            renderer.draw_pelvis_spline = true;
+        }
     }
     if (mouse_keyboard_input.key_down(Keybinds::STEP_MODE)) {
         game_config.step_mode = !game_config.step_mode;
@@ -215,12 +224,19 @@ void Game::update_gui() {
     Checkbox("Render player model", &renderer.draw_models);
     Checkbox("Render wireframes", &renderer.draw_wireframes);
     Checkbox("Render bones", &renderer.draw_bones);
-    Checkbox("Render walk splines", &renderer.draw_walk_splines);
+
+    NewLine();
+    Text("Render splines for:");
+    Checkbox("Arms", &renderer.draw_arm_splines);
+    Checkbox("Legs", &renderer.draw_leg_splines);
+    Checkbox("Pelvis", &renderer.draw_pelvis_spline);
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
     SetNextItemWidth(100);
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
+    SetNextItemWidth(100);
+    DragFloat("Step distance multiplier", &player.animator.STEP_DISTANCE_MULTIPLIER);
 
     NewLine();
     Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);
@@ -242,8 +258,8 @@ void Game::update_gui() {
     sprintf_s(label, "% 6.1f, % 6.1f", player.position.x, player.position.y);
     Text("Player position: ");
     SameLine();
-        DragFloat2("Player position", value_ptr(player.position), 1.0f, 0.0f,
-                   0.0f, "% .2f");
+    DragFloat2("Player position", value_ptr(player.position), 1.0f, 0.0f, 0.0f,
+               "% .2f");
 
     Text("Target Positions");
     Columns(4);

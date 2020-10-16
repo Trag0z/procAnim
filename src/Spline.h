@@ -90,6 +90,8 @@ class SplineEditor {
     static const size_t CIRCLE_SEGMENTS = 30;
     VertexArray<DebugShader::Vertex> circle_vao;
 
+    VertexArray<DebugShader::Vertex> tangents_vao;
+
     void save_splines(bool get_new_file_path = false);
     void load_splines(const std::string& path);
 
