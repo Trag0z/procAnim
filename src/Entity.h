@@ -36,16 +36,6 @@ class Entity {
         return {local_vec.x * scale.x, local_vec.y * scale.y};
     }
 
-    // // TODO: These have to change, can't just scale a float by a vector
-    // float world_to_local_space(float world_length) const {
-    //     SDL_assert(std::abs(scale.x) == std::abs(scale.y));
-    //     return world_length / std::abs(scale.x);
-    // }
-    // float local_to_world_space(float local_length) const {
-    //     SDL_assert(std::abs(scale.x) == std::abs(scale.y));
-    //     return std::abs(scale.x) * local_length;
-    // }
-
     const glm::mat3& get_model_matrix() const { return model; }
 
     glm::vec2 get_position() const { return position; }

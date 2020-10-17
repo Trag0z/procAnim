@@ -282,7 +282,6 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
     } else {
         point_to_set = new_point;
     }
-    // @OPTIMIZATION: Is called way more often than it needs to be
     selected_spline.update_render_data();
 
     if (selected_spline_index != Animator::PELVIS) {
@@ -422,7 +421,6 @@ bool SplineEditor::update_gui() {
     selected_spline_index = static_cast<size_t>(selected);
 
     if (Button("Replace with new spline") && !creating_new_spline) {
-        // @CLEANUP: Is this necessary?
         SDL_assert_always(selected_animation < NUM_ANIMATIONS &&
                           selected_spline_index < NUM_SPLINES_PER_ANIMATION);
 
@@ -465,7 +463,7 @@ bool SplineEditor::update_gui() {
         }
 
         // NOTE: Calling set_spline_point every time might be inefficient,
-        // but it's a big hassle otherwise
+        // but it's a big hassle otherwise.
         if (DragFloat2("P1 (forward)", value_ptr(points[0]), sensitivity, 0.0f,
                        0.0f, "% .2f")) {
             set_spline_point(points[P1], P1, forward_spline_index);
@@ -529,7 +527,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         renderer.debug_shader.set_model(&parent->get_model_matrix());
         renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
 
-        // @OPTIMIZATION: Calculate this stuff less often
+        // NOTE: This is calculated every frame, but is not necessary most of the time. 
         float radius;
         if (selected_spline_index == Animator::LEG_FORWARD ||
             selected_spline_index == Animator::LEG_BACKWARD) {

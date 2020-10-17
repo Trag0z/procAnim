@@ -243,7 +243,6 @@ void Game::update_gui() {
                &player.animator.INTERPOLATION_SPEED_MULTIPLIER.MIN, 0.01f);
 
     NewLine();
-    Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);
     Checkbox("Step mode", &game_config.step_mode);
 
     NewLine();

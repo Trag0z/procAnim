@@ -40,7 +40,7 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
         walking_speed = 0.0f;
     }
 
-    animator.update(delta_time, walking_speed, input, colliders);
+    animator.update(delta_time, walking_speed, colliders);
 
     velocity = glm::vec2(0.0f);
     position = animator.get_pelvis_pos();

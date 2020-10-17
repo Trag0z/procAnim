@@ -9,11 +9,6 @@ struct RiggedMesh;
 class Game;
 class Player;
 
-// @TODO: Rename to AnimationState // @CLEANUP: What?
-struct BoneRestrictions {
-    float min_rotation, max_rotation;
-};
-
 struct SplineSet {
     Spline walk[5];
     Spline run[5];
@@ -43,7 +38,6 @@ class Animator {
     void init(const Player* parent_, RiggedMesh& mesh,
               const std::list<BoxCollider>& colliders);
     void update(float delta_time, float walking_speed,
-                const MouseKeyboardInput& input,
                 const std::list<BoxCollider>& colliders);
     void render(const Renderer& renderer);
 
@@ -73,12 +67,9 @@ class Animator {
     float interpolation_factor_between_splines;
     float interpolation_factor_on_spline;
 
-    bool arm_follows_mouse = false;
-
     static const float MAX_SPINE_ROTATION;
     float STEP_DISTANCE_MULTIPLIER = 100.0f;
 
-    // @CLEANUP: Rename this?
     struct InterpolationSpeedMultiplier {
         float MIN = 0.02f, MAX = 0.08f;
     } INTERPOLATION_SPEED_MULTIPLIER;

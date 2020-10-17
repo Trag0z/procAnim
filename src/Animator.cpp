@@ -138,16 +138,7 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh,
 }
 
 void Animator::update(float delta_time, float walking_speed,
-                      const MouseKeyboardInput& input,
                       const std::list<BoxCollider>& colliders) {
-    // @CLEANUP
-    if (arm_follows_mouse && input.mouse_button(MouseButton::LEFT)) {
-        auto& right_arm = limbs[RIGHT_ARM];
-        solve_ik(right_arm.bones,
-                 parent->world_to_local_space(input.mouse_pos_world()), false);
-        return;
-    }
-
     if (walking_speed > 0.0f) {
         if (leg_state == NEUTRAL) {
             // Start to walk
@@ -301,7 +292,6 @@ void Animator::set_new_splines(float walking_speed,
         step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
 
         // Arms
-        // @CLEANUP: Remove ? operators?
         Spline* prototype = moving_forward
                                 ? &spline_prototypes.idle[ARM_FORWARD]
                                 : &spline_prototypes.idle[ARM_BACKWARD];

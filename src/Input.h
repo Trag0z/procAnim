@@ -77,8 +77,6 @@ class Gamepad {
                          axes[static_cast<size_t>(id) * 2 + 1]);
     }
 
-    // NOTE: These could only be shifted by n-1 if SDL_GAMECONTROLLER_BUTTON
-    // starts at 1
     inline bool button(u32 n) const { return button_map & BIT(n); };
     inline bool button_down(u32 n) const { return button_down_map & BIT(n); };
     inline bool button_up(u32 n) const { return button_up_map & BIT(n); };
