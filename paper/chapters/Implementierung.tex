@@ -27,16 +27,20 @@ Das Skelett des zu animierenden Charakters und damit zusammenhängend auch das M
 Bei \href{https://github.com/ocornut/imgui}{Dear ImGui} handelt es sich um eine Implementierung des Immediate Mode GUI Paradigmas. Es ermöglicht die Darstellung von grafischen Interfaces im bestehenden OpenGL-Kontext und wird hier verwendet, um ein Debug-Informationen anzuzeigen, die erstellten Tools zu kontrollieren und einige Variablen der Simulation zur Laufzeit ändern zu können.
 
 \section{Aufbau des Programms}
-Das UML-Klassendiagramm in \ref{} zeigt den generellen Aufbau der Anwendung. Im Zentrum steht dabei die Klasse \lstinline{Game}, die auf hoher Ebene den Ablauf koordiniert und die verschiedenen Komponenten der Simulation verwaltet. Ihre Methode \lstinline{run()} führt einen Simulationsschritt aus und zeichnet das Ergebnis auf den Bildschirm.
+Das UML-Klassendiagramm in \ref{} zeigt den generellen Aufbau der Anwendung. Im Zentrum steht dabei die Klasse \lstinline{Game}, die auf hoher Ebene den Ablauf koordiniert und die verschiedenen Komponenten der Simulation verwaltet. Ihre Methode \lstinline{init()} initialisiert alle nötigen Systeme und erstellt das Fenster, sodass das Programm in einem geeigneten Ausgangszustand ist. Die Methode \lstinline{run()} berechnet den nächsten Simulationsschritt und zeichnet das Ergebnis auf den Bildschirm.
 
 Die Klassen \lstinline {MouseKeyboardInput} und \lstinline{Gamepad} verwalten die verschiedenen Eingabemöglichkeiten und werden zu Beginn jedes Frames aktualisiert. Bei \lstinline{Background} handelt es sich um eine sehr einfache Klasse, die nur dafür zuständig ist, eine Textur als Hintergrund zu rendern. Der Hintergrund stellt einen Referenzpunkt für die Bewegungen des Charakters da und erleichtert so die Beurteilung der Animationen.
 
-Da der Charakter über Untergründe verschiedener Höhen laufen können soll, wurde die Klasse \lstinline{Level} zur Repräsentation der Bodenstruktur erstellt. Der Untergrund besteht dabei aus einer Reihe von Collidern, die jeweils aus Quadraten bestehen und entlang der globalen X- und Y-Achsen ausgerichtet sind. Um den Aufbau des Levels anzupassen gibt es außerdem den \lstinline{LevelEditor}. Er bietet ein simples User Interface zum Erstellen, Löschen und Verändern der Levelelemente. Weiterhin besteht die Möglichkeit, die Level in einem selbst erstellten Dateiformat zu speichern und wieder zu laden. Beim Start des Programms wird immer die Datei assets/default.level geladen, über den Editor können aber auch noch weitere Levels zum testen verschiedener Aspekte der Laufsimulation geladen werden.
+Da der Charakter über Untergründe verschiedener Höhen laufen können soll, wurde die Klasse \lstinline{Level} zur Repräsentation der Bodenstruktur erstellt. Der Untergrund besteht dabei aus einer Reihe von Collidern, die jeweils aus Quadraten bestehen und entlang der globalen X- und Y-Achsen ausgerichtet sind. Um den Aufbau des Levels anzupassen gibt es außerdem den \lstinline{LevelEditor}. Er bietet ein simples User Interface zum Erstellen, Löschen und Verändern der Levelelemente. Weiterhin besteht die Möglichkeit, die Level in einem selbst erstellten Dateiformat zu speichern und wieder zu laden. Beim Start des Programms wird immer die Datei \lstinline{assets/default.level} geladen, über den Editor können aber auch noch weitere Levels zum testen verschiedener Aspekte der Laufsimulation geladen werden.
 
+\lstinline{Player} repräsentiert den Spielercharakter und ist eine Unterklasse von \lstinline{Entity}. Er besitzt ein \lstinline{Mesh}, das wiederum aus einer Reihe von Vertices und Knochen besteht. Zusammen mit der Textur bietet es die Grundlage für die visuelle Darstellung des Charakters. Kontrolliert wird letzterer hauptsächlich mit den Inputdaten des \lstinline{Gamepad}.
+
+Der \lstinline{Animator} steuert die Bewegungen des Spielercharakters und bildet somit den Kern der Anwendung. Er beinhaltet Repräsentationen der vier Gliedmaßen des Spielers in \lstinline{limbs} und Splines zur Bewegung dieser in \lstinline{spline_prototypes}.
+Der genaue Ablauf des Animationsprozesses wird im Abschnitt \ref{animator_section} ausführlich erklärt.
 
 
 \subsection{Rendering und Shader}
 
-\section{Animator}
+\section{Animator} \label{animator_section}
 
-\subsection{Anpassung Bewegungen}
+\subsection{Anpassung der Bewegungen}

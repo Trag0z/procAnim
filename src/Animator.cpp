@@ -448,14 +448,3 @@ void Animator::interpolate_splines(glm::vec2 dst[Spline::NUM_POINTS],
                  interpolation_factor_between_splines);
     }
 }
-
-void Animator::interpolate_tangents(glm::vec2 dst[Spline::NUM_POINTS],
-                                    SplineIndex spline_index) {
-    dst[T1] = lerp(spline_prototypes.walk[spline_index].get_point(T1),
-                   spline_prototypes.run[spline_index].get_point(T1),
-                   interpolation_factor_between_splines);
-
-    dst[T2] = lerp(spline_prototypes.walk[spline_index].get_point(T2),
-                   spline_prototypes.run[spline_index].get_point(T2),
-                   interpolation_factor_between_splines);
-}

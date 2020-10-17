@@ -82,10 +82,5 @@ class Animator {
     void interpolate_splines(glm::vec2 dst[Spline::NUM_POINTS],
                              SplineIndex spline_index) const;
 
-    // Interpolates between T1 and T2 from the walking and running spline
-    // prototypes. Writes the resulting values in world space to dst.
-    void interpolate_tangents(glm::vec2 dst[Spline::NUM_POINTS],
-                              SplineIndex spline_index);
-
     friend Game;
 };
