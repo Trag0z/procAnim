@@ -9,8 +9,8 @@ void Player::init(glm::vec3 position_, glm::vec3 scale_,
                   const Gamepad* pad, const std::list<BoxCollider>& colliders) {
     Entity::init(position_, scale_);
     tex.load_from_file(texture_path);
-    rigged_mesh.load_from_file(mesh_path);
-    animator.init(this, rigged_mesh, colliders);
+    mesh.load_from_file(mesh_path);
+    animator.init(this, mesh, colliders);
     SDL_assert(pad);
     gamepad = pad;
 }
@@ -42,20 +42,19 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 
     animator.update(delta_time, walking_speed, colliders);
 
-    velocity = glm::vec2(0.0f);
     position = animator.get_pelvis_pos();
 
     update_model_matrix();
 }
 
 void Player::render(const Renderer& renderer) {
-    RiggedMesh& rm = rigged_mesh;
+    Mesh& rm = mesh;
 
     // Calculate bone transforms from their rotations
     glm::mat3 bone_transforms[RiggedShader::NUMBER_OF_BONES];
-    SDL_assert(rigged_mesh.bones.size() < RiggedShader::NUMBER_OF_BONES);
-    for (size_t i = 0; i < rigged_mesh.bones.size(); ++i) {
-        bone_transforms[i] = rigged_mesh.bones[i].get_transform();
+    SDL_assert(mesh.bones.size() < RiggedShader::NUMBER_OF_BONES);
+    for (size_t i = 0; i < mesh.bones.size(); ++i) {
+        bone_transforms[i] = mesh.bones[i].get_transform();
     }
 
     renderer.rigged_shader.use();

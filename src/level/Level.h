@@ -8,15 +8,18 @@ class MouseKeyboardInput;
 class LevelEditor;
 
 class Level {
-    std::list<BoxCollider> colliders_;
+    std::list<BoxCollider> colliders;
     std::string opened_path;
 
   public:
-    void load_from_file(const char* path);
     void render(const Renderer& renderer) const;
 
-    const std::list<BoxCollider> colliders() const noexcept;
+    const std::list<BoxCollider> get_colliders() const noexcept;
 
+    void save_to_file(const char* path) const;
+    void load_from_file(const char* path);
+
+    // Let the editor access our private members so it can manipulate them
     friend LevelEditor;
 };
 

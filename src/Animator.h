@@ -5,7 +5,7 @@
 #include "level/Collider.h"
 
 struct Bone;
-struct RiggedMesh;
+struct Mesh;
 class Game;
 class Player;
 
@@ -35,7 +35,7 @@ class Animator {
     };
     enum LimbIndex { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
 
-    void init(const Player* parent_, RiggedMesh& mesh,
+    void init(const Player* parent_, Mesh& mesh,
               const std::list<BoxCollider>& colliders);
     void update(float delta_time, float walking_speed,
                 const std::list<BoxCollider>& colliders);

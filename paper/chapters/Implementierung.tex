@@ -5,6 +5,8 @@ In diesem Kapitel wird der Vorgang der Implementierung erläutert. Dabei wird zu
 \section{Konzeption}
 Da der hauptsächliche Anwendungsbereich des in dieser Arbeit beschriebenen Animationssystems Videospiele sind, werden zur Implementierung auch Werkzeuge verwendet, die in der Spieleindustrie gängig sind. Programmiert wird deshalb in C++ unter Windows und mit einem x64-Prozessor als Zielplatform. Um gute Performance des Programms zu gewährleisten soll ein möglichst großer Teil der Berechnungen auf der Grafikkarte ausgeführt werden. Dafür kommt OpenGL als Grafikbibliothek zum Einsatz und es werden Shader in GLSL geschrieben.
 
+mit gamepad als bevorzugte steuerungsmethode implementiert
+
 
 \section{Verwendete Bibliotheken}
 Um viele der grundlegenden Prozesse im Programm zu vereinfachen und schon gut gelöste Probleme wie z.B. das Erstellen eines OpenGL-Kontexts oder das Laden der Modelldaten nicht erneut lösen zu müssen, werden einige Bibliotheken verwendet. Diese werden im Folgenden im Detail erläutert.
@@ -23,3 +25,18 @@ Das Skelett des zu animierenden Charakters und damit zusammenhängend auch das M
 
 \subsection{Dear ImGui}
 Bei \href{https://github.com/ocornut/imgui}{Dear ImGui} handelt es sich um eine Implementierung des Immediate Mode GUI Paradigmas. Es ermöglicht die Darstellung von grafischen Interfaces im bestehenden OpenGL-Kontext und wird hier verwendet, um ein Debug-Informationen anzuzeigen, die erstellten Tools zu kontrollieren und einige Variablen der Simulation zur Laufzeit ändern zu können.
+
+\section{Aufbau des Programms}
+Das UML-Klassendiagramm in \ref{} zeigt den generellen Aufbau der Anwendung. Im Zentrum steht dabei die Klasse \lstinline{Game}, die auf hoher Ebene den Ablauf koordiniert und die verschiedenen Komponenten der Simulation verwaltet. Ihre Methode \lstinline{run()} führt einen Simulationsschritt aus und zeichnet das Ergebnis auf den Bildschirm.
+
+Die Klassen \lstinline {MouseKeyboardInput} und \lstinline{Gamepad} verwalten die verschiedenen Eingabemöglichkeiten und werden zu Beginn jedes Frames aktualisiert. Bei \lstinline{Background} handelt es sich um eine sehr einfache Klasse, die nur dafür zuständig ist, eine Textur als Hintergrund zu rendern. Der Hintergrund stellt einen Referenzpunkt für die Bewegungen des Charakters da und erleichtert so die Beurteilung der Animationen.
+
+Da der Charakter über Untergründe verschiedener Höhen laufen können soll, wurde die Klasse \lstinline{Level} zur Repräsentation der Bodenstruktur erstellt. Der Untergrund besteht dabei aus einer Reihe von Collidern, die jeweils aus Quadraten bestehen und entlang der globalen X- und Y-Achsen ausgerichtet sind. Um den Aufbau des Levels anzupassen gibt es außerdem den \lstinline{LevelEditor}. Er bietet ein simples User Interface zum Erstellen, Löschen und Verändern der Levelelemente. Weiterhin besteht die Möglichkeit, die Level in einem selbst erstellten Dateiformat zu speichern und wieder zu laden. Beim Start des Programms wird immer die Datei assets/default.level geladen, über den Editor können aber auch noch weitere Levels zum testen verschiedener Aspekte der Laufsimulation geladen werden.
+
+
+
+\subsection{Rendering und Shader}
+
+\section{Animator}
+
+\subsection{Anpassung Bewegungen}

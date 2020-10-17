@@ -7,20 +7,15 @@
 #include "Renderer.h"
 
 class Gamepad;
-struct GameConfig;
 struct BoxCollider;
-class Game;
 
 class Player : public Entity {
     Texture tex;
-    RiggedMesh rigged_mesh;
-    // WalkAnimator animator;
+    Mesh mesh;
     Animator animator;
     const Gamepad* gamepad;
 
-    glm::vec2 velocity = glm::vec2(0.0f);
     float walking_speed;
-    const float gravity = 0.5f;
     bool facing_right = true;
 
   public:
@@ -36,6 +31,7 @@ class Player : public Entity {
     bool is_facing_right() const noexcept;
 
     // The general UI displays the player's private members, so it needs to
-    // access them. This feels cleaner than writing a bunch of getters.
+    // access them. This seems cleaner to me than writing a bunch of
+    // getters/setters.
     friend Game;
 };

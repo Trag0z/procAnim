@@ -22,7 +22,7 @@ struct Bone {
     glm::vec2 head() const;
 };
 
-struct RiggedMesh {
+struct Mesh {
     VertexArray<RiggedShader::Vertex> vao;
 
     VertexArray<DebugShader::Vertex> bones_vao;

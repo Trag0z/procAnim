@@ -46,14 +46,16 @@ class Game {
     bool is_running = false;
     u32 frame_start, last_frame_start;
 
+    GameConfig game_config;
+
     SDL_Window* window;
     SDL_Renderer* sdl_renderer;
     SDL_GLContext gl_context;
 
-    GameConfig game_config;
     Renderer renderer;
 
     MouseKeyboardInput mouse_keyboard_input;
+    // TODO: make it be one gamepad
     std::array<Gamepad, Gamepad::NUM_PADS> gamepads;
 
     Player player;

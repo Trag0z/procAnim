@@ -82,7 +82,7 @@ void Game::init() {
     glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
     player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
                 "../assets/playerTexture.png", "../assets/guy.fbx",
-                &gamepads[0], level.colliders());
+                &gamepads[0], level.get_colliders());
 
     frame_start = SDL_GetTicks();
     is_running = true;
@@ -94,6 +94,7 @@ void Game::run() {
 
     SDL_PumpEvents();
 
+    // Get inputs
     mouse_keyboard_input.update();
     for (auto& pad : gamepads) {
         pad.update();
@@ -158,7 +159,7 @@ void Game::run() {
         static_cast<float>(frame_start - last_frame_start);
     float frame_delay = static_cast<float>(game_config.frame_delay);
 
-    // Update stuff based on the current game_mode
+    // Update components based on the current game_mode
     if (game_mode == PLAY) {
         if (!game_config.step_mode) {
             float delta_time;
@@ -169,11 +170,12 @@ void Game::run() {
                     last_frame_duration / frame_delay * game_config.speed;
             }
 
-            player.update(delta_time, level.colliders(), mouse_keyboard_input);
+            player.update(delta_time, level.get_colliders(),
+                          mouse_keyboard_input);
 
         } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
                    mouse_keyboard_input.key(SDL_SCANCODE_M)) {
-            player.update(game_config.speed, level.colliders(),
+            player.update(game_config.speed, level.get_colliders(),
                           mouse_keyboard_input);
         }
     } else if (game_mode == SPLINE_EDITOR) {
@@ -303,7 +305,7 @@ void Game::update_gui() {
     NextColumn();
     Separator();
 
-    for (const auto& bone : player.rigged_mesh.bones) {
+    for (const auto& bone : player.mesh.bones) {
         Text(bone.name.c_str());
         NextColumn();
 

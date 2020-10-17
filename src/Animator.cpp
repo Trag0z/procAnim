@@ -91,7 +91,7 @@ float Limb::length() const { return bones[0]->length + bones[1]->length; }
 
 const float Animator::MAX_SPINE_ROTATION = -0.25f * PI;
 
-void Animator::init(const Player* parent_, RiggedMesh& mesh,
+void Animator::init(const Player* parent_, Mesh& mesh,
                     const std::list<BoxCollider>& colliders) {
     parent = parent_;
     spline_editor = new SplineEditor();

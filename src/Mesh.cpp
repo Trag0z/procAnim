@@ -20,7 +20,7 @@ glm::vec2 Bone::head() const {
     return get_transform() * bind_pose_transform[2];
 }
 
-void RiggedMesh::load_from_file(const char* file) {
+void Mesh::load_from_file(const char* file) {
     // Load data from file
     Assimp::Importer importer;
 
@@ -38,7 +38,7 @@ void RiggedMesh::load_from_file(const char* file) {
     aiMesh& mesh_data = *scene->mMeshes[0];
 
     // Import vertex data
-    RiggedMesh result;
+    Mesh result;
 
     std::vector<RiggedShader::Vertex> shader_vertices;
     shader_vertices.reserve(mesh_data.mNumVertices);
@@ -143,7 +143,7 @@ void RiggedMesh::load_from_file(const char* file) {
                    static_cast<GLuint>(bones_shader_vertices.size()));
 }
 
-Bone* RiggedMesh::find_bone(const char* str) {
+Bone* Mesh::find_bone(const char* str) {
     for (uint i = 0; i < bones.size(); ++i) {
         if (bones[i].name.compare(str) == 0) {
             return &bones[i];
