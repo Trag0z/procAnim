@@ -11,7 +11,7 @@ struct Bone {
     glm::mat3
         inverse_bind_pose_transform; // Transforms from mesh space to bone space
 
-    // Positio of the tail in the bones local space
+    // Position of the tail in the bones local space
     glm::vec2 tail;
     float length;
 
@@ -29,9 +29,7 @@ struct Bone {
 
 struct Mesh {
     VertexArray<RiggedShader::Vertex> vao;
-
-    VertexArray<DebugShader::Vertex> bones_vao;
-    std::vector<DebugShader::Vertex> bones_shader_vertices;
+    VertexArray<RiggedDebugShader::Vertex> bones_vao;
 
     std::vector<Bone> bones;
 

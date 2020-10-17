@@ -76,56 +76,28 @@ static GLuint load_and_compile_shader_from_file(const char* vert_shader_path,
     return id;
 }
 
-ShaderDetail::Shader::Shader(const char* vert_path, const char* frag_path) {
+namespace ShaderDetail {
+Shader::Shader(const char* vert_path, const char* frag_path) {
     id = load_and_compile_shader_from_file(vert_path, frag_path);
 
     camera_loc = glGetUniformLocation(id, "camera");
     model_loc = glGetUniformLocation(id, "model");
 }
 
-void ShaderDetail::Shader::use() const { glUseProgram(id); };
+void Shader::use() const { glUseProgram(id); };
 
-void ShaderDetail::Shader::set_camera(const glm::mat3* mat) const {
+void Shader::set_camera(const glm::mat3* mat) const {
     use();
     glUniformMatrix3fv(camera_loc, 1, 0, (const GLfloat*)mat);
 }
 
-void ShaderDetail::Shader::set_model(const glm::mat3* mat) const {
+void Shader::set_model(const glm::mat3* mat) const {
     use();
     glUniformMatrix3fv(model_loc, 1, 0, (const GLfloat*)mat);
 };
+} // namespace ShaderDetail
 
-RiggedShader::RiggedShader(const char* vert_path, const char* frag_path)
-    : Shader(vert_path, frag_path) {
-    bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
-}
-
-void RiggedShader::set_bone_transforms(const glm::mat3* transforms) const {
-    use();
-    glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
-                       (const GLfloat*)transforms);
-}
-
-VertexArray<TexturedShader::Vertex> TexturedShader::DEFAULT_VAO;
-
-TexturedShader::TexturedShader(const char* vert_path, const char* frag_path)
-    : Shader(vert_path, frag_path) {
-    GLuint indices[6] = {0, 1, 2, 2, 3, 0};
-
-    Vertex vertices[4];
-    vertices[0] = {{-1.0f, 1.0f}, {0.0f, 0.0f}};
-    vertices[1] = {{-1.0f, -1.0f}, {0.0f, 1.0f}};
-    vertices[2] = {{1.0f, -1.0f}, {1.0f, 1.0f}};
-    vertices[3] = {{1.0f, 1.0f}, {1.0f, 0.0f}};
-
-    DEFAULT_VAO.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
-}
-
-void TexturedShader::set_texture(const Texture& texture) const {
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture.id);
-}
-
+//                  DebugShader                     //
 VertexArray<DebugShader::Vertex> DebugShader::DEFAULT_VAO;
 
 DebugShader::DebugShader(const char* vert_path, const char* frag_path)
@@ -146,4 +118,56 @@ DebugShader::DebugShader(const char* vert_path, const char* frag_path)
 void DebugShader::set_color(const Color* color) const {
     use();
     glUniform4fv(color_loc, 1, (const GLfloat*)color);
+}
+
+//                  TexturedShader                  //
+VertexArray<TexturedShader::Vertex> TexturedShader::DEFAULT_VAO;
+
+TexturedShader::TexturedShader(const char* vert_path, const char* frag_path)
+    : Shader(vert_path, frag_path) {
+    GLuint indices[6] = {0, 1, 2, 2, 3, 0};
+
+    Vertex vertices[4];
+    vertices[0] = {{-1.0f, 1.0f}, {0.0f, 0.0f}};
+    vertices[1] = {{-1.0f, -1.0f}, {0.0f, 1.0f}};
+    vertices[2] = {{1.0f, -1.0f}, {1.0f, 1.0f}};
+    vertices[3] = {{1.0f, 1.0f}, {1.0f, 0.0f}};
+
+    DEFAULT_VAO.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
+}
+
+void TexturedShader::set_texture(const Texture& texture) const {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture.id);
+}
+
+//                  RiggedShader                    //
+RiggedShader::RiggedShader(const char* vert_path, const char* frag_path)
+    : Shader(vert_path, frag_path) {
+    bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
+}
+
+void RiggedShader::set_bone_transforms(const glm::mat3* transforms) const {
+    use();
+    glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
+                       (const GLfloat*)transforms);
+}
+
+//                  RiggedDebugShader                    //
+RiggedDebugShader::RiggedDebugShader(const char* vert_path,
+                                     const char* frag_path)
+    : Shader(vert_path, frag_path) {
+    color_loc = glGetUniformLocation(id, "color");
+    bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
+}
+
+void RiggedDebugShader::set_color(const Color* color) const {
+    use();
+    glUniform4fv(color_loc, 1, (const GLfloat*)color);
+}
+
+void RiggedDebugShader::set_bone_transforms(const glm::mat3* transforms) const {
+    use();
+    glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
+                       (const GLfloat*)transforms);
 }

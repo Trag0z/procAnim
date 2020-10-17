@@ -73,33 +73,21 @@ void Player::render(const Renderer& renderer) {
     // Render wireframes
     // TODO: This doesn't adjust to bone movements
     if (renderer.draw_wireframes) {
-        renderer.debug_shader.set_color(&Color::RED);
+        renderer.debug_shader.set_color(&Color::BLUE);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        mesh.vao.draw(GL_TRIANGLES);
+        mesh.vao.draw(GL_LINES);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     // Render bones
     if (renderer.draw_bones) {
-        for (size_t i = 0; i < mesh.bones.size(); ++i) {
-            mesh.bones_shader_vertices[i * 2].pos =
-                bone_transforms[i] *
-                mesh.bones[i].bind_pose_transform[2]; // Renders (0.0f, 0.0f,
-                                                      // 0.0f) in the bones
-                                                      // local space
-            mesh.bones_shader_vertices[i * 2 + 1].pos =
-                bone_transforms[i] * mesh.bones[i].bind_pose_transform *
-                glm::vec3(mesh.bones[i].tail, 1.0f);
-        }
-
-        mesh.bones_vao.update_vertex_data(mesh.bones_shader_vertices);
-
-        renderer.debug_shader.set_color(&Color::BLUE);
+        renderer.rigged_debug_shader.set_model(&model);
+        renderer.rigged_debug_shader.set_color(&Color::RED);
+        renderer.rigged_debug_shader.set_bone_transforms(bone_transforms);
 
         glLineWidth(2.0f);
         mesh.bones_vao.draw(GL_LINES);
-
         mesh.bones_vao.draw(GL_POINTS);
     }
 
