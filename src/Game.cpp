@@ -307,7 +307,7 @@ void Game::update_gui() {
         Text(bone.name.c_str());
         NextColumn();
 
-        sprintf_s(label, "% 6.1f /% 1.2f", radToDeg(bone.rotation),
+        sprintf_s(label, "% 6.1f /% 1.2f", glm::degrees(bone.rotation),
                   bone.rotation);
         Text(label);
         NextColumn();
