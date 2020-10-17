@@ -16,7 +16,7 @@ struct SplineSet {
 };
 
 struct Limb {
-    Spline spline; // In parent's local space
+    Spline spline; // In local space
 
     Bone* bones[2];
 
@@ -41,9 +41,9 @@ class Animator {
                 const std::list<BoxCollider>& colliders);
     void render(const Renderer& renderer);
 
-    glm::vec2 get_tip_pos(LimbIndex limb_index) const;
+    glm::vec2 tip_pos(LimbIndex limb_index) const;
 
-    glm::vec2 get_pelvis_pos() const;
+    glm::vec2 pelvis_pos() const;
 
   private:
     const Player* parent;

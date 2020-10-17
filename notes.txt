@@ -19,7 +19,6 @@ Bugs:               (@BUG)
 - sometimes turns around due to stick snap-back?
 
 Cleanup:            (@CLEANUP)
-- unify naming scheme for getter methods
 
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time

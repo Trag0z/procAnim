@@ -11,13 +11,13 @@ void Level::render(const Renderer& renderer) const {
     glm::mat3 model(1.0f);
     renderer.textured_shader.set_model(&model);
 
-    for (auto& coll : colliders) {
+    for (auto& coll : colliders_) {
         coll.render(renderer);
     }
 }
 
-const std::list<BoxCollider> Level::get_colliders() const noexcept {
-    return colliders;
+const std::list<BoxCollider> Level::colliders() const noexcept {
+    return colliders_;
 }
 
 struct BoxColliderSaveFormat {
@@ -30,7 +30,7 @@ void Level::load_from_file(const char* path) {
 
     opened_path = std::string(path);
 
-    colliders.clear();
+    colliders_.clear();
 
     // Read data from file
     SDL_RWops* file = SDL_RWFromFile(path, "rb");
@@ -45,18 +45,18 @@ void Level::load_from_file(const char* path) {
 
     // Create list of colliders from data
     for (size_t i = 0; i < num_colliders; ++i) {
-        colliders.emplace_back(save_data[i].position, save_data[i].half_ext);
+        colliders_.emplace_back(save_data[i].position, save_data[i].half_ext);
     }
 
     delete[] save_data;
 }
 
 void Level::save_to_file(const char* path) const {
-    size_t num_colliders = colliders.size();
+    size_t num_colliders = colliders_.size();
     BoxColliderSaveFormat* save_data = new BoxColliderSaveFormat[num_colliders];
 
     size_t i = 0;
-    for (auto& coll : colliders) {
+    for (auto& coll : colliders_) {
         save_data[i].position = coll.position;
         save_data[i].half_ext = coll.half_ext;
         ++i;
@@ -77,7 +77,7 @@ void LevelEditor::init(Level* level_) { level = level_; }
 bool LevelEditor::update(const Renderer& renderer,
                          const MouseKeyboardInput& input) {
     bool keep_open = true;
-    auto& colliders = level->colliders;
+    auto& colliders = level->colliders_;
 
     { // UI
         using namespace ImGui;

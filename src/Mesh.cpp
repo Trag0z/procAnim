@@ -3,22 +3,20 @@
 #include "Mesh.h"
 #include "Util.h"
 
-glm::mat3 Bone::get_transform() const {
+glm::mat3 Bone::transform() const {
     // Recurse until there's no parent
     if (parent) {
         glm::mat3 this_transform = bind_pose_transform *
                                    glm::rotate(glm::mat3(1.0f), rotation) *
                                    inverse_bind_pose_transform;
-        return parent->get_transform() * this_transform;
+        return parent->transform() * this_transform;
     }
 
-    return bind_pose_transform *
-           glm::rotate(glm::mat3(1.0f), rotation) * inverse_bind_pose_transform;
+    return bind_pose_transform * glm::rotate(glm::mat3(1.0f), rotation) *
+           inverse_bind_pose_transform;
 }
 
-glm::vec2 Bone::head() const {
-    return get_transform() * bind_pose_transform[2];
-}
+glm::vec2 Bone::head() const { return transform() * bind_pose_transform[2]; }
 
 void Mesh::load_from_file(const char* file) {
     // Load data from file

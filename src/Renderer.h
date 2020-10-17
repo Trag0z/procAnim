@@ -3,10 +3,6 @@
 #include "Shaders.h"
 #include "Texture.h"
 
-class Player;
-class Background;
-class Level;
-
 class Renderer {
     glm::vec2 window_size_ = {1920.0f, 1200.0f};
     glm::vec2 camera_center_ = {0.0f, 0.0f};

@@ -3,12 +3,12 @@
 #include "Entity.h"
 
 void Entity::update_model_matrix() {
-    model = glm::translate(glm::mat3(1.0f), position);
+    model = glm::translate(glm::mat3(1.0f), position_);
     model = glm::scale(model, scale);
 }
 
 void Entity::init(glm::vec2 pos_, glm::vec2 scale_, const Entity* parent_) {
-    position = pos_;
+    position_ = pos_;
     scale = scale_;
     update_model_matrix();
     parent = parent_;
@@ -28,6 +28,6 @@ glm::vec2 Entity::local_to_world_scale(const glm::vec2& local_vec) const {
     return {local_vec.x * scale.x, local_vec.y * scale.y};
 }
 
-const glm::mat3& Entity::get_model_matrix() const { return model; }
+const glm::mat3& Entity::model_matrix() const { return model; }
 
-glm::vec2 Entity::get_position() const { return position; }
+glm::vec2 Entity::position() const { return position_; }

@@ -82,7 +82,7 @@ void Game::init() {
     glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
     player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
                 "../assets/playerTexture.png", "../assets/guy.fbx",
-                &gamepads[0], level.get_colliders());
+                &gamepads[0], level.colliders());
 
     frame_start = SDL_GetTicks();
     is_running = true;
@@ -170,12 +170,11 @@ void Game::run() {
                     last_frame_duration / frame_delay * game_config.speed;
             }
 
-            player.update(delta_time, level.get_colliders(),
-                          mouse_keyboard_input);
+            player.update(delta_time, level.colliders(), mouse_keyboard_input);
 
         } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
                    mouse_keyboard_input.key(SDL_SCANCODE_M)) {
-            player.update(game_config.speed, level.get_colliders(),
+            player.update(game_config.speed, level.colliders(),
                           mouse_keyboard_input);
         }
     } else if (game_mode == SPLINE_EDITOR) {
@@ -192,7 +191,7 @@ void Game::run() {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    renderer.update_camera(player.get_position() + glm::vec2(0.0f, 200.0f));
+    renderer.update_camera(player.position() + glm::vec2(0.0f, 200.0f));
 
     background.render(renderer, renderer.camera_center());
 
@@ -260,10 +259,10 @@ void Game::update_gui() {
 
     char label[128];
 
-    sprintf_s(label, "% 6.1f, % 6.1f", player.position.x, player.position.y);
+    sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x, player.position_.y);
     Text("Player position: ");
     SameLine();
-    DragFloat2("Player position", value_ptr(player.position), 1.0f, 0.0f, 0.0f,
+    DragFloat2("Player position", value_ptr(player.position_), 1.0f, 0.0f, 0.0f,
                "% .2f");
 
     Text("Target Positions");
@@ -281,7 +280,7 @@ void Game::update_gui() {
 
     for (const auto& limb : player.animator.limbs) {
         glm::vec2 target_world_pos =
-            player.local_to_world_space(limb.spline.get_point(P2));
+            player.local_to_world_space(limb.spline.point(P2));
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
         Text(label);
@@ -315,14 +314,14 @@ void Game::update_gui() {
         NextColumn();
 
         glm::vec2 head_world_pos = player.local_to_world_space(
-            bone.get_transform() * bone.bind_pose_transform *
+            bone.transform() * bone.bind_pose_transform *
             glm::vec3(bone.head(), 1.0f));
         sprintf_s(label, "% 7.1f, % 7.1f", head_world_pos.x, head_world_pos.y);
         Text(label);
         NextColumn();
 
         glm::vec2 tail_world_pos = player.local_to_world_space(
-            glm::vec2(bone.get_transform() * bone.bind_pose_transform *
+            glm::vec2(bone.transform() * bone.bind_pose_transform *
                       glm::vec3(bone.tail, 1.0f)));
         sprintf_s(label, "% 7.1f, % 7.1f", tail_world_pos.x, tail_world_pos.y);
         Text(label);

@@ -4,10 +4,8 @@
 #include "Shaders.h"
 #include "Entity.h"
 
-struct Bone;
 class Renderer;
 class SplineEditor;
-class Animator;
 struct SplineSet;
 struct Limb;
 
@@ -21,8 +19,8 @@ class Spline {
     void init(const glm::vec2 points_[NUM_POINTS] = nullptr);
     void render(const Renderer& renderer, bool draw_points = false) const;
 
-    const glm::vec2& get_point(SplinePointName p) const;
-    const glm::vec2* get_points() const;
+    const glm::vec2& point(SplinePointName p) const;
+    const glm::vec2* points() const;
 
     // If P1 or P2 are set, T1 or T2 are moved with them
     void set_point(SplinePointName name, glm::vec2 point);
@@ -39,7 +37,7 @@ class Spline {
     static const size_t RENDER_STEPS = 50;
 
     // T1 and T2 are relative to P1/P2
-    glm::vec2 points[NUM_POINTS];
+    glm::vec2 points_[NUM_POINTS];
     glm::mat4 parameter_matrix;
 
     VertexArray<DebugShader::Vertex> line_vao;

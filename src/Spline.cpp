@@ -8,20 +8,21 @@
 /////               Spline              /////
 /////                                   /////
 
-void Spline::init(const glm::vec2 points_[NUM_POINTS]) {
-    if (points_ != nullptr) {
-        memcpy_s(points, 4 * sizeof(glm::vec2), points_, 4 * sizeof(glm::vec2));
+void Spline::init(const glm::vec2 points[NUM_POINTS]) {
+    if (points != nullptr) {
+        memcpy_s(points_, 4 * sizeof(glm::vec2), points,
+                 4 * sizeof(glm::vec2));
     } else {
-        points[0] = glm::vec2(0.0f, 0.0f);
-        points[1] = glm::vec2(0.0f, 0.0f);
-        points[2] = glm::vec2(0.0f, 0.0f);
-        points[3] = glm::vec2(0.0f, 0.0f);
+        points_[0] = glm::vec2(0.0f, 0.0f);
+        points_[1] = glm::vec2(0.0f, 0.0f);
+        points_[2] = glm::vec2(0.0f, 0.0f);
+        points_[3] = glm::vec2(0.0f, 0.0f);
     }
 
     // Init line render data
     parameter_matrix = glm::mat4(
-        glm::vec4(points[P1], 0.0f, 1.0f), glm::vec4(points[P2], 0.0f, 1.0f),
-        glm::vec4(points[T1], 0.0f, 1.0f), glm::vec4(points[T2], 0.0f, 1.0f));
+        glm::vec4(points_[P1], 0.0f, 1.0f), glm::vec4(points_[P2], 0.0f, 1.0f),
+        glm::vec4(points_[T1], 0.0f, 1.0f), glm::vec4(points_[T2], 0.0f, 1.0f));
 
     if (vertices_initialized) {
         update_render_data();
@@ -40,8 +41,8 @@ void Spline::init(const glm::vec2 points_[NUM_POINTS]) {
                       static_cast<GLuint>(line_shader_vertices.size()));
 
         // Init point render data
-        point_shader_vertices[0].pos = glm::vec4(points[P1], 0.0f, 1.0f);
-        point_shader_vertices[1].pos = glm::vec4(points[P2], 0.0f, 1.0f);
+        point_shader_vertices[0].pos = glm::vec4(points_[P1], 0.0f, 1.0f);
+        point_shader_vertices[1].pos = glm::vec4(points_[P2], 0.0f, 1.0f);
 
         point_vao.init(indices, 2, point_shader_vertices.data(),
                        static_cast<GLuint>(point_shader_vertices.size()));
@@ -62,31 +63,29 @@ void Spline::render(const Renderer& renderer, bool draw_points) const {
     }
 }
 
-const glm::vec2& Spline::get_point(SplinePointName p) const {
-    return points[p];
-}
+const glm::vec2& Spline::point(SplinePointName p) const { return points_[p]; }
 
-const glm::vec2* Spline::get_points() const { return points; }
+const glm::vec2* Spline::points() const { return points_; }
 
 void Spline::set_points(const glm::vec2 new_points[NUM_POINTS]) {
     for (size_t i = 0; i < NUM_POINTS; ++i) {
-        points[i] = new_points[i];
+        points_[i] = new_points[i];
     }
     update_render_data();
 }
 
 void Spline::set_point(SplinePointName name, glm::vec2 point) {
     if (name == T1 || name == T2) {
-        points[name] = point;
+        points_[name] = point;
         return;
     }
 
-    glm::vec2 point_delta = point - points[name];
-    points[name] = point;
+    glm::vec2 point_delta = point - points_[name];
+    points_[name] = point;
     if (name == P1) {
-        points[T1] += point_delta;
+        points_[T1] += point_delta;
     } else {
-        points[T2] += point_delta;
+        points_[T2] += point_delta;
     }
     update_render_data();
 }
@@ -96,8 +95,8 @@ void Spline::update_render_data() {
     // Line
     // @optimize
     parameter_matrix = glm::mat4(
-        glm::vec4(points[P1], 0.0f, 1.0f), glm::vec4(points[P2], 0.0f, 1.0f),
-        glm::vec4(points[T1], 0.0f, 1.0f), glm::vec4(points[T2], 0.0f, 1.0f));
+        glm::vec4(points_[P1], 0.0f, 1.0f), glm::vec4(points_[P2], 0.0f, 1.0f),
+        glm::vec4(points_[T1], 0.0f, 1.0f), glm::vec4(points_[T2], 0.0f, 1.0f));
 
     for (size_t i = 0; i < RENDER_STEPS; ++i) {
         float t = static_cast<float>(i) / static_cast<float>(RENDER_STEPS - 1);
@@ -110,8 +109,8 @@ void Spline::update_render_data() {
         static_cast<GLuint>(line_shader_vertices.size()));
 
     // Points
-    point_shader_vertices[0].pos = glm::vec4(points[P1], 0.0f, 1.0f);
-    point_shader_vertices[1].pos = glm::vec4(points[P2], 0.0f, 1.0f);
+    point_shader_vertices[0].pos = glm::vec4(points_[P1], 0.0f, 1.0f);
+    point_shader_vertices[1].pos = glm::vec4(points_[P2], 0.0f, 1.0f);
 
     point_vao.update_vertex_data(
         point_shader_vertices.data(),
@@ -155,21 +154,21 @@ void SplineEditor::save_splines(bool get_new_file_path) {
          ++n_spline) {
         for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
             all_points[num_copied++] =
-                spline_set->walk[n_spline].points[n_point];
+                spline_set->walk[n_spline].points_[n_point];
         }
     }
     for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
          ++n_spline) {
         for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
             all_points[num_copied++] =
-                spline_set->run[n_spline].points[n_point];
+                spline_set->run[n_spline].points_[n_point];
         }
     }
     for (size_t n_spline = 0; n_spline < NUM_SPLINES_PER_ANIMATION;
          ++n_spline) {
         for (size_t n_point = 0; n_point < Spline::NUM_POINTS; ++n_point) {
             all_points[num_copied++] =
-                spline_set->idle[n_spline].points[n_point];
+                spline_set->idle[n_spline].points_[n_point];
         }
     }
     SDL_assert(num_copied == num_splines_total * Spline::NUM_POINTS);
@@ -273,12 +272,12 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
     }
 
     auto& selected_spline = splines[spline_index];
-    auto& point_to_set = selected_spline.points[point_index];
+    auto& point_to_set = selected_spline.points_[point_index];
 
     if (absolute_tangent && point_index == T1) {
-        point_to_set = new_point - selected_spline.points[P1];
+        point_to_set = new_point - selected_spline.points_[P1];
     } else if (absolute_tangent && point_index == T2) {
-        point_to_set = new_point - selected_spline.points[P2];
+        point_to_set = new_point - selected_spline.points_[P2];
     } else {
         point_to_set = new_point;
     }
@@ -289,11 +288,11 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
         bool updated = false;
         auto& partner_spline = splines[opposite_direction(spline_index)];
         if (connect_point_pairs && (point_index == P1 || point_index == P2)) {
-            partner_spline.points[3 - point_index] = point_to_set;
+            partner_spline.points_[3 - point_index] = point_to_set;
             updated = true;
         }
         if (connect_tangent_pairs && (point_index == T1 || point_index == T2)) {
-            partner_spline.points[3 - point_index] = point_to_set;
+            partner_spline.points_[3 - point_index] = point_to_set;
             updated = true;
         }
 
@@ -338,10 +337,10 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
             auto& selected_spline = splines[selected_spline_index];
 
             glm::vec2 start_to_end =
-                selected_spline.points[P2] - selected_spline.points[P1];
-            set_spline_point(selected_spline.points[P1] + start_to_end * 0.3f,
+                selected_spline.points_[P2] - selected_spline.points_[P1];
+            set_spline_point(selected_spline.points_[P1] + start_to_end * 0.3f,
                              T1);
-            set_spline_point(selected_spline.points[P2] + start_to_end * 0.3f,
+            set_spline_point(selected_spline.points_[P2] + start_to_end * 0.3f,
                              T2);
 
             if (input.mouse_button_down(MouseButton::LEFT)) {
@@ -369,17 +368,17 @@ bool SplineEditor::update(const MouseKeyboardInput& input) {
 
         if (input.mouse_button_down(MouseButton::LEFT)) {
             // If a point was clicked, select it
-            if (glm::length(spline->points[P1] - mouse_pos) < 0.1f) {
+            if (glm::length(spline->points_[P1] - mouse_pos) < 0.1f) {
                 selected_point_index = P1;
 
-            } else if (glm::length(spline->points[P2] - mouse_pos) < 0.1f) {
+            } else if (glm::length(spline->points_[P2] - mouse_pos) < 0.1f) {
                 selected_point_index = P2;
 
-            } else if (glm::length(spline->points[P1] + spline->points[T1] -
+            } else if (glm::length(spline->points_[P1] + spline->points_[T1] -
                                    mouse_pos) < 0.1f) {
                 selected_point_index = T1;
 
-            } else if (glm::length(spline->points[P2] + spline->points[T2] -
+            } else if (glm::length(spline->points_[P2] + spline->points_[T2] -
                                    mouse_pos) < 0.1f) {
                 selected_point_index = T2;
             }
@@ -453,11 +452,11 @@ bool SplineEditor::update_gui() {
 
         glm::vec2* points = nullptr;
         if (selected_animation == WALK) {
-            points = spline_set->walk[forward_spline_index].points;
+            points = spline_set->walk[forward_spline_index].points_;
         } else if (selected_animation == RUN) {
-            points = spline_set->run[forward_spline_index].points;
+            points = spline_set->run[forward_spline_index].points_;
         } else if (selected_animation == IDLE) {
-            points = spline_set->idle[forward_spline_index].points;
+            points = spline_set->idle[forward_spline_index].points_;
         } else {
             SDL_TriggerBreakpoint();
         }
@@ -487,11 +486,11 @@ bool SplineEditor::update_gui() {
 
             size_t backward_spline_index = forward_spline_index + 1;
             if (selected_animation == WALK) {
-                spline_set->walk[backward_spline_index].points;
+                spline_set->walk[backward_spline_index].points_;
             } else if (selected_animation == RUN) {
-                spline_set->run[backward_spline_index].points;
+                spline_set->run[backward_spline_index].points_;
             } else if (selected_animation == IDLE) {
-                spline_set->idle[backward_spline_index].points;
+                spline_set->idle[backward_spline_index].points_;
             }
 
             if (DragFloat2("P1 (backward)", value_ptr(points[0]), sensitivity,
@@ -524,10 +523,11 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
 
     if (selected_spline_index < NUM_SPLINES_PER_ANIMATION && spline_edit_mode) {
         // Draw circle for selected limb
-        renderer.debug_shader.set_model(&parent->get_model_matrix());
+        renderer.debug_shader.set_model(&parent->model_matrix());
         renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
 
-        // NOTE: This is calculated every frame, but is not necessary most of the time. 
+        // NOTE: This is calculated every frame, but is not necessary most of
+        // the time.
         float radius;
         if (selected_spline_index == Animator::LEG_FORWARD ||
             selected_spline_index == Animator::LEG_BACKWARD) {
@@ -571,7 +571,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         spline->line_vao.draw(GL_LINE_STRIP);
 
         if (spline_edit_mode) {
-            const glm::vec2* spline_points = spline->get_points();
+            const glm::vec2* spline_points = spline->points();
 
             DebugShader::Vertex points[4];
             points[P1].pos = glm::vec4(spline_points[P1], 0.0f, 1.0f);

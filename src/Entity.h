@@ -3,7 +3,7 @@
 
 class Entity {
   protected:
-    glm::vec2 position = glm::vec2(1.0f);
+    glm::vec2 position_ = glm::vec2(1.0f);
     glm::vec2 scale = glm::vec2(1.0f);
     glm::mat3 model = glm::mat3(1.0f);
 
@@ -21,7 +21,7 @@ class Entity {
     glm::vec2 world_to_world_scale(const glm::vec2& world_vec) const;
     glm::vec2 local_to_world_scale(const glm::vec2& local_vec) const;
 
-    const glm::mat3& get_model_matrix() const;
+    const glm::mat3& model_matrix() const;
 
-    glm::vec2 get_position() const;
+    glm::vec2 position() const;
 };

@@ -4,10 +4,10 @@
 #include "Game.h"
 #include "level/Collider.h"
 
-void Player::init(glm::vec3 position_, glm::vec3 scale_,
+void Player::init(glm::vec3 position, glm::vec3 scale_,
                   const char* texture_path, const char* mesh_path,
                   const Gamepad* pad, const std::list<BoxCollider>& colliders) {
-    Entity::init(position_, scale_);
+    Entity::init(position, scale_);
     tex.load_from_file(texture_path);
     mesh.load_from_file(mesh_path);
     animator.init(this, mesh, colliders);
@@ -42,7 +42,7 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 
     animator.update(delta_time, walking_speed, colliders);
 
-    position = animator.get_pelvis_pos();
+    position_ = animator.pelvis_pos();
 
     update_model_matrix();
 }
@@ -54,7 +54,7 @@ void Player::render(const Renderer& renderer) {
     glm::mat3 bone_transforms[RiggedShader::NUMBER_OF_BONES];
     SDL_assert(mesh.bones.size() < RiggedShader::NUMBER_OF_BONES);
     for (size_t i = 0; i < mesh.bones.size(); ++i) {
-        bone_transforms[i] = mesh.bones[i].get_transform();
+        bone_transforms[i] = mesh.bones[i].transform();
     }
 
     renderer.rigged_shader.use();

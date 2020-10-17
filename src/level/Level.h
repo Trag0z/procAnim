@@ -8,13 +8,13 @@ class MouseKeyboardInput;
 class LevelEditor;
 
 class Level {
-    std::list<BoxCollider> colliders;
+    std::list<BoxCollider> colliders_;
     std::string opened_path;
 
   public:
     void render(const Renderer& renderer) const;
 
-    const std::list<BoxCollider> get_colliders() const noexcept;
+    const std::list<BoxCollider> colliders() const noexcept;
 
     void save_to_file(const char* path) const;
     void load_from_file(const char* path);
