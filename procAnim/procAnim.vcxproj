@@ -147,6 +147,7 @@
     <ClCompile Include="..\src\Animator.cpp" />
     <ClCompile Include="..\src\Background.cpp" />
     <ClCompile Include="..\src\Color.cpp" />
+    <ClCompile Include="..\src\Entity.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\Input.cpp" />
     <ClCompile Include="..\src\level\Collider.cpp" />
