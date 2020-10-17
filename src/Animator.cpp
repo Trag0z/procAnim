@@ -97,9 +97,6 @@ void Animator::init(const Player* parent_, Mesh& mesh,
     spline_editor->init(parent, &spline_prototypes, limbs,
                         "../assets/player_splines.spl");
 
-    GLuint indices[] = {0, 1, 2, 3};
-    target_points_vao.init(indices, 4, nullptr, 4, GL_DYNAMIC_DRAW);
-
     leg_state = NEUTRAL;
     last_leg_state = NEUTRAL;
 

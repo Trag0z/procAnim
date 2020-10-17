@@ -5,13 +5,13 @@
 #include "VertexArray.h"
 #include "Types.h"
 
-static bool checkCompileErrors(GLuint object, bool program);
+static bool check_compile_errors(GLuint object, bool program);
 
-GLuint loadAndCompileShaderFromFile(const char* vShaderPath,
-                                    const char* fShaderPath);
+static GLuint load_and_compile_shader_from_file(const char* vert_shader_path,
+                                                const char* frag_shader_path);
 
 namespace ShaderDetail {
-// This class should never be instantiated, only derived from
+// This class should never be instantiated, only derived from.
 class Shader {
   protected:
     GLuint id;
@@ -26,6 +26,37 @@ class Shader {
     void set_model(const glm::mat3* mat) const;
 };
 } // namespace ShaderDetail
+
+class DebugShader : public ShaderDetail::Shader {
+    GLuint color_loc;
+
+  public:
+    DebugShader() {}
+    DebugShader(const char* vert_path, const char* frag_path);
+
+    void set_color(const Color* color) const;
+
+    struct Vertex {
+        glm::vec2 pos;
+    };
+
+    static VertexArray<Vertex> DEFAULT_VAO;
+};
+
+class TexturedShader : public ShaderDetail::Shader {
+  public:
+    TexturedShader() {}
+    TexturedShader(const char* vert_path, const char* frag_path);
+
+    void set_texture(const Texture& texture) const;
+
+    struct Vertex {
+        glm::vec2 pos;
+        glm::vec2 uv_coord;
+    };
+
+    static VertexArray<Vertex> DEFAULT_VAO;
+};
 
 class RiggedShader : public ShaderDetail::Shader {
     GLuint bone_transforms_loc;
@@ -45,37 +76,6 @@ class RiggedShader : public ShaderDetail::Shader {
         uint bone_indices[MAX_BONES_PER_VERTEX];
         float bone_weights[MAX_BONES_PER_VERTEX];
     };
-};
-
-class TexturedShader : public ShaderDetail::Shader {
-  public:
-    TexturedShader() {}
-    TexturedShader(const char* vert_path, const char* frag_path);
-
-    void set_texture(const Texture& texture) const;
-
-    struct Vertex {
-        glm::vec2 pos;
-        glm::vec2 uv_coord;
-    };
-
-    static VertexArray<Vertex> DEFAULT_VAO;
-};
-
-class DebugShader : public ShaderDetail::Shader {
-    GLuint color_loc;
-
-  public:
-    DebugShader() {}
-    DebugShader(const char* vert_path, const char* frag_path);
-
-    void set_color(const Color* color) const;
-
-    struct Vertex {
-        glm::vec2 pos;
-    };
-
-    static VertexArray<Vertex> DEFAULT_VAO;
 };
 
 //                                                              //

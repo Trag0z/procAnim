@@ -41,8 +41,20 @@ Der \lstinline{Animator} steuert die Bewegungen des Spielercharakters und bildet
 
 
 \subsection{Rendering und Shader} \label{rendering_section}
+Alle Klassen, die grafische Objekte in der Simulation darstellen, haben eine Methode \lstinline{void render(const Renderer&)} (eventuell noch mit weiteren Parametern), mit der sie sich selbst auf den Bildschirm zeichnen. Die Objekte wählen dann einen der drei verschiedenen Shader aus, indem sie auf dem entsprechenden Member-Objekt des Renderers \lstinline{use()} aufrufen und setzen gegebenenfalls noch Uniform-Variablen. Die zu rendernden Vertexdaten halten die Objekte in einer Instanziierung des Templates \lstinline{VertexArray<>} mit dem zum Shader passenden Vertextyp als Template-Argument. Sie rufen auf diesem VertexArray \lstinline{draw(GLenum mode)} auf, um die Vertices im entsprechenden Modus zeichnen zu lassen.
 
+Die drei verfügbaren Shader sind:
+\begin{enumerate}
+    \item \lstinline{DebugShader}
+    \item \lstinline{TexturedShader}
+    \item \lstinline{RiggedShader}
+\end{enumerate}
 
+Der Debug-Shader wird hauptsächlich zur Visualisierung von Debug-Informationen verwendet. Es kann eine Farbe für die zu rendernden Primitive in Form einer Uniform-Variable eingestellt werden; Texturen werden nicht verwendet. Das Vertexformat dieses Shaders besteht nur aus einem zweidimensionalen Vektor zur Angabe der Vertexposition. Außerdem gibt es die statische Variable \lstinline{DEFAULT_VAO}, die ein simples Vertex Array zur Darstellung von quadratischen Objekten anbietet. Diese müssen so nicht ihre eigenen Vertices im Arbeitsspeicher der GPU verwalten, sondern können die beschriebenen Vertices verwenden und mithilfe der Model-Matrix beliebig transformieren.
+
+Der Textured-Shader kommt beim Rendering von texturierten Objekten zum Einsatz. Seine Vertices enthalten deshalb neben der Position noch eine Texturkoordinate.
+
+Nur Animator, Mesh, Spline und Background
 
 \section{Animator} \label{animator_section}
 

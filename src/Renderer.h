@@ -10,9 +10,9 @@ class Renderer {
   public:
     void update_camera(const glm::vec2& center);
 
-    RiggedShader rigged_shader;
-    TexturedShader textured_shader;
     DebugShader debug_shader;
+    TexturedShader textured_shader;
+    RiggedShader rigged_shader;
 
     void init();
 

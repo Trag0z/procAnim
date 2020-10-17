@@ -10,8 +10,7 @@
 
 void Spline::init(const glm::vec2 points[NUM_POINTS]) {
     if (points != nullptr) {
-        memcpy_s(points_, 4 * sizeof(glm::vec2), points,
-                 4 * sizeof(glm::vec2));
+        memcpy_s(points_, 4 * sizeof(glm::vec2), points, 4 * sizeof(glm::vec2));
     } else {
         points_[0] = glm::vec2(0.0f, 0.0f);
         points_[1] = glm::vec2(0.0f, 0.0f);
@@ -38,14 +37,16 @@ void Spline::init(const glm::vec2 points[NUM_POINTS]) {
             indices[i] = static_cast<GLuint>(i);
         }
         line_vao.init(indices, RENDER_STEPS, line_shader_vertices.data(),
-                      static_cast<GLuint>(line_shader_vertices.size()));
+                      static_cast<GLuint>(line_shader_vertices.size()),
+                      GL_DYNAMIC_DRAW);
 
         // Init point render data
         point_shader_vertices[0].pos = glm::vec4(points_[P1], 0.0f, 1.0f);
         point_shader_vertices[1].pos = glm::vec4(points_[P2], 0.0f, 1.0f);
 
         point_vao.init(indices, 2, point_shader_vertices.data(),
-                       static_cast<GLuint>(point_shader_vertices.size()));
+                       static_cast<GLuint>(point_shader_vertices.size()),
+                       GL_DYNAMIC_DRAW);
 
         vertices_initialized = true;
     }
@@ -243,9 +244,10 @@ void SplineEditor::init(const Entity* parent_, SplineSet* splines_,
         circle_indices[i] = static_cast<GLuint>(i);
     }
 
-    circle_vao.init(circle_indices, CIRCLE_SEGMENTS, nullptr, CIRCLE_SEGMENTS);
+    circle_vao.init(circle_indices, CIRCLE_SEGMENTS, nullptr, CIRCLE_SEGMENTS,
+                    GL_DYNAMIC_DRAW);
 
-    tangents_vao.init(circle_indices, 4, nullptr, 4);
+    tangents_vao.init(circle_indices, 4, nullptr, 4, GL_DYNAMIC_DRAW);
 }
 
 void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,

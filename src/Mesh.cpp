@@ -138,7 +138,8 @@ void Mesh::load_from_file(const char* file) {
     }
 
     bones_vao.init(bone_indices, static_cast<GLuint>(num_bone_indices), NULL,
-                   static_cast<GLuint>(bones_shader_vertices.size()));
+                   static_cast<GLuint>(bones_shader_vertices.size()),
+                   GL_DYNAMIC_DRAW);
 }
 
 Bone* Mesh::find_bone(const char* str) {

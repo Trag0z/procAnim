@@ -62,8 +62,6 @@ class Animator {
 
     Limb limbs[4];
 
-    VertexArray<DebugShader::Vertex> target_points_vao;
-
     float interpolation_factor_between_splines;
     float interpolation_factor_on_spline;
 

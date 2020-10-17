@@ -48,8 +48,6 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 }
 
 void Player::render(const Renderer& renderer) {
-    Mesh& rm = mesh;
-
     // Calculate bone transforms from their rotations
     glm::mat3 bone_transforms[RiggedShader::NUMBER_OF_BONES];
     SDL_assert(mesh.bones.size() < RiggedShader::NUMBER_OF_BONES);
@@ -66,7 +64,7 @@ void Player::render(const Renderer& renderer) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex.id);
 
-        rm.vao.draw(GL_TRIANGLES);
+        mesh.vao.draw(GL_TRIANGLES);
     }
 
     renderer.debug_shader.use();
@@ -78,31 +76,31 @@ void Player::render(const Renderer& renderer) {
         renderer.debug_shader.set_color(&Color::RED);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        rm.vao.draw(GL_TRIANGLES);
+        mesh.vao.draw(GL_TRIANGLES);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     // Render bones
     if (renderer.draw_bones) {
-        for (size_t i = 0; i < rm.bones.size(); ++i) {
-            rm.bones_shader_vertices[i * 2].pos =
+        for (size_t i = 0; i < mesh.bones.size(); ++i) {
+            mesh.bones_shader_vertices[i * 2].pos =
                 bone_transforms[i] *
-                rm.bones[i].bind_pose_transform[2]; // Renders (0.0f, 0.0f,
-                                                    // 0.0f) in the bones local
-                                                    // space
-            rm.bones_shader_vertices[i * 2 + 1].pos =
-                bone_transforms[i] * rm.bones[i].bind_pose_transform *
-                glm::vec3(rm.bones[i].tail, 1.0f);
+                mesh.bones[i].bind_pose_transform[2]; // Renders (0.0f, 0.0f,
+                                                      // 0.0f) in the bones
+                                                      // local space
+            mesh.bones_shader_vertices[i * 2 + 1].pos =
+                bone_transforms[i] * mesh.bones[i].bind_pose_transform *
+                glm::vec3(mesh.bones[i].tail, 1.0f);
         }
 
-        rm.bones_vao.update_vertex_data(rm.bones_shader_vertices);
+        mesh.bones_vao.update_vertex_data(mesh.bones_shader_vertices);
 
         renderer.debug_shader.set_color(&Color::BLUE);
 
         glLineWidth(2.0f);
-        rm.bones_vao.draw(GL_LINES);
+        mesh.bones_vao.draw(GL_LINES);
 
-        rm.bones_vao.draw(GL_POINTS);
+        mesh.bones_vao.draw(GL_POINTS);
     }
 
     // Render animator target positions

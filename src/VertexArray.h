@@ -10,7 +10,7 @@ template <typename vertex_t> class VertexArray {
   public:
     void init(const GLuint* indices, GLuint num_indices,
               const vertex_t* vertices, GLuint num_vertices,
-              GLenum usage = GL_DYNAMIC_DRAW) {
+              GLenum usage = GL_STATIC_DRAW) {
         // Template specifications for acceptable vertex types are defined
         // in Shaders.h. If this function overload is called, something went
         // wrong.
