@@ -29,7 +29,7 @@ struct Bone {
 
 struct Mesh {
     VertexArray<RiggedShader::Vertex> vao;
-    VertexArray<RiggedDebugShader::Vertex> bones_vao;
+    VertexArray<BoneShader::Vertex> bones_vao;
 
     std::vector<Bone> bones;
 

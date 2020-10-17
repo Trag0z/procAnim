@@ -17,9 +17,7 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
 
 void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
                     const MouseKeyboardInput& input) {
-
-    //////          Walking animation           //////
-    auto stick = gamepad->stick(StickID::LEFT);
+    auto stick_input = gamepad->stick(StickID::LEFT);
 
     if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
         if ((input.key(SDL_SCANCODE_LEFT) && facing_right) ||
@@ -28,10 +26,10 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
             facing_right = !facing_right;
             scale.x *= -1.0f;
         }
-    } else if (stick.x != 0.0f) {
-        walking_speed = std::abs(stick.x);
-        if ((stick.x < 0.0f && facing_right) ||
-            (stick.x > 0.0f && !facing_right)) {
+    } else if (stick_input.x != 0.0f) {
+        walking_speed = std::abs(stick_input.x);
+        if ((stick_input.x < 0.0f && facing_right) ||
+            (stick_input.x > 0.0f && !facing_right)) {
             facing_right = !facing_right;
             scale.x *= -1.0f;
             update_model_matrix();
@@ -82,9 +80,9 @@ void Player::render(const Renderer& renderer) {
 
     // Render bones
     if (renderer.draw_bones) {
-        renderer.rigged_debug_shader.set_model(&model);
-        renderer.rigged_debug_shader.set_color(&Color::RED);
-        renderer.rigged_debug_shader.set_bone_transforms(bone_transforms);
+        renderer.bone_shader.set_model(&model);
+        renderer.bone_shader.set_color(&Color::RED);
+        renderer.bone_shader.set_bone_transforms(bone_transforms);
 
         glLineWidth(2.0f);
         mesh.bones_vao.draw(GL_LINES);

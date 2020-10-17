@@ -136,7 +136,7 @@ void Mesh::load_from_file(const char* file) {
         bone_indices.push_back(i);
     }
 
-    std::vector<RiggedDebugShader::Vertex> bone_vertices;
+    std::vector<BoneShader::Vertex> bone_vertices;
     bone_vertices.reserve(mesh_data.mNumBones * 2);
     for (size_t i = 0; i < bones.size(); ++i) {
         bone_vertices.push_back({bones[i].bind_pose_transform[2]});

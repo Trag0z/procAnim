@@ -16,7 +16,7 @@ void Renderer::update_camera(const glm::vec2& center) {
     debug_shader.set_camera(&cam);
     textured_shader.set_camera(&cam);
     rigged_shader.set_camera(&cam);
-    rigged_debug_shader.set_camera(&cam);
+    bone_shader.set_camera(&cam);
 }
 
 void Renderer::init() {
@@ -29,8 +29,8 @@ void Renderer::init() {
     rigged_shader = RiggedShader("../src/shaders/rigged.vert",
                                  "../src/shaders/rigged.frag");
 
-    rigged_debug_shader = RiggedDebugShader("../src/shaders/rigged_debug.vert",
-                                            "../src/shaders/rigged_debug.frag");
+    bone_shader =
+        BoneShader("../src/shaders/bone.vert", "../src/shaders/bone.frag");
 }
 
 glm::vec2 Renderer::window_size() const noexcept { return window_size_; }

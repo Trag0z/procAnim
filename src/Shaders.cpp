@@ -153,20 +153,19 @@ void RiggedShader::set_bone_transforms(const glm::mat3* transforms) const {
                        (const GLfloat*)transforms);
 }
 
-//                  RiggedDebugShader                    //
-RiggedDebugShader::RiggedDebugShader(const char* vert_path,
-                                     const char* frag_path)
+//                  BoneShader                      //
+BoneShader::BoneShader(const char* vert_path, const char* frag_path)
     : Shader(vert_path, frag_path) {
     color_loc = glGetUniformLocation(id, "color");
     bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
 }
 
-void RiggedDebugShader::set_color(const Color* color) const {
+void BoneShader::set_color(const Color* color) const {
     use();
     glUniform4fv(color_loc, 1, (const GLfloat*)color);
 }
 
-void RiggedDebugShader::set_bone_transforms(const glm::mat3* transforms) const {
+void BoneShader::set_bone_transforms(const glm::mat3* transforms) const {
     use();
     glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
                        (const GLfloat*)transforms);

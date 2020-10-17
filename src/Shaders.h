@@ -78,15 +78,15 @@ class RiggedShader : public ShaderDetail::Shader {
     };
 };
 
-class RiggedDebugShader : public ShaderDetail::Shader {
+class BoneShader : public ShaderDetail::Shader {
     GLuint color_loc;
     GLuint bone_transforms_loc;
 
   public:
     static const size_t NUMBER_OF_BONES = 15;
 
-    RiggedDebugShader() {}
-    RiggedDebugShader(const char* vert_path, const char* frag_path);
+    BoneShader() {}
+    BoneShader(const char* vert_path, const char* frag_path);
 
     void set_color(const Color* color) const;
     void set_bone_transforms(const glm::mat3* transforms) const;
@@ -211,10 +211,10 @@ void VertexArray<RiggedShader::Vertex>::init(
     glEnableVertexAttribArray(3);
 }
 
-void VertexArray<RiggedDebugShader::Vertex>::init(
-    const GLuint* indices, GLuint num_indices,
-    const RiggedDebugShader::Vertex* vertices, GLuint num_vertices,
-    GLenum usage) {
+void VertexArray<BoneShader::Vertex>::init(const GLuint* indices,
+                                           GLuint num_indices,
+                                           const BoneShader::Vertex* vertices,
+                                           GLuint num_vertices, GLenum usage) {
 
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
@@ -232,13 +232,11 @@ void VertexArray<RiggedDebugShader::Vertex>::init(
     // Create vertex buffer
     glGenBuffers(1, &vbo_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER,
-                 sizeof(RiggedDebugShader::Vertex) * num_vertices_, vertices,
-                 usage);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(BoneShader::Vertex) * num_vertices_,
+                 vertices, usage);
 
     // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
-                          sizeof(RiggedDebugShader::Vertex),
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(BoneShader::Vertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
 }
