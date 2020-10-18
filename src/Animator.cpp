@@ -244,8 +244,6 @@ void Animator::set_new_splines(float walking_speed,
     spine_rotation_target =
         std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
 
-    step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
-
     auto find_highest_ground_at =
         [&colliders](glm::vec2 world_pos) -> glm::vec2 {
         glm::vec2 result = glm::vec2(world_pos.x, 0.0f);
@@ -349,6 +347,7 @@ void Animator::set_new_splines(float walking_speed,
         pelvis_spline.set_points(spline_points);
 
     } else { // leg_state != NEUTRAL
+        step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
 
         if (!parent->is_facing_right()) {
             step_distance_world *= -1.0f;

@@ -1,447 +1,441 @@
-<svg version="1.1"
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:svg="http://www.w3.org/2000/svg"
     xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink" width="1052" height="916">
-    <defs/>
-    <g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 120 16 L 808 16 L 808 912 L 120 912 L 120 16" stroke-miterlimit="10"/>
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="1052" height="916" id="svg2349" sodipodi:docname="AnimatorActivity.svg" inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+    <metadata id="metadata2353">
+        <rdf:RDF>
+            <cc:Work rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+            </cc:Work>
+        </rdf:RDF>
+    </metadata>
+    <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="3840" inkscape:window-height="2081" id="namedview2351" showgrid="false" inkscape:zoom="1.4574428" inkscape:cx="712.26878" inkscape:cy="387.62169" inkscape:window-x="-9" inkscape:window-y="-9" inkscape:window-maximized="1" inkscape:current-layer="g2347" />
+    <defs id="defs1409" />
+    <g id="g2347">
+
+        <g transform="translate(-6,-6) scale(1,1)" id="g1785">
+            <path fill="none" stroke="#000000" d="M 120 16 L 808 16 L 808 912 L 120 912 L 120 16" stroke-miterlimit="10" id="path1783" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 120 16 L 120 38 L 217.63720703125 38 L 228.63720703125 27 L 228.63720703125 16 L 120 16"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1789">
+            <path fill="#ffffff" stroke="none" d="M 120 16 L 120 38 L 217.63720703125 38 L 228.63720703125 27 L 228.63720703125 16 L 120 16" id="path1787" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 120 16 L 120 38 L 217.63720703125 38 L 228.63720703125 27 L 228.63720703125 16 L 120 16 L 120 16" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1793">
+            <path fill="none" stroke="#000000" d="M 120 16 L 120 38 L 217.63720703125 38 L 228.63720703125 27 L 228.63720703125 16 L 120 16 L 120 16" stroke-miterlimit="10" id="path1791" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="160.6181640625" y="33.5">Animator</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1801">
+            <g id="g1799">
+                <path fill="none" stroke="none" id="path1795" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="160.6181640625" y="33.5" id="text1797">Animator</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="125" y="33.5">class</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1809">
+            <g id="g1807">
+                <path fill="none" stroke="none" id="path1803" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="125" y="33.5" id="text1805">class</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 824 16 L 1048 16 L 1048 912 L 824 912 L 824 16" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1813">
+            <path fill="none" stroke="#000000" d="M 824 16 L 1048 16 L 1048 912 L 824 912 L 824 16" stroke-miterlimit="10" id="path1811" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 824 16 L 824 38 L 905.75537109375 38 L 916.75537109375 27 L 916.75537109375 16 L 824 16"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1817">
+            <path fill="#ffffff" stroke="none" d="M 824 16 L 824 38 L 905.75537109375 38 L 916.75537109375 27 L 916.75537109375 16 L 824 16" id="path1815" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 824 16 L 824 38 L 905.75537109375 38 L 916.75537109375 27 L 916.75537109375 16 L 824 16 L 824 16" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1821">
+            <path fill="none" stroke="#000000" d="M 824 16 L 824 38 L 905.75537109375 38 L 916.75537109375 27 L 916.75537109375 16 L 824 16 L 824 16" stroke-miterlimit="10" id="path1819" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="864.6181640625" y="33.5">Spline</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1829">
+            <g id="g1827">
+                <path fill="none" stroke="none" id="path1823" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="864.6181640625" y="33.5" id="text1825">Spline</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="829" y="33.5">class</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1837">
+            <g id="g1835">
+                <path fill="none" stroke="none" id="path1831" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="829" y="33.5" id="text1833">class</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <rect fill="#ffffff" stroke="none" x="136" y="48" width="320" height="21"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1841">
+            <rect fill="#ffffff" stroke="none" x="136" y="48" width="320" height="21" id="rect1839" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 136 48 L 456 48 L 456 69 L 136 69 L 136 48 Z Z" stroke-miterlimit="10" stroke-width="2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1845">
+            <path fill="none" stroke="#000000" d="M 136 48 L 456 48 L 456 69 L 136 69 L 136 48 Z Z" stroke-miterlimit="10" stroke-width="2" id="path1843" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 136 904 L 136 48 L 456 48 L 456 904" stroke-miterlimit="10" stroke-width="2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1849">
+            <path fill="none" stroke="#000000" d="M 136 904 L 136 48 L 456 48 L 456 904" stroke-miterlimit="10" stroke-width="2" id="path1847" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="169.177001953125" y="65">update(delta_time, walking_speed, coliders)</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1857">
+            <g id="g1855">
+                <path fill="none" stroke="none" id="path1851" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="169.177001953125" y="65" id="text1853">update(delta_time, walking_speed, coliders)</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 209 167 L 353.3271484375 167 Q 363.3271484375 167 363.3271484375 177 L 363.3271484375 210 Q 363.3271484375 220 353.3271484375 220 L 209 220 Q 199 220 199 210 L 199 177 Q 199 167 209 167 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1861">
+            <path fill="#C0C0C0" stroke="none" d="M 209 167 L 353.3271484375 167 Q 363.3271484375 167 363.3271484375 177 L 363.3271484375 210 Q 363.3271484375 220 353.3271484375 220 L 209 220 Q 199 220 199 210 L 199 177 Q 199 167 209 167 Z" opacity="0.2" id="path1859" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 202 160 L 346.3271484375 160 Q 356.3271484375 160 356.3271484375 170 L 356.3271484375 203 Q 356.3271484375 213 346.3271484375 213 L 202 213 Q 192 213 192 203 L 192 170 Q 192 160 202 160 Z"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1865">
+            <path fill="#ffffff" stroke="none" d="M 202 160 L 346.3271484375 160 Q 356.3271484375 160 356.3271484375 170 L 356.3271484375 203 Q 356.3271484375 213 346.3271484375 213 L 202 213 Q 192 213 192 203 L 192 170 Q 192 160 202 160 Z" id="path1863" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 202 160 L 346.3271484375 160 Q 356.3271484375 160 356.3271484375 170 L 356.3271484375 203 Q 356.3271484375 213 346.3271484375 213 L 202 213 Q 192 213 192 203 L 192 170 Q 192 160 202 160 Z" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1869">
+            <path fill="none" stroke="#000000" d="M 202 160 L 346.3271484375 160 Q 356.3271484375 160 356.3271484375 170 L 356.3271484375 203 Q 356.3271484375 213 346.3271484375 213 L 202 213 Q 192 213 192 203 L 192 170 Q 192 160 202 160 Z" stroke-miterlimit="10" id="path1867" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="235.1318359375" y="179.5">leg_state neu</text>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="242.37451171875" y="192.5">bestimmen</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1879">
+            <g id="g1877">
+                <path fill="none" stroke="none" id="path1871" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="235.1318359375" y="179.5" id="text1873">leg_state neu</text>
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="242.37451171875" y="192.5" id="text1875">bestimmen</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 159 119.5 L 175.5 103 L 191 119.5 L 175.5 135 L 159 119.5" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1883">
+            <path fill="#C0C0C0" stroke="none" d="M 159 119.5 L 175.5 103 L 191 119.5 L 175.5 135 L 159 119.5" opacity="0.2" id="path1881" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 152 112 L 168 96 L 184 112 L 168 128 L 152 112"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1887">
+            <path fill="#ffffff" stroke="none" d="M 152 112 L 168 96 L 184 112 L 168 128 L 152 112" id="path1885" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 152 112 L 168 96 L 184 112 L 168 128 L 152 112 L 152 112" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1891">
+            <path fill="none" stroke="#000000" d="M 152 112 L 168 96 L 184 112 L 168 128 L 152 112 L 152 112" stroke-miterlimit="10" id="path1889" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 184 113 L 280 113 L 280 160" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1895">
+            <path fill="none" stroke="#000000" d="M 184 113 L 280 113 L 280 160" stroke-miterlimit="10" id="path1893" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 275.790482243984 149.83732514237585 L 280 160 L 284.209517756016 149.83732514237585" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1899">
+            <path fill="none" stroke="#000000" d="M 275.790482243984 149.83732514237585 L 280 160 L 284.209517756016 149.83732514237585" stroke-miterlimit="10" id="path1897" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="281.71923828125" y="138.5">[Schritt beendet oder stehend</text>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="298.518310546875" y="151.5">und walking_speed &gt; 0]</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1909">
+            <g id="g1907">
+                <path fill="none" stroke="none" id="path1901" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="281.71923828125" y="138.5" id="text1903">[Schritt beendet oder stehend</text>
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="298.518310546875" y="151.5" id="text1905">und walking_speed &gt; 0]</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 201 367 L 429 367 Q 439 367 439 377 L 439 410 Q 439 420 429 420 L 201 420 Q 191 420 191 410 L 191 377 Q 191 367 201 367 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1913">
+            <path fill="#C0C0C0" stroke="none" d="M 201 367 L 429 367 Q 439 367 439 377 L 439 410 Q 439 420 429 420 L 201 420 Q 191 420 191 410 L 191 377 Q 191 367 201 367 Z" opacity="0.2" id="path1911" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 194 360 L 422 360 Q 432 360 432 370 L 432 403 Q 432 413 422 413 L 194 413 Q 184 413 184 403 L 184 370 Q 184 360 194 360 Z"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1917">
+            <path fill="#ffffff" stroke="none" d="M 194 360 L 422 360 Q 432 360 432 370 L 432 403 Q 432 413 422 413 L 194 413 Q 184 413 184 403 L 184 370 Q 184 360 194 360 Z" id="path1915" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 194 360 L 422 360 Q 432 360 432 370 L 432 403 Q 432 413 422 413 L 194 413 Q 184 413 184 403 L 184 370 Q 184 360 194 360 Z" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1921">
+            <path fill="none" stroke="#000000" d="M 194 360 L 422 360 Q 432 360 432 370 L 432 403 Q 432 413 422 413 L 194 413 Q 184 413 184 403 L 184 370 Q 184 360 194 360 Z" stroke-miterlimit="10" id="path1919" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="200.677001953125" y="379.5">interpolation_factor_between_splines</text>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="263.56005859375" y="392.5">neu bestimmen</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1931">
+            <g id="g1929">
+                <path fill="none" stroke="none" id="path1923" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="200.677001953125" y="379.5" id="text1925">interpolation_factor_between_splines</text>
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="263.56005859375" y="392.5" id="text1927">neu bestimmen</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 280 213 L 280 256" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1935">
+            <path fill="none" stroke="#000000" d="M 280 213 L 280 256" stroke-miterlimit="10" id="path1933" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 275.790482243984 245.83732514237585 L 280 256 L 284.209517756016 245.83732514237585" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1939">
+            <path fill="none" stroke="#000000" d="M 275.790482243984 245.83732514237585 L 280 256 L 284.209517756016 245.83732514237585" stroke-miterlimit="10" id="path1937" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 280 288 L 280 360" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1943">
+            <path fill="none" stroke="#000000" d="M 280 288 L 280 360" stroke-miterlimit="10" id="path1941" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 275.790482243984 349.83732514237585 L 280 360 L 284.209517756016 349.83732514237585" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1947">
+            <path fill="none" stroke="#000000" d="M 275.790482243984 349.83732514237585 L 280 360 L 284.209517756016 349.83732514237585" stroke-miterlimit="10" id="path1945" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="190.721435546875" y="330.5">[nicht stehend]</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1955">
+            <g id="g1953">
+                <path fill="none" stroke="none" id="path1949" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="190.721435546875" y="330.5" id="text1951">[nicht stehend]</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <rect fill="#ffffff" stroke="none" x="472" y="48" width="320" height="21"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1959">
+            <rect fill="#ffffff" stroke="none" x="472" y="48" width="320" height="21" id="rect1957" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 472 48 L 792 48 L 792 69 L 472 69 L 472 48 Z Z" stroke-miterlimit="10" stroke-width="2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1963">
+            <path fill="none" stroke="#000000" d="M 472 48 L 792 48 L 792 69 L 472 69 L 472 48 Z Z" stroke-miterlimit="10" stroke-width="2" id="path1961" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 472 904 L 472 48 L 792 48 L 792 904" stroke-miterlimit="10" stroke-width="2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1967">
+            <path fill="none" stroke="#000000" d="M 472 904 L 472 48 L 792 48 L 792 904" stroke-miterlimit="10" stroke-width="2" id="path1965" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="509.156982421875" y="65">set_new_splines(walking_speed, colliders)</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1975">
+            <g id="g1973">
+                <path fill="none" stroke="none" id="path1969" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="509.156982421875" y="65" id="text1971">set_new_splines(walking_speed, colliders)</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 505 367 L 773 367 Q 783 367 783 377 L 783 410 Q 783 420 773 420 L 505 420 Q 495 420 495 410 L 495 377 Q 495 367 505 367 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1979">
+            <path fill="#C0C0C0" stroke="none" d="M 505 367 L 773 367 Q 783 367 783 377 L 783 410 Q 783 420 773 420 L 505 420 Q 495 420 495 410 L 495 377 Q 495 367 505 367 Z" opacity="0.2" id="path1977" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 498 360 L 766 360 Q 776 360 776 370 L 776 403 Q 776 413 766 413 L 498 413 Q 488 413 488 403 L 488 370 Q 488 360 498 360 Z"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1983">
+            <path fill="#ffffff" stroke="none" d="M 498 360 L 766 360 Q 776 360 776 370 L 776 403 Q 776 413 766 413 L 498 413 Q 488 413 488 403 L 488 370 Q 488 360 498 360 Z" id="path1981" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 498 360 L 766 360 Q 776 360 776 370 L 776 403 Q 776 413 766 413 L 498 413 Q 488 413 488 403 L 488 370 Q 488 360 498 360 Z" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1987">
+            <path fill="none" stroke="#000000" d="M 498 360 L 766 360 Q 776 360 776 370 L 776 403 Q 776 413 766 413 L 498 413 Q 488 413 488 403 L 488 370 Q 488 360 498 360 Z" stroke-miterlimit="10" id="path1985" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="556.472412109375" y="379.5">spine_rotation_target  und</text>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="551.78466796875" y="392.5">step_distance_world setzen</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g1997">
+            <g id="g1995">
+                <path fill="none" stroke="none" id="path1989" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="556.472412109375" y="379.5" id="text1991">spine_rotation_target  und</text>
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="551.78466796875" y="392.5" id="text1993">step_distance_world setzen</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 432 384 L 488 384" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2001">
+            <path fill="none" stroke="#000000" d="M 432 384 L 488 384" stroke-miterlimit="10" id="path1999" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 477.83732514237585 388.209517756016 L 488 384 L 477.83732514237585 379.790482243984" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2005">
+            <path fill="none" stroke="#000000" d="M 477.83732514237585 388.209517756016 L 488 384 L 477.83732514237585 379.790482243984" stroke-miterlimit="10" id="path2003" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 296 272 L 616 272 L 616 360" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2009">
+            <path fill="none" stroke="#000000" d="M 296 272 L 616 272 L 616 360" stroke-miterlimit="10" id="path2007" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 611.790482243984 349.83732514237585 L 616 360 L 620.209517756016 349.83732514237585" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2013">
+            <path fill="none" stroke="#000000" d="M 611.790482243984 349.83732514237585 L 616 360 L 620.209517756016 349.83732514237585" stroke-miterlimit="10" id="path2011" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="319.5" y="267.5">[stehend]</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2021">
+            <g id="g2019">
+                <path fill="none" stroke="none" id="path2015" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="319.5" y="267.5" id="text2017">[stehend]</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <rect fill="#ffffff" stroke="none" x="471" y="584" width="17" height="17"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2025">
+            <path fill="#C0C0C0" stroke="none" d="M 505 583 L 773 583 Q 783 583 783 593 L 783 613 Q 783 623 773 623 L 505 623 Q 495 623 495 613 L 495 593 Q 495 583 505 583 Z" opacity="0.2" id="path2023" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 471 584 L 488 584 L 488 601 L 471 601 L 471 584 Z Z" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2029">
+            <path fill="#ffffff" stroke="none" d="M 498 576 L 766 576 Q 776 576 776 586 L 776 606 Q 776 616 766 616 L 498 616 Q 488 616 488 606 L 488 586 Q 488 576 498 576 Z" id="path2027" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 473 592 L 486 592" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2033">
+            <path fill="none" stroke="#000000" d="M 498 576 L 766 576 Q 776 576 776 586 L 776 606 Q 776 616 766 616 L 498 616 Q 488 616 488 606 L 488 586 Q 488 576 498 576 Z" stroke-miterlimit="10" id="path2031" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 486 592 L 483 589" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 486 592 L 483 595" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="436.53369140625" y="583.5">InputPin1</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2041">
+            <g id="g2039">
+                <path fill="none" stroke="none" id="path2035" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="540.590576171875" y="595.5" id="text2037">Neue Spline-Punkte bestimmen</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 505 583 L 773 583 Q 783 583 783 593 L 783 613 Q 783 623 773 623 L 505 623 Q 495 623 495 613 L 495 593 Q 495 583 505 583 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2045">
+            <path fill="#C0C0C0" stroke="none" d="M 31 119 C 31 110.1634432 38.1634432 103 47 103 C 55.8365568 103 63 110.1634432 63 119 C 63 127.8365568 55.8365568 135 47 135 C 38.1634432 135 31 127.8365568 31 119 Z" opacity="0.2" id="path2043" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 498 576 L 766 576 Q 776 576 776 586 L 776 606 Q 776 616 766 616 L 498 616 Q 488 616 488 606 L 488 586 Q 488 576 498 576 Z"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2049">
+            <path fill="#000000" stroke="none" d="M 24 112 C 24 103.1634432 31.1634432 96 40 96 C 48.8365568 96 56 103.1634432 56 112 C 56 120.8365568 48.8365568 128 40 128 C 31.1634432 128 24 120.8365568 24 112 Z" id="path2047" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 498 576 L 766 576 Q 776 576 776 586 L 776 606 Q 776 616 766 616 L 498 616 Q 488 616 488 606 L 488 586 Q 488 576 498 576 Z" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2053">
+            <path fill="none" stroke="#000000" d="M 56 113 L 152 113" stroke-miterlimit="10" id="path2051" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="540.590576171875" y="595.5">Neue Spline-Punkte bestimmen</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2057">
+            <path fill="none" stroke="#000000" d="M 141.83732514237585 117.20951775601598 L 152 113 L 141.83732514237585 108.79048224398402" stroke-miterlimit="10" id="path2055" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2061">
+            <path fill="#C0C0C0" stroke="none" d="M 535 455.5 L 551.5 439 L 567 455.5 L 551.5 471 L 535 455.5" opacity="0.2" id="path2059" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2065">
+            <path fill="#ffffff" stroke="none" d="M 528 448 L 544 432 L 560 448 L 544 464 L 528 448" id="path2063" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2069">
+            <path fill="none" stroke="#000000" d="M 528 448 L 544 432 L 560 448 L 544 464 L 528 448 L 528 448" stroke-miterlimit="10" id="path2067" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2073">
+            <path fill="#C0C0C0" stroke="none" d="M 633 487 L 773 487 Q 783 487 783 497 L 783 543 Q 783 553 773 553 L 633 553 Q 623 553 623 543 L 623 497 Q 623 487 633 487 Z" opacity="0.2" id="path2071" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2077">
+            <path fill="#ffffff" stroke="none" d="M 626 480 L 766 480 Q 776 480 776 490 L 776 536 Q 776 546 766 546 L 626 546 Q 616 546 616 536 L 616 490 Q 616 480 626 480 Z" id="path2075" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2081">
+            <path fill="none" stroke="#000000" d="M 626 480 L 766 480 Q 776 480 776 490 L 776 536 Q 776 546 766 546 L 626 546 Q 616 546 616 536 L 616 490 Q 616 480 626 480 Z" stroke-miterlimit="10" id="path2079" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2093">
+            <g id="g2091">
+                <path fill="none" stroke="none" id="path2083" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="668.54638671875" y="499.5" id="text2085">Zwischen</text>
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="644.330078125" y="512.5" id="text2087">Spline-Prototypen</text>
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="660.227783203125" y="525.5" id="text2089">interpolieren</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 31 119 C 31 110.1634432 38.1634432 103 47 103 C 55.8365568 103 63 110.1634432 63 119 C 63 127.8365568 55.8365568 135 47 135 C 38.1634432 135 31 127.8365568 31 119 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2097">
+            <path fill="none" stroke="#000000" d="M 544 413 L 544 432" stroke-miterlimit="10" id="path2095" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#000000" stroke="none" d="M 24 112 C 24 103.1634432 31.1634432 96 40 96 C 48.8365568 96 56 103.1634432 56 112 C 56 120.8365568 48.8365568 128 40 128 C 31.1634432 128 24 120.8365568 24 112 Z"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2101">
+            <path fill="none" stroke="#000000" d="M 539.790482243984 421.83732514237585 L 544 432 L 548.209517756016 421.83732514237585" stroke-miterlimit="10" id="path2099" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 56 113 L 152 113" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2105">
+            <path fill="none" stroke="#000000" d="M 544 464 L 544 576" stroke-miterlimit="10" id="path2103" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 141.83732514237585 117.20951775601598 L 152 113 L 141.83732514237585 108.79048224398402" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2109">
+            <path fill="none" stroke="#000000" d="M 539.790482243984 565.8373251423759 L 544 576 L 548.209517756016 565.8373251423759" stroke-miterlimit="10" id="path2107" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 535 455.5 L 551.5 439 L 567 455.5 L 551.5 471 L 535 455.5" opacity="0.2"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 528 448 L 544 432 L 560 448 L 544 464 L 528 448"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 528 448 L 544 432 L 560 448 L 544 464 L 528 448 L 528 448" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 633 487 L 773 487 Q 783 487 783 497 L 783 543 Q 783 553 773 553 L 633 553 Q 623 553 623 543 L 623 497 Q 623 487 633 487 Z" opacity="0.2"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 626 480 L 766 480 Q 776 480 776 490 L 776 536 Q 776 546 766 546 L 626 546 Q 616 546 616 536 L 616 490 Q 616 480 626 480 Z"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 626 480 L 766 480 Q 776 480 776 490 L 776 536 Q 776 546 766 546 L 626 546 Q 616 546 616 536 L 616 490 Q 616 480 626 480 Z" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="668.54638671875" y="499.5">Zwischen</text>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="644.330078125" y="512.5">Spline-Prototypen</text>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="660.227783203125" y="525.5">interpolieren</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2117">
+            <g id="g2115">
+                <path fill="none" stroke="none" id="path2111" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="487.5" y="515.5" id="text2113">[stehend]</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 544 413 L 544 432" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2121">
+            <path fill="none" stroke="#000000" d="M 560 448 L 696 448 L 696 480" stroke-miterlimit="10" id="path2119" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 539.790482243984 421.83732514237585 L 544 432 L 548.209517756016 421.83732514237585" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2125">
+            <path fill="none" stroke="#000000" d="M 691.790482243984 469.83732514237585 L 696 480 L 700.209517756016 469.83732514237585" stroke-miterlimit="10" id="path2123" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 544 464 L 544 576" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 539.790482243984 565.8373251423759 L 544 576 L 548.209517756016 565.8373251423759" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="487.5" y="515.5">[stehend]</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2133">
+            <g id="g2131">
+                <path fill="none" stroke="none" id="path2127" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="605.5" y="467.5" id="text2129">[nicht stehend]</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 560 448 L 696 448 L 696 480" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2137">
+            <rect fill="#ffffff" stroke="none" x="840" y="48" width="192" height="21" id="rect2135" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 691.790482243984 469.83732514237585 L 696 480 L 700.209517756016 469.83732514237585" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2141">
+            <path fill="none" stroke="#000000" d="M 840 48 L 1032 48 L 1032 69 L 840 69 L 840 48 Z Z" stroke-miterlimit="10" stroke-width="2" id="path2139" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="605.5" y="467.5">[nicht stehend]</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2145">
+            <path fill="none" stroke="#000000" d="M 840 904 L 840 48 L 1032 48 L 1032 904" stroke-miterlimit="10" stroke-width="2" id="path2143" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2153">
+            <g id="g2151">
+                <path fill="none" stroke="none" id="path2147" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="869.156005859375" y="65" id="text2149">set_points(new_points)</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <rect fill="#ffffff" stroke="none" x="840" y="48" width="192" height="21"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2157">
+            <path fill="none" stroke="#000000" d="M 656 546 L 656 576" stroke-miterlimit="10" id="path2155" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 840 48 L 1032 48 L 1032 69 L 840 69 L 840 48 Z Z" stroke-miterlimit="10" stroke-width="2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2161">
+            <path fill="none" stroke="#000000" d="M 651.790482243984 565.8373251423759 L 656 576 L 660.209517756016 565.8373251423759" stroke-miterlimit="10" id="path2159" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 840 904 L 840 48 L 1032 48 L 1032 904" stroke-miterlimit="10" stroke-width="2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2165">
+            <path fill="none" stroke="#000000" d="M 776 600 L 856 600" stroke-miterlimit="10" id="path2163" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="normal" text-decoration="none" x="869.156005859375" y="65">set_points(new_points)</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2169">
+            <path fill="none" stroke="#000000" d="M 845.8373251423759 604.209517756016 L 856 600 L 845.8373251423758 595.790482243984" stroke-miterlimit="10" id="path2167" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2173">
+            <path fill="none" stroke="#000000" d="M 936 613 L 936 664 L 776 664" stroke-miterlimit="10" id="path2171" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2177">
+            <path fill="none" stroke="#000000" d="M 786.1626748576241 659.790482243984 L 776 664 L 786.1626748576241 668.209517756016" stroke-miterlimit="10" id="path2175" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2181">
+            <path fill="#C0C0C0" stroke="none" d="M 169 694 L 437 694 Q 447 694 447 704 L 447 724 Q 447 734 437 734 L 169 734 Q 159 734 159 724 L 159 704 Q 159 694 169 694 Z" opacity="0.2" id="path2179" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2185">
+            <path fill="#ffffff" stroke="none" d="M 162 687 L 430 687 Q 440 687 440 697 L 440 717 Q 440 727 430 727 L 162 727 Q 152 727 152 717 L 152 697 Q 152 687 162 687 Z" id="path2183" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2189">
+            <path fill="none" stroke="#000000" d="M 162 687 L 430 687 Q 440 687 440 697 L 440 717 Q 440 727 430 727 L 162 727 Q 152 727 152 717 L 152 697 Q 152 687 162 687 Z" stroke-miterlimit="10" id="path2187" />
+        </g>
+        <g transform="translate(-16.291999,-6)" id="g2197">
+            <g id="g2195">
+                <path id="path2191" d="" inkscape:connector-curvature="0" style="fill:none;stroke:none" />
+                <text font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="170.97339" y="706.5" id="text2193" style="font-style:normal;font-weight:bold;font-size:13px;font-family:Arial;text-decoration:none;text-decoration-line:none;fill:#000000;stroke:none">interpolation_factor_on_spline aktualisieren</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 656 546 L 656 576" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2201">
+            <path fill="none" stroke="#000000" d="M 168 128 L 168 687" stroke-miterlimit="10" id="path2199" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 651.790482243984 565.8373251423759 L 656 576 L 660.209517756016 565.8373251423759" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2205">
+            <path fill="none" stroke="#000000" d="M 163.790482243984 676.8373251423759 L 168 687 L 172.209517756016 676.8373251423759" stroke-miterlimit="10" id="path2203" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 776 600 L 856 600" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2209">
+            <path fill="none" stroke="#000000" d="M 603 693 L 603 719 L 440 719" stroke-miterlimit="10" id="path2207" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 845.8373251423759 604.209517756016 L 856 600 L 845.8373251423758 595.790482243984" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2213">
+            <path fill="none" stroke="#000000" d="M 450.16267485762415 714.790482243984 L 440 719 L 450.16267485762415 723.209517756016" stroke-miterlimit="10" id="path2211" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 936 613 L 936 664 L 776 664" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2217">
+            <path fill="#C0C0C0" stroke="none" d="M 169 767 L 437 767 Q 447 767 447 777 L 447 797 Q 447 807 437 807 L 169 807 Q 159 807 159 797 L 159 777 Q 159 767 169 767 Z" opacity="0.2" id="path2215" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 786.1626748576241 659.790482243984 L 776 664 L 786.1626748576241 668.209517756016" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2221">
+            <path fill="#ffffff" stroke="none" d="M 162 760 L 430 760 Q 440 760 440 770 L 440 790 Q 440 800 430 800 L 162 800 Q 152 800 152 790 L 152 770 Q 152 760 162 760 Z" id="path2219" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 169 695 L 437 695 Q 447 695 447 705 L 447 725 Q 447 735 437 735 L 169 735 Q 159 735 159 725 L 159 705 Q 159 695 169 695 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2225">
+            <path fill="none" stroke="#000000" d="M 162 760 L 430 760 Q 440 760 440 770 L 440 790 Q 440 800 430 800 L 162 800 Q 152 800 152 790 L 152 770 Q 152 760 162 760 Z" stroke-miterlimit="10" id="path2223" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 162 688 L 430 688 Q 440 688 440 698 L 440 718 Q 440 728 430 728 L 162 728 Q 152 728 152 718 L 152 698 Q 152 688 162 688 Z"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 162 688 L 430 688 Q 440 688 440 698 L 440 718 Q 440 728 430 728 L 162 728 Q 152 728 152 718 L 152 698 Q 152 688 162 688 Z" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="170.973388671875" y="707.5">interpolation_factor_on_spline aktualisieren</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2233">
+            <g id="g2231">
+                <path fill="none" stroke="none" id="path2227" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="216.50830078125" y="779.5" id="text2229">spine-Rotation interpolieren</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 168 128 L 168 688" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2237">
+            <path fill="none" stroke="#000000" d="M 283 727 L 283 760" stroke-miterlimit="10" id="path2235" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 163.790482243984 677.8373251423759 L 168 688 L 172.209517756016 677.8373251423759" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2241">
+            <path fill="none" stroke="#000000" d="M 278.790482243984 749.8373251423759 L 283 760 L 287.209517756016 749.8373251423759" stroke-miterlimit="10" id="path2239" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 603 693 L 603 719 L 440 719" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2245">
+            <path fill="none" stroke="#000000" d="M 280 800 L 280 832" stroke-miterlimit="10" id="path2243" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 450.16267485762415 714.790482243984 L 440 719 L 450.16267485762415 723.209517756016" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2249">
+            <path fill="none" stroke="#000000" d="M 275.790482243984 821.8373251423759 L 280 832 L 284.209517756016 821.8373251423759" stroke-miterlimit="10" id="path2247" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 169 767 L 437 767 Q 447 767 447 777 L 447 797 Q 447 807 437 807 L 169 807 Q 159 807 159 797 L 159 777 Q 159 767 169 767 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2253">
+            <path fill="#C0C0C0" stroke="none" d="M 271 279.5 L 287.5 263 L 303 279.5 L 287.5 295 L 271 279.5" opacity="0.2" id="path2251" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 162 760 L 430 760 Q 440 760 440 770 L 440 790 Q 440 800 430 800 L 162 800 Q 152 800 152 790 L 152 770 Q 152 760 162 760 Z"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2257">
+            <path fill="#ffffff" stroke="none" d="M 264 272 L 280 256 L 296 272 L 280 288 L 264 272" id="path2255" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 162 760 L 430 760 Q 440 760 440 770 L 440 790 Q 440 800 430 800 L 162 800 Q 152 800 152 790 L 152 770 Q 152 760 162 760 Z" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2261">
+            <path fill="none" stroke="#000000" d="M 264 272 L 280 256 L 296 272 L 280 288 L 264 272 L 264 272" stroke-miterlimit="10" id="path2259" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="216.50830078125" y="779.5">spine-Rotation interpolieren</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2265">
+            <path fill="#C0C0C0" stroke="none" d="M 505 647 L 773 647 Q 783 647 783 657 L 783 690 Q 783 700 773 700 L 505 700 Q 495 700 495 690 L 495 657 Q 495 647 505 647 Z" opacity="0.2" id="path2263" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2269">
+            <path fill="#ffffff" stroke="none" d="M 498 640 L 766 640 Q 776 640 776 650 L 776 683 Q 776 693 766 693 L 498 693 Q 488 693 488 683 L 488 650 Q 488 640 498 640 Z" id="path2267" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2273">
+            <path fill="none" stroke="#000000" d="M 498 640 L 766 640 Q 776 640 776 650 L 776 683 Q 776 693 766 693 L 498 693 Q 488 693 488 683 L 488 650 Q 488 640 498 640 Z" stroke-miterlimit="10" id="path2271" />
+        </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2283">
+            <g id="g2281">
+                <path fill="none" stroke="none" id="path2275" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="529.00927734375" y="659.5" id="text2277">interpolation_factor_on_spline auf 0</text>
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="593.70458984375" y="672.5" id="text2279">zurücksetzen</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 283 728 L 283 760" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2287">
+            <path fill="#C0C0C0" stroke="none" d="M 873 567 L 1013 567 Q 1023 567 1023 577 L 1023 610 Q 1023 620 1013 620 L 873 620 Q 863 620 863 610 L 863 577 Q 863 567 873 567 Z" opacity="0.2" id="path2285" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 278.790482243984 749.8373251423759 L 283 760 L 287.209517756016 749.8373251423759" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2291">
+            <path fill="#ffffff" stroke="none" d="M 866 560 L 1006 560 Q 1016 560 1016 570 L 1016 603 Q 1016 613 1006 613 L 866 613 Q 856 613 856 603 L 856 570 Q 856 560 866 560 Z" id="path2289" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 280 800 L 280 832" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2295">
+            <path fill="none" stroke="#000000" d="M 866 560 L 1006 560 Q 1016 560 1016 570 L 1016 603 Q 1016 613 1006 613 L 866 613 Q 856 613 856 603 L 856 570 Q 856 560 866 560 Z" stroke-miterlimit="10" id="path2293" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 275.790482243984 821.8373251423759 L 280 832 L 284.209517756016 821.8373251423759" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 271 279.5 L 287.5 263 L 303 279.5 L 287.5 295 L 271 279.5" opacity="0.2"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 264 272 L 280 256 L 296 272 L 280 288 L 264 272"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 264 272 L 280 256 L 296 272 L 280 288 L 264 272 L 264 272" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 505 647 L 773 647 Q 783 647 783 657 L 783 690 Q 783 700 773 700 L 505 700 Q 495 700 495 690 L 495 657 Q 495 647 505 647 Z" opacity="0.2"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 498 640 L 766 640 Q 776 640 776 650 L 776 683 Q 776 693 766 693 L 498 693 Q 488 693 488 683 L 488 650 Q 488 640 498 640 Z"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 498 640 L 766 640 Q 776 640 776 650 L 776 683 Q 776 693 766 693 L 498 693 Q 488 693 488 683 L 488 650 Q 488 640 498 640 Z" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="529.00927734375" y="659.5">interpolation_factor_on_spline auf 0</text>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="593.70458984375" y="672.5">zurücksetzen</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2305">
+            <g id="g2303">
+                <path fill="none" stroke="none" id="path2297" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="873.497802734375" y="579.5" id="text2299">Matrizen und Vertices</text>
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="899.50732421875" y="592.5" id="text2301">aktualisieren</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 873 567 L 1013 567 Q 1023 567 1023 577 L 1023 610 Q 1023 620 1013 620 L 873 620 Q 863 620 863 610 L 863 577 Q 863 567 873 567 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2309">
+            <path fill="#C0C0C0" stroke="none" d="M 169 839 L 437 839 Q 447 839 447 849 L 447 869 Q 447 879 437 879 L 169 879 Q 159 879 159 869 L 159 849 Q 159 839 169 839 Z" opacity="0.2" id="path2307" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 866 560 L 1006 560 Q 1016 560 1016 570 L 1016 603 Q 1016 613 1006 613 L 866 613 Q 856 613 856 603 L 856 570 Q 856 560 866 560 Z"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2313">
+            <path fill="#ffffff" stroke="none" d="M 162 832 L 430 832 Q 440 832 440 842 L 440 862 Q 440 872 430 872 L 162 872 Q 152 872 152 862 L 152 842 Q 152 832 162 832 Z" id="path2311" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 866 560 L 1006 560 Q 1016 560 1016 570 L 1016 603 Q 1016 613 1006 613 L 866 613 Q 856 613 856 603 L 856 570 Q 856 560 866 560 Z" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2317">
+            <path fill="none" stroke="#000000" d="M 162 832 L 430 832 Q 440 832 440 842 L 440 862 Q 440 872 430 872 L 162 872 Q 152 872 152 862 L 152 842 Q 152 832 162 832 Z" stroke-miterlimit="10" id="path2315" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="873.497802734375" y="579.5">Matrizen und Vertices</text>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="899.50732421875" y="592.5">aktualisieren</text>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2325">
+            <g id="g2323">
+                <path fill="none" stroke="none" id="path2319" />
+                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="223.74462890625" y="851.5" id="text2321">Inverse Kinematics lösen</text>
             </g>
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 169 839 L 437 839 Q 447 839 447 849 L 447 869 Q 447 879 437 879 L 169 879 Q 159 879 159 869 L 159 849 Q 159 839 169 839 Z" opacity="0.2"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2329">
+            <path fill="#C0C0C0" stroke="none" d="M 23 903 C 23 894.1634432 30.1634432 887 39 887 C 47.8365568 887 55 894.1634432 55 903 C 55 911.8365568 47.8365568 919 39 919 C 30.1634432 919 23 911.8365568 23 903 Z" opacity="0.2" id="path2327" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#ffffff" stroke="none" d="M 162 832 L 430 832 Q 440 832 440 842 L 440 862 Q 440 872 430 872 L 162 872 Q 152 872 152 862 L 152 842 Q 152 832 162 832 Z"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2333">
+            <path fill="none" stroke="#000000" d="M 16 896 C 16 887.1634432 23.1634432 880 32 880 C 40.8365568 880 48 887.1634432 48 896 C 48 904.8365568 40.8365568 912 32 912 C 23.1634432 912 16 904.8365568 16 896 Z" stroke-miterlimit="10" id="path2331" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 162 832 L 430 832 Q 440 832 440 842 L 440 862 Q 440 872 430 872 L 162 872 Q 152 872 152 862 L 152 842 Q 152 832 162 832 Z" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2337">
+            <path fill="#000000" stroke="none" d="M 21 896 C 21 889.9248672 25.9248672 885 32 885 C 38.0751328 885 43 889.9248672 43 896 C 43 902.0751328 38.0751328 907 32 907 C 25.9248672 907 21 902.0751328 21 896 Z" id="path2335" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <g>
-                <path fill="none" stroke="none"/>
-                <text fill="#000000" stroke="none" font-family="Arial" font-size="13px" font-style="normal" font-weight="bold" text-decoration="none" x="223.74462890625" y="851.5">Inverse Kinematics lösen</text>
-            </g>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2341">
+            <path fill="none" stroke="#000000" d="M 280 872 L 280 897 L 48 897" stroke-miterlimit="10" id="path2339" />
         </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#C0C0C0" stroke="none" d="M 23 903 C 23 894.1634432 30.1634432 887 39 887 C 47.8365568 887 55 894.1634432 55 903 C 55 911.8365568 47.8365568 919 39 919 C 30.1634432 919 23 911.8365568 23 903 Z" opacity="0.2"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 16 896 C 16 887.1634432 23.1634432 880 32 880 C 40.8365568 880 48 887.1634432 48 896 C 48 904.8365568 40.8365568 912 32 912 C 23.1634432 912 16 904.8365568 16 896 Z" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="#000000" stroke="none" d="M 21 896 C 21 889.9248672 25.9248672 885 32 885 C 38.0751328 885 43 889.9248672 43 896 C 43 902.0751328 38.0751328 907 32 907 C 25.9248672 907 21 902.0751328 21 896 Z"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 280 872 L 280 897 L 48 897" stroke-miterlimit="10"/>
-        </g>
-        <g transform="translate(-6,-6) scale(1,1)">
-            <path fill="none" stroke="#000000" d="M 58.162674857624154 892.790482243984 L 48 897 L 58.162674857624154 901.209517756016" stroke-miterlimit="10"/>
+        <g transform="translate(-6,-6) scale(1,1)" id="g2345">
+            <path fill="none" stroke="#000000" d="M 58.162674857624154 892.790482243984 L 48 897 L 58.162674857624154 901.209517756016" stroke-miterlimit="10" id="path2343" />
         </g>
     </g>
 </svg>

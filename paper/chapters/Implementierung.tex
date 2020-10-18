@@ -37,7 +37,7 @@ Da der Charakter über Untergründe verschiedener Höhen laufen können soll, wu
 
 \lstinline{Player} repräsentiert den Spielercharakter und ist eine Unterklasse von \lstinline{Entity}. Er besitzt ein \lstinline{Mesh}, das wiederum aus einer Reihe von Vertices und Knochen besteht. Zusammen mit der Textur bietet es die Grundlage für die visuelle Darstellung des Charakters. Kontrolliert wird letzterer hauptsächlich mit den Inputdaten des \lstinline{Gamepad}.
 
-Der \lstinline{Animator} steuert die Bewegungen des Spielercharakters und bildet somit den Kern der Anwendung. Er beinhaltet Repräsentationen der vier Gliedmaßen des Spielers in \lstinline{limbs} und Splines, an denen die Bewegungsabläufe orientiert werden in \lstinline{spline_prototypes}. Der genaue Ablauf des Animationsprozesses wird im Abschnitt \ref{animator_section} ausführlich erklärt.
+Der \lstinline{Animator} steuert die Bewegungen des Spielercharakters und bildet somit den Kern der Anwendung. Er beinhaltet Repräsentationen der vier Gliedmaßen des Spielers in \lstinline{limbs} und Splines, an denen die Bewegungsabläufe orientiert werden in \lstinline{spline_prototypes}. Der genaue Ablauf des Animationsprozesses wird in Abschnitt \ref{animator_section} ausführlich erklärt.
 
 
 \subsection{Rendering und Shader} \label{rendering_section}
@@ -61,6 +61,23 @@ Der BoneShader zeichnet die Knochen des Modells. Seine Input-Vertices sollten je
 
 Nur die Klassen \lstinline{Mesh}, \lstinline{Background} und \lstinline{Spline} verwenden eigene Vertex-Arrays auf der GPU. Nur \lstinline{Spline} verändert diese Daten nach der Initialisierung noch, die anderen beiden transformieren die Vertices nur noch durch Uniforms.
 
-\section{Animator} \label{animator_section}
+\section{Animation} \label{animator_section}
+Zur Animation des Charakters bestimmt der \lstinline{Player} in seiner Update-Methode zunächst die aktuelle Bewegungsgeschwindigkeit anhand der Eingaben des Spielers. Sollte der Charakter gerade in die entgegengesetzte Richtung der Eingabe blicken, wird außerdem das Modell an der Y-Achse gespiegelt. Daraufhin ruft der \lstinline{Player} die Update-Methode des Animators auf und gibt dabei die Bewegungsgeschwindigkeit -- zusammen mit einer Liste der Collider im Level und dem Faktor \lstinline{delta_time}, der die vergangene Zeit seit dem letzten Simulationsschritt angibt -- als Argumente weiter.
+
+Ein Aktivitätsdiagramm der nun folgenden Abläufe zur Animation des Charakters ist in Abb. \ref{uml_activity} zu sehen. Der Animator bestimmt zunächst anhand der Bewegungsgeschwindigkeit und des aktuellen Animationszustands, ob eine neue Animation bestimmt werden muss. Ist dies der Fall, wird der neue Animationszustand in \lstinline{leg_state} gespeichert und die Methode \lstinline{set_new_splines} aufgerufen, die daraufhin die nächste Animation berechnet.
+
+In der genannten Methode wird dann als erstes anhand der Laufgeschwindigkeit eine Zielrotation für den Rücken des Charakters bestimmt. Diese dient dazu, dass letzterer sich beim Rennen in die Bewegung hinein lehnt. Um flüssige Bewegungsabläufe zu gewährleisten wird dieser Wert nicht direkt als Rotation des entsprechenden Knochens gesetzt, sondern als Zielwert zu dem der Knochen dann hin interpoliert.
+
+Daraufhin wird zwischen zwei verschiedenen Fällen unterschieden, die unterschiedliche Animationen erfordern: Entweder der Charakter steht still, oder er bewegt sich.
+
+Anhand der Bewegungsgeschwindigkeit wird auch bestimmt, wie weit sich der Spieler mit dem nächsten Schritt nach vorne bewegen soll.
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/AnimatorActivity.pdf}
+    \caption{Aktivitätsdiagramm des Animationsprozesses}
+    \label{uml_activity}
+\end{figure}
 
 \subsection{Anpassung der Bewegungen}
