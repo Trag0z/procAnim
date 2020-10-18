@@ -50,7 +50,7 @@ void Mesh::load_from_file(const char* file) {
             {glm::vec2(vertex_data[i].x, vertex_data[i].y),
              {uv_coords[i].x, 1.0f - uv_coords[i].y},
              {0, 0},
-             {0.0f, 0.0f}}); // Or 0.5f, 0.5f?
+             {0.0f, 0.0f}});
     }
 
     std::vector<GLuint> indices;
@@ -112,6 +112,7 @@ void Mesh::load_from_file(const char* file) {
     memset(vertex_bone_counts, 0, shader_vertices.size() * sizeof(size_t));
 
     for (auto this_weight : weight_data) {
+        // Maximum 2 bones per vertex allowed, skip if there are two already
         size_t bone_count = vertex_bone_counts[this_weight.vert_index];
         if (bone_count == RiggedShader::MAX_BONES_PER_VERTEX)
             continue;

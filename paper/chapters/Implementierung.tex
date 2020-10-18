@@ -18,7 +18,7 @@ Um viele der grundlegenden Prozesse im Programm zu vereinfachen und schon gut ge
 Bei \href{https://glm.g-truc.net/0.9.9/index.html}{GLM} handelt es sich um eine Mathematik-Bibliothek für C++, die der Namensgebung und Funktionalität von GLSL entspricht und deren Datenformate so aufgebaut sind, dass sie den von GLSL erwarteten Formaten entsprechen. Die von GLM bereitgestellten Matrix- und Vektorklassen und die Funktionen, die mit ihnen arbeiten, werden für Berechnungen auf der CPU sowie zum Hochladen von Daten in den GPU-Speicher verwendet.
 
 \subsection{Simple DirectMedia Layer (SDL)}
-\href{https://www.libsdl.org/index.php}{SDL} ist eine leichtgewichtige C-Bibliothek, die das Erstellen und Verwalten eines Fensters und dazugehörigen OpenGL-Kontexts unter Windows stark vereinfacht. Außerdem bietet sie mit simplen Funktionen Zugang zu Maus-, Tastatur- und Gamepad-Inputs. Des Weiteren wird die dazugehörige Bibliothek \href{https://www.libsdl.org/projects/SDL_image/}{SDL_image} zum Laden von Bildern im PNG-Format verwendet.
+\href{https://www.libsdl.org/index.php}{SDL} ist eine leichtgewichtige C-Bibliothek, die das Erstellen und Verwalten eines Fensters und dazugehörigen OpenGL-Kontexts unter Windows stark vereinfacht. Außerdem bietet sie mit simplen Funktionen Zugang zu Maus-, Tastatur- und Gamepad-Inputs. Des Weiteren wird die dazugehörige Bibliothek \href{https://www.libsdl.org/projects/SDL_image/}{SDL\_image} zum Laden von Bildern im PNG-Format verwendet.
 
 \subsection{Open Asset Import Library (Assimp)}
 Das Skelett des zu animierenden Charakters und damit zusammenhängend auch das Mesh sowie die UV-Koordinaten und Bone-Weights liegen dem Programm im FBX-Format vor.\href{http://assimp.org/}{Assimp} ermöglicht es, dieses Dateiformat zu parsen und dabei einige Post-Processing Operationen wie das Vereinigen identischer Vertices durchzuführen.
@@ -29,7 +29,7 @@ Bei \href{https://github.com/ocornut/imgui}{Dear ImGui} handelt es sich um eine 
 \section{Aufbau des Programms}
 Das UML-Klassendiagramm in \ref{} zeigt den generellen Aufbau der Anwendung. Im Zentrum steht dabei die Klasse \lstinline{Game}, die auf hoher Ebene den Ablauf koordiniert und die verschiedenen Komponenten der Simulation verwaltet. Ihre Methode \lstinline{init()} initialisiert alle nötigen Systeme und erstellt das Fenster, sodass das Programm in einem geeigneten Ausgangszustand ist. Die Methode \lstinline{run()} berechnet den nächsten Simulationsschritt und zeichnet das Ergebnis auf den Bildschirm.
 
-Zum Zeichnen der Grafiken und Verwalten der Shader wird \lstinline{Renderer} verwendet. Er lädt bei seiner Initialisierung die drei verschiedenen Shader-Programme, die in der Anwendung zum Einsatz kommen und besitzt jeweils ein Objekt der drei entsprechenden Shader-Klassen \lstinline{RiggedShader}, \lstinline{TexturedShader} und \lstinline{DebugShader}. Die verschiedenen Shader und ihre Anwendungsgebiete werden in Abschnitt \ref{rendering_section} ausführlicher beschrieben.
+Zum Zeichnen der Grafiken und Verwalten der Shader wird \lstinline{Renderer} verwendet. Er lädt bei seiner Initialisierung die drei verschiedenen Shader-Programme, die in der Anwendung zum Einsatz kommen und besitzt jeweils ein Objekt der vier entsprechenden Shader-Klassen \lstinline{DebugShader}, \lstinline{TexturedShader}, \lstinline{RiggedShader} und \lstinline{BoneShader}. Die verschiedenen Shader und ihre Anwendungsgebiete werden in Abschnitt \ref{rendering_section} ausführlicher beschrieben.
 
 Die Klassen \lstinline {MouseKeyboardInput} und \lstinline{Gamepad} verwalten die verschiedenen Eingabemöglichkeiten und werden zu Beginn jedes Frames aktualisiert. Bei \lstinline{Background} handelt es sich um eine sehr einfache Klasse, die nur dafür zuständig ist, eine Textur als Hintergrund zu rendern. Der Hintergrund stellt einen Referenzpunkt für die Bewegungen des Charakters da und erleichtert so die Beurteilung der Animationen.
 
@@ -41,20 +41,25 @@ Der \lstinline{Animator} steuert die Bewegungen des Spielercharakters und bildet
 
 
 \subsection{Rendering und Shader} \label{rendering_section}
-Alle Klassen, die grafische Objekte in der Simulation darstellen, haben eine Methode \lstinline{void render(const Renderer&)} (eventuell noch mit weiteren Parametern), mit der sie sich selbst auf den Bildschirm zeichnen. Die Objekte wählen dann einen der drei verschiedenen Shader aus, indem sie auf dem entsprechenden Member-Objekt des Renderers \lstinline{use()} aufrufen und setzen gegebenenfalls noch Uniform-Variablen. Die zu rendernden Vertexdaten halten die Objekte in einer Instanziierung des Templates \lstinline{VertexArray<>} mit dem zum Shader passenden Vertextyp als Template-Argument. Sie rufen auf diesem VertexArray \lstinline{draw(GLenum mode)} auf, um die Vertices im entsprechenden Modus zeichnen zu lassen.
+Alle Klassen, die grafische Objekte in der Simulation darstellen, haben eine Methode \lstinline{void render(const Renderer&)} (eventuell noch mit weiteren Parametern), mit der sie sich selbst auf den Bildschirm zeichnen. Die Objekte wählen dann einen der vier verschiedenen Shader aus, indem sie auf dem entsprechenden Member-Objekt des Renderers \lstinline{use()} aufrufen und setzen gegebenenfalls noch Uniform-Variablen. Die zu rendernden Vertexdaten halten die Objekte in einer Instanziierung des Templates \lstinline{VertexArray<>} mit dem zum Shader passenden Vertextyp als Template-Argument. Sie rufen auf diesem VertexArray \lstinline{draw(GLenum mode)} auf, um die Vertices im entsprechenden Modus zeichnen zu lassen.
 
-Die drei verfügbaren Shader sind:
+Die vier verfügbaren Shader sind:
 \begin{enumerate}
     \item \lstinline{DebugShader}
     \item \lstinline{TexturedShader}
     \item \lstinline{RiggedShader}
+    \item \lstinline{BoneShader}
 \end{enumerate}
 
-Der Debug-Shader wird hauptsächlich zur Visualisierung von Debug-Informationen verwendet. Es kann eine Farbe für die zu rendernden Primitive in Form einer Uniform-Variable eingestellt werden; Texturen werden nicht verwendet. Das Vertexformat dieses Shaders besteht nur aus einem zweidimensionalen Vektor zur Angabe der Vertexposition. Außerdem gibt es die statische Variable \lstinline{DEFAULT_VAO}, die ein simples Vertex Array zur Darstellung von quadratischen Objekten anbietet. Diese müssen so nicht ihre eigenen Vertices im Arbeitsspeicher der GPU verwalten, sondern können die beschriebenen Vertices verwenden und mithilfe der Model-Matrix beliebig transformieren.
+Der DebugShader wird hauptsächlich zur Visualisierung von Debug-Informationen verwendet. Es kann eine Farbe für die zu rendernden Primitive in Form einer Uniform-Variable eingestellt werden; Texturen werden nicht verwendet. Das Vertexformat dieses Shaders besteht nur aus einem zweidimensionalen Vektor zur Angabe der Vertexposition. Außerdem gibt es die statische Variable \lstinline{DEFAULT_VAO}, die ein simples Vertex Array zur Darstellung von quadratischen Objekten anbietet. Diese müssen so nicht ihre eigenen Vertices im Arbeitsspeicher der GPU verwalten, sondern können die beschriebenen Vertices verwenden und mithilfe der Model-Matrix beliebig transformieren.
 
-Der Textured-Shader kommt beim Rendering von texturierten Objekten zum Einsatz. Seine Vertices enthalten deshalb neben der Position noch eine Texturkoordinate.
+Bei texturierten Objekten kommt der TexturedShader zum Einsatz. Seine Vertices enthalten deshalb neben der Position noch eine Texturkoordinate; er funktioniert ansonsten aber sehr ähnlich wie der DebugShader.
 
-Nur Animator, Mesh, Spline und Background haben eigene Vertices
+Soll ein animierter Charakter mit Skelett gerendert werden, wird der RiggedShader verwendet. Er ist der komplexeste der hier verwendeten Shader und transformiert die Vertices anhand der ihnen zugeordneten Knochen. Seine Input-Vertices bestehen deshalb aus vier Komponenten: Neben Position und Texturkoordinate noch die Indizes der zwei Knochen, die diesen Vertex beeinflussen, und die dazugehörigen Gewichtungen. Die Transformationsmatrizen der verschiedenen Knochen werden vor dem Rendering auf der CPU berechnet und als Uniform-Variable auf die GPU hochgeladen, wo der Shader dann auf sie zugreifen kann.
+
+Der BoneShader zeichnet die Knochen des Modells. Seine Input-Vertices sollten jeweils Head- und Tail-Position der Knochen des Modells sein. Die Vertices sollten in der gleichen Reihenfolge wie die Knochen des Modells vorliegen, denn der Shader verwendet die gleichen Bone-Transformationsmatrizen wie der RiggedShader und berechnet den Index des zu verwendenden Knochens aus dem Index des Vertices (geteilt durch Zwei). So können die Vertices wie beim DebugShader lediglich aus einem zweidimensionalen Vektor zur Angabe der Position bestehen.
+
+Nur die Klassen \lstinline{Mesh}, \lstinline{Background} und \lstinline{Spline} verwenden eigene Vertex-Arrays auf der GPU. Nur \lstinline{Spline} verändert diese Daten nach der Initialisierung noch, die anderen beiden transformieren die Vertices nur noch durch Uniforms.
 
 \section{Animator} \label{animator_section}
 

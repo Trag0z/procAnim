@@ -15,7 +15,7 @@ void Background::init(const char* texture_path) {
     vertices[2] = {{tex.dimensions.x, tex.dimensions.y}, {1.0f, 1.0f}};
     vertices[3] = {{tex.dimensions.x, 0.0f}, {1.0f, 0.0f}};
 
-    vao.init(indices, 6, vertices, 4);
+    vao.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
 }
 
 void Background::render(const Renderer& renderer, glm::vec2 camera_position) {
