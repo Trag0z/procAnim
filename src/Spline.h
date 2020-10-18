@@ -16,7 +16,7 @@ class Spline {
     static const size_t NUM_POINTS = 4;
 
     // Points in format P1, T1, T2, P2
-    void init(const glm::vec2 points_[NUM_POINTS] = nullptr);
+    void init(const glm::vec2 points[NUM_POINTS] = nullptr);
     void render(const Renderer& renderer, bool draw_points = false) const;
 
     const glm::vec2& point(SplinePointName p) const;
@@ -29,9 +29,7 @@ class Spline {
     void update_render_data();
     glm::vec2 get_point_on_spline(float t) const;
 
-    const glm::mat4 HERMITE_MATRIX = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
-                                      -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
-                                      1.0f,  0.0f,  0.0f, 0.0f};
+    static const glm::mat4 HERMITE_MATRIX;
 
   private:
     static const size_t RENDER_STEPS = 50;
@@ -93,6 +91,7 @@ class SplineEditor {
     void save_splines(bool get_new_file_path = false);
     void load_splines(const std::string& path);
 
+    // TODO: document?
     void set_spline_point(glm::vec2 p,
                           size_t point_index = static_cast<size_t>(-1),
                           size_t spline_index = static_cast<size_t>(-1),

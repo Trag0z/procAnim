@@ -27,7 +27,7 @@ Das Skelett des zu animierenden Charakters und damit zusammenhängend auch das M
 Bei \href{https://github.com/ocornut/imgui}{Dear ImGui} handelt es sich um eine Implementierung des Immediate Mode GUI Paradigmas. Es ermöglicht die Darstellung von grafischen Interfaces im bestehenden OpenGL-Kontext und wird hier verwendet, um ein Debug-Informationen anzuzeigen, die erstellten Tools zu kontrollieren und einige Variablen der Simulation zur Laufzeit ändern zu können.
 
 \section{Aufbau des Programms}
-Das UML-Klassendiagramm in \ref{} zeigt den generellen Aufbau der Anwendung. Im Zentrum steht dabei die Klasse \lstinline{Game}, die auf hoher Ebene den Ablauf koordiniert und die verschiedenen Komponenten der Simulation verwaltet. Ihre Methode \lstinline{init()} initialisiert alle nötigen Systeme und erstellt das Fenster, sodass das Programm in einem geeigneten Ausgangszustand ist. Die Methode \lstinline{run()} berechnet den nächsten Simulationsschritt und zeichnet das Ergebnis auf den Bildschirm.
+Das UML-Klassendiagramm in Abb. \ref{uml_classes} zeigt den generellen Aufbau der Anwendung. Im Zentrum steht dabei die Klasse \lstinline{Game}, die auf hoher Ebene den Ablauf koordiniert und die verschiedenen Komponenten der Simulation verwaltet. Ihre Methode \lstinline{init()} initialisiert alle nötigen Systeme und erstellt das Fenster, sodass das Programm in einem geeigneten Ausgangszustand ist. Die Methode \lstinline{run()} berechnet den nächsten Simulationsschritt und zeichnet das Ergebnis auf den Bildschirm.
 
 Zum Zeichnen der Grafiken und Verwalten der Shader wird \lstinline{Renderer} verwendet. Er lädt bei seiner Initialisierung die drei verschiedenen Shader-Programme, die in der Anwendung zum Einsatz kommen und besitzt jeweils ein Objekt der vier entsprechenden Shader-Klassen \lstinline{DebugShader}, \lstinline{TexturedShader}, \lstinline{RiggedShader} und \lstinline{BoneShader}. Die verschiedenen Shader und ihre Anwendungsgebiete werden in Abschnitt \ref{rendering_section} ausführlicher beschrieben.
 
@@ -72,6 +72,13 @@ Daraufhin wird zwischen zwei verschiedenen Fällen unterschieden, die unterschie
 
 Anhand der Bewegungsgeschwindigkeit wird auch bestimmt, wie weit sich der Spieler mit dem nächsten Schritt nach vorne bewegen soll.
 
+\begin{landscape}
+    \begin{figure}
+        \includegraphics[width=\linewidth]{images/ClassDiagram.pdf}
+        \caption{Objektdiagramm des gesamten Programms. Einige Assoziationen wurden der Übersichtlichkeit wegen ausgelassen.}
+        \label{uml_classes}
+    \end{figure}
+\end{landscape}
 
 \begin{figure}
     \centering
@@ -81,3 +88,6 @@ Anhand der Bewegungsgeschwindigkeit wird auch bestimmt, wie weit sich der Spiele
 \end{figure}
 
 \subsection{Anpassung der Bewegungen}
+
+
+

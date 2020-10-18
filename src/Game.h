@@ -44,6 +44,11 @@ struct GameConfig {
 class Game {
   public:
     bool is_running = false;
+
+    void init();
+    void run();
+
+  private:
     u32 frame_start, last_frame_start;
 
     GameConfig game_config;
@@ -66,9 +71,5 @@ class Game {
 
     enum GameMode { PLAY = 0, SPLINE_EDITOR = 1, LEVEL_EDITOR = 2 } game_mode;
 
-    void init();
-    void run();
-
-  private:
     void update_gui();
 };

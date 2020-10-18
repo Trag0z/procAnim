@@ -8,6 +8,7 @@ class MouseKeyboardInput;
 class LevelEditor;
 
 class Level {
+    // TODO: comment about how lists are bad
     std::list<BoxCollider> colliders_;
     std::string opened_path;
 

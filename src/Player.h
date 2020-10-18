@@ -10,7 +10,7 @@ class Gamepad;
 struct BoxCollider;
 
 class Player : public Entity {
-    Texture tex;
+    Texture texture;
     Mesh mesh;
     Animator animator;
     const Gamepad* gamepad;

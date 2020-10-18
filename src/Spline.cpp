@@ -8,6 +8,10 @@
 /////               Spline              /////
 /////                                   /////
 
+const glm::mat4 Spline::HERMITE_MATRIX = {2.0f,  -2.0f, 1.0f, 1.0f, -3.0f, 3.0f,
+                                          -2.0f, -1.0f, 0.0f, 0.0f, 1.0f,  0.0f,
+                                          1.0f,  0.0f,  0.0f, 0.0f};
+
 void Spline::init(const glm::vec2 points[NUM_POINTS]) {
     if (points != nullptr) {
         memcpy_s(points_, 4 * sizeof(glm::vec2), points, 4 * sizeof(glm::vec2));

@@ -8,7 +8,7 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
                   const char* texture_path, const char* mesh_path,
                   const Gamepad* pad, const std::list<BoxCollider>& colliders) {
     Entity::init(position, scale_);
-    tex.load_from_file(texture_path);
+    texture.load_from_file(texture_path);
     mesh.load_from_file(mesh_path);
     animator.init(this, mesh, colliders);
     SDL_assert(pad);
@@ -60,7 +60,7 @@ void Player::render(const Renderer& renderer) {
     // Render player model
     if (renderer.draw_models) {
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tex.id);
+        glBindTexture(GL_TEXTURE_2D, texture.id);
 
         mesh.vao.draw(GL_TRIANGLES);
     }
