@@ -17,8 +17,9 @@ static void move_spline_points(glm::vec2* dst, const glm::vec2* src,
 }
 
 // Takes a target_pos in model space and sets bone rotations so that the tail of
-// bone[1] is at (or at the closest possible point to) target_pos.
-static void solve_ik(Bone* const bones[2], glm::vec2 target_pos, bool is_leg) {
+// bone[1] is at (or at the closest possible point to) target_pos_model_space.
+static void solve_ik(Bone* const bones[2], glm::vec2 target_pos_model_space,
+                     bool is_leg) {
     SDL_assert(bones != nullptr);
 
     // This algorithm assumes that the angle between the bones in bind pose is
@@ -31,13 +32,14 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos, bool is_leg) {
                 bones[1]->bind_pose_transform *
                     glm::vec3(bones[1]->tail, 1.0f))) < 0.1f);
 
-    float target_distance = glm::length(bones[0]->head() - target_pos);
+    float target_distance =
+        glm::length(bones[0]->head() - target_pos_model_space);
 
     if (target_distance > bones[0]->length + bones[1]->length) {
         glm::vec2 local_target_pos =
             glm::vec2(bones[0]->inverse_bind_pose_transform *
                       glm::inverse(bones[0]->parent->transform()) *
-                      glm::vec3(target_pos, 1.0f));
+                      glm::vec3(target_pos_model_space, 1.0f));
 
         bones[0]->rotation =
             atan2f(local_target_pos.y, local_target_pos.x) - PI * 0.5f;
@@ -50,9 +52,10 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos, bool is_leg) {
         for (size_t i = 0; i < 2; ++i) {
             Bone& b = *bones[i];
 
-            local_target[i] = glm::vec2(b.inverse_bind_pose_transform *
-                                        glm::inverse(b.parent->transform()) *
-                                        glm::vec3(target_pos, 1.0f));
+            local_target[i] =
+                glm::vec2(b.inverse_bind_pose_transform *
+                          glm::inverse(b.parent->transform()) *
+                          glm::vec3(target_pos_model_space, 1.0f));
             local_target2[i] = local_target[i] * local_target[i];
 
             length2[i] = b.length * b.length;
@@ -241,6 +244,8 @@ void Animator::set_new_splines(float walking_speed,
     spine_rotation_target =
         std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
 
+    step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
+
     auto find_highest_ground_at =
         [&colliders](glm::vec2 world_pos) -> glm::vec2 {
         glm::vec2 result = glm::vec2(world_pos.x, 0.0f);
@@ -275,17 +280,18 @@ void Animator::set_new_splines(float walking_speed,
     };
 
     if (leg_state == NEUTRAL) {
-        static bool moving_forward = true;
+        static bool moving_forward =
+            true; // Indicates whether the idle spline should be traversed
+                  // forwards or backwards
 
         if (interpolation_factor_on_spline == 1.0f) {
             moving_forward = !moving_forward;
         }
 
         if (last_leg_state != NEUTRAL) {
+            // Charakter just stopped walking
             moving_forward = false;
         }
-
-        step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
 
         // Arms
         Spline* prototype = moving_forward
@@ -343,7 +349,6 @@ void Animator::set_new_splines(float walking_speed,
         pelvis_spline.set_points(spline_points);
 
     } else { // leg_state != NEUTRAL
-        step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
 
         if (!parent->is_facing_right()) {
             step_distance_world *= -1.0f;

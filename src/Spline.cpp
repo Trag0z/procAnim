@@ -110,8 +110,8 @@ void Spline::update_render_data() {
         static_cast<GLuint>(line_shader_vertices.size()));
 
     // Points
-    point_shader_vertices[0].pos = glm::vec4(points_[P1], 0.0f, 1.0f);
-    point_shader_vertices[1].pos = glm::vec4(points_[P2], 0.0f, 1.0f);
+    point_shader_vertices[0].pos = points_[P1];
+    point_shader_vertices[1].pos = points_[P2];
 
     point_vao.update_vertex_data(
         point_shader_vertices.data(),
