@@ -56,9 +56,7 @@ class Animator {
     float step_distance_world;
     float spine_rotation_target;
 
-    struct {
-        float local, world;
-    } pelvis_height;
+    float pelvis_height;
 
     Limb limbs[4];
 
@@ -72,12 +70,12 @@ class Animator {
     } leg_state,
         last_leg_state;
 
-    static const float MAX_SPINE_ROTATION;
-    float STEP_DISTANCE_MULTIPLIER = 100.0f;
+    float step_distance_multiplier = 100.0f;
+    float max_spine_rotation = 0.25f;
 
     struct InterpolationSpeedMultiplier {
-        float MIN = 0.02f, MAX = 0.08f;
-    } INTERPOLATION_SPEED_MULTIPLIER;
+        float min = 0.02f, max = 0.08f;
+    } interpolation_speed_multiplier;
 
     void set_new_splines(float walking_speed,
                          const std::list<BoxCollider>& colliders);

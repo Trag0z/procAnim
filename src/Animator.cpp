@@ -91,8 +91,6 @@ float Limb::length() const { return bones[0]->length + bones[1]->length; }
 //          Animator        //
 //                          //
 
-const float Animator::MAX_SPINE_ROTATION = -0.25f * PI;
-
 void Animator::init(const Player* parent_, Mesh& mesh,
                     const std::list<BoxCollider>& colliders) {
     parent = parent_;
@@ -129,9 +127,9 @@ void Animator::init(const Player* parent_, Mesh& mesh,
     spine = mesh.find_bone("Spine");
     pelvis_spline.init(spline_prototypes.idle[PELVIS].points());
 
-    pelvis_height.local = limbs[LEFT_LEG].length();
-    pelvis_height.world =
-        parent->local_to_world_scale(glm::vec2(0.0f, pelvis_height.local)).y;
+    pelvis_height =
+        parent->local_to_world_scale(glm::vec2(0.0f, limbs[LEFT_LEG].length()))
+            .y;
 
     set_new_splines(0.0f, colliders);
 }
@@ -176,9 +174,9 @@ void Animator::update(float delta_time, float walking_speed,
 
     // Update limbs
     float interpolation_speed =
-        INTERPOLATION_SPEED_MULTIPLIER.MIN +
-        walking_speed * (INTERPOLATION_SPEED_MULTIPLIER.MAX -
-                         INTERPOLATION_SPEED_MULTIPLIER.MIN);
+        interpolation_speed_multiplier.min +
+        walking_speed * (interpolation_speed_multiplier.max -
+                         interpolation_speed_multiplier.min);
 
     if (leg_state == NEUTRAL && last_leg_state != NEUTRAL) {
         // Transitioning to neutral, make this go extra quick
@@ -242,7 +240,7 @@ void Animator::set_new_splines(float walking_speed,
                                const std::list<BoxCollider>& colliders) {
     // Lean in walking direction when walking fast/running
     spine_rotation_target =
-        std::max(walking_speed - 0.2f, 0.0f) * MAX_SPINE_ROTATION;
+        std::max(walking_speed - 0.2f, 0.0f) * max_spine_rotation * -PI;
 
     auto find_highest_ground_at =
         [&colliders](glm::vec2 world_pos) -> glm::vec2 {
@@ -330,7 +328,7 @@ void Animator::set_new_splines(float walking_speed,
         spline_to_world_space(spline_points);
 
         float new_pelvis_height =
-            std::min(ground_left.y, ground_right.y) + pelvis_height.world;
+            std::min(ground_left.y, ground_right.y) + pelvis_height;
 
         move_spline_points(
             spline_points, spline_points,
@@ -347,7 +345,7 @@ void Animator::set_new_splines(float walking_speed,
         pelvis_spline.set_points(spline_points);
 
     } else { // leg_state != NEUTRAL
-        step_distance_world = walking_speed * STEP_DISTANCE_MULTIPLIER;
+        step_distance_world = walking_speed * step_distance_multiplier;
 
         if (!parent->is_facing_right()) {
             step_distance_world *= -1.0f;
@@ -377,7 +375,7 @@ void Animator::set_new_splines(float walking_speed,
         move_spline_points(spline_points, spline_points,
                            limbs[forward_arm].origin());
         spline_to_world_space(spline_points);
-        // spline_points[P1] = limbs[forward_arm].spline.get_point(P2);
+        // spline_points[P1] = limbs[forward_arm].spline.get_point(P2); // TODO:
         spline_points[P2].x += step_distance_world;
         limbs[forward_arm].spline.set_points(spline_points);
 
@@ -385,7 +383,8 @@ void Animator::set_new_splines(float walking_speed,
         move_spline_points(spline_points, spline_points,
                            limbs[backward_arm].origin());
         spline_to_world_space(spline_points);
-        // spline_points[P1] = limbs[backward_arm].spline.get_point(P2);
+        // spline_points[P1] = limbs[backward_arm].spline.get_point(P2); //
+        // TODO:
         spline_points[P2].x += step_distance_world;
         limbs[backward_arm].spline.set_points(spline_points);
 
@@ -430,7 +429,7 @@ void Animator::set_new_splines(float walking_speed,
                                     backward_leg_target_point.y) *
                                        0.5f;
         spline_points[P2].y +=
-            average_leg_height + pelvis_height.world - parent->position().y;
+            average_leg_height + pelvis_height - parent->position().y;
 
         pelvis_spline.set_points(spline_points);
     }

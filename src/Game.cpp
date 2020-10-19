@@ -234,23 +234,25 @@ void Game::update_gui() {
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
-    SetNextItemWidth(100);
-    DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
-    SetNextItemWidth(100);
-    DragFloat("Step distance multiplier",
-              &player.animator.STEP_DISTANCE_MULTIPLIER);
-    SetNextItemWidth(100);
-    DragFloat2("Interpolation speed min/max",
-               &player.animator.INTERPOLATION_SPEED_MULTIPLIER.MIN, 0.01f);
-
-    NewLine();
     Checkbox("Step mode", &game_config.step_mode);
+    PushItemWidth(100);
+    DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
 
     NewLine();
     Text("Mode");
     RadioButton("Play", (int*)&game_mode, GameMode::PLAY);
     RadioButton("Spline editor", (int*)&game_mode, GameMode::SPLINE_EDITOR);
     RadioButton("Level editor", (int*)&game_mode, GameMode::LEVEL_EDITOR);
+
+    NewLine();
+    Text("Animation controls");
+    DragFloat("Step distance multiplier",
+              &player.animator.step_distance_multiplier, 1.0f, 0.0f, 0.0f,
+              "%.1f");
+    DragFloat2("Interpolation speed min/max",
+               &player.animator.interpolation_speed_multiplier.min, 0.01f);
+    DragFloat("Max spine rotation", &player.animator.max_spine_rotation, 0.01f);
+    PopItemWidth();
 
     End();
 

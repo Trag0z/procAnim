@@ -7,8 +7,6 @@ NEXT:
 - sort out files (in assets etc)
 - check that spline is masculin
 - comment about how not all spline prptotypes get used
-- make animation parameters not const (also in UML)
-- remove pelvis height local
 - lstinline besser formatieren
 
 TODO:
