@@ -5,10 +5,11 @@ In diesem Kapitel wird der Vorgang der Implementierung erläutert. Dabei wird zu
 \section{Konzeption}
 Da der hauptsächliche Anwendungsbereich des in dieser Arbeit beschriebenen Animationssystems Videospiele sind, werden zur Implementierung auch Werkzeuge verwendet, die in der Spieleindustrie gängig sind. Programmiert wird deshalb in C++ unter Windows und mit einem x64-Prozessor als Zielplatform. Um gute Performance des Programms zu gewährleisten soll ein möglichst großer Teil der Berechnungen auf der Grafikkarte ausgeführt werden. Dafür kommt OpenGL als Grafikbibliothek zum Einsatz und es werden Shader in GLSL geschrieben.
 
-mit gamepad als bevorzugte steuerungsmethode implementiert
-Splines zur bewegungsanpassung und flüssigen bewegung
-zwei animationen wie "zitat"
-splines welt vs local koordinaten
+Um das Ziel der präzisen Bestimmung der Bewegungsgeschwindigkeit zu erreichen, wird davon ausgegangen, dass die Simulation mit einem Gamepad gesteuert wird. Die Laufgeschwindigkeit soll dann aus den Eingabedaten des Control Sticks errechnet werden.
+
+Außerdem soll zur Synthese von Animationen für die verschiedenen Laufgeschwindigkeiten ein Verfahren zum Einsatz kommen, das aus zwei zuvor festgelegten Animationen eine neue erstellt, die auf die auf die geforderte Situation passt (angelehnt an das Verfahren von Johansen\cite{johansen2009automated}).
+
+Um flüssige Bewegungen der Gliedmaßen zwischen vorbestimmten Punkten in der Simulation möglich zu machen, sollen Hermite Splines generiert werden, die die entsprechenden Punkte verbinden. Daraufhin sollen Inverse Kinematics angewendet werden, um die Gliedmaßen entlang der Splines zu bewegen.
 
 \section{Verwendete Bibliotheken}
 Um viele der grundlegenden Prozesse im Programm zu vereinfachen und schon gut gelöste Probleme wie z.B. das Erstellen eines OpenGL-Kontexts oder das Laden der Modelldaten nicht erneut lösen zu müssen, werden einige Bibliotheken verwendet. Diese werden im Folgenden im Detail erläutert.
