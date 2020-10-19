@@ -1,4 +1,5 @@
 NEXT:
+- reset screenshot stuff
 - arm idle animation looks stupid
 - arm going back to idle is still a little werid
 
