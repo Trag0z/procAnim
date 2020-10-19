@@ -6,7 +6,9 @@ In diesem Kapitel wird der Vorgang der Implementierung erläutert. Dabei wird zu
 Da der hauptsächliche Anwendungsbereich des in dieser Arbeit beschriebenen Animationssystems Videospiele sind, werden zur Implementierung auch Werkzeuge verwendet, die in der Spieleindustrie gängig sind. Programmiert wird deshalb in C++ unter Windows und mit einem x64-Prozessor als Zielplatform. Um gute Performance des Programms zu gewährleisten soll ein möglichst großer Teil der Berechnungen auf der Grafikkarte ausgeführt werden. Dafür kommt OpenGL als Grafikbibliothek zum Einsatz und es werden Shader in GLSL geschrieben.
 
 mit gamepad als bevorzugte steuerungsmethode implementiert
-
+Splines zur bewegungsanpassung und flüssigen bewegung
+zwei animationen wie "zitat"
+splines welt vs local koordinaten
 
 \section{Verwendete Bibliotheken}
 Um viele der grundlegenden Prozesse im Programm zu vereinfachen und schon gut gelöste Probleme wie z.B. das Erstellen eines OpenGL-Kontexts oder das Laden der Modelldaten nicht erneut lösen zu müssen, werden einige Bibliotheken verwendet. Diese werden im Folgenden im Detail erläutert.
@@ -66,11 +68,24 @@ Zur Animation des Charakters bestimmt der \lstinline{Player} in seiner Update-Me
 
 Ein Aktivitätsdiagramm der nun folgenden Abläufe zur Animation des Charakters ist in Abb. \ref{uml_activity} zu sehen. Der Animator bestimmt zunächst anhand der Bewegungsgeschwindigkeit und des aktuellen Animationszustands, ob eine neue Animation bestimmt werden muss. Ist dies der Fall, wird der neue Animationszustand in \lstinline{leg_state} gespeichert und die Methode \lstinline{set_new_splines} aufgerufen, die daraufhin die nächste Animation berechnet.
 
+
+
+\subsection{Generierung neuer Animationen}
 In der genannten Methode wird dann als erstes anhand der Laufgeschwindigkeit eine Zielrotation für den Rücken des Charakters bestimmt. Diese dient dazu, dass letzterer sich beim Rennen in die Bewegung hinein lehnt. Um flüssige Bewegungsabläufe zu gewährleisten wird dieser Wert nicht direkt als Rotation des entsprechenden Knochens gesetzt, sondern als Zielwert zu dem der Knochen dann hin interpoliert.
 
-Daraufhin wird zwischen zwei verschiedenen Fällen unterschieden, die unterschiedliche Animationen erfordern: Entweder der Charakter steht still, oder er bewegt sich.
+Daraufhin wird zwischen zwei verschiedenen Fällen unterschieden, die unterschiedliche Animationen erfordern: Entweder der Charakter steht still, oder er bewegt sich. Da die Animation für den stehenden Charakter (Idle-Animation) aus einer leichten auf und ab Bewegung besteht, muss hier zuerst festgestellt werden, in welche Richtung die Animation als nächstes ausgeführt werden soll. Daraufhin werden für die Arme die entsprechenden Spline-Prototypen ausgewählt und an die richtige Position relativ zum Arm transformiert. Außerdem wird der Startpunkt der Spline an die aktuelle Position der Hand gesetzt. Dieser Schritt findet in fast allen Fällen beim setzen eines neuen Splines für Gliedmaßen statt und gewährleistet, dass es keine Sprünge in der Animation gibt und stattdessen immer weiche Bewegungen von einem Punkt zum nächsten erfolgen.
 
-Anhand der Bewegungsgeschwindigkeit wird auch bestimmt, wie weit sich der Spieler mit dem nächsten Schritt nach vorne bewegen soll.
+Für die Beine wird bei der Idle-Animation nach dem Boden direkt unter dem Hüftknochen gesucht und ein Spline direkt vom aktuellen Punkt dort hin verwendet. Das Becken verwendet als Basis seiner Bewegung wie die Arme einen Spline-Prototypen. Da ganze Körper des Charakters der Bewegung des Beckens folgt muss beim Erstellen eines Splines sichergestellt werden, dass die Beine immer den Boden erreichen können. Die Höhe des Beckens über dem Boden wird durch eine Membervariable in \lstinline{Animator} bestimmt, deren Wert deshalb immer kleiner sein sollte als die Länge eines Beins. Als Boden unter dem Becken wird außerdem immer der niedrige der beiden Untergründe unter den Beinen gewählt. Zuletzt wird so ermittelte Spline wird dann je nach aktueller Richtung der Idle-Animation noch umgedreht.
+
+Steht der Spieler hingegen nicht still, wird zunächst anhand der gewünschten Bewegungsgeschwindigkeit die Länge des nächsten Schritts ermittelt. Sollte der Charakter gerade erst los laufen, wird diese Schrittweite halbiert, um die Position für den vorderen Fuß nicht so weit nach vorne zu setzen, dass das Bein diese gar nicht mehr erreichen kann. Im Folgenden wird zur Bestimmung der Splines jeweils zwischen zwei Prototypen für Gehen und Rennen interpoliert. Der dabei verwendete Interpolationsfaktor ist wie die Schrittweite von der Laufgeschwindigkeit abhängig.
+
+Die Splines für die Arme werden durch die gerade beschriebene Interpolation berechnet und der Zielpunkt um eine Schrittweite in Bewegungsrichtung verschoben. Das ist nötig um die Position des Punkts relativ zum Körper konstant zu halten, da die Splines in Weltkoordinaten angegeben werden und der Körper des Charakters sich bis zu Ende des Schritts um eben diese Schrittweite bewegt haben wird.
+
+Die beiden Beine führen beim laufen jeweils verschiedene Bewegungen aus und müssen deshalb getrennt betrachtet werden. Das führende Bein berechnet zunächst die Interpolation der beiden Spline-Prototypen, passt dann aber noch sowohl den Ausgangs- als auch den Endpunkt an. Als Ausgangspunkt wird die aktuelle Fußposition gesetzt. Der Fuß soll sich am Ende des Schritts eine halbe Schrittweite vor dem Körper befinden, deshalb wird als X-Koordinate des Endpunkts die des Ausgangspunkts verwendet und um 1,5 Schrittweiten nach vorne verschoben. Das Level wird an dieser Stelle nach geeignetem Untergrund durchsucht und die Höhe von diesem als Y-Koordinate verwendet. Bei diesem Verfahren werden zwar die beiden interpolierten Punkte quasi vollständig missachtet, die Interpolation hat aber trotzdem einen Zweck, da die so bestimmten Tangenten den Stil der Bewegung maßgeblich bestimmen.
+
+Da andere Bein steht während des gesamten Schritts am gleichen Ort auf dem Boden; sein Spline ist deshalb trivial bestimmbar: Beide Punkte entsprechen der aktuellen Fußposition, beide Tangenten haben die Länge Null.\footnote{Eigentlich könnte diese Position auch einfach direkt festgelegt und gar kein Spline mehr verwendet werden. Es müsste dann aber ein Sonderfall für das stehende Bein im Code eingeführt werden, der das System zwar möglicherweise effizienter, dafür aber auch schwieriger verständlich machen würde.} Zuletzt wird dann noch die Bewegung des Beckens bestimmt. Dazu werden wieder die interpolierten Spline-Prototypen genutzt, die Startposition auf die aktuelle Beckenposition gesetzt und die X-Koordinate der Zielposition als eine Schrittweite davon entfernt festgelegt. Zur Bestimmung der Y-Koordinate berechnet das Programm die durchschnittliche Höhe der beiden Beine und fügt dem Ergebnis die im \lstinline{Animator} eingestellte Beckenhöhe hinzu.
+
+
 
 \begin{landscape}
     \begin{figure}
@@ -89,5 +104,5 @@ Anhand der Bewegungsgeschwindigkeit wird auch bestimmt, wie weit sich der Spiele
 
 \subsection{Anpassung der Bewegungen}
 
-
+- pelvis height
 
