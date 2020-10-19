@@ -79,7 +79,7 @@ void Game::init() {
     BoxCollider::TEXTURE.load_from_file("../assets/ground.png");
 
     // Player
-    glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
+    glm::vec3 position = {960.0f, 271.0f, 0.0f};
     player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
                 "../assets/playerTexture.png", "../assets/guy.fbx",
                 &gamepads[0], level.colliders());

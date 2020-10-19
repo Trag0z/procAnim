@@ -108,7 +108,7 @@ void Animator::init(const Player* parent_, Mesh& mesh,
         auto& limb = limbs[i];
         limb.spline.init(nullptr);
 
-        glm::vec2 spline_points[Spline::NUM_POINTS];
+        // glm::vec2 spline_points[Spline::NUM_POINTS];
         if (i == LEFT_ARM) {
             limb.bones[0] = mesh.find_bone("Arm_L_1");
             limb.bones[1] = mesh.find_bone("Arm_L_2");
@@ -122,7 +122,7 @@ void Animator::init(const Player* parent_, Mesh& mesh,
             limb.bones[0] = mesh.find_bone("Leg_R_1");
             limb.bones[1] = mesh.find_bone("Leg_R_2");
         }
-        limb.spline.set_points(spline_points);
+        // limb.spline.set_points(spline_points);
     }
     spine = mesh.find_bone("Spine");
     pelvis_spline.init(spline_prototypes.idle[PELVIS].points());
@@ -132,6 +132,9 @@ void Animator::init(const Player* parent_, Mesh& mesh,
             .y;
 
     set_new_splines(0.0f, colliders);
+    interpolation_factor_on_spline =
+        1.0f; // Make the palyer move to the final position of the initial
+              // spline instantly
 }
 
 void Animator::update(float delta_time, float walking_speed,

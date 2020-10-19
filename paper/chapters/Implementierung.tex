@@ -68,7 +68,7 @@ Zur Animation des Charakters bestimmt der \lstinline{Player} in seiner Update-Me
 
 Ein Aktivitätsdiagramm der nun folgenden Abläufe zur Animation des Charakters ist in Abb. \ref{uml_activity} zu sehen. Der \lstinline{Animator} bestimmt zunächst anhand der Bewegungsgeschwindigkeit und des aktuellen Animationszustands, ob eine neue Animation bestimmt werden muss. Ist dies der Fall, wird der neue Animationszustand in \lstinline{leg_state} gespeichert und die Methode \lstinline{set_new_splines} aufgerufen, die daraufhin die nächste Animation berechnet.
 
-Als nächstes wird der Interpolationsfaktor der Animation abhängig von \lstinline{delta_time} erhöht und die Rotation des Rückens weiter zu ihrer Zielrotation hin interpoliert. Zuletzt berechnet das Programm anhand des Interpolationsfaktors und der jeweiligen Splines die aktuellen Zielpunkte für die Gliedmaßen und sucht mittels Inverse Kinematics nach einer passenden Stellung für die beiden Gelenke des Arms oder Beins. Damit endet die Update-Methode des \lstinline{Animator}s und der \lstinine{Player} verschiebt seine Position auf die neue Beckenposition.
+Als nächstes wird der Interpolationsfaktor der Animation abhängig von \lstinline{delta_time} erhöht und die Rotation des Rückens weiter zu ihrer Zielrotation hin interpoliert. Zuletzt berechnet das Programm anhand des Interpolationsfaktors und der jeweiligen Splines die aktuellen Zielpunkte für die Gliedmaßen und sucht mittels Inverse Kinematics nach einer passenden Stellung für die beiden Gelenke des Arms oder Beins. Damit endet die Update-Methode des \lstinline{Animator}s und der \lstinline{Player} verschiebt seine Position auf die neue Beckenposition.
 
 \subsection{Generierung neuer Animationen}
 In der genannten Methode wird dann als erstes anhand der Laufgeschwindigkeit eine Zielrotation für den Rücken des Charakters bestimmt. Diese dient dazu, dass letzterer sich beim Rennen in die Bewegung hinein lehnt. Um flüssige Bewegungsabläufe zu gewährleisten wird dieser Wert nicht direkt als Rotation des entsprechenden Knochens gesetzt, sondern als Zielwert zu dem der Knochen dann hin interpoliert.
@@ -103,6 +103,4 @@ Da andere Bein steht während des gesamten Schritts am gleichen Ort auf dem Bode
 \end{figure}
 
 \subsection{Anpassung der Bewegungen}
-
-- pelvis height
-
+Um den Stil der generierten Animationen an die Persönlichkeit des animierten Charakters anzupassen, erlaubt das Interface direkten Zugriff auf die Membervariablen \lstinline{step_distance_multiplier}, \lstinline{interpolation_speed_multiplier} und \lstinline{max_spine_rotation} des \lstinline{Animator}s. Außerdem wurde ein Editor für die Spline-Prototypen implementiert, der direkt mit den Daten \lstinline{Animator}s arbeitet und diese auch in einem Binärformat speichern und laden kann.
