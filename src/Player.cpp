@@ -48,7 +48,7 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 void Player::render(const Renderer& renderer) {
     // Calculate bone transforms from their rotations
     glm::mat3 bone_transforms[RiggedShader::NUMBER_OF_BONES];
-    SDL_assert(mesh.bones.size() < RiggedShader::NUMBER_OF_BONES);
+    SDL_assert(mesh.bones.size() <= RiggedShader::NUMBER_OF_BONES);
     for (size_t i = 0; i < mesh.bones.size(); ++i) {
         bone_transforms[i] = mesh.bones[i].transform();
     }

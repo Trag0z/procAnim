@@ -26,8 +26,7 @@ constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
 //----------------------------------//
 
 struct GameConfig {
-    const u32 window_flags =
-        SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
+    const u32 window_flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
 
     const u32 fps = 60;
     const u32 frame_delay = 1000 / fps;
