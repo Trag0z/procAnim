@@ -36,3 +36,4 @@ Offene fragen:
 - ergebnisteil gliedern?
 - grundlagen vor oder literaturteil?
 - cpu verarbeitung von IK und bone_transforms erwähnen?
+- textur und texturverzerrung besser beshreiben?
