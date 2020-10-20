@@ -49,25 +49,3 @@ Außerdem werden diverse Möglichkeiten geboten, die Generierung der Animationen
     \end{subfigure}
     \caption{Beispiele generierter Animationen. Das Skelett ist in rot dargestellt. Die grünen Linien stellen die Splines dar, an denen sich die entsprechenden Knochen entlang bewegen.}
 \end{figure}
-
-\section{Limitierungen}
-Es gibt sehr sehr viele.
-
-Limits:
-- kein flight-state beim rennen
-- keine physikalische simulation
-- keine verlangsamung/beschleunigung bei bergauf/bergab gehen
-- kein kopf bone, ist aber evtl unnötig
-
-- shape deformation des charakters kann hart sein, kein fancy algorithmus dafür wird angewendet
-> wäre aber auch cpu/gpu intensiv, also für spiele lieber nicht? würde zumindest viel optimierungsarbeit kosten
-- keine schrägen oberflächen, collision detection nur aabb
-- keine foot-base
-- zyklische bewegungen
-- nur humanoide, könnte aber erweitert werden
-- collision derection nicht trivial, bei IK sogar extra hart wenn man alles auf einmal beachten will (also z.B. knie in den boden bei laufen)
-- umkehren sieht kacke aus, keine umkehranimation
-
-- bleibt der charakter stehen, sieht die aimation etwas komsich aus. dafür mehr responsive als wenn er zurück oder weiter steppen würde
-- je nachdem wann input gepollt wird kann erster schritt oft sehr klein sein
-
