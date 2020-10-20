@@ -22,10 +22,6 @@ constexpr SDL_Scancode SPEED_DOWN = SDL_SCANCODE_PERIOD;
 constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
 }; // namespace Keybinds
 
-//----------------------------------//
-//----------Member structs----------//
-//----------------------------------//
-
 struct GameConfig {
     const u32 window_flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
     const glm::ivec2 window_position = {0, 0};
@@ -37,10 +33,6 @@ struct GameConfig {
     bool step_mode = false;
     bool use_const_delta_time = true;
 };
-
-//-------------------------------//
-//----------Game struct----------//
-//-------------------------------//
 
 class Game {
   public:

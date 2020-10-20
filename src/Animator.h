@@ -9,6 +9,11 @@ struct Mesh;
 class Game;
 class Player;
 
+// NOTE: Not all of these splines are actually relevant for the players
+// animations. For example, the legs just stick to one point on the ground in
+// their idle animation. This is in part due to changes that the animation
+// system went through, but I also don't see a good way to restructure it so it
+// only contains the relevant splines.
 struct SplineSet {
     Spline walk[5];
     Spline run[5];
@@ -26,6 +31,7 @@ struct Limb {
 
 class Animator {
   public:
+    // Indices of the splines for the animations in SplineSet
     enum SplineIndex {
         LEG_FORWARD = 0,
         LEG_BACKWARD = 1,
@@ -33,6 +39,8 @@ class Animator {
         ARM_BACKWARD = 3,
         PELVIS = 4
     };
+
+    // Indices of the limbs for the limbs member variable.
     enum LimbIndex { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
 
     void init(const Player* parent_, Mesh& mesh,
@@ -50,7 +58,7 @@ class Animator {
     SplineEditor* spline_editor;
     Bone* spine;
 
-    // The splines are all in players' local space
+    // The splines are all in the players' local space.
     SplineSet spline_prototypes;
     Spline pelvis_spline;
     float step_distance_world;
