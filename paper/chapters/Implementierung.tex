@@ -88,6 +88,9 @@ Da andere Bein steht während des gesamten Schritts am gleichen Ort auf dem Bode
 
 Zuletzt wird dann noch die Bewegung des Beckens bestimmt. Dazu werden wieder die interpolierten Spline-Prototypen genutzt, die Startposition auf die aktuelle Beckenposition gesetzt und die X-Koordinate der Zielposition als eine Schrittweite davon entfernt festgelegt. Zur Bestimmung der Y-Koordinate berechnet das Programm die durchschnittliche Höhe der beiden Beine und fügt dem Ergebnis die im \lstinline{Animator} eingestellte Beckenhöhe hinzu. Als letztes wird dann noch der Faktor zur Interpolation auf den Splines auf Null zurückgesetzt, sodass alle Animationen bei ihrem Startpunkt beginnen.
 
+\subsection{Anpassung der Bewegungen}
+Um den Stil der generierten Animationen an die Persönlichkeit des animierten Charakters anzupassen, erlaubt das Interface direkten Zugriff auf die Membervariablen \lstinline{step_distance_multiplier}, \lstinline{interpolation_speed_multiplier} und \lstinline{max_spine_rotation} des \lstinline{Animator}s. Außerdem wurde ein Editor für die Spline-Prototypen implementiert, der direkt mit den Daten \lstinline{Animator}s arbeitet und diese auch in einem Binärformat speichern und laden kann.
+
 \begin{landscape}
     \begin{figure}
         \includegraphics[width=\linewidth]{images/ClassDiagram.pdf}
@@ -102,6 +105,3 @@ Zuletzt wird dann noch die Bewegung des Beckens bestimmt. Dazu werden wieder die
     \caption{Aktivitätsdiagramm des Animationsprozesses}
     \label{uml_activity}
 \end{figure}
-
-\subsection{Anpassung der Bewegungen}
-Um den Stil der generierten Animationen an die Persönlichkeit des animierten Charakters anzupassen, erlaubt das Interface direkten Zugriff auf die Membervariablen \lstinline{step_distance_multiplier}, \lstinline{interpolation_speed_multiplier} und \lstinline{max_spine_rotation} des \lstinline{Animator}s. Außerdem wurde ein Editor für die Spline-Prototypen implementiert, der direkt mit den Daten \lstinline{Animator}s arbeitet und diese auch in einem Binärformat speichern und laden kann.
