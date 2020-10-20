@@ -42,8 +42,7 @@
         "xlocmon": "cpp"
     },
     "spellright.language": [
-        "de",
-        "en"
+        "de"
     ],
     "spellright.documentTypes": [
         "markdown",

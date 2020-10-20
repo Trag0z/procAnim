@@ -1,4 +1,5 @@
 NEXT:
+- uml überarbeiten
 - reset screenshot stuff
 - arm idle animation looks stupid
 - arm going back to idle is still a little werid
@@ -32,8 +33,11 @@ Paper:
 - quellen für grafiken
 
 Offene fragen:
+- Entity ins UML?
 - gendering?
 - ergebnisteil gliedern?
-- grundlagen vor oder literaturteil?
-- cpu verarbeitung von IK und bone_transforms erwähnen?
+- grundlagen vor oder nach literaturteil?
+- cpu verarbeitung von IK erwähnen?
 - textur und texturverzerrung besser beshreiben?
+
+- mehr über SplineEditor, vllt einen screenshot
