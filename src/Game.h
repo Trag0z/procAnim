@@ -28,9 +28,10 @@ constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
 
 struct GameConfig {
     const u32 window_flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
+    const glm::ivec2 window_position = {0, 0};
 
-    const u32 FPS = 60;
-    const u32 FRAME_DELAY = 1000 / FPS;
+    const u32 fps = 60;
+    const u32 frame_delay = 1000 / fps;
 
     float speed = 1.0f;
     bool step_mode = false;

@@ -11,8 +11,9 @@ void Game::init() {
 
     glm::ivec2 window_size = static_cast<glm::ivec2>(renderer.window_size());
 
-    window = SDL_CreateWindow("procAnim", 0, 0, window_size.x, window_size.y,
-                              game_config.window_flags);
+    window = SDL_CreateWindow("procAnim", game_config.window_position.x,
+                              game_config.window_position.y, window_size.x,
+                              window_size.y, game_config.window_flags);
     SDL_assert_always(window);
 
     sdl_renderer = SDL_CreateRenderer(window, -1, 0);
@@ -152,7 +153,7 @@ void Game::run() {
 
     float last_frame_duration =
         static_cast<float>(frame_start - last_frame_start);
-    float FRAME_DELAY = static_cast<float>(game_config.FRAME_DELAY);
+    float frame_delay = static_cast<float>(game_config.frame_delay);
 
     // Update components based on the current game_mode
     if (game_mode == PLAY) {
@@ -162,7 +163,7 @@ void Game::run() {
                 delta_time = game_config.speed;
             } else {
                 delta_time =
-                    last_frame_duration / FRAME_DELAY * game_config.speed;
+                    last_frame_duration / frame_delay * game_config.speed;
             }
 
             player.update(delta_time, level.colliders(), mouse_keyboard_input);
@@ -207,8 +208,8 @@ void Game::run() {
 
     // Wait for next frame
     u32 last_frame_time = SDL_GetTicks() - frame_start;
-    if (game_config.FRAME_DELAY > last_frame_time) {
-        SDL_Delay(game_config.FRAME_DELAY - last_frame_time);
+    if (game_config.frame_delay > last_frame_time) {
+        SDL_Delay(game_config.frame_delay - last_frame_time);
     }
 }
 
