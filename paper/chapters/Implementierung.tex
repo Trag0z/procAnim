@@ -1,5 +1,5 @@
-\chapter{Implementierung}
-In diesem Kapitel wird der Vorgang der Implementierung erläutert. Dabei wird zuerst...
+\chapter{Implementierung} \label{implementierung}
+Nachdem in den vorherigen Kapiteln theoretische Vorarbeit geleistet wurde, soll nun die Implementierung des geplanten Animationssystems erläutert werden. Begonnen wird dabei mit der konzeptionellen Planung der Software. Da diverse Bibliotheken zur Vereinfachung der Programmierarbeit verwendet werden, werden diese dann kurz beschrieben. Als nächstes folgt eine visuelle und schriftliche Darstellung des Programmaufbaus, bevor dann der Animationsprozess detailliert erklärt wird.
 
 
 \section{Konzeption}
@@ -7,7 +7,7 @@ Da der hauptsächliche Anwendungsbereich des in dieser Arbeit beschriebenen Anim
 
 Um das Ziel der präzisen Bestimmung der Bewegungsgeschwindigkeit zu erreichen, wird davon ausgegangen, dass die Simulation mit einem Gamepad gesteuert wird. Die Laufgeschwindigkeit soll dann aus den Eingabedaten des Control Sticks errechnet werden.
 
-Außerdem soll zur Synthese von Animationen für die verschiedenen Laufgeschwindigkeiten ein Verfahren zum Einsatz kommen, das aus zwei zuvor festgelegten Animationen eine neue erstellt, die auf die auf die geforderte Situation passt (angelehnt an das Verfahren von Johansen\cite{johansen2009automated}).
+Außerdem soll zur Synthese von Animationen für die verschiedenen Laufgeschwindigkeiten ein Verfahren zum Einsatz kommen, das aus zwei zuvor festgelegten Animationen eine neue erstellt, die auf die auf die geforderte Situation passt (angelehnt an das Verfahren von \cite{johansen2009automated}).
 
 Um flüssige Bewegungen der Gliedmaßen zwischen vorbestimmten Punkten in der Simulation möglich zu machen, sollen Hermite Splines generiert werden, die die entsprechenden Punkte verbinden. Daraufhin sollen Inverse Kinematics angewendet werden, um die Gliedmaßen entlang der Splines zu bewegen.
 
@@ -29,7 +29,7 @@ Das Skelett des zu animierenden Charakters und damit zusammenhängend auch das M
 \subsection{Dear ImGui}
 Bei \href{https://github.com/ocornut/imgui}{Dear ImGui} handelt es sich um eine Implementierung des Immediate Mode GUI Paradigmas. Es ermöglicht die Darstellung von grafischen Interfaces im bestehenden OpenGL-Kontext und wird hier verwendet, um ein Debug-Informationen anzuzeigen, die erstellten Tools zu kontrollieren und einige Variablen der Simulation zur Laufzeit ändern zu können.
 
-\section{Aufbau des Programms}
+\section{Aufbau des Programms} \label{aufbau}
 Das UML-Klassendiagramm in Abb. \ref{uml_classes} zeigt den generellen Aufbau der Anwendung. Im Zentrum steht dabei die Klasse \lstinline{Game}, die auf hoher Ebene den Ablauf koordiniert und die verschiedenen Komponenten der Simulation verwaltet. Ihre Methode \lstinline{init()} initialisiert alle nötigen Systeme und erstellt das Fenster, sodass das Programm in einem geeigneten Ausgangszustand ist. Die Methode \lstinline{run()} berechnet den nächsten Simulationsschritt und zeichnet das Ergebnis auf den Bildschirm.
 
 Zum Zeichnen der Grafiken und Verwalten der Shader wird \lstinline{Renderer} verwendet. Er lädt bei seiner Initialisierung die drei verschiedenen Shader-Programme, die in der Anwendung zum Einsatz kommen und besitzt jeweils ein Objekt der vier entsprechenden Shader-Klassen \lstinline{DebugShader}, \lstinline{TexturedShader}, \lstinline{RiggedShader} und \lstinline{BoneShader}. Die verschiedenen Shader und ihre Anwendungsgebiete werden in Abschnitt \ref{rendering_section} ausführlicher beschrieben.
@@ -66,7 +66,7 @@ Der BoneShader zeichnet die Knochen des Modells. Seine Input-Vertices sollten je
 
 Nur die Klassen \lstinline{Mesh}, \lstinline{Background} und \lstinline{Spline} verwenden eigene Vertex-Arrays auf der GPU. Nur \lstinline{Spline} verändert diese Daten nach der Initialisierung noch, die anderen beiden transformieren die Vertices nur noch durch Uniforms.
 
-\section{Animation} \label{animator_section}
+\section{Animationsprozess} \label{animator_section}
 Zur Animation des Charakters bestimmt der \lstinline{Player} in seiner Update-Methode zunächst die aktuelle Bewegungsgeschwindigkeit anhand der Eingaben des Spielers. Sollte der Charakter gerade in die entgegengesetzte Richtung der Eingabe blicken, wird außerdem das Modell an der Y-Achse gespiegelt. Daraufhin ruft der \lstinline{Player} die Update-Methode des \lstinline{Animator}s auf und gibt dabei die Bewegungsgeschwindigkeit -- zusammen mit einer Liste der Collider im Level und dem Faktor \lstinline{delta_time}, der die vergangene Zeit seit dem letzten Simulationsschritt angibt -- als Argumente weiter.
 
 Ein Aktivitätsdiagramm der nun folgenden Abläufe zur Animation des Charakters ist in Abb. \ref{uml_activity} zu sehen. Der \lstinline{Animator} bestimmt zunächst anhand der Bewegungsgeschwindigkeit und des aktuellen Animationszustands, ob eine neue Animation bestimmt werden muss. Ist dies der Fall, wird der neue Animationszustand in \lstinline{leg_state} gespeichert und die Methode \lstinline{set_new_splines} aufgerufen, die daraufhin die nächste Animation berechnet.

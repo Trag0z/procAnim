@@ -1,5 +1,4 @@
 NEXT:
-- cpu verarbeitung von IK und bone_transforms erwähnen?
 - reset screenshot stuff
 - arm idle animation looks stupid
 - arm going back to idle is still a little werid
@@ -28,7 +27,12 @@ Optimizations:      (@OPTIMIZE)
 - move IK calculations to shader?
 
 Paper:
-- gendering?
 - problem/hypothesis/method/limitations aufzählung in einleitung?
 
 - quellen für grafiken
+
+Offene fragen:
+- gendering?
+- ergebnisteil gliedern?
+- grundlagen vor oder literaturteil?
+- cpu verarbeitung von IK und bone_transforms erwähnen?
