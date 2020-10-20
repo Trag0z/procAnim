@@ -108,7 +108,6 @@ void Animator::init(const Player* parent_, Mesh& mesh,
         auto& limb = limbs[i];
         limb.spline.init(nullptr);
 
-        // glm::vec2 spline_points[Spline::NUM_POINTS];
         if (i == LEFT_ARM) {
             limb.bones[0] = mesh.find_bone("Arm_L_1");
             limb.bones[1] = mesh.find_bone("Arm_L_2");
@@ -122,7 +121,6 @@ void Animator::init(const Player* parent_, Mesh& mesh,
             limb.bones[0] = mesh.find_bone("Leg_R_1");
             limb.bones[1] = mesh.find_bone("Leg_R_2");
         }
-        // limb.spline.set_points(spline_points);
     }
     spine = mesh.find_bone("Spine");
     pelvis_spline.init(spline_prototypes.idle[PELVIS].points());
@@ -378,7 +376,6 @@ void Animator::set_new_splines(float walking_speed,
         move_spline_points(spline_points, spline_points,
                            limbs[forward_arm].origin());
         spline_to_world_space(spline_points);
-        // spline_points[P1] = limbs[forward_arm].spline.get_point(P2); // TODO:
         spline_points[P2].x += step_distance_world;
         limbs[forward_arm].spline.set_points(spline_points);
 
@@ -386,8 +383,6 @@ void Animator::set_new_splines(float walking_speed,
         move_spline_points(spline_points, spline_points,
                            limbs[backward_arm].origin());
         spline_to_world_space(spline_points);
-        // spline_points[P1] = limbs[backward_arm].spline.get_point(P2); //
-        // TODO:
         spline_points[P2].x += step_distance_world;
         limbs[backward_arm].spline.set_points(spline_points);
 

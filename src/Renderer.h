@@ -21,9 +21,8 @@ class Renderer {
     glm::vec2 camera_position() const noexcept;
     glm::vec2 camera_center() const noexcept;
 
-    bool draw_models = true;
+    bool draw_model = true;
     bool draw_bones = true;
-    bool draw_wireframes = false;
     bool draw_arm_splines = false;
     bool draw_leg_splines = true;
     bool draw_pelvis_spline = true;

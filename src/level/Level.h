@@ -8,7 +8,9 @@ class MouseKeyboardInput;
 class LevelEditor;
 
 class Level {
-    // TODO: comment about how lists are bad
+    // Linked lists are probably a bad choice for performance here, but they
+    // allow for deletion of random elements which the LevelEditor uses
+    // frequently.
     std::list<BoxCollider> colliders_;
     std::string opened_path;
 
@@ -20,7 +22,7 @@ class Level {
     void save_to_file(const char* path) const;
     void load_from_file(const char* path);
 
-    // Let the editor access our private members so it can manipulate them
+    // Let the LevelEditor access our private members so it can manipulate them.
     friend LevelEditor;
 };
 

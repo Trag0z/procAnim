@@ -83,5 +83,8 @@ class Animator {
     void interpolate_splines(glm::vec2 dst[Spline::NUM_POINTS],
                              SplineIndex spline_index) const;
 
+    // The debug UI needs to access the private members of this class. Letting
+    // Game access them this way seems cleaner to me then writing a bunch of
+    // getters/setters that are only used in one place.
     friend Game;
 };

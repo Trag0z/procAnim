@@ -12,10 +12,11 @@
 #include "level/Level.h"
 
 namespace Keybinds {
-constexpr SDL_Scancode DRAW_WIREFRAEMS = SDL_SCANCODE_F1;
-constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F2;
-constexpr SDL_Scancode DRAW_SPLINES = SDL_SCANCODE_F3;
+constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F1;
+constexpr SDL_Scancode DRAW_SPLINES = SDL_SCANCODE_F2;
 constexpr SDL_Scancode STEP_MODE = SDL_SCANCODE_P;
+constexpr SDL_Scancode NEXT_STEP = SDL_SCANCODE_N;
+constexpr SDL_Scancode HOLD_TO_STEP = SDL_SCANCODE_M;
 constexpr SDL_Scancode SPEED_UP = SDL_SCANCODE_COMMA;
 constexpr SDL_Scancode SPEED_DOWN = SDL_SCANCODE_PERIOD;
 constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
@@ -28,8 +29,8 @@ constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
 struct GameConfig {
     const u32 window_flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
 
-    const u32 fps = 60;
-    const u32 frame_delay = 1000 / fps;
+    const u32 FPS = 60;
+    const u32 FRAME_DELAY = 1000 / FPS;
 
     float speed = 1.0f;
     bool step_mode = false;
@@ -59,8 +60,7 @@ class Game {
     Renderer renderer;
 
     MouseKeyboardInput mouse_keyboard_input;
-    // TODO: make it be one gamepad
-    std::array<Gamepad, Gamepad::NUM_PADS> gamepads;
+    Gamepad gamepad;
 
     Player player;
     Background background;

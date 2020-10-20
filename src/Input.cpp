@@ -3,6 +3,15 @@
 #include "Input.h"
 #include "Renderer.h"
 
+void MouseKeyboardInput::init(const Renderer* renderer_) {
+    sdl_keyboard = SDL_GetKeyboardState(&num_keys);
+    key_ = (bool*)malloc(sizeof(bool) * (num_keys * 3));
+    key_down_ = key_ + num_keys;
+    key_up_ = key_down_ + num_keys;
+
+    renderer = renderer_;
+}
+
 void MouseKeyboardInput::update() {
     // Update mouse
     last_mouse_pos = mouse_pos;
@@ -43,20 +52,23 @@ void MouseKeyboardInput::update() {
         }
     }
 
-    // Game::run() sets this to a value later if there was a scroll event
-    mouse_wheel_scroll = 0;
+        mouse_wheel_scroll = 0;
 }
 
-std::array<Gamepad, Gamepad::NUM_PADS> Gamepad::init() {
-    std::array<Gamepad, NUM_PADS> ret;
-    for (u32 i = 0; i < Gamepad::NUM_PADS; ++i) {
-        ret[i].sdl_ptr = SDL_GameControllerOpen(i);
-        if (!ret[i].sdl_ptr) {
-            printf("[Input] Error opening gamepad%I32d: %s\n", i,
-                   SDL_GetError());
-        }
-    }
-    return ret;
+bool MouseKeyboardInput::mouse_button(MouseButton button) const {
+    return mouse_button_map & static_cast<uint>(button);
+}
+bool MouseKeyboardInput::mouse_button_up(MouseButton button) const {
+    return mouse_button_up_map & static_cast<uint>(button);
+}
+bool MouseKeyboardInput::mouse_button_down(MouseButton button) const {
+    return mouse_button_down_map & static_cast<uint>(button);
+}
+
+bool MouseKeyboardInput::key(SDL_Scancode key) const { return key_[key]; }
+bool MouseKeyboardInput::key_up(SDL_Scancode key) const { return key_up_[key]; }
+bool MouseKeyboardInput::key_down(SDL_Scancode key) const {
+    return key_down_[key];
 }
 
 glm::vec2 MouseKeyboardInput::mouse_pos_world() const noexcept {
@@ -75,13 +87,21 @@ glm::vec2 MouseKeyboardInput::mouse_move() const noexcept {
     return move;
 }
 
+void Gamepad::init() {
+    sdl_ptr = SDL_GameControllerOpen(0);
+    if (!sdl_ptr) {
+        printf("[Input] Error opening gamepad: %s\n", SDL_GetError());
+        SDL_TriggerBreakpoint();
+    }
+}
+
 void Gamepad::update() {
     // Check if gamepad is still valid
     SDL_assert(sdl_ptr);
 
     // Poll all the axes on this pad
     Sint16 tempAxis;
-    for (size_t i = 0; i < Gamepad::num_axes; ++i) {
+    for (size_t i = 0; i < Gamepad::NUM_AXES; ++i) {
 
         // If it's a trigger, normalize and set the value
         if (i == SDL_CONTROLLER_AXIS_TRIGGERLEFT ||
@@ -95,24 +115,24 @@ void Gamepad::update() {
         // If it's a stick, calculate and set it's value
         tempAxis = SDL_GameControllerGetAxis(
             sdl_ptr, static_cast<SDL_GameControllerAxis>(i));
-        if (tempAxis > -Gamepad::stick_deadzone_in &&
-            tempAxis < Gamepad::stick_deadzone_in) {
+        if (tempAxis > -Gamepad::STICK_DEADZONE_IN &&
+            tempAxis < Gamepad::STICK_DEADZONE_IN) {
             axes[i] = 0.0F;
-        } else if (tempAxis > Gamepad::stick_deadzone_out) {
+        } else if (tempAxis > Gamepad::STICK_DEADZONE_OUT) {
             axes[i] = 1.0F;
-        } else if (tempAxis < -Gamepad::stick_deadzone_out) {
+        } else if (tempAxis < -Gamepad::STICK_DEADZONE_OUT) {
             axes[i] = -1.0F;
         } else {
             if (tempAxis > 0) {
                 axes[i] =
-                    static_cast<float>(tempAxis - Gamepad::stick_deadzone_in) /
-                    static_cast<float>(Gamepad::stick_deadzone_out -
-                                       Gamepad::stick_deadzone_in);
+                    static_cast<float>(tempAxis - Gamepad::STICK_DEADZONE_IN) /
+                    static_cast<float>(Gamepad::STICK_DEADZONE_OUT -
+                                       Gamepad::STICK_DEADZONE_IN);
             } else {
                 axes[i] =
-                    static_cast<float>(tempAxis + Gamepad::stick_deadzone_in) /
-                    static_cast<float>(Gamepad::stick_deadzone_out -
-                                       Gamepad::stick_deadzone_in);
+                    static_cast<float>(tempAxis + Gamepad::STICK_DEADZONE_IN) /
+                    static_cast<float>(Gamepad::STICK_DEADZONE_OUT -
+                                       Gamepad::STICK_DEADZONE_IN);
             }
         }
         // Invert Y axis cause it's the wrong way by default
@@ -121,7 +141,7 @@ void Gamepad::update() {
     }
 
     // Poll all the buttons on this pad
-    for (u32 i = 0; i < Gamepad::num_buttons; ++i) {
+    for (u32 i = 0; i < Gamepad::NUM_BUTTONS; ++i) {
         if (SDL_GameControllerGetButton(
                 sdl_ptr, static_cast<SDL_GameControllerButton>(i))) {
             if (!button(i)) {
@@ -139,3 +159,12 @@ void Gamepad::update() {
         }
     }
 }
+
+glm::vec2 Gamepad::stick(StickID id) const {
+    return glm::vec2(axes[static_cast<size_t>(id) * 2],
+                     axes[static_cast<size_t>(id) * 2 + 1]);
+}
+
+bool Gamepad::button(u32 n) const { return button_map & BIT(n); }
+bool Gamepad::button_down(u32 n) const { return button_down_map & BIT(n); }
+bool Gamepad::button_up(u32 n) const { return button_up_map & BIT(n); }

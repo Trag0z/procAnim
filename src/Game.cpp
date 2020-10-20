@@ -69,7 +69,7 @@ void Game::init() {
 
     mouse_keyboard_input.init(&renderer);
 
-    gamepads = Gamepad::init();
+    gamepad.init();
 
     background.init("../assets/background.png");
 
@@ -81,8 +81,8 @@ void Game::init() {
     // Player
     glm::vec3 position = {960.0f, 271.0f, 0.0f};
     player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
-                "../assets/playerTexture.png", "../assets/guy.fbx",
-                &gamepads[0], level.colliders());
+                "../assets/playerTexture.png", "../assets/guy.fbx", &gamepad,
+                level.colliders());
 
     frame_start = SDL_GetTicks();
     is_running = true;
@@ -96,9 +96,7 @@ void Game::run() {
 
     // Get inputs
     mouse_keyboard_input.update();
-    for (auto& pad : gamepads) {
-        pad.update();
-    }
+    gamepad.update();
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -114,9 +112,6 @@ void Game::run() {
     }
 
     // Handle general keyboard inputs
-    if (mouse_keyboard_input.key_down(Keybinds::DRAW_WIREFRAEMS)) {
-        renderer.draw_wireframes = !renderer.draw_wireframes;
-    }
     if (mouse_keyboard_input.key_down(Keybinds::DRAW_BONES)) {
         renderer.draw_bones = !renderer.draw_bones;
     }
@@ -157,7 +152,7 @@ void Game::run() {
 
     float last_frame_duration =
         static_cast<float>(frame_start - last_frame_start);
-    float frame_delay = static_cast<float>(game_config.frame_delay);
+    float FRAME_DELAY = static_cast<float>(game_config.FRAME_DELAY);
 
     // Update components based on the current game_mode
     if (game_mode == PLAY) {
@@ -167,13 +162,13 @@ void Game::run() {
                 delta_time = game_config.speed;
             } else {
                 delta_time =
-                    last_frame_duration / frame_delay * game_config.speed;
+                    last_frame_duration / FRAME_DELAY * game_config.speed;
             }
 
             player.update(delta_time, level.colliders(), mouse_keyboard_input);
 
-        } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
-                   mouse_keyboard_input.key(SDL_SCANCODE_M)) {
+        } else if (mouse_keyboard_input.key_down(Keybinds::NEXT_STEP) ||
+                   mouse_keyboard_input.key(Keybinds::HOLD_TO_STEP)) {
             player.update(game_config.speed, level.colliders(),
                           mouse_keyboard_input);
         }
@@ -212,8 +207,8 @@ void Game::run() {
 
     // Wait for next frame
     u32 last_frame_time = SDL_GetTicks() - frame_start;
-    if (game_config.frame_delay > last_frame_time) {
-        SDL_Delay(game_config.frame_delay - last_frame_time);
+    if (game_config.FRAME_DELAY > last_frame_time) {
+        SDL_Delay(game_config.FRAME_DELAY - last_frame_time);
     }
 }
 
@@ -222,8 +217,7 @@ void Game::update_gui() {
 
     //////          Debug controls window           //////
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
-    Checkbox("Render player model", &renderer.draw_models);
-    Checkbox("Render wireframes", &renderer.draw_wireframes);
+    Checkbox("Render player model", &renderer.draw_model);
     Checkbox("Render bones", &renderer.draw_bones);
 
     NewLine();
@@ -257,6 +251,9 @@ void Game::update_gui() {
     End();
 
     //////          Limb data display window            //////
+    // This is a big window that displays a lot of the data about the player and
+    // its limbs. It's probably not really useful to show off the functionality
+    // of the program, but it was helpful in debugging.
     Begin("Limb data", NULL);
 
     char label[128];

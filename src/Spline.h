@@ -15,14 +15,16 @@ class Spline {
   public:
     static const size_t NUM_POINTS = 4;
 
-    // Points in format P1, T1, T2, P2
+    // Points in format P1, T1, T2, P2.
+    // The values of T1 and T2 are the coordinates relative to P1 and P2,
+    // respectively.
     void init(const glm::vec2 points[NUM_POINTS] = nullptr);
     void render(const Renderer& renderer, bool draw_points = false) const;
 
     const glm::vec2& point(SplinePointName p) const;
     const glm::vec2* points() const;
 
-    // If P1 or P2 are set, T1 or T2 are moved with them
+    // If P1 or P2 are set, T1 or T2 are moved with them.
     void set_point(SplinePointName name, glm::vec2 point);
 
     void set_points(const glm::vec2 new_points[NUM_POINTS]);
@@ -34,7 +36,7 @@ class Spline {
   private:
     static const size_t RENDER_STEPS = 50;
 
-    // T1 and T2 are relative to P1/P2
+    // T1 and T2 are relative to P1/P2.
     glm::vec2 points_[NUM_POINTS];
     glm::mat4 parameter_matrix;
 
@@ -46,6 +48,8 @@ class Spline {
 
     bool vertices_initialized = false;
 
+    // SplineEditor has to access the points and VertexArrays in order to
+    // dislpay and modify them.
     friend SplineEditor;
 };
 
@@ -91,7 +95,11 @@ class SplineEditor {
     void save_splines(bool get_new_file_path = false);
     void load_splines(const std::string& path);
 
-    // TODO: document?
+    // Sets the point at index_point_index of the spline at spline_index to
+    // position p. If absolute_tangent_pos is set to true, the function assumes
+    // that p is given in absolute (model) coordinates and adjusts it to be
+    // relative to either P1 or P2. If absolute_tangent_pos is false, it just
+    // uses the value of p.
     void set_spline_point(glm::vec2 p,
                           size_t point_index = static_cast<size_t>(-1),
                           size_t spline_index = static_cast<size_t>(-1),

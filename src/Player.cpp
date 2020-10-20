@@ -58,7 +58,7 @@ void Player::render(const Renderer& renderer) {
     renderer.rigged_shader.set_bone_transforms(bone_transforms);
 
     // Render player model
-    if (renderer.draw_models) {
+    if (renderer.draw_model) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture.id);
 
@@ -67,16 +67,6 @@ void Player::render(const Renderer& renderer) {
 
     renderer.debug_shader.use();
     renderer.debug_shader.set_model(&model);
-
-    // Render wireframes
-    // TODO: This doesn't adjust to bone movements
-    if (renderer.draw_wireframes) {
-        renderer.debug_shader.set_color(&Color::BLUE);
-
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        mesh.vao.draw(GL_LINES);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
 
     // Render bones
     if (renderer.draw_bones) {

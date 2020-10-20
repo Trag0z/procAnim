@@ -30,8 +30,8 @@ class Player : public Entity {
 
     bool is_facing_right() const noexcept;
 
-    // The general UI displays the player's private members, so it needs to
-    // access them. This seems cleaner to me than writing a bunch of
-    // getters/setters.
+    // The debug UI needs to access the private members of this class. Letting
+    // Game access them this way seems cleaner to me then writing a bunch of
+    // getters/setters that are only used in one place.
     friend Game;
 };

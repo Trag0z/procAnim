@@ -97,8 +97,8 @@ void Spline::set_point(SplinePointName name, glm::vec2 point) {
 
 void Spline::update_render_data() {
     SDL_assert(vertices_initialized);
+
     // Line
-    // @optimize
     parameter_matrix = glm::mat4(
         glm::vec4(points_[P1], 0.0f, 1.0f), glm::vec4(points_[P2], 0.0f, 1.0f),
         glm::vec4(points_[T1], 0.0f, 1.0f), glm::vec4(points_[T2], 0.0f, 1.0f));
