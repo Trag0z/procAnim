@@ -4,7 +4,6 @@ NEXT:
 - arm going back to idle is still a little werid
 
 - sort out files (in assets etc)
-- comment about how not all spline prptotypes get used
 
 TODO:
 - check portability of solution file

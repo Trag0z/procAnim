@@ -21,7 +21,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -38,13 +38,13 @@
      inkscape:window-height="2081"
      id="namedview3162"
      showgrid="false"
-     inkscape:zoom="1.798905"
-     inkscape:cx="676.70775"
-     inkscape:cy="537.98025"
+     inkscape:zoom="1.2720179"
+     inkscape:cx="948.32459"
+     inkscape:cy="713.92777"
      inkscape:window-x="-9"
      inkscape:window-y="-9"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g3158" />
+     inkscape:current-layer="g612" />
   <defs
      id="defs2" />
   <g
@@ -343,7 +343,12 @@
            id="text106"
            font-family="Arial"
            stroke="none"
-           fill="#000000">-gamepads: std::array&lt;Gamepad&gt;</text>
+           fill="#000000"
+           style="-inkscape-font-specification:'Arial, Normal';font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:13px;text-anchor:start;text-align:start;writing-mode:lr;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;">
+          <tspan
+             sodipodi:role="line"
+             id="tspan6077">-gamepad: Gamepad</tspan>
+        </text>
       </g>
     </g>
     <g
@@ -5177,25 +5182,24 @@
          fill="none" />
     </g>
     <g
-       transform="translate(-966,-358) scale(1,1)"
+       transform="translate(-965.44411,-360.77947)"
        id="g1896">
       <g
          id="g1894">
         <path
            id="path1890"
-           stroke="none"
-           fill="none" />
+           d=""
+           inkscape:connector-curvature="0"
+           style="fill:none;stroke:none" />
         <text
            font-size="13px"
            font-style="normal"
            font-weight="normal"
            text-decoration="none"
-           x="2505.13134765625"
+           x="2505.1313"
            y="844.5"
            id="text1892"
-           font-family="Arial"
-           stroke="none"
-           fill="#000000">-spline_prototypes</text>
+           style="font-style:normal;font-weight:normal;font-size:13px;font-family:Arial;text-decoration:none;text-decoration-line:none;fill:#000000;stroke:none">-spline_prototypes</text>
       </g>
     </g>
     <g
