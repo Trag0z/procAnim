@@ -2,7 +2,7 @@
 
 %% deutsch
 \paragraph*{}
-Diese Arbeit beschreibt die Entwicklung eines Systems, das die dynamische Animation der Laufbewegungen von zweidimensionalen Charakteren in Videospielen ermöglicht. Dabei wird zuerst ein Charaktermodell als Skelett erstellt und mit einer Textur versehen. Das Programm erstellt dann anhand der Eingaben des Nutzers und der Daten des Skeletts neue Bewegungsabläufe für jeden einzelnen Schritt des Charakters. Die Bewegungsgeschwindigkeit der so erstellten Animationen sind präzise auf die Eingabe des Spielers abgestimmt und erlaubt Bewegungen über Untergründe verschiedener Höhen.
+Diese Arbeit beschreibt die Entwicklung eines Systems, das die dynamische Animation der Laufbewegungen von zweidimensionalen Charakteren in Videospielen ermöglicht. Dabei wird zuerst ein Charaktermodell als Skelett erstellt und mit einer Textur versehen. Das Programm erstellt dann anhand der Eingaben des Nutzers und der Daten des Skeletts neue Bewegungsabläufe für jeden einzelnen Schritt des Charakters. Die Bewegungsgeschwindigkeit der so erstellten Animationen ist präzise auf die Eingabe des Spielers abgestimmt und erlaubt Bewegungen über Untergründe verschiedener Höhen.
 
 Dazu werden Hermite Splines für die Hände, Füße und das Becken des Charakters berechnet, denen die entsprechenden Punkte des Körpers dann folgen. Die Splines sind an den Boden unter dem Spieler angepasst und variieren die Schrittweite und -form je nach geforderter Bewegungsgeschwindigkeit.
 Außerdem werden die Splines basierend auf einer Reihe von Spline-Prototypen gebildet, die zuvor vom Nutzer festgelegt werden können. So soll eine große Anpassbarkeit der Animationen an verschiedene Charaktere und Anwendungsfälle ermöglicht werden.
