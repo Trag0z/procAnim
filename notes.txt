@@ -1,13 +1,8 @@
 NEXT:
-- uml überarbeiten
 - arm idle animation looks stupid
 - arm going back to idle is still a little werid
 
-- sort out files (in assets etc)
-
 TODO:
-- check portability of solution file
-
 - one frame leg glitch into ground when starting to move
 
 - more polygons, nicer texture
@@ -31,6 +26,4 @@ Paper:
 Offene fragen:
 - Entity ins UML?
 - ergebnisteil gliedern?
-- textur und texturverzerrung besser beshreiben?
-
 - mehr über SplineEditor, vllt einen screenshot
