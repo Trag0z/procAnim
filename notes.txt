@@ -5,7 +5,6 @@ NEXT:
 - arm going back to idle is still a little werid
 
 - sort out files (in assets etc)
-- check that spline is masculin
 - comment about how not all spline prptotypes get used
 
 TODO:
@@ -34,10 +33,7 @@ Paper:
 
 Offene fragen:
 - Entity ins UML?
-- gendering?
 - ergebnisteil gliedern?
-- grundlagen vor oder nach literaturteil?
-- cpu verarbeitung von IK erwähnen?
 - textur und texturverzerrung besser beshreiben?
 
 - mehr über SplineEditor, vllt einen screenshot
