@@ -1,0 +1,147 @@
+%Praesentationsmodus
+\documentclass[t,aspectratio=169,divpsnames]{beamer}
+%Die Beameroption aspectratio legt das verwendete Seitenverhaeltnis fest
+%aspectratio=169	16:9 Seitenverhaeltnis
+%aspectratio=1610	16:10 Seitenverhaeltnis
+%aspectratio=43		4:3 Seitenverhaeltnis
+%Die Beameroption envcountsect nummeriert Umgebungen wie theorem pro section durch.
+%Die Beameroption divpsnames wird an das xcolor Paket durchgereicht.
+
+%Handout-Generierung mit Foliennotizen (statt obiger Zeile für den Präsentationsmodus verwenden)
+%\documentclass[t,handout,aspectratio=169]{beamer}
+%\setbeameroption{show notes}
+
+\usepackage[utf8]{inputenc}
+
+% Deutsch
+\usepackage[ngerman]{babel} 
+\usepackage{bibgerm}
+
+% Englisch
+%\usepackage[english]{babel}
+
+\input{templatesetup}
+\usepackage{listings}
+\lstset
+{
+	basicstyle=\ttfamily, 
+	keywordstyle=\color{blue}\bfseries\ttfamily,
+	identifierstyle=\ttfamily, 
+	stringstyle=\ttfamily,
+	commentstyle=\color{ForestGreen},
+	showstringspaces=false,
+	framexleftmargin=7mm, 
+	breaklines=true,
+	tabsize=3,
+	showtabs=false,
+	frame=single, 
+	rulesepcolor=\color{blue},
+	numbers=left,
+	linewidth=146mm,
+	xleftmargin=8mm,
+	language={C++},
+}
+
+% Stil des Literaturverzeichnisses
+\bibliographystyle{geralpha}
+%\bibliographystyle{alpha}
+%\bibliographystyle{abstract}
+
+%Bitte ausfuellen:
+\title{Entwicklung eines 2D Charakter-Animationssystemes für automatische Laufbewegungen}
+\subtitle{Kolloquiumsvortrag}
+\author{Daniel Track}
+\institute{Hochschule Trier}
+\date{03.11.2020}
+\subject{Thema für PDF-Metadaten (optional)}
+
+%Inhaltsverzeichnisses bis auf subsubsection-Ebene:
+%\setcounter{tocdepth}{3}
+
+%Aktivieren, um am Anfang jeder Section ein Inhaltsverzeichnis zur Section anzuzeigen
+%\AtBeginSection[]
+%{
+%\begin{frame}<beamer>
+%\frametitle{Agenda}
+%\tableofcontents[currentsection,hideothersubsections,sectionstyle=show/hide,subsubsectionstyle=show/show]
+%\end{frame}
+%}
+
+%Aktivieren, um alles Schritt-fuer-Schritt einzublenden
+%\beamerdefaultoverlayspecification{<+->}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}
+    \frametitle{Agenda}
+    \tableofcontents
+    %\tableofcontents[hideallsubsections] % Subsections ausblenden
+    %\tableofcontents[pausesections] %Sections Schritt-fuer-Schritt einblenden
+\end{frame}
+
+\section{Einleitung}
+
+\begin{frame}{Motivation}
+    \begin{itemize}
+        \item Gängige 2D-Animationssysteme benötigen oft sehr viele Sprites % Gibt natürlich Ausnahmen/andere Systeme 
+        \item Nicht einfach skalierbar für hohe Framerates ($>$ 60 fps)
+        \item Skelettbasierte 3D-Animation hat diese Probleme nicht
+        \item Außerdem flexibler, da Runtime-Daten in die Animation mit einbezogen werden können
+    \end{itemize}
+
+    $\Rightarrow$ Warum nicht das 3D-System auf 2D-Charaktere übertragen?
+\end{frame}
+
+\begin{frame}{Zielsetzung}{Anforderungen an das Aniamtionssystem}
+    \begin{itemize}
+        \item Generierung von glaubhaften Laufanimationen aus einem einzelnen PNG, gepaart mit einem Skelett
+        \item Bewegung über verschieden hohe Untergründe durch Einbeziehung von Laufzeitdaten
+        \item Responsive Steuerung
+              \begin{itemize}
+                  \item Schnelle Reaktion auf Inputs
+                  \item Laufgeschwindigkeit mit Control-Stick präzise regulierbar
+              \end{itemize}
+        \item Anpassbarkeit des Animationsverhaltens
+    \end{itemize}
+\end{frame}
+
+
+\section{Forschungsstand}
+
+\section{Implementierung}
+
+\begin{frame}{Programmaufbau}
+    % hier ausschnitt aus UML?
+\end{frame}
+
+\begin{frame}{Animationsprozess}
+
+\end{frame}
+
+\section{Live Demonstration}
+\begin{frame}{Live Demonstration}
+    \begin{center}
+        \huge{(Demonstration des Programms)}
+    \end{center}
+\end{frame}
+
+\section*{Schluss}
+\begin{frame}
+    \begin{center}
+        \huge{Vielen Dank für die Aufmerksamkeit}
+    \end{center}
+    \begin{center}
+        \Huge{Fragen?}
+    \end{center}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{\bibname}
+    \bibliography{literatur}     %BibTeX-Datei literatur.bib
+\end{frame}
+
+
+\end{document}
