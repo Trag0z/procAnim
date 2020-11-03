@@ -48,8 +48,8 @@
 %\bibliographystyle{abstract}
 
 %Bitte ausfuellen:
-\title{Entwicklung eines 2D Charakter-Animationssystemes für automatische Laufbewegungen}
-\subtitle{Kolloquiumsvortrag}
+\title{Kolloquiumsvortrag}
+\subtitle{Entwicklung eines 2D Charakter-Animationssystemes für automatische Laufbewegungen}
 \author{Daniel Track}
 \institute{Hochschule Trier}
 \date{03.11.2020}
@@ -98,7 +98,7 @@
 
 \begin{frame}{Zielsetzung}{Anforderungen an das Aniamtionssystem}
     \begin{itemize}
-        \item Generierung von glaubhaften Laufanimationen aus einem einzelnen PNG, gepaart mit einem Skelett
+        \item Generierung von glaubhaften Laufanimationen aus einem einzelnen Sprite, gepaart mit einem Skelett
         \item Bewegung über verschieden hohe Untergründe durch Einbeziehung von Laufzeitdaten
         \item Responsive Steuerung
               \begin{itemize}
@@ -114,25 +114,37 @@
 
 \section{Implementierung}
 
-\begin{frame}{Programmaufbau}
-    % hier ausschnitt aus UML?
+\begin{frame}{Animationsprozess}
+    \includegraphics[height=\textheight]{AnimatorActivity_presentation.pdf}
 \end{frame}
 
 \begin{frame}{Animationsprozess}
 
 \end{frame}
 
-\section{Live Demonstration}
+\section{Ergebnisse}
 \begin{frame}{Live Demonstration}
     \begin{center}
         \huge{(Demonstration des Programms)}
     \end{center}
 \end{frame}
 
+\begin{frame}{Möglichkeiten zur Verbesserung und Erweiterung}
+    \begin{itemize}
+        \item Collision-Detection für gesamte Splines (nicht nur Start- und Endpunkt)
+        \item Eventuell kombiniert mit Einführung eines dritten Punktes für die Splines, was auch die Customization verbessern sollte
+        \item Komplexerer Algorithmus zur Suche von Zielpositionen für Füße, sodass mehr Variation in Leveln möglich ist
+              \begin{itemize}
+                  \item Schräge Oberflächen
+                  \item Mehrere ''Ebenen"
+              \end{itemize}
+    \end{itemize}
+\end{frame}
+
 \section*{Schluss}
 \begin{frame}
     \begin{center}
-        \huge{Vielen Dank für die Aufmerksamkeit}
+        \huge{Vielen Dank für Ihre Aufmerksamkeit!}
     \end{center}
     \begin{center}
         \Huge{Fragen?}
