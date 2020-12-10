@@ -5,13 +5,13 @@
 #include "VertexArray.h"
 #include "Types.h"
 
-static bool checkCompileErrors(GLuint object, bool program);
+static bool check_compile_errors(GLuint object, bool program);
 
-GLuint loadAndCompileShaderFromFile(const char* vShaderPath,
-                                    const char* fShaderPath);
+static GLuint load_and_compile_shader_from_file(const char* vert_shader_path,
+                                                const char* frag_shader_path);
 
 namespace ShaderDetail {
-// This class should never be instantiated, only derived from
+// This class should never be instantiated, only derived from.
 class Shader {
   protected:
     GLuint id;
@@ -26,6 +26,37 @@ class Shader {
     void set_model(const glm::mat3* mat) const;
 };
 } // namespace ShaderDetail
+
+class DebugShader : public ShaderDetail::Shader {
+    GLuint color_loc;
+
+  public:
+    DebugShader() {}
+    DebugShader(const char* vert_path, const char* frag_path);
+
+    void set_color(const Color* color) const;
+
+    struct Vertex {
+        glm::vec2 pos;
+    };
+
+    static VertexArray<Vertex> DEFAULT_VAO;
+};
+
+class TexturedShader : public ShaderDetail::Shader {
+  public:
+    TexturedShader() {}
+    TexturedShader(const char* vert_path, const char* frag_path);
+
+    void set_texture(const Texture& texture) const;
+
+    struct Vertex {
+        glm::vec2 pos;
+        glm::vec2 uv_coord;
+    };
+
+    static VertexArray<Vertex> DEFAULT_VAO;
+};
 
 class RiggedShader : public ShaderDetail::Shader {
     GLuint bone_transforms_loc;
@@ -47,44 +78,98 @@ class RiggedShader : public ShaderDetail::Shader {
     };
 };
 
-class TexturedShader : public ShaderDetail::Shader {
-  public:
-    TexturedShader() {}
-    TexturedShader(const char* vert_path, const char* frag_path);
-
-    void set_texture(const Texture& texture) const;
-
-    struct Vertex {
-        glm::vec2 pos;
-        glm::vec2 uv_coord;
-    };
-
-    static VertexArray<Vertex> DEFAULT_VAO;
-};
-
-class DebugShader : public ShaderDetail::Shader {
+class BoneShader : public ShaderDetail::Shader {
     GLuint color_loc;
+    GLuint bone_transforms_loc;
 
   public:
-    DebugShader() {}
-    DebugShader(const char* vert_path, const char* frag_path);
+    static const size_t NUMBER_OF_BONES = 15;
+
+    BoneShader() {}
+    BoneShader(const char* vert_path, const char* frag_path);
 
     void set_color(const Color* color) const;
+    void set_bone_transforms(const glm::mat3* transforms) const;
 
     struct Vertex {
         glm::vec2 pos;
     };
-
-    static VertexArray<Vertex> DEFAULT_VAO;
 };
 
 //                                                              //
 //          Template specifications for VertexArray<>           //
 //                                                              //
 
+void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
+                                            GLuint num_indices,
+                                            const DebugShader::Vertex* vertices,
+                                            GLuint num_vertices, GLenum usage) {
+    num_indices_ = num_indices;
+    num_vertices_ = num_vertices;
+    usage_ = usage;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    // Create index buffer
+    glGenBuffers(1, &ebo_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * num_indices, indices,
+                 usage);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(DebugShader::Vertex) * num_vertices,
+                 vertices, usage);
+
+    // position attribute
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebugShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+}
+
+void VertexArray<TexturedShader::Vertex>::init(
+    const GLuint* indices, GLuint num_indices,
+    const TexturedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
+
+    num_indices_ = num_indices;
+    num_vertices_ = num_vertices;
+    usage_ = usage;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    // Create index buffer
+    glGenBuffers(1, &ebo_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * num_indices_,
+                 indices, usage);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(TexturedShader::Vertex) * num_vertices_, vertices,
+                 usage);
+
+    // position attribute
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(TexturedShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+    // uvCoord attribute
+    glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedShader::Vertex),
+        reinterpret_cast<void*>(offsetof(TexturedShader::Vertex, uv_coord)));
+    glEnableVertexAttribArray(1);
+}
+
 void VertexArray<RiggedShader::Vertex>::init(
     const GLuint* indices, GLuint num_indices,
     const RiggedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
+
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
     usage_ = usage;
@@ -126,9 +211,11 @@ void VertexArray<RiggedShader::Vertex>::init(
     glEnableVertexAttribArray(3);
 }
 
-void VertexArray<TexturedShader::Vertex>::init(
-    const GLuint* indices, GLuint num_indices,
-    const TexturedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
+void VertexArray<BoneShader::Vertex>::init(const GLuint* indices,
+                                           GLuint num_indices,
+                                           const BoneShader::Vertex* vertices,
+                                           GLuint num_vertices, GLenum usage) {
+
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
     usage_ = usage;
@@ -145,48 +232,11 @@ void VertexArray<TexturedShader::Vertex>::init(
     // Create vertex buffer
     glGenBuffers(1, &vbo_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER,
-                 sizeof(TexturedShader::Vertex) * num_vertices_, vertices,
-                 usage);
-
-    // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
-                          sizeof(TexturedShader::Vertex),
-                          reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0);
-    // uvCoord attribute
-    glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedShader::Vertex),
-        reinterpret_cast<void*>(offsetof(TexturedShader::Vertex, uv_coord)));
-    glEnableVertexAttribArray(1);
-}
-
-void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
-                                            GLuint num_indices,
-                                            const DebugShader::Vertex* vertices,
-                                            GLuint num_vertices, GLenum usage) {
-    num_indices_ = num_indices;
-    num_vertices_ = num_vertices;
-    usage_ = usage;
-
-    glGenVertexArrays(1, &vao_id);
-    glBindVertexArray(vao_id);
-
-    // Create index buffer
-    glGenBuffers(1, &ebo_id);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * num_indices, indices,
-                 usage);
-
-    // Create vertex buffer
-    glGenBuffers(1, &vbo_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(DebugShader::Vertex) * num_vertices,
+    glBufferData(GL_ARRAY_BUFFER, sizeof(BoneShader::Vertex) * num_vertices_,
                  vertices, usage);
 
     // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebugShader::Vertex),
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(BoneShader::Vertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
 }

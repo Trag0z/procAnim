@@ -11,7 +11,8 @@ void Game::init() {
 
     glm::ivec2 window_size = static_cast<glm::ivec2>(renderer.window_size());
 
-    window = SDL_CreateWindow("procAnim", 3840, 956, window_size.x,
+    window = SDL_CreateWindow("procAnim", game_config.window_position.x,
+                              game_config.window_position.y, window_size.x,
                               window_size.y, game_config.window_flags);
     SDL_assert_always(window);
 
@@ -69,7 +70,7 @@ void Game::init() {
 
     mouse_keyboard_input.init(&renderer);
 
-    gamepads = Gamepad::init();
+    gamepad.init();
 
     background.init("../assets/background.png");
 
@@ -79,10 +80,10 @@ void Game::init() {
     BoxCollider::TEXTURE.load_from_file("../assets/ground.png");
 
     // Player
-    glm::vec3 position = {1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f};
+    glm::vec3 position = {960.0f, 271.0f, 0.0f};
     player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
-                "../assets/playerTexture.png", "../assets/guy.fbx",
-                &gamepads[0], level.colliders());
+                "../assets/playerTexture.png", "../assets/guy.fbx", &gamepad,
+                level.colliders());
 
     frame_start = SDL_GetTicks();
     is_running = true;
@@ -94,10 +95,9 @@ void Game::run() {
 
     SDL_PumpEvents();
 
+    // Get inputs
     mouse_keyboard_input.update();
-    for (auto& pad : gamepads) {
-        pad.update();
-    }
+    gamepad.update();
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -113,9 +113,6 @@ void Game::run() {
     }
 
     // Handle general keyboard inputs
-    if (mouse_keyboard_input.key_down(Keybinds::DRAW_WIREFRAEMS)) {
-        renderer.draw_wireframes = !renderer.draw_wireframes;
-    }
     if (mouse_keyboard_input.key_down(Keybinds::DRAW_BONES)) {
         renderer.draw_bones = !renderer.draw_bones;
     }
@@ -158,7 +155,7 @@ void Game::run() {
         static_cast<float>(frame_start - last_frame_start);
     float frame_delay = static_cast<float>(game_config.frame_delay);
 
-    // Update stuff based on the current game_mode
+    // Update components based on the current game_mode
     if (game_mode == PLAY) {
         if (!game_config.step_mode) {
             float delta_time;
@@ -171,8 +168,8 @@ void Game::run() {
 
             player.update(delta_time, level.colliders(), mouse_keyboard_input);
 
-        } else if (mouse_keyboard_input.key_down(SDL_SCANCODE_N) ||
-                   mouse_keyboard_input.key(SDL_SCANCODE_M)) {
+        } else if (mouse_keyboard_input.key_down(Keybinds::NEXT_STEP) ||
+                   mouse_keyboard_input.key(Keybinds::HOLD_TO_STEP)) {
             player.update(game_config.speed, level.colliders(),
                           mouse_keyboard_input);
         }
@@ -190,7 +187,7 @@ void Game::run() {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    renderer.update_camera(player.get_position() + glm::vec2(0.0f, 200.0f));
+    renderer.update_camera(player.position() + glm::vec2(0.0f, 200.0f));
 
     background.render(renderer, renderer.camera_center());
 
@@ -221,8 +218,7 @@ void Game::update_gui() {
 
     //////          Debug controls window           //////
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
-    Checkbox("Render player model", &renderer.draw_models);
-    Checkbox("Render wireframes", &renderer.draw_wireframes);
+    Checkbox("Render player model", &renderer.draw_model);
     Checkbox("Render bones", &renderer.draw_bones);
 
     NewLine();
@@ -233,18 +229,9 @@ void Game::update_gui() {
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
-    SetNextItemWidth(100);
-    DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
-    SetNextItemWidth(100);
-    DragFloat("Step distance multiplier",
-              &player.animator.STEP_DISTANCE_MULTIPLIER);
-    SetNextItemWidth(100);
-    DragFloat2("Interpolation speed min/max",
-               &player.animator.INTERPOLATION_SPEED_MULTIPLIER.MIN, 0.01f);
-
-    NewLine();
-    Checkbox("Arm follows mouse", &player.animator.arm_follows_mouse);
     Checkbox("Step mode", &game_config.step_mode);
+    PushItemWidth(100);
+    DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
 
     NewLine();
     Text("Mode");
@@ -252,17 +239,30 @@ void Game::update_gui() {
     RadioButton("Spline editor", (int*)&game_mode, GameMode::SPLINE_EDITOR);
     RadioButton("Level editor", (int*)&game_mode, GameMode::LEVEL_EDITOR);
 
+    NewLine();
+    Text("Animation controls");
+    DragFloat("Step distance multiplier",
+              &player.animator.step_distance_multiplier, 1.0f, 0.0f, 0.0f,
+              "%.1f");
+    DragFloat2("Interpolation speed min/max",
+               &player.animator.interpolation_speed_multiplier.min, 0.01f);
+    DragFloat("Max spine rotation", &player.animator.max_spine_rotation, 0.01f);
+    PopItemWidth();
+
     End();
 
     //////          Limb data display window            //////
+    // This is a big window that displays a lot of the data about the player and
+    // its limbs. It's probably not really useful to show off the functionality
+    // of the program, but it was helpful in debugging.
     Begin("Limb data", NULL);
 
     char label[128];
 
-    sprintf_s(label, "% 6.1f, % 6.1f", player.position.x, player.position.y);
+    sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x, player.position_.y);
     Text("Player position: ");
     SameLine();
-    DragFloat2("Player position", value_ptr(player.position), 1.0f, 0.0f, 0.0f,
+    DragFloat2("Player position", value_ptr(player.position_), 1.0f, 0.0f, 0.0f,
                "% .2f");
 
     Text("Target Positions");
@@ -280,7 +280,7 @@ void Game::update_gui() {
 
     for (const auto& limb : player.animator.limbs) {
         glm::vec2 target_world_pos =
-            player.local_to_world_space(limb.spline.get_point(P2));
+            player.local_to_world_space(limb.spline.point(P2));
         sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
                   target_world_pos.y);
         Text(label);
@@ -304,24 +304,24 @@ void Game::update_gui() {
     NextColumn();
     Separator();
 
-    for (const auto& bone : player.rigged_mesh.bones) {
+    for (const auto& bone : player.mesh.bones) {
         Text(bone.name.c_str());
         NextColumn();
 
-        sprintf_s(label, "% 6.1f /% 1.2f", radToDeg(bone.rotation),
+        sprintf_s(label, "% 6.1f /% 1.2f", glm::degrees(bone.rotation),
                   bone.rotation);
         Text(label);
         NextColumn();
 
         glm::vec2 head_world_pos = player.local_to_world_space(
-            bone.get_transform() * bone.bind_pose_transform *
+            bone.transform() * bone.bind_pose_transform *
             glm::vec3(bone.head(), 1.0f));
         sprintf_s(label, "% 7.1f, % 7.1f", head_world_pos.x, head_world_pos.y);
         Text(label);
         NextColumn();
 
         glm::vec2 tail_world_pos = player.local_to_world_space(
-            glm::vec2(bone.get_transform() * bone.bind_pose_transform *
+            glm::vec2(bone.transform() * bone.bind_pose_transform *
                       glm::vec3(bone.tail, 1.0f)));
         sprintf_s(label, "% 7.1f, % 7.1f", tail_world_pos.x, tail_world_pos.y);
         Text(label);

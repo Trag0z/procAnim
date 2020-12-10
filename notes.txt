@@ -1,32 +1,29 @@
 NEXT:
-- first animation is broken
-
 - arm idle animation looks stupid
 - arm going back to idle is still a little werid
 
 TODO:
 - one frame leg glitch into ground when starting to move
-- wireframes don't get modified by bones
 
 - more polygons, nicer texture
 - test utf8 chars in save/load strings
 
 Bugs:               (@BUG)
-- SplineEditor sets connected tangents in wrong direction since it still assumes what has been some time ago
-- SplineEditor sometimes sets points of wrong splines when entering number by hand
+- SplineEditor sets connected tangents in wrong direction since it still assumes what has been true some time ago
 - sometimes turns around due to stick snap-back?
 
 Cleanup:            (@CLEANUP)
-- unify naming scheme for getter methods
 
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time
-- move IK calculations to shader
+- move IK calculations to shader?
 
 Paper:
-- gendering?
 - problem/hypothesis/method/limitations aufzählung in einleitung?
 
-- responsiveness als ziel
-
 - quellen für grafiken
+
+Offene fragen:
+- Entity ins UML?
+- ergebnisteil gliedern?
+- mehr über SplineEditor, vllt einen screenshot

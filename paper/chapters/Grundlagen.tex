@@ -1,7 +1,8 @@
 \chapter{Grundlagen}
+Im Folgenden werden kurz einige grundlegende Konzepte erklärt, die bei der Animation von virtuellen Charakteren zum Einsatz kommen. Diese Konzepte werden sowohl von der später diskutierten Literatur als auch von dem für diese Arbeit entwickelten System verwendet.
 
 \section{Skelettbasierte Animation}
-Die skelettbasierte Animation ist ein weit verbreitetes Verfahren zur Animation von 3D-Charakteren. Dabei werden für jeden Charakter zwei verschiedene Repräsentationen erstellt: Die erste besteht aus einem Dreiecksnetz (Skin), stellt die Oberfläche des Modells dar und wird zur visuellen Darstellung verwendet. Hinzu kommt eine Menge von Knochen, die nicht sichtbar sind und nur zur Animation des Dreiecksnetzes verwendet werden. Diese Knochen bilden eine hierarchische Datenstruktur und mit Ausnahme des Root-Knochens bestehen sie alle aus den folgenden drei Werten:
+Die skelettbasierte Animation ist ein weit verbreitetes Verfahren zur Animation von 3D-Charakteren. Dabei werden für jeden Charakter zwei verschiedene Repräsentationen erstellt: Die erste besteht aus einem Dreiecksnetz (Skin), stellt die Oberfläche des Modells dar und wird zur visuellen Darstellung verwendet. Hinzu kommt eine Menge von Knochen (das Skelett oder Rig), die nicht sichtbar sind und nur zur Animation des Skins verwendet werden. Diese Knochen bilden eine hierarchische Datenstruktur und mit Ausnahme des Root-Knochens bestehen sie alle aus den folgenden drei Werten:
 
 \begin{enumerate}
     \item Ein Parent-Knochen
@@ -9,7 +10,7 @@ Die skelettbasierte Animation ist ein weit verbreitetes Verfahren zur Animation 
     \item Eine Rotation
 \end{enumerate}
 
-Der Root-Knochen hat keinen Parent, seine Transformationsmatrix stellt eine Transformation vom globalen Koordinatensystem ins Koordinatensystem des Knochens dar. Durch die Rotation der Knochen können neue Posen für den Charakter gebildet werden. Dabei wird die Rotation im lokalen Koordinatensystem des jeweiligen Knochens angewendet und beeinflusst so Position aller Knochen weiter unten in der Hierarchie. Jeder Vertex des Skins ist einem (Rigid Binding) oder mehreren Knochen (Smooth Binding) zugeordnet. Zur Bestimmung seiner neuen Position wird der Vertex in das Koordinatensystem der entsprechenden Knochen transformiert, dort rotiert und dann wieder ins Ursprungskoordinatensystem zurück transformiert. Um einen Vertex $v$ in eine beliebige Pose zu transformieren gelten die Formeln:
+Der Root-Knochen hat keinen Parent, seine Transformationsmatrix stellt eine Transformation vom globalen Koordinatensystem ins Koordinatensystem des Knochens dar. Durch die Rotation der Knochen können neue Posen für den Charakter gebildet werden. Dabei wird die Rotation im lokalen Koordinatensystem des jeweiligen Knochens angewendet und beeinflusst so die Positionen aller Knochen weiter unten in der Hierarchie. Jeder Vertex des Skins ist einem Knochen (Rigid Binding) oder mehreren Knochen (Smooth Binding) zugeordnet. Zur Bestimmung seiner neuen, animierten Position wird ein Vertex in das Koordinatensystem der entsprechenden Knochen transformiert, dort rotiert und dann wieder ins Ursprungskoordinatensystem zurück transformiert. Um einen Vertex $v$ in eine beliebige Pose zu transformieren, gelten folgende Formeln:
 
 \begin{subequations}
     \begin{equation}
@@ -22,7 +23,7 @@ Der Root-Knochen hat keinen Parent, seine Transformationsmatrix stellt eine Tran
     \end{equation}
 \end{subequations}
 
-Dabei stellen $B_{i}^{-1}$ die Inverse Bind-Pose Transformationen der Knochen und $C_{i}$ die Transformationen für die aktuelle Pose dar. Die Gleichung in \ref{bone1} beschreibt das Verfahren beim Rigid Binding. Beim Smooth Binding (\ref{bone2}) werden Joint-Matrizen für alle relevanten Knochen berechnet, die dann mit deinem Gewichtungsfaktor $w_{i}$ auf den Vertex wirken.
+Dabei stellen $B_{i}^{-1}$ die Inversen der Bind-Pose Transformationen der Knochen und $C_{i}$ die Transformationen für die aktuelle Pose dar. Die Gleichung in \ref{bone1} beschreibt das Verfahren beim Rigid Binding. Beim Smooth Binding (\ref{bone2}) werden Joint-Matrizen für alle relevanten Knochen berechnet, die dann mit einem Gewichtungsfaktor $w_{i}$ auf den Vertex wirken.
 
 \section{Inverse Kinematics}
 Bei Inverse Kinematics handelt es sich um mathematische Prozesse zur Berechnung von Gelenkparametern, um das Ende einer kinematischen Kette (wie z.B. eine Hand) an einem bestimmten Punkt zu positionieren. Zur Lösung dieser Problemstellungen gibt es verschiedene analytische und numerische Verfahren. Welches dieser Verfahren gewählt werden sollte, hängt von den Details des vorliegenden Problems ab. Da in dieser Arbeit nur die Hände und Füße des Charakters mittels Inverse Kinematics positioniert werden sollen, wird lediglich ein simples analytisches Verfahren verwendet, das bei der Erläuterung des entsprechenden Programmcodes im Detail erklärt wird.

@@ -48,15 +48,3 @@ float BoxCollider::bottom_edge() const noexcept {
     SDL_assert(half_ext.y > 0.0f);
     return position.y - half_ext.y;
 }
-
-// std::vector<BoxCollider>
-// find_colliders_around_point(glm::vec2 point, float max_distance,
-//                             const std::list<BoxCollider>& colliders) {
-//     std::vector<BoxCollider> ret;
-//     for (auto& coll : colliders) {
-//         if (glm::length(coll.position - point) > max_distance) {
-//             ret.push_back(coll);
-//         }
-//     }
-//     return ret;
-// }

@@ -11,7 +11,6 @@ int main(int argc, char* argv[]) {
         game.run();
     }
 
-    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
     return 0;

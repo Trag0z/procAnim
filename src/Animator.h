@@ -5,15 +5,15 @@
 #include "level/Collider.h"
 
 struct Bone;
-struct RiggedMesh;
+struct Mesh;
 class Game;
 class Player;
 
-// @TODO: Rename to AnimationState // @CLEANUP: What?
-struct BoneRestrictions {
-    float min_rotation, max_rotation;
-};
-
+// NOTE: Not all of these splines are actually relevant for the players
+// animations. For example, the legs just stick to one point on the ground in
+// their idle animation. This is in part due to changes that the animation
+// system went through, but I also don't see a good way to restructure it so it
+// only contains the relevant splines.
 struct SplineSet {
     Spline walk[5];
     Spline run[5];
@@ -21,7 +21,7 @@ struct SplineSet {
 };
 
 struct Limb {
-    Spline spline; // In parent's local space
+    Spline spline; // In local space
 
     Bone* bones[2];
 
@@ -31,6 +31,7 @@ struct Limb {
 
 class Animator {
   public:
+    // Indices of the splines for the animations in SplineSet
     enum SplineIndex {
         LEG_FORWARD = 0,
         LEG_BACKWARD = 1,
@@ -38,52 +39,51 @@ class Animator {
         ARM_BACKWARD = 3,
         PELVIS = 4
     };
+
+    // Indices of the limbs for the limbs member variable.
     enum LimbIndex { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
 
-    void init(const Player* parent_, RiggedMesh& mesh,
+    void init(const Player* parent_, Mesh& mesh,
               const std::list<BoxCollider>& colliders);
     void update(float delta_time, float walking_speed,
-                const MouseKeyboardInput& input,
                 const std::list<BoxCollider>& colliders);
     void render(const Renderer& renderer);
 
-    glm::vec2 get_tip_pos(LimbIndex limb_index) const;
+    glm::vec2 tip_pos(LimbIndex limb_index) const;
 
-    glm::vec2 get_pelvis_pos() const;
+    glm::vec2 pelvis_pos() const;
 
   private:
     const Player* parent;
     SplineEditor* spline_editor;
     Bone* spine;
 
-    // The splines are all in players' local space
+    // The splines are all in the players' local space.
     SplineSet spline_prototypes;
     Spline pelvis_spline;
     float step_distance_world;
     float spine_rotation_target;
 
-    struct {
-        float local, world;
-    } pelvis_height;
+    float pelvis_height;
 
     Limb limbs[4];
-
-    VertexArray<DebugShader::Vertex> target_points_vao;
 
     float interpolation_factor_between_splines;
     float interpolation_factor_on_spline;
 
-    bool arm_follows_mouse = false;
+    enum LegState {
+        NEUTRAL,
+        LEFT_LEG_UP,
+        RIGHT_LEG_UP
+    } leg_state,
+        last_leg_state;
 
-    static const float MAX_SPINE_ROTATION;
-    float STEP_DISTANCE_MULTIPLIER = 100.0f;
+    float step_distance_multiplier = 100.0f;
+    float max_spine_rotation = 0.25f;
 
-    // @CLEANUP: Rename this?
     struct InterpolationSpeedMultiplier {
-        float MIN = 0.02f, MAX = 0.08f;
-    } INTERPOLATION_SPEED_MULTIPLIER;
-
-    enum { NEUTRAL, LEFT_LEG_UP, RIGHT_LEG_UP } leg_state, last_leg_state;
+        float min = 0.02f, max = 0.08f;
+    } interpolation_speed_multiplier;
 
     void set_new_splines(float walking_speed,
                          const std::list<BoxCollider>& colliders);
@@ -91,10 +91,8 @@ class Animator {
     void interpolate_splines(glm::vec2 dst[Spline::NUM_POINTS],
                              SplineIndex spline_index) const;
 
-    // Interpolates between T1 and T2 from the walking and running spline
-    // prototypes. Writes the resulting values in world space to dst.
-    void interpolate_tangents(glm::vec2 dst[Spline::NUM_POINTS],
-                              SplineIndex spline_index);
-
+    // The debug UI needs to access the private members of this class. Letting
+    // Game access them this way seems cleaner to me then writing a bunch of
+    // getters/setters that are only used in one place.
     friend Game;
 };

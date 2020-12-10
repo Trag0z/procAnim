@@ -1,23 +1,37 @@
-\chapter{Zusammenfassung und Ausblick}
+\chapter{Zusammenfassung und Ausblick} \label{zusammenfassung}
+In dieser Arbeit wurde versucht, ein System zu entwickeln, das die automatische Laufanimation von zweidimensionalen Charakteren zur Laufzeit des Programms anhand eines Skeletts und eines einzelnen Sprites ermöglicht. Dieses Ziel wurde erreicht; der Charakter kann sich dabei auch über verschieden hohe Untergründe und in beliebiger Geschwindigkeit bewegen. Außerdem reagiert der Charakter dabei meist schnell auf Eingaben und viele der nötigen Berechnungen werden von der GPU ausgeführt, was die Verwendung in einem Videospiel begünstigt. Ein Editor für die zur Animation verwendeten Splines ermöglicht die Anpassung der Bewegungsabläufe an die Bedürfnisse des Nutzers.
 
-In diesem Kapitel soll die Arbeit noch einmal kurz zusammengefasst werden. Insbesondere sollen die wesentlichen Ergebnisse Ihrer Arbeit herausgehoben werden. Erfahrungen, die z.B. Benutzer mit der Mensch-Maschine-Schnittstelle gemacht haben oder Ergebnisse von Leistungsmessungen sollen an dieser Stelle pr�sentiert werden. Sie k�nnen in diesem Kapitel auch die Ergebnisse oder das Arbeitsumfeld Ihrer Arbeit kritisch bewerten. W�nschenswerte Erweiterungen sollen als Hinweise auf weiterf�hrende Arbeiten erw�hnt werden.
+Das System verfügt jedoch auch noch über viele Limitierungen, an denen zukünftige Arbeiten ansetzen könnten. Beispielsweise ist aktuell immer ein Fuß fest an den Boden gebunden, obwohl Menschen beim Rennen in der Regel zeitweise keinen Kontakt mehr zum Bode haben. Ein offensichtlicher Fehler ist außerdem die fehlende Collision Detection beim Bewegen über unebenen Untergrund. So kann es häufig vorkommen, dass sich beispielsweise der Fuß des Charakters durch ein Hindernis bewegt. Durch die Verwendung passender Splines lässt sich das Problem etwas minimieren, was aber die Anpassungsmöglichkeiten der Animation stark einschränkt.
+
+Im Zusammenhang mit dieser Problematik der Kollisionsvermeidung wäre es möglicherweise hilfreich, eine komplexere Art von Splines zu verwenden. Die aktuellen Hermite Splines bestehen immer nur aus zwei Punkten und den zwei dazugehörigen Tangenten. Ein dritter Punkt könnte jedoch beispielsweise an den Mittelpunkt des Schritts gesetzt werden, um die Bewegung besser zu definieren und Kollisionen mit Hindernissen zu vermeiden. Ein komplexeres System zur dynamischen Anpassung der Tangenten in diesem dritten Punkt wäre dann aber vermutlich auch vonnöten, um bei Schritten auf höhere oder niedrigere Ebenen einen gutaussehenden Bewegungsablauf zu wahren.
+
+Außerdem funktioniert der Algorithmus zum Finden der neuen Fußpositionen nur mit Collidern, die entlang der X- und Y-Achsen der Spielwelt ausgerichtet sind. Schräge Flächen sind also nicht möglich. Hier könnte das System leicht erweitert werden, um mehr Variation in den Levels zu erlauben.
 
 
 
-Limits:
-- kein flight-state beim rennen
-- keine physikalische simulation
-- keine verlangsamung/beschleunigung bei bergauf/bergab gehen
-- kein kopf bone, ist aber evtl unnötig
 
-- shape deformation des charakters kann hart sein, kein fancy algorithmus dafür wird angewendet
-> wäre aber auch cpu/gpu intensiv, also für spiele lieber nicht? würde zumindest viel optimierungsarbeit kosten
-- keine schrägen oberflächen, collision detection nur aabb
-- keine foot-base
-- zyklische bewegungen
-- nur humanoide, könnte aber erweitert werden
-- collision derection nicht trivial, bei IK sogar extra hart wenn man alles auf einmal beachten will (also z.B. knie in den boden bei laufen)
+% In diesem Kapitel soll die Arbeit noch einmal kurz zusammengefasst werden. Insbesondere sollen die wesentlichen Ergebnisse Ihrer Arbeit herausgehoben werden. Erfahrungen, die z.B. Benutzer mit der Mensch-Maschine-Schnittstelle gemacht haben oder Ergebnisse von Leistungsmessungen sollen an dieser Stelle pr�sentiert werden. Sie k�nnen in diesem Kapitel auch die Ergebnisse oder das Arbeitsumfeld Ihrer Arbeit kritisch bewerten. W�nschenswerte Erweiterungen sollen als Hinweise auf weiterf�hrende Arbeiten erw�hnt werden.
 
-Verbesserungen:
-- punkte festlegen, durch die die splines verlaufen sollen (siehe bruderlin1994procedural)
-- mehrere schritte in die zukunft simulieren, um besser auf hindernisse reagieren zu können (siehe Animation of Human Walking in Virtual Environments)
+
+
+% Limits:
+% - kein flight-state beim rennen
+% - keine physikalische simulation
+% - keine verlangsamung/beschleunigung bei bergauf/bergab gehen
+% - kein kopf bone, ist aber evtl unnötig
+
+% - shape deformation des charakters kann hart sein, kein fancy algorithmus dafür wird angewendet
+% > wäre aber auch cpu/gpu intensiv, also für spiele lieber nicht? würde zumindest viel optimierungsarbeit kosten
+% % - keine schrägen oberflächen, collision detection nur aabb
+% - keine foot-base
+% - zyklische bewegungen
+% - nur humanoide, könnte aber erweitert werden
+% % - collision derection nicht trivial, bei IK sogar extra hart wenn man alles auf einmal beachten will (also z.B. knie in den boden bei laufen)
+% - umkehren sieht kacke aus, keine umkehranimation
+
+% - bleibt der charakter stehen, sieht die aimation etwas komsich aus. dafür mehr responsive als wenn er zurück oder weiter steppen würde
+% - je nachdem wann input gepollt wird kann erster schritt oft sehr klein sein
+
+% Verbesserungen:
+% - punkte festlegen, durch die die splines verlaufen sollen (siehe bruderlin1994procedural)
+% - mehrere schritte in die zukunft simulieren, um besser auf hindernisse reagieren zu können (siehe Animation of Human Walking in Virtual Environments)

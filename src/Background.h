@@ -8,7 +8,7 @@ class Renderer;
 
 class Background : Entity {
     glm::vec2 size;
-    Texture tex;
+    Texture texture;
     VertexArray<TexturedShader::Vertex> vao;
 
   public:

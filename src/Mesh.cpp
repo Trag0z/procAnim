@@ -3,24 +3,22 @@
 #include "Mesh.h"
 #include "Util.h"
 
-glm::mat3 Bone::get_transform() const {
+glm::mat3 Bone::transform() const {
     // Recurse until there's no parent
     if (parent) {
         glm::mat3 this_transform = bind_pose_transform *
                                    glm::rotate(glm::mat3(1.0f), rotation) *
                                    inverse_bind_pose_transform;
-        return parent->get_transform() * this_transform;
+        return parent->transform() * this_transform;
     }
 
-    return bind_pose_transform *
-           glm::rotate(glm::mat3(1.0f), rotation) * inverse_bind_pose_transform;
+    return bind_pose_transform * glm::rotate(glm::mat3(1.0f), rotation) *
+           inverse_bind_pose_transform;
 }
 
-glm::vec2 Bone::head() const {
-    return get_transform() * bind_pose_transform[2];
-}
+glm::vec2 Bone::head() const { return transform() * bind_pose_transform[2]; }
 
-void RiggedMesh::load_from_file(const char* file) {
+void Mesh::load_from_file(const char* file) {
     // Load data from file
     Assimp::Importer importer;
 
@@ -38,7 +36,7 @@ void RiggedMesh::load_from_file(const char* file) {
     aiMesh& mesh_data = *scene->mMeshes[0];
 
     // Import vertex data
-    RiggedMesh result;
+    Mesh result;
 
     std::vector<RiggedShader::Vertex> shader_vertices;
     shader_vertices.reserve(mesh_data.mNumVertices);
@@ -52,7 +50,7 @@ void RiggedMesh::load_from_file(const char* file) {
             {glm::vec2(vertex_data[i].x, vertex_data[i].y),
              {uv_coords[i].x, 1.0f - uv_coords[i].y},
              {0, 0},
-             {0.0f, 0.0f}}); // Or 0.5f, 0.5f?
+             {0.0f, 0.0f}});
     }
 
     std::vector<GLuint> indices;
@@ -73,7 +71,6 @@ void RiggedMesh::load_from_file(const char* file) {
 
     // Create bones and populate weight_data
     bones.reserve(mesh_data.mNumBones);
-    bones_shader_vertices.reserve(mesh_data.mNumBones * 2);
     for (uint n_bone = 0; n_bone < mesh_data.mNumBones; ++n_bone) {
         Bone bone;
 
@@ -93,8 +90,6 @@ void RiggedMesh::load_from_file(const char* file) {
         }
 
         bones.push_back(bone);
-        bones_shader_vertices.push_back({glm::vec4()});
-        bones_shader_vertices.push_back({glm::vec4()});
     }
 
     // Find bone parents, calculate length and tail positions
@@ -116,14 +111,16 @@ void RiggedMesh::load_from_file(const char* file) {
     size_t* vertex_bone_counts = new size_t[shader_vertices.size()];
     memset(vertex_bone_counts, 0, shader_vertices.size() * sizeof(size_t));
 
-    for (auto w : weight_data) {
-        size_t bone_count = vertex_bone_counts[w.vert_index];
+    for (auto this_weight : weight_data) {
+        // Maximum 2 bones per vertex allowed, skip if there are two already
+        size_t bone_count = vertex_bone_counts[this_weight.vert_index];
         if (bone_count == RiggedShader::MAX_BONES_PER_VERTEX)
             continue;
 
-        shader_vertices[w.vert_index].bone_indices[bone_count] =
-            static_cast<GLuint>(w.bone_index);
-        shader_vertices[w.vert_index].bone_weights[bone_count] = w.weight;
+        shader_vertices[this_weight.vert_index].bone_indices[bone_count] =
+            static_cast<GLuint>(this_weight.bone_index);
+        shader_vertices[this_weight.vert_index].bone_weights[bone_count] =
+            this_weight.weight;
         ++bone_count;
     }
     delete[] vertex_bone_counts;
@@ -133,17 +130,26 @@ void RiggedMesh::load_from_file(const char* file) {
              static_cast<GLuint>(shader_vertices.size()), GL_STATIC_DRAW);
 
     // Create and upload bone render data to GPU
-    size_t num_bone_indices = bones_shader_vertices.size();
-    GLuint* bone_indices = new GLuint[num_bone_indices];
-    for (size_t i = 0; i < num_bone_indices; ++i) {
-        bone_indices[i] = static_cast<GLuint>(i);
+    const GLuint num_bone_vertices = mesh_data.mNumBones * 2;
+    std::vector<GLuint> bone_indices;
+    bone_indices.reserve(num_bone_vertices);
+    for (GLuint i = 0; i < num_bone_vertices; ++i) {
+        bone_indices.push_back(i);
     }
 
-    bones_vao.init(bone_indices, static_cast<GLuint>(num_bone_indices), NULL,
-                   static_cast<GLuint>(bones_shader_vertices.size()));
+    std::vector<BoneShader::Vertex> bone_vertices;
+    bone_vertices.reserve(mesh_data.mNumBones * 2);
+    for (size_t i = 0; i < bones.size(); ++i) {
+        bone_vertices.push_back({bones[i].bind_pose_transform[2]});
+        bone_vertices.push_back(
+            {bones[i].bind_pose_transform * glm::vec3(bones[i].tail, 1.0f)});
+    }
+
+    bones_vao.init(bone_indices.data(), num_bone_vertices, bone_vertices.data(),
+                   num_bone_vertices, GL_STATIC_DRAW);
 }
 
-Bone* RiggedMesh::find_bone(const char* str) {
+Bone* Mesh::find_bone(const char* str) {
     for (uint i = 0; i < bones.size(); ++i) {
         if (bones[i].name.compare(str) == 0) {
             return &bones[i];

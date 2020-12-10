@@ -26,6 +26,10 @@
 \usepackage[pdftex]{graphicx}
 \usepackage{epstopdf}
 \usepackage[pdftex,plainpages=false]{hyperref}
+% \usepackage[paper=portrait,pagesize]{typearea}
+% \usepackage{rotating}
+\usepackage{lscape}
+\usepackage{subcaption}
 %\else
 %\usepackage{graphicx}
 %\usepackage[plainpages=false]{hyperref}
@@ -42,8 +46,8 @@
 \usepackage{listings} 			% Code-Darstellung
 \lstset
 {
-	basicstyle=\scriptsize, 	% print whole listing small
-	keywordstyle=\color{blue}\bfseries,
+	basicstyle=\ttfamily, % \scriptsize, 	% print whole listing small
+	keywordstyle=\color{blue}, %\bfseries,
 								% underlined bold black keywords
 	identifierstyle=, 			% nothing happens
 	commentstyle=\color{red}, 	% white comments
@@ -56,7 +60,8 @@
 	rulesepcolor=\color{blue},
 	numbers=left,
 	linewidth=146mm,
-	xleftmargin=8mm
+	xleftmargin=8mm,
+	language=C++
 }
 \usepackage{textcomp} 			% Celsius-Darstellung
 \usepackage{amssymb,amsfonts,amstext,amsmath}	% Mathematische Symbole
@@ -75,8 +80,8 @@
 %--------------------------------------------------------------------------
 \begin{document}
 %------------------------- Titelblatt -------------------------------------
-\title{Entwicklung eines 2D Character-Animationssystemes für automatische Laufbewegungen}
-\subtitle{Development of a 2D Character Animation System for automatic Walking}
+\title{Entwicklung eines 2D Charakter-Animationssystemes für automatische Laufbewegungen}
+\subtitle{Development of a 2D Character Animation System for Automatic Walking Movements}
 %---- Die Art der Dokumentation kann hier ausgew�hlt werden---------------
 %\project{Bachelor-Projektarbeit}
 \project{Bachelor-Abschlussarbeit}
@@ -85,10 +90,10 @@
 %\project{Seminar zur Vorlesung ...}
 %\project{Hausarbeit zur Vorlesung ...}
 %--------------------------------------------------------------------------
-\supervisor{Titel Vorname Name} 		% Betreuer der Arbeit
+\supervisor{Prof. Dr. Christoph Lürig} 		% Betreuer der Arbeit
 \author{Daniel Track} 							% Autor der Arbeit
-\address{Ort,} 							% Im Zusammenhang mit dem Datum wird hinter dem Ort ein Komma angegeben
-\submitdate{Abgabedatum} 				% Abgabedatum
+\address{Trier,} 							% Im Zusammenhang mit dem Datum wird hinter dem Ort ein Komma angegeben
+\submitdate{20.10.2020} 				% Abgabedatum
 %\begingroup
 %  \renewcommand{\thepage}{title}
 %  \mytitlepage
@@ -102,7 +107,7 @@
 %--------------------------------------------------------------------------
 \frontmatter
 %--------------------------------------------------------------------------
-\input{chapters/Vorwort}				% Vorwort (optional)
+% \input{chapters/Vorwort}				% Vorwort (optional)
 \input{chapters/Kurzfassung} 			% Kurzfassung Deutsch/English
 \tableofcontents 						% Inhaltsverzeichnis
 \listoffigures 							% Abbildungsverzeichnis (optional)
@@ -112,8 +117,8 @@
 %--------------------------------------------------------------------------
 % Die Kapitel werden in separaten .tex-Dateien abgelegt und hier eingebunden.
 \input{chapters/Einleitung}
-\input{chapters/Forschungsstand}
 \input{chapters/Grundlagen}
+\input{chapters/Forschungsstand}
 \input{chapters/Implementierung}
 \input{chapters/Ergebnisse}
 \input{chapters/ZusammenfassungAusblick}

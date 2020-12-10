@@ -26,6 +26,3 @@ struct BoxCollider {
     float top_edge() const noexcept;
     float bottom_edge() const noexcept;
 };
-
-// const std::list<const BoxCollider>
-// find_colliders_around_point(const std::list<BoxCollider>& colliders);

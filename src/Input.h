@@ -19,32 +19,21 @@ class MouseKeyboardInput {
     const Renderer* renderer;
 
   public:
+    // Game::run() sets this if there was a scroll event. Would
+    // be cleaner if this could be a private member that this class could update
+    // itself, but I could not find a way to do it that way.
     int mouse_wheel_scroll;
 
-    inline void init(const Renderer* renderer_) {
-        sdl_keyboard = SDL_GetKeyboardState(&num_keys);
-        key_ = (bool*)malloc(sizeof(bool) * (num_keys * 3));
-        key_down_ = key_ + num_keys;
-        key_up_ = key_down_ + num_keys;
-
-        renderer = renderer_;
-    }
-
+    void init(const Renderer* renderer_);
     void update();
 
-    inline bool mouse_button(MouseButton button) const {
-        return mouse_button_map & static_cast<uint>(button);
-    }
-    inline bool mouse_button_up(MouseButton button) const {
-        return mouse_button_up_map & static_cast<uint>(button);
-    }
-    inline bool mouse_button_down(MouseButton button) const {
-        return mouse_button_down_map & static_cast<uint>(button);
-    }
+    bool mouse_button(MouseButton button) const;
+    bool mouse_button_up(MouseButton button) const;
+    bool mouse_button_down(MouseButton button) const;
 
-    inline bool key(SDL_Scancode key) const { return key_[key]; }
-    inline bool key_up(SDL_Scancode key) const { return key_up_[key]; }
-    inline bool key_down(SDL_Scancode key) const { return key_down_[key]; }
+    bool key(SDL_Scancode key) const;
+    bool key_up(SDL_Scancode key) const;
+    bool key_down(SDL_Scancode key) const;
 
     glm::vec2 mouse_pos_world() const noexcept;
     glm::vec2 mouse_screen_pos() const noexcept;
@@ -55,31 +44,23 @@ class MouseKeyboardInput {
 enum class StickID : size_t { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };
 
 class Gamepad {
-    static const u32 num_axes = SDL_CONTROLLER_AXIS_MAX;
-    static const u32 num_buttons = SDL_CONTROLLER_BUTTON_MAX;
-    static const s32 stick_deadzone_in = 8000;
-    static const s32 stick_deadzone_out = 32767 - 1000;
+    static const u32 NUM_AXES = SDL_CONTROLLER_AXIS_MAX;
+    static const u32 NUM_BUTTONS = SDL_CONTROLLER_BUTTON_MAX;
+    static const s32 STICK_DEADZONE_IN = 8000;
+    static const s32 STICK_DEADZONE_OUT = 32767 - 1000;
 
     SDL_GameController* sdl_ptr = nullptr;
 
-    float axes[num_axes];
+    float axes[NUM_AXES];
     Uint32 button_map, button_down_map, button_up_map;
 
   public:
-    static const u32 NUM_PADS = 1;
-
-    static std::array<Gamepad, NUM_PADS> init();
-
+    void init();
     void update();
 
-    inline glm::vec2 stick(StickID id) const {
-        return glm::vec2(axes[static_cast<size_t>(id) * 2],
-                         axes[static_cast<size_t>(id) * 2 + 1]);
-    }
+    glm::vec2 stick(StickID id) const;
 
-    // NOTE: These could only be shifted by n-1 if SDL_GAMECONTROLLER_BUTTON
-    // starts at 1
-    inline bool button(u32 n) const { return button_map & BIT(n); };
-    inline bool button_down(u32 n) const { return button_down_map & BIT(n); };
-    inline bool button_up(u32 n) const { return button_up_map & BIT(n); };
+    inline bool button(u32 n) const;
+    inline bool button_down(u32 n) const;
+    inline bool button_up(u32 n) const;
 };

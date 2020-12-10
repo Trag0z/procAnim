@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 
+// Manages an array of vertices of type vertex_t in GPU memory.
 template <typename vertex_t> class VertexArray {
     GLuint vao_id, ebo_id, vbo_id;
     GLuint num_indices_, num_vertices_;
@@ -8,12 +9,12 @@ template <typename vertex_t> class VertexArray {
 
   public:
     void init(const GLuint* indices, GLuint num_indices,
-              const vertex_t* vertices, GLuint num_vertices,
-              GLenum usage = GL_DYNAMIC_DRAW) {
+              const vertex_t* vertices, GLuint num_vertices, GLenum usage) {
         // Template specifications for acceptable vertex types are defined
-        // below. If this function overload is called, something went wrong.
+        // in Shaders.h. If this function overload is called, something went
+        // wrong.
         printf("[ERROR] Trying to initialize VertexArray of an unknown "
-               "vertex type");
+               "vertex type!\n");
         SDL_TriggerBreakpoint();
     }
 
