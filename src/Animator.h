@@ -46,6 +46,7 @@ class Animator {
     void init(const Player* parent_, Mesh& mesh,
               const std::list<BoxCollider>& colliders);
     void update(float delta_time, float walking_speed,
+                glm::vec2 right_stick_input,
                 const std::list<BoxCollider>& colliders);
     void render(const Renderer& renderer);
 
@@ -58,7 +59,9 @@ class Animator {
     SplineEditor* spline_editor;
     Bone* spine;
 
-    // The splines are all in the players' local space.
+    glm::vec2 right_arm_target_position;
+
+    // The splines are all in the player's local space.
     SplineSet spline_prototypes;
     Spline pelvis_spline;
     float step_distance_world;

@@ -38,7 +38,8 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
         walking_speed = 0.0f;
     }
 
-    animator.update(delta_time, walking_speed, colliders);
+    animator.update(delta_time, walking_speed, gamepad->stick(StickID::RIGHT),
+                    colliders);
 
     position_ = animator.pelvis_pos();
 

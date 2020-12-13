@@ -65,8 +65,11 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos_model_space,
                              length2[0] - length2[1]) /
                             (2 * bones[0]->length * bones[1]->length);
 
+        long_factor = clamp(long_factor, -1.0f, 1.0f);
+
         bones[1]->rotation =
             atan2f(sqrtf(1.0f - long_factor * long_factor), long_factor);
+        SDL_assert(bones[1]->rotation >= 0.0f);
 
         if (is_leg) {
             bones[1]->rotation *= -1.0f;
@@ -136,7 +139,29 @@ void Animator::init(const Player* parent_, Mesh& mesh,
 }
 
 void Animator::update(float delta_time, float walking_speed,
+                      glm::vec2 right_stick_input,
                       const std::list<BoxCollider>& colliders) {
+
+    if (right_stick_input != glm::vec2(0.0f, 0.0f)) {
+        if (!parent->is_facing_right()) {
+            right_stick_input.x *= -1.0f;
+        }
+
+        auto right_arm = limbs[RIGHT_ARM];
+        float right_arm_length = right_arm.length();
+
+        auto hand_position = right_stick_input * right_arm_length;
+        float target_arm_length = glm::length(hand_position);
+
+        if (target_arm_length > right_arm_length) {
+            hand_position *= right_arm_length / target_arm_length;
+        }
+        target_arm_length = glm::length(hand_position);
+        SDL_assert(target_arm_length <= right_arm_length * 1.01f);
+
+        right_arm_target_position = right_arm.origin() + hand_position;
+    }
+
     if (walking_speed > 0.0f) {
         if (leg_state == NEUTRAL) {
             // Start to walk
@@ -191,13 +216,19 @@ void Animator::update(float delta_time, float walking_speed,
     spine->rotation = lerp(spine->rotation, spine_rotation_target,
                            interpolation_factor_on_spline);
 
-    for (size_t i = 0; i < 4; ++i) {
-        auto& limb = limbs[i];
+    for (size_t n_limb = 0; n_limb < 4; ++n_limb) {
+        auto& limb = limbs[n_limb];
 
-        glm::vec2 target_pos = parent->world_to_local_space(
-            limb.spline.get_point_on_spline(interpolation_factor_on_spline));
+        glm::vec2 target_pos;
+        if (n_limb == RIGHT_ARM && right_stick_input != glm::vec2(0.0f, 0.0f)) {
+            target_pos = right_arm_target_position;
+        } else {
+            target_pos =
+                parent->world_to_local_space(limb.spline.get_point_on_spline(
+                    interpolation_factor_on_spline));
+        }
 
-        if (i == LEFT_LEG || i == RIGHT_LEG) {
+        if (n_limb == LEFT_LEG || n_limb == RIGHT_LEG) {
             solve_ik(limb.bones, target_pos, true);
         } else {
             solve_ik(limb.bones, target_pos, false);

@@ -46,7 +46,7 @@ enum class StickID : size_t { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };
 class Gamepad {
     static const u32 NUM_AXES = SDL_CONTROLLER_AXIS_MAX;
     static const u32 NUM_BUTTONS = SDL_CONTROLLER_BUTTON_MAX;
-    static const s32 STICK_DEADZONE_IN = 8000;
+    static const s32 STICK_DEADZONE_IN = 3000;
     static const s32 STICK_DEADZONE_OUT = 32767 - 1000;
 
     SDL_GameController* sdl_ptr = nullptr;

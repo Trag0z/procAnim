@@ -11,6 +11,12 @@ inline void setNthBitTo(unsigned int& bitField, unsigned int n, int value) {
 
 template <typename T> T lerp(T a, T b, float t) { return a + (b - a) * t; }
 
+template <typename T>
+constexpr const T& clamp(const T& v, const T& low, const T& high) {
+    SDL_assert(low < high);
+    return (v < low) ? low : (high < v) ? high : v;
+}
+
 typedef const wchar_t* cwstrptr_t;
 bool get_save_path(std::string& path, cwstrptr_t filter_name = nullptr,
                    cwstrptr_t filter_pattern = nullptr,
