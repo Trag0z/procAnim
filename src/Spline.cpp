@@ -289,22 +289,20 @@ void SplineEditor::set_spline_point(glm::vec2 new_point, size_t point_index,
     }
     selected_spline.update_render_data();
 
-    if (selected_spline_index != Animator::PELVIS) {
-        // Conditionally set points on other splines as well
-        bool updated = false;
-        auto& partner_spline = splines[opposite_direction(spline_index)];
-        if (connect_point_pairs && (point_index == P1 || point_index == P2)) {
-            partner_spline.points_[3 - point_index] = point_to_set;
-            updated = true;
-        }
-        if (connect_tangent_pairs && (point_index == T1 || point_index == T2)) {
-            partner_spline.points_[3 - point_index] = point_to_set;
-            updated = true;
-        }
-
-        if (updated)
-            partner_spline.update_render_data();
+    // Conditionally set points on other splines as well
+    bool updated = false;
+    auto& partner_spline = splines[opposite_direction(spline_index)];
+    if (connect_point_pairs && (point_index == P1 || point_index == P2)) {
+        partner_spline.points_[3 - point_index] = point_to_set;
+        updated = true;
     }
+    if (connect_tangent_pairs && (point_index == T1 || point_index == T2)) {
+        partner_spline.points_[3 - point_index] = point_to_set;
+        updated = true;
+    }
+
+    if (updated)
+        partner_spline.update_render_data();
 }
 
 bool SplineEditor::update(const MouseKeyboardInput& input) {
@@ -416,8 +414,8 @@ bool SplineEditor::update_gui() {
     NewLine();
     Text("Splines");
 
-    const char* spline_names[NUM_SPLINES_PER_ANIMATION] = {
-        "Leg_Forward", "Leg_Backward", "Arm_Forward", "Arm_Backward", "Pelvis"};
+    const char* spline_names[NUM_SPLINES_PER_ANIMATION] = {"Leg_Forward",
+                                                           "Leg_Backward"};
 
     selected = static_cast<int>(selected_spline_index);
     ListBox("Splines", &selected, spline_names,
@@ -486,35 +484,32 @@ bool SplineEditor::update_gui() {
             set_spline_point(points[P2], P2, forward_spline_index);
         }
 
-        if (selected_spline_index != Animator::PELVIS) {
+        NewLine();
 
-            NewLine();
+        size_t backward_spline_index = forward_spline_index + 1;
+        if (selected_animation == WALK) {
+            spline_set->walk[backward_spline_index].points_;
+        } else if (selected_animation == RUN) {
+            spline_set->run[backward_spline_index].points_;
+        } else if (selected_animation == IDLE) {
+            spline_set->idle[backward_spline_index].points_;
+        }
 
-            size_t backward_spline_index = forward_spline_index + 1;
-            if (selected_animation == WALK) {
-                spline_set->walk[backward_spline_index].points_;
-            } else if (selected_animation == RUN) {
-                spline_set->run[backward_spline_index].points_;
-            } else if (selected_animation == IDLE) {
-                spline_set->idle[backward_spline_index].points_;
-            }
-
-            if (DragFloat2("P1 (backward)", value_ptr(points[0]), sensitivity,
-                           0.0f, 0.0f, "% .2f")) {
-                set_spline_point(points[P1], P1, backward_spline_index);
-            }
-            if (DragFloat2("T1 (backward)", value_ptr(points[1]), sensitivity,
-                           0.0f, 0.0f, "% .2f")) {
-                set_spline_point(points[T1], T1, backward_spline_index);
-            }
-            if (DragFloat2("T2 (backward)", value_ptr(points[2]), sensitivity,
-                           0.0f, 0.0f, "% .2f")) {
-                set_spline_point(points[T2], T2, backward_spline_index);
-            }
-            if (DragFloat2("P2 (backward)", value_ptr(points[3]), sensitivity,
-                           0.0f, 0.0f, "% .2f")) {
-                set_spline_point(points[P2], P2, backward_spline_index);
-            }
+        if (DragFloat2("P1 (backward)", value_ptr(points[0]), sensitivity, 0.0f,
+                       0.0f, "% .2f")) {
+            set_spline_point(points[P1], P1, backward_spline_index);
+        }
+        if (DragFloat2("T1 (backward)", value_ptr(points[1]), sensitivity, 0.0f,
+                       0.0f, "% .2f")) {
+            set_spline_point(points[T1], T1, backward_spline_index);
+        }
+        if (DragFloat2("T2 (backward)", value_ptr(points[2]), sensitivity, 0.0f,
+                       0.0f, "% .2f")) {
+            set_spline_point(points[T2], T2, backward_spline_index);
+        }
+        if (DragFloat2("P2 (backward)", value_ptr(points[3]), sensitivity, 0.0f,
+                       0.0f, "% .2f")) {
+            set_spline_point(points[P2], P2, backward_spline_index);
         }
     }
 
@@ -535,13 +530,8 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         // NOTE: This is calculated every frame, but is not necessary most of
         // the time.
         float radius;
-        if (selected_spline_index == Animator::LEG_FORWARD ||
-            selected_spline_index == Animator::LEG_BACKWARD) {
 
             radius = limbs[Animator::LEFT_LEG].length();
-        } else {
-            radius = limbs[Animator::LEFT_ARM].length();
-        }
 
         DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];
 

@@ -41,8 +41,6 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
     animator.update(delta_time, walking_speed, gamepad->stick(StickID::RIGHT),
                     colliders);
 
-    position_ = animator.pelvis_pos();
-
     update_model_matrix();
 }
 
@@ -58,6 +56,9 @@ void Player::render(const Renderer& renderer) {
     renderer.rigged_shader.set_model(&model);
     renderer.rigged_shader.set_bone_transforms(bone_transforms);
 
+    // renderer.textured_shader.use();
+    // renderer.textured_shader.set_model(&model);
+
     // Render player model
     if (renderer.draw_model) {
         glActiveTexture(GL_TEXTURE0);
@@ -68,6 +69,10 @@ void Player::render(const Renderer& renderer) {
 
     renderer.debug_shader.use();
     renderer.debug_shader.set_model(&model);
+
+    if (renderer.draw_wireframe) {
+        mesh.vao.draw(GL_LINE_LOOP);
+    }
 
     // Render bones
     if (renderer.draw_bones) {

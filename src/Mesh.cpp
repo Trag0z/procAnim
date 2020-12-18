@@ -32,6 +32,8 @@ void Mesh::load_from_file(const char* file) {
     }
 
     SDL_assert(scene->HasMeshes());
+    SDL_assert(scene->mNumMeshes == 1);
+    SDL_assert(scene->mNumMaterials == 1);
 
     aiMesh& mesh_data = *scene->mMeshes[0];
 
@@ -112,7 +114,7 @@ void Mesh::load_from_file(const char* file) {
     memset(vertex_bone_counts, 0, shader_vertices.size() * sizeof(size_t));
 
     for (auto this_weight : weight_data) {
-        // Maximum 2 bones per vertex allowed, skip if there are two already
+        // Maximum 2 bones per vertex allowed, skip if there are 2 already
         size_t bone_count = vertex_bone_counts[this_weight.vert_index];
         if (bone_count == RiggedShader::MAX_BONES_PER_VERTEX)
             continue;

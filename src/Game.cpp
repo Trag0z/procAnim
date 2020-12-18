@@ -117,16 +117,7 @@ void Game::run() {
         renderer.draw_bones = !renderer.draw_bones;
     }
     if (mouse_keyboard_input.key_down(Keybinds::DRAW_SPLINES)) {
-        if (renderer.draw_arm_splines || renderer.draw_leg_splines ||
-            renderer.draw_pelvis_spline) {
-            renderer.draw_arm_splines = false;
-            renderer.draw_leg_splines = false;
-            renderer.draw_pelvis_spline = false;
-        } else {
-            renderer.draw_arm_splines = true;
-            renderer.draw_leg_splines = true;
-            renderer.draw_pelvis_spline = true;
-        }
+        renderer.draw_leg_splines = !renderer.draw_leg_splines;
     }
     if (mouse_keyboard_input.key_down(Keybinds::STEP_MODE)) {
         game_config.step_mode = !game_config.step_mode;
@@ -220,12 +211,11 @@ void Game::update_gui() {
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
     Checkbox("Render player model", &renderer.draw_model);
     Checkbox("Render bones", &renderer.draw_bones);
+    Checkbox("Render wireframe", &renderer.draw_wireframe);
 
     NewLine();
     Text("Render splines for:");
-    Checkbox("Arms", &renderer.draw_arm_splines);
-    Checkbox("Legs", &renderer.draw_leg_splines);
-    Checkbox("Pelvis", &renderer.draw_pelvis_spline);
+    Checkbox("Arms", &renderer.draw_leg_splines);
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
@@ -246,7 +236,6 @@ void Game::update_gui() {
               "%.1f");
     DragFloat2("Interpolation speed min/max",
                &player.animator.interpolation_speed_multiplier.min, 0.01f);
-    DragFloat("Max spine rotation", &player.animator.max_spine_rotation, 0.01f);
     PopItemWidth();
 
     End();

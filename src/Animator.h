@@ -15,9 +15,9 @@ class Player;
 // system went through, but I also don't see a good way to restructure it so it
 // only contains the relevant splines.
 struct SplineSet {
-    Spline walk[5];
-    Spline run[5];
-    Spline idle[5];
+    Spline walk[2];
+    Spline run[2];
+    Spline idle[2];
 };
 
 struct Limb {
@@ -32,16 +32,10 @@ struct Limb {
 class Animator {
   public:
     // Indices of the splines for the animations in SplineSet
-    enum SplineIndex {
-        LEG_FORWARD = 0,
-        LEG_BACKWARD = 1,
-        ARM_FORWARD = 2,
-        ARM_BACKWARD = 3,
-        PELVIS = 4
-    };
+    enum SplineIndex { LEG_FORWARD = 0, LEG_BACKWARD = 1 };
 
     // Indices of the limbs for the limbs member variable.
-    enum LimbIndex { LEFT_ARM = 0, RIGHT_ARM = 1, LEFT_LEG = 2, RIGHT_LEG = 3 };
+    enum LegIndex { LEFT_LEG = 0, RIGHT_LEG = 1 };
 
     void init(const Player* parent_, Mesh& mesh,
               const std::list<BoxCollider>& colliders);
@@ -50,26 +44,24 @@ class Animator {
                 const std::list<BoxCollider>& colliders);
     void render(const Renderer& renderer);
 
-    glm::vec2 tip_pos(LimbIndex limb_index) const;
-
-    glm::vec2 pelvis_pos() const;
+    glm::vec2 tip_pos(LegIndex limb_index) const;
 
   private:
     const Player* parent;
     SplineEditor* spline_editor;
-    Bone* spine;
+    Bone* weapon;
+    float max_weapon_length = 2.0f;
 
     glm::vec2 right_arm_target_position;
 
     // The splines are all in the player's local space.
     SplineSet spline_prototypes;
-    Spline pelvis_spline;
     float step_distance_world;
     float spine_rotation_target;
 
-    float pelvis_height;
+    // float pelvis_height;
 
-    Limb limbs[4];
+    Limb limbs[2];
 
     float interpolation_factor_between_splines;
     float interpolation_factor_on_spline;
@@ -82,7 +74,6 @@ class Animator {
         last_leg_state;
 
     float step_distance_multiplier = 100.0f;
-    float max_spine_rotation = 0.25f;
 
     struct InterpolationSpeedMultiplier {
         float min = 0.02f, max = 0.08f;

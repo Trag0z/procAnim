@@ -1,4 +1,7 @@
 NEXT:
+- why is the body not rendering?
+
+
 - change fix camera
 - hitboxes/attacks
 
