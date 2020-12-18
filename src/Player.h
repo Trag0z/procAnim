@@ -11,7 +11,9 @@ struct BoxCollider;
 
 class Player : public Entity {
     Texture texture;
-    Mesh mesh;
+    Mesh body_mesh;
+    RiggedMesh rigged_mesh;
+
     Animator animator;
     const Gamepad* gamepad;
 

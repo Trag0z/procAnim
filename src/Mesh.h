@@ -28,11 +28,17 @@ struct Bone {
 };
 
 struct Mesh {
+    VertexArray<TexturedShader::Vertex> vao;
+};
+
+struct RiggedMesh {
     VertexArray<RiggedShader::Vertex> vao;
     VertexArray<BoneShader::Vertex> bones_vao;
 
     std::vector<Bone> bones;
 
     Bone* find_bone(const char* name);
-    void load_from_file(const char* file);
 };
+
+void load_character_model_from_file(const char* path, Mesh& body_mesh,
+                                    RiggedMesh& rigged_mesh);

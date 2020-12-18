@@ -1,17 +1,11 @@
 NEXT:
-- why is the body not rendering?
-
-
-- change fix camera
-- hitboxes/attacks
+- correct height above ground
+- movement
 
 TODO:
+- change fix camera
+- hitboxes/attacks
 - one frame leg glitch into ground when starting to move
-
-- arm idle animation looks stupid
-- arm going back to idle is still a little werid
-- more polygons, nicer texture
-- test utf8 chars in save/load strings
 
 Bugs:               (@BUG)
 - SplineEditor sets connected tangents in wrong direction since it still assumes what has been true some time ago

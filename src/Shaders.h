@@ -68,6 +68,7 @@ class RiggedShader : public ShaderDetail::Shader {
     RiggedShader() {}
     RiggedShader(const char* vert_path, const char* frag_path);
 
+    void set_texture(const Texture& texture) const;
     void set_bone_transforms(const glm::mat3* transforms) const;
 
     struct Vertex {

@@ -91,7 +91,7 @@ float Limb::length() const { return bones[0]->length + bones[1]->length; }
 //          Animator        //
 //                          //
 
-void Animator::init(const Player* parent_, Mesh& mesh,
+void Animator::init(const Player* parent_, RiggedMesh& mesh,
                     const std::list<BoxCollider>& colliders) {
     parent = parent_;
     spline_editor = new SplineEditor();

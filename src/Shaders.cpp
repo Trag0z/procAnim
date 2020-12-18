@@ -147,6 +147,11 @@ RiggedShader::RiggedShader(const char* vert_path, const char* frag_path)
     bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
 }
 
+void RiggedShader::set_texture(const Texture& texture) const {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture.id);
+}
+
 void RiggedShader::set_bone_transforms(const glm::mat3* transforms) const {
     use();
     glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,

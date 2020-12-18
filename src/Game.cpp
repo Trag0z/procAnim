@@ -293,7 +293,7 @@ void Game::update_gui() {
     NextColumn();
     Separator();
 
-    for (const auto& bone : player.mesh.bones) {
+    for (const auto& bone : player.rigged_mesh.bones) {
         Text(bone.name.c_str());
         NextColumn();
 

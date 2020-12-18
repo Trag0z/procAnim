@@ -5,12 +5,12 @@
 #include "level/Collider.h"
 
 void Player::init(glm::vec3 position, glm::vec3 scale_,
-                  const char* texture_path, const char* mesh_path,
+                  const char* texture_path, const char* model_path,
                   const Gamepad* pad, const std::list<BoxCollider>& colliders) {
     Entity::init(position, scale_);
     texture.load_from_file(texture_path);
-    mesh.load_from_file(mesh_path);
-    animator.init(this, mesh, colliders);
+    load_character_model_from_file(model_path, body_mesh, rigged_mesh);
+    animator.init(this, rigged_mesh, colliders);
     SDL_assert(pad);
     gamepad = pad;
 }
@@ -47,31 +47,34 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 void Player::render(const Renderer& renderer) {
     // Calculate bone transforms from their rotations
     glm::mat3 bone_transforms[RiggedShader::NUMBER_OF_BONES];
-    SDL_assert(mesh.bones.size() <= RiggedShader::NUMBER_OF_BONES);
-    for (size_t i = 0; i < mesh.bones.size(); ++i) {
-        bone_transforms[i] = mesh.bones[i].transform();
+    SDL_assert(rigged_mesh.bones.size() <= RiggedShader::NUMBER_OF_BONES);
+    for (size_t i = 0; i < rigged_mesh.bones.size(); ++i) {
+        bone_transforms[i] = rigged_mesh.bones[i].transform();
     }
-
-    renderer.rigged_shader.use();
-    renderer.rigged_shader.set_model(&model);
-    renderer.rigged_shader.set_bone_transforms(bone_transforms);
-
-    // renderer.textured_shader.use();
-    // renderer.textured_shader.set_model(&model);
 
     // Render player model
     if (renderer.draw_model) {
+        // Render rigged_mesh
+        renderer.rigged_shader.use();
+        renderer.rigged_shader.set_model(&model);
+        renderer.rigged_shader.set_bone_transforms(bone_transforms);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture.id);
 
-        mesh.vao.draw(GL_TRIANGLES);
+        rigged_mesh.vao.draw(GL_TRIANGLES);
+
+        // Render body_mesh
+        renderer.textured_shader.use();
+        renderer.textured_shader.set_model(&model);
+
+        body_mesh.vao.draw(GL_TRIANGLES);
     }
 
-    renderer.debug_shader.use();
-    renderer.debug_shader.set_model(&model);
-
     if (renderer.draw_wireframe) {
-        mesh.vao.draw(GL_LINE_LOOP);
+        renderer.debug_shader.use();
+        renderer.debug_shader.set_model(&model);
+        rigged_mesh.vao.draw(GL_LINE_LOOP);
     }
 
     // Render bones
@@ -81,8 +84,8 @@ void Player::render(const Renderer& renderer) {
         renderer.bone_shader.set_bone_transforms(bone_transforms);
 
         glLineWidth(2.0f);
-        mesh.bones_vao.draw(GL_LINES);
-        mesh.bones_vao.draw(GL_POINTS);
+        rigged_mesh.bones_vao.draw(GL_LINES);
+        rigged_mesh.bones_vao.draw(GL_POINTS);
     }
 
     // Render animator target positions
