@@ -23,21 +23,21 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos_model_space) {
 
     // This algorithm assumes that the angle between the bones in bind pose is
     // zero. Check this assumption here, just to be sure.
-    SDL_assert(
-        glm::length(glm::cross(
-            bones[0]->bind_pose_transform[2] -
-                bones[0]->bind_pose_transform * glm::vec3(bones[0]->tail, 1.0f),
-            bones[1]->bind_pose_transform[2] -
-                bones[1]->bind_pose_transform *
-                    glm::vec3(bones[1]->tail, 1.0f))) < 0.1f);
+    SDL_assert(glm::length(glm::cross(
+                   bones[0]->bind_pose_transform()[2] -
+                       bones[0]->bind_pose_transform() *
+                           glm::vec3(bones[0]->tail(), 1.0f),
+                   bones[1]->bind_pose_transform()[2] -
+                       bones[1]->bind_pose_transform() *
+                           glm::vec3(bones[1]->tail(), 1.0f))) < 0.1f);
 
     float target_distance =
         glm::length(bones[0]->head() - target_pos_model_space);
 
     if (target_distance > bones[0]->length + bones[1]->length) {
         glm::vec2 local_target_pos =
-            glm::vec2(bones[0]->inverse_bind_pose_transform *
-                      glm::inverse(bones[0]->parent->transform()) *
+            glm::vec2(bones[0]->inverse_bind_pose_transform() *
+                      glm::inverse(bones[0]->parent()->transform()) *
                       glm::vec3(target_pos_model_space, 1.0f));
 
         bones[0]->rotation =
@@ -52,8 +52,8 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos_model_space) {
             Bone& b = *bones[i];
 
             local_target[i] =
-                glm::vec2(b.inverse_bind_pose_transform *
-                          glm::inverse(b.parent->transform()) *
+                glm::vec2(b.inverse_bind_pose_transform() *
+                          glm::inverse(b.parent()->transform()) *
                           glm::vec3(target_pos_model_space, 1.0f));
             local_target2[i] = local_target[i] * local_target[i];
 
@@ -114,9 +114,6 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh,
 
     weapon = mesh.find_bone("Weapon");
 
-    // pelvis_height =
-    //     parent->local_to_world_scale(limbs[LEFT_LEG].bones[2]->tail).y;
-
     set_new_splines(0.0f, colliders);
     interpolation_factor_on_spline =
         1.0f; // Make the palyer move to the final position of the initial
@@ -133,14 +130,14 @@ void Animator::update(float delta_time, float walking_speed,
         }
 
         float weapon_rotation =
-            atan2f(right_stick_input.y, right_stick_input.x);
+            atan2f(right_stick_input.y, right_stick_input.x) - PI * 0.5f;
 
         float weapon_length =
             glm::length(right_stick_input) * max_weapon_length;
 
         weapon->rotation = weapon_rotation;
-        SDL_assert(weapon->tail.x == 0.0f);
-        weapon->tail.y = weapon_length;
+        SDL_assert(weapon->tail().x == 0.0f);
+        weapon->length = weapon_length; // probably scales everything
     }
 
     if (walking_speed > 0.0f) {

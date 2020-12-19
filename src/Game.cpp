@@ -209,7 +209,8 @@ void Game::update_gui() {
 
     //////          Debug controls window           //////
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
-    Checkbox("Render player model", &renderer.draw_model);
+    Checkbox("Render player limbs", &renderer.draw_limbs);
+    Checkbox("Render player body", &renderer.draw_body);
     Checkbox("Render bones", &renderer.draw_bones);
     Checkbox("Render wireframe", &renderer.draw_wireframe);
 
@@ -241,83 +242,83 @@ void Game::update_gui() {
     End();
 
     //////          Limb data display window            //////
-    // This is a big window that displays a lot of the data about the player and
-    // its limbs. It's probably not really useful to show off the functionality
-    // of the program, but it was helpful in debugging.
-    Begin("Limb data", NULL);
+    // // This is a big window that displays a lot of the data about the player
+    // and
+    // // its limbs. It's probably not really useful to show off the
+    // functionality
+    // // of the program, but it was helpful in debugging.
+    // Begin("Limb data", NULL);
 
-    char label[128];
+    // char label[128];
 
-    sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x, player.position_.y);
-    Text("Player position: ");
-    SameLine();
-    DragFloat2("Player position", value_ptr(player.position_), 1.0f, 0.0f, 0.0f,
-               "% .2f");
+    // sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x,
+    // player.position_.y); Text("Player position: "); SameLine();
+    // DragFloat2("Player position", value_ptr(player.position_), 1.0f, 0.0f,
+    // 0.0f,
+    //            "% .2f");
 
-    Text("Target Positions");
-    Columns(4);
-    Separator();
-    Text("Arm_L");
-    NextColumn();
-    Text("Arm_R");
-    NextColumn();
-    Text("Leg_L");
-    NextColumn();
-    Text("Leg_R");
-    NextColumn();
-    Separator();
+    // Text("Target Positions");
+    // Columns(4);
+    // Separator();
+    // Text("Arm_L");
+    // NextColumn();
+    // Text("Arm_R");
+    // NextColumn();
+    // Text("Leg_L");
+    // NextColumn();
+    // Text("Leg_R");
+    // NextColumn();
+    // Separator();
 
-    for (const auto& limb : player.animator.limbs) {
-        glm::vec2 target_world_pos =
-            player.local_to_world_space(limb.spline.point(P2));
-        sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
-                  target_world_pos.y);
-        Text(label);
-        NextColumn();
-    }
+    // for (const auto& limb : player.animator.limbs) {
+    //     glm::vec2 target_world_pos =
+    //         player.local_to_world_space(limb.spline.point(P2));
+    //     sprintf_s(label, "%6.1f, %6.1f", target_world_pos.x,
+    //               target_world_pos.y);
+    //     Text(label);
+    //     NextColumn();
+    // }
 
-    Columns(1);
-    Separator();
+    // Columns(1);
+    // Separator();
 
-    NewLine();
-    Text("Limb data");
-    Columns(4);
-    Separator();
-    Text("Name");
-    NextColumn();
-    Text("Rotation deg/rad");
-    NextColumn();
-    Text("Head Position");
-    NextColumn();
-    Text("Tail Position");
-    NextColumn();
-    Separator();
+    // NewLine();
+    // Text("Limb data");
+    // Columns(4);
+    // Separator();
+    // Text("Name");
+    // NextColumn();
+    // Text("Rotation deg/rad");
+    // NextColumn();
+    // Text("Head Position");
+    // NextColumn();
+    // Text("Tail Position");
+    // NextColumn();
+    // Separator();
 
-    for (const auto& bone : player.rigged_mesh.bones) {
-        Text(bone.name.c_str());
-        NextColumn();
+    // for (const auto& bone : player.rigged_mesh.bones) {
+    //     Text(bone.name.c_str());
+    //     NextColumn();
 
-        sprintf_s(label, "% 6.1f /% 1.2f", glm::degrees(bone.rotation),
-                  bone.rotation);
-        Text(label);
-        NextColumn();
+    //     sprintf_s(label, "% 6.1f /% 1.2f", glm::degrees(bone.rotation),
+    //               bone.rotation);
+    //     Text(label);
+    //     NextColumn();
 
-        glm::vec2 head_world_pos = player.local_to_world_space(
-            bone.transform() * bone.bind_pose_transform *
-            glm::vec3(bone.head(), 1.0f));
-        sprintf_s(label, "% 7.1f, % 7.1f", head_world_pos.x, head_world_pos.y);
-        Text(label);
-        NextColumn();
+    //     glm::vec2 head_world_pos = player.local_to_world_space(
+    //         bone.transform() * bone.bind_pose_transform_ *
+    //         glm::vec3(bone.head(), 1.0f));
+    //     sprintf_s(label, "% 7.1f, % 7.1f", head_world_pos.x,
+    //     head_world_pos.y); Text(label); NextColumn();
 
-        glm::vec2 tail_world_pos = player.local_to_world_space(
-            glm::vec2(bone.transform() * bone.bind_pose_transform *
-                      glm::vec3(bone.tail, 1.0f)));
-        sprintf_s(label, "% 7.1f, % 7.1f", tail_world_pos.x, tail_world_pos.y);
-        Text(label);
-        NextColumn();
-    }
-    Columns(1);
-    Separator();
+    //     glm::vec2 tail_world_pos = player.local_to_world_space(
+    //         glm::vec2(bone.transform() * bone.bind_pose_transform_ *
+    //                   glm::vec3(bone.tail, 1.0f)));
+    //     sprintf_s(label, "% 7.1f, % 7.1f", tail_world_pos.x,
+    //     tail_world_pos.y); Text(label); NextColumn();
+    // }
+    // Columns(1);
+    // Separator();
 
-    End();
+    // End();
 }

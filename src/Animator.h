@@ -4,7 +4,7 @@
 #include "Spline.h"
 #include "level/Collider.h"
 
-struct Bone;
+class Bone;
 struct RiggedMesh;
 class Game;
 class Player;
@@ -50,7 +50,7 @@ class Animator {
     const Player* parent;
     SplineEditor* spline_editor;
     Bone* weapon;
-    float max_weapon_length = 2.0f;
+    float max_weapon_length = 3.0f;
 
     glm::vec2 right_arm_target_position;
 

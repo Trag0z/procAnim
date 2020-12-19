@@ -52,21 +52,21 @@ void Player::render(const Renderer& renderer) {
         bone_transforms[i] = rigged_mesh.bones[i].transform();
     }
 
-    // Render player model
-    if (renderer.draw_model) {
-        // Render rigged_mesh
+    if (renderer.draw_limbs) {
         renderer.rigged_shader.use();
         renderer.rigged_shader.set_model(&model);
         renderer.rigged_shader.set_bone_transforms(bone_transforms);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture.id);
+        renderer.rigged_shader.set_texture(texture);
 
         rigged_mesh.vao.draw(GL_TRIANGLES);
+    }
 
-        // Render body_mesh
+    if (renderer.draw_body) {
         renderer.textured_shader.use();
         renderer.textured_shader.set_model(&model);
+
+        renderer.textured_shader.set_texture(texture);
 
         body_mesh.vao.draw(GL_TRIANGLES);
     }

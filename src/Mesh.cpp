@@ -3,24 +3,38 @@
 #include "Mesh.h"
 #include "Util.h"
 
-glm::mat3 Bone::transform() const {
-    // Recurse until there's no parent
-    if (parent) {
-        glm::mat3 this_transform = bind_pose_transform *
-                                   glm::rotate(glm::mat3(1.0f), rotation) *
-                                   inverse_bind_pose_transform;
-        return parent->transform() * this_transform;
-    }
-
-    return bind_pose_transform * glm::rotate(glm::mat3(1.0f), rotation) *
-           inverse_bind_pose_transform;
+const std::string& Bone::name() const { return name_; }
+const Bone* Bone::parent() const { return parent_; }
+glm::vec2 Bone::tail() const { return tail_; }
+const glm::mat3& Bone::bind_pose_transform() const {
+    return bind_pose_transform_;
+}
+const glm::mat3& Bone::inverse_bind_pose_transform() const {
+    return inverse_bind_pose_transform_;
 }
 
-glm::vec2 Bone::head() const { return transform() * bind_pose_transform[2]; }
+glm::mat3 Bone::transform() const {
+    glm::mat3 scale =
+        glm::scale(glm::mat3(1.0f), glm::vec2(length / original_length,
+                                              length / original_length));
+
+    if (parent_) {
+        // Recurse until there's no parent
+        glm::mat3 this_transform = bind_pose_transform_ *
+                                   glm::rotate(glm::mat3(1.0f), rotation) *
+                                   scale * inverse_bind_pose_transform_;
+        return parent_->transform() * this_transform;
+    }
+
+    return bind_pose_transform_ * glm::rotate(glm::mat3(1.0f), rotation) *
+           scale * inverse_bind_pose_transform_;
+}
+
+glm::vec2 Bone::head() const { return transform() * bind_pose_transform_[2]; }
 
 Bone* RiggedMesh::find_bone(const char* str) {
     for (uint i = 0; i < bones.size(); ++i) {
-        if (bones[i].name.compare(str) == 0) {
+        if (bones[i].name().compare(str) == 0) {
             return &bones[i];
         }
     }
@@ -87,14 +101,14 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
             Bone bone;
 
             aiBone& ai_bone = *mesh_data.mBones[n_bone];
-            bone.name = ai_bone.mName.C_Str();
+            bone.name_ = ai_bone.mName.C_Str();
 
             auto& matrix = ai_bone.mOffsetMatrix;
-            bone.inverse_bind_pose_transform =
+            bone.inverse_bind_pose_transform_ =
                 glm::mat3(matrix.a1, matrix.b1, matrix.d1, matrix.a2, matrix.b2,
                           matrix.d2, matrix.a4, matrix.b4, matrix.d4);
-            bone.bind_pose_transform =
-                glm::inverse(bone.inverse_bind_pose_transform);
+            bone.bind_pose_transform_ =
+                glm::inverse(bone.inverse_bind_pose_transform_);
 
             for (uint n_weight = 0; n_weight < ai_bone.mNumWeights;
                  ++n_weight) {
@@ -110,20 +124,19 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
         aiNode* root = scene->mRootNode;
 
         for (auto& b : rigged_mesh.bones) {
-            aiNode* node = root->FindNode(b.name.c_str());
+            aiNode* node = root->FindNode(b.name_.c_str());
 
             if (node->mParent->mName == aiString("Rig")) {
-                b.parent = nullptr;
-            }
-            else {
-                b.parent = rigged_mesh.find_bone(node->mParent->mName.C_Str());
+                b.parent_ = nullptr;
+            } else {
+                b.parent_ = rigged_mesh.find_bone(node->mParent->mName.C_Str());
             }
 
             if (node->mNumChildren > 0) {
                 auto& child_transform = node->mChildren[0]->mTransformation;
-                b.tail = glm::vec2(child_transform.a4, child_transform.b4);
+                b.tail_ = glm::vec2(child_transform.a4, child_transform.b4);
 
-                b.length = glm::length(b.tail);
+                b.original_length = b.length = glm::length(b.tail_);
             }
         }
 
@@ -161,9 +174,9 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
         std::vector<BoneShader::Vertex> bone_vertices;
         bone_vertices.reserve(mesh_data.mNumBones * 2);
         for (auto& bone : rigged_mesh.bones) {
-            bone_vertices.push_back({bone.bind_pose_transform[2]});
+            bone_vertices.push_back({bone.bind_pose_transform_[2]});
             bone_vertices.push_back(
-                {bone.bind_pose_transform * glm::vec3(bone.tail, 1.0f)});
+                {bone.bind_pose_transform_ * glm::vec3(bone.tail_, 1.0f)});
         }
 
         rigged_mesh.bones_vao.init(bone_indices.data(), num_bone_vertices,
