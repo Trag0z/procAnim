@@ -123,23 +123,21 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh,
 void Animator::update(float delta_time, float walking_speed,
                       glm::vec2 right_stick_input,
                       const std::list<BoxCollider>& colliders) {
-
-    if (right_stick_input != glm::vec2(0.0f, 0.0f)) {
-        if (!parent->is_facing_right()) {
-            right_stick_input.x *= -1.0f;
-        }
-
-        float weapon_rotation =
-            atan2f(right_stick_input.y, right_stick_input.x) - PI * 0.5f;
-
-        float weapon_length =
-            glm::length(right_stick_input) * max_weapon_length;
-
-        weapon->rotation = weapon_rotation;
-        SDL_assert(weapon->tail().x == 0.0f);
-        weapon->length = weapon_length; // probably scales everything
+    // Weapon animation
+    if (!parent->is_facing_right()) {
+        right_stick_input.x *= -1.0f;
     }
 
+    float weapon_rotation =
+        atan2f(right_stick_input.y, right_stick_input.x) - PI * 0.5f;
+
+    float weapon_length = glm::length(right_stick_input) * max_weapon_length;
+
+    weapon->rotation = weapon_rotation;
+    SDL_assert(weapon->tail().x == 0.0f);
+    weapon->length = weapon_length;
+
+    // Walk animation
     if (walking_speed > 0.0f) {
         if (leg_state == NEUTRAL) {
             // Start to walk
@@ -176,7 +174,7 @@ void Animator::update(float delta_time, float walking_speed,
         }
     }
 
-    // Update limbs
+    // Update legs
     float interpolation_speed =
         interpolation_speed_multiplier.min +
         walking_speed * (interpolation_speed_multiplier.max -
