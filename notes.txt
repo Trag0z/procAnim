@@ -1,4 +1,5 @@
 NEXT:
+- circle rect collision detection
 - movement
 
 TODO:
