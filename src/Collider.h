@@ -16,8 +16,6 @@ class BoxCollider : public Entity {
 
     void update_model_matrix();
 
-    void render(const Renderer& renderer) const;
-
     glm::vec2 half_ext() const;
 
     bool encloses_point(glm::vec2 point) const noexcept;
@@ -28,4 +26,8 @@ class BoxCollider : public Entity {
     float bottom_edge() const noexcept;
 
     friend LevelEditor;
+};
+
+class CircleCollider : public Entity {
+    float radius;
 };

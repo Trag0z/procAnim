@@ -8,11 +8,6 @@ BoxCollider::BoxCollider(glm::vec2 position, glm::vec2 half_ext) {
     half_ext_ = half_ext;
 }
 
-void BoxCollider::render(const Renderer& renderer) const {
-    renderer.textured_shader.set_model(&model);
-    renderer.textured_shader.DEFAULT_VAO.draw(GL_TRIANGLES);
-}
-
 void BoxCollider::update_model_matrix() {
     scale = half_ext_;
     Entity::update_model_matrix();
