@@ -172,10 +172,14 @@ void Game::run() {
             new_player_position.y - ground_under_player->top_edge() >
                 player.distance_to_ground) {
             player.grounded = false;
+            player.state = Player::FALLING;
         } else {
             new_player_position.y =
                 ground_under_player->top_edge() + player.distance_to_ground;
             player.grounded = true;
+            if (player.state == Player::FALLING) {
+                player.state = Player::STANDING;
+            }
         }
 
         player.position_ = new_player_position;

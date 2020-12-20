@@ -17,7 +17,7 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
 
 void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
                     const MouseKeyboardInput& input) {
-    auto right_stick_input = gamepad->stick(StickID::LEFT);
+    auto left_stick_input = gamepad->stick(StickID::LEFT);
 
     if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
         if ((input.key(SDL_SCANCODE_LEFT) && facing_right) ||
@@ -26,10 +26,10 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
             facing_right = !facing_right;
             scale.x *= -1.0f;
         }
-    } else if (right_stick_input.x != 0.0f) {
-        walk_speed = std::abs(right_stick_input.x);
-        if ((right_stick_input.x < 0.0f && facing_right) ||
-            (right_stick_input.x > 0.0f && !facing_right)) {
+    } else if (left_stick_input.x != 0.0f) {
+        walk_speed = std::abs(left_stick_input.x);
+        if ((left_stick_input.x < 0.0f && facing_right) ||
+            (left_stick_input.x > 0.0f && !facing_right)) {
             facing_right = !facing_right;
             scale.x *= -1.0f;
             update_model_matrix();
@@ -43,17 +43,9 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 
     update_model_matrix();
 
-    // NEXT: player speed needs to decrease somehow
-    if (std::abs(velocity.x) < max_walk_speed) {
-        if (facing_right) {
-            velocity.x =
-                std::min(velocity.x + walk_speed * max_walk_acceleration,
-                         max_walk_speed);
-        } else {
-            velocity.x =
-                std::max(velocity.x - walk_speed * max_walk_acceleration,
-                         -max_walk_speed);
-        }
+    // Movement
+    if (state == STANDING || state == WALKING) {
+        velocity.x = left_stick_input.x * max_walk_speed;
     }
 
     if (!grounded) {
