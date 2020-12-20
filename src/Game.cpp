@@ -148,22 +148,38 @@ void Game::run() {
 
     // Update components based on the current game_mode
     if (game_mode == PLAY) {
-        if (!game_config.step_mode) {
-            float delta_time;
-            if (game_config.use_const_delta_time) {
-                delta_time = game_config.speed;
-            } else {
-                delta_time =
-                    last_frame_duration / frame_delay * game_config.speed;
-            }
 
-            player.update(delta_time, level.colliders(), mouse_keyboard_input);
-
-        } else if (mouse_keyboard_input.key_down(Keybinds::NEXT_STEP) ||
-                   mouse_keyboard_input.key(Keybinds::HOLD_TO_STEP)) {
-            player.update(game_config.speed, level.colliders(),
-                          mouse_keyboard_input);
+        float delta_time;
+        if (game_config.use_const_delta_time || game_config.step_mode) {
+            delta_time = game_config.speed;
+        } else {
+            delta_time = last_frame_duration / frame_delay * game_config.speed;
         }
+
+        if (!game_config.step_mode ||
+            (game_config.step_mode &&
+             (mouse_keyboard_input.key_down(Keybinds::NEXT_STEP) ||
+              mouse_keyboard_input.key(Keybinds::HOLD_TO_STEP)))) {
+            player.update(delta_time, level.colliders(), mouse_keyboard_input);
+        }
+
+        glm::vec2 new_player_position =
+            player.position() + player.velocity * delta_time;
+
+        // Keep player above ground, check grounded status
+        auto ground_under_player = level.find_ground_under(new_player_position);
+        if (!ground_under_player ||
+            new_player_position.y - ground_under_player->top_edge() >
+                player.distance_to_ground) {
+            player.grounded = false;
+        } else {
+            new_player_position.y =
+                ground_under_player->top_edge() + player.distance_to_ground;
+            player.grounded = true;
+        }
+
+        player.position_ = new_player_position;
+
     } else if (game_mode == SPLINE_EDITOR) {
         if (!player.animator.spline_editor->update(mouse_keyboard_input)) {
             game_mode = PLAY;
@@ -229,6 +245,10 @@ void Game::update_gui() {
     RadioButton("Play", (int*)&game_mode, GameMode::PLAY);
     RadioButton("Spline editor", (int*)&game_mode, GameMode::SPLINE_EDITOR);
     RadioButton("Level editor", (int*)&game_mode, GameMode::LEVEL_EDITOR);
+
+    NewLine();
+    Text("Player");
+    DragFloat("Ground distance", &player.distance_to_ground);
 
     NewLine();
     Text("Animation controls");

@@ -17,31 +17,48 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
 
 void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
                     const MouseKeyboardInput& input) {
-    auto stick_input = gamepad->stick(StickID::LEFT);
+    auto right_stick_input = gamepad->stick(StickID::LEFT);
 
     if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
         if ((input.key(SDL_SCANCODE_LEFT) && facing_right) ||
             (input.key(SDL_SCANCODE_RIGHT) && !facing_right)) {
-            walking_speed = 1.0f;
+            walk_speed = 1.0f;
             facing_right = !facing_right;
             scale.x *= -1.0f;
         }
-    } else if (stick_input.x != 0.0f) {
-        walking_speed = std::abs(stick_input.x);
-        if ((stick_input.x < 0.0f && facing_right) ||
-            (stick_input.x > 0.0f && !facing_right)) {
+    } else if (right_stick_input.x != 0.0f) {
+        walk_speed = std::abs(right_stick_input.x);
+        if ((right_stick_input.x < 0.0f && facing_right) ||
+            (right_stick_input.x > 0.0f && !facing_right)) {
             facing_right = !facing_right;
             scale.x *= -1.0f;
             update_model_matrix();
         }
     } else {
-        walking_speed = 0.0f;
+        walk_speed = 0.0f;
     }
 
-    animator.update(delta_time, walking_speed, gamepad->stick(StickID::RIGHT),
+    animator.update(delta_time, walk_speed, gamepad->stick(StickID::RIGHT),
                     colliders);
 
     update_model_matrix();
+
+    // NEXT: player speed needs to decrease somehow
+    if (std::abs(velocity.x) < max_walk_speed) {
+        if (facing_right) {
+            velocity.x =
+                std::min(velocity.x + walk_speed * max_walk_acceleration,
+                         max_walk_speed);
+        } else {
+            velocity.x =
+                std::max(velocity.x - walk_speed * max_walk_acceleration,
+                         -max_walk_speed);
+        }
+    }
+
+    if (!grounded) {
+        velocity.y -= gravity;
+    }
 }
 
 void Player::render(const Renderer& renderer) {

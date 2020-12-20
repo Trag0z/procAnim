@@ -19,6 +19,8 @@ class Level {
 
     const std::list<BoxCollider> colliders() const noexcept;
 
+    const BoxCollider* find_ground_under(glm::vec2 position) const;
+
     void save_to_file(const char* path) const;
     void load_from_file(const char* path);
 

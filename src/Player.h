@@ -17,8 +17,16 @@ class Player : public Entity {
     Animator animator;
     const Gamepad* gamepad;
 
-    float walking_speed;
+    glm::vec2 velocity = glm::vec2(0.0f); // In world space
+    bool grounded = false;
+
+    float walk_speed;
     bool facing_right = true;
+
+    float distance_to_ground = 160.0f;
+    const float max_walk_acceleration = 3.0f;
+    const float max_walk_speed = 10.0f;
+    const float gravity = 2.0f;
 
   public:
     void init(glm::vec3 position, glm::vec3 scale_factor,

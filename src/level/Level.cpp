@@ -20,6 +20,21 @@ const std::list<BoxCollider> Level::colliders() const noexcept {
     return colliders_;
 }
 
+const BoxCollider* Level::find_ground_under(glm::vec2 position) const {
+    const BoxCollider* candidate = nullptr;
+    for (const auto& coll : colliders_) {
+
+        if (coll.left_edge() <= position.x && coll.right_edge() >= position.x &&
+            position.y > coll.top_edge()) {
+
+            if (!candidate || coll.top_edge() > candidate->top_edge()) {
+                candidate = &coll;
+            }
+        }
+    }
+    return candidate;
+}
+
 struct BoxColliderSaveFormat {
     glm::vec2 position;
     glm::vec2 half_ext;
