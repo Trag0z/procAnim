@@ -1,4 +1,6 @@
 NEXT:
+- make the public API for level work.
+
 - circle rect collision detection
 - movement
 

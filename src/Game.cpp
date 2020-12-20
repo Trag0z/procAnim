@@ -77,7 +77,6 @@ void Game::init() {
     // Level
     level.load_from_file("../assets/default.level");
     level_editor.init(&level);
-    BoxCollider::TEXTURE.load_from_file("../assets/ground.png");
 
     // Player
     glm::vec3 position = {960.0f, 271.0f, 0.0f};

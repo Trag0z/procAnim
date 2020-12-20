@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Player.h"
 #include "Game.h"
-#include "level/Collider.h"
+#include "Collider.h"
 
 static const struct PlayerControllerMapping {
     u32 jump = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;

@@ -19,12 +19,6 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{97869913-1c00-4986-9e10-32922fe4c759}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\level">
-      <UniqueIdentifier>{fd4cbad1-0a4d-4a88-b8f5-b4d55177f6db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\level">
-      <UniqueIdentifier>{c292a561-7647-49e9-b039-43cd6f9a78bf}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Game.cpp">
@@ -84,16 +78,16 @@
     <ClCompile Include="..\src\Background.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\level\Collider.cpp">
-      <Filter>Source Files\level</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\level\Level.cpp">
-      <Filter>Source Files\level</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Collider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -173,13 +167,13 @@
     <ClInclude Include="..\src\Background.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\level\Level.h">
-      <Filter>Header Files\level</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\level\Collider.h">
-      <Filter>Header Files\level</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Collider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

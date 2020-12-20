@@ -9,7 +9,7 @@
 #include "Input.h"
 #include "Background.h"
 #include "Renderer.h"
-#include "level/Level.h"
+#include "Level.h"
 
 namespace Keybinds {
 constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F1;

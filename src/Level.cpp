@@ -1,18 +1,16 @@
 #pragma once
 #include "pch.h"
 #include "Level.h"
-#include "Collider.h"
-#include "../Renderer.h"
-#include "../Input.h"
+#include "Renderer.h"
+#include "Input.h"
 
 void Level::render(const Renderer& renderer) const {
-    renderer.textured_shader.set_texture(BoxCollider::TEXTURE);
+    renderer.textured_shader.set_texture(wall_texture);
 
-    glm::mat3 model(1.0f);
-    renderer.textured_shader.set_model(&model);
+    for (const auto& coll : colliders_) {
+        renderer.textured_shader.set_model(&coll.model_matrix());
 
-    for (auto& coll : colliders_) {
-        coll.render(renderer);
+        renderer.textured_shader.DEFAULT_VAO.draw(GL_TRIANGLES);
     }
 }
 
@@ -22,8 +20,7 @@ const std::list<BoxCollider> Level::colliders() const noexcept {
 
 const BoxCollider* Level::find_ground_under(glm::vec2 position) const {
     const BoxCollider* candidate = nullptr;
-    for (const auto& coll : colliders_) {
-
+    for (const BoxCollider& coll : colliders_) {
         if (coll.left_edge() <= position.x && coll.right_edge() >= position.x &&
             position.y > coll.top_edge()) {
 
@@ -64,6 +61,8 @@ void Level::load_from_file(const char* path) {
     }
 
     delete[] save_data;
+
+    wall_texture.load_from_file("../assets/ground.png");
 }
 
 void Level::save_to_file(const char* path) const {
@@ -72,8 +71,8 @@ void Level::save_to_file(const char* path) const {
 
     size_t i = 0;
     for (auto& coll : colliders_) {
-        save_data[i].position = coll.position;
-        save_data[i].half_ext = coll.half_ext;
+        save_data[i].position = coll.position();
+        save_data[i].half_ext = coll.half_ext();
         ++i;
     }
 
@@ -127,10 +126,10 @@ bool LevelEditor::update(const Renderer& renderer,
         if (selected_collider) {
             bool needs_update = false;
             needs_update |=
-                DragFloat2("Position", value_ptr(selected_collider->position),
+                DragFloat2("Position", value_ptr(selected_collider->position_),
                            1.0f, 0.0f, 0.0f, "% 6.1f");
             needs_update |=
-                DragFloat2("Half ext.", value_ptr(selected_collider->half_ext),
+                DragFloat2("Half ext.", value_ptr(selected_collider->half_ext_),
                            0.1f, 0.0f, 0.0f, "% 6.1f");
 
             if (needs_update) {
@@ -165,10 +164,10 @@ bool LevelEditor::update(const Renderer& renderer,
     }
 
     if (selected_collider) {
-        selected_collider->half_ext += input.mouse_wheel_scroll * SCROLL_SPEED;
+        selected_collider->half_ext_ += input.mouse_wheel_scroll * SCROLL_SPEED;
 
         if (dragging_collider) {
-            selected_collider->position += input.mouse_move();
+            selected_collider->position_ += input.mouse_move();
         }
 
         selected_collider->update_model_matrix();
@@ -180,7 +179,7 @@ bool LevelEditor::update(const Renderer& renderer,
 void LevelEditor::render(const Renderer& renderer) {
     if (selected_collider) {
         renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
-        renderer.debug_shader.set_model(&selected_collider->model);
+        renderer.debug_shader.set_model(&selected_collider->model_matrix());
         renderer.debug_shader.DEFAULT_VAO.draw(GL_LINE_LOOP);
     }
 }

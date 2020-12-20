@@ -7,7 +7,7 @@
 #include "Renderer.h"
 
 class Gamepad;
-struct BoxCollider;
+class BoxCollider;
 
 class Player : public Entity {
     Texture texture;

@@ -3,7 +3,7 @@
 #include "Renderer.h"
 #include "Player.h"
 #include "Background.h"
-#include "level/Level.h"
+#include "Level.h"
 
 void Renderer::update_camera(const glm::vec2& center) {
     camera_center_ = center;

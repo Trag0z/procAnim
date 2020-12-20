@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "VertexArray.h"
 #include "Spline.h"
-#include "level/Collider.h"
+#include "Collider.h"
 
 class Bone;
 struct RiggedMesh;

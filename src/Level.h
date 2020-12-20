@@ -1,9 +1,10 @@
 #pragma once
-#include "../pch.h"
+#include "pch.h"
 #include "Collider.h"
 
 class Renderer;
 class MouseKeyboardInput;
+class BoxCollider;
 
 class LevelEditor;
 
@@ -13,6 +14,8 @@ class Level {
     // frequently.
     std::list<BoxCollider> colliders_;
     std::string opened_path;
+
+    Texture wall_texture;
 
   public:
     void render(const Renderer& renderer) const;
