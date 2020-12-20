@@ -173,9 +173,12 @@ void Game::run() {
                 player.distance_to_ground) {
             player.grounded = false;
             player.state = Player::FALLING;
+
         } else {
             new_player_position.y =
                 ground_under_player->top_edge() + player.distance_to_ground;
+            player.velocity.y = 0.0f;
+
             player.grounded = true;
             if (player.state == Player::FALLING) {
                 player.state = Player::STANDING;
@@ -252,7 +255,10 @@ void Game::update_gui() {
 
     NewLine();
     Text("Player");
-    DragFloat("Ground distance", &player.distance_to_ground);
+    DragFloat("distance_to_ground", &player.distance_to_ground);
+    DragFloat("jump_force", &player.jump_force);
+    DragFloat("max_walk_speed", &player.max_walk_speed);
+    DragFloat("gravity", &player.gravity);
 
     NewLine();
     Text("Animation controls");

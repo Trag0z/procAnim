@@ -60,7 +60,7 @@ class Gamepad {
 
     glm::vec2 stick(StickID id) const;
 
-    inline bool button(u32 n) const;
-    inline bool button_down(u32 n) const;
-    inline bool button_up(u32 n) const;
+    bool button(u32 n) const;
+    bool button_down(u32 n) const;
+    bool button_up(u32 n) const;
 };
