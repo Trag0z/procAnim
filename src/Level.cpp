@@ -8,7 +8,9 @@ void Level::render(const Renderer& renderer) const {
     renderer.textured_shader.set_texture(wall_texture);
 
     for (const auto& coll : colliders_) {
-        renderer.textured_shader.set_model(&coll.model_matrix());
+        glm::mat3 model = glm::translate(glm::mat3(1.0f), coll.position);
+        model = glm::scale(model, coll.half_ext);
+        renderer.textured_shader.set_model(&model);
 
         renderer.textured_shader.DEFAULT_VAO.draw(GL_TRIANGLES);
     }
@@ -31,11 +33,7 @@ const BoxCollider* Level::find_ground_under(glm::vec2 position) const {
     }
     return candidate;
 }
-
-struct BoxColliderSaveFormat {
-    glm::vec2 position;
-    glm::vec2 half_ext;
-};
+typedef BoxCollider BoxColliderSaveFormat;
 
 void Level::load_from_file(const char* path) {
     SDL_assert_always(path != nullptr);
@@ -57,7 +55,7 @@ void Level::load_from_file(const char* path) {
 
     // Create list of colliders from data
     for (size_t i = 0; i < num_colliders; ++i) {
-        colliders_.emplace_back(save_data[i].position, save_data[i].half_ext);
+        colliders_.emplace_back(save_data[i]);
     }
 
     delete[] save_data;
@@ -71,8 +69,8 @@ void Level::save_to_file(const char* path) const {
 
     size_t i = 0;
     for (auto& coll : colliders_) {
-        save_data[i].position = coll.position();
-        save_data[i].half_ext = coll.half_ext();
+        save_data[i].position = coll.position;
+        save_data[i].half_ext = coll.half_ext;
         ++i;
     }
 
@@ -112,9 +110,9 @@ bool LevelEditor::update(const Renderer& renderer,
         NewLine();
 
         if (Button("New collider")) {
-            colliders.emplace_front(renderer.camera_position() +
+            colliders.emplace_front(BoxCollider{ renderer.camera_position() +
                                         renderer.window_size() * 0.5f,
-                                    new_collider_dimensions);
+                                    new_collider_dimensions });
 
             selected_collider = &colliders.front();
         }
@@ -124,17 +122,11 @@ bool LevelEditor::update(const Renderer& renderer,
         NewLine();
         Text("Selected Collider");
         if (selected_collider) {
-            bool needs_update = false;
-            needs_update |=
-                DragFloat2("Position", value_ptr(selected_collider->position_),
-                           1.0f, 0.0f, 0.0f, "% 6.1f");
-            needs_update |=
-                DragFloat2("Half ext.", value_ptr(selected_collider->half_ext_),
-                           0.1f, 0.0f, 0.0f, "% 6.1f");
+            DragFloat2("Position", value_ptr(selected_collider->position), 1.0f,
+                       0.0f, 0.0f, "% 6.1f");
+            DragFloat2("Half ext.", value_ptr(selected_collider->half_ext),
+                       0.1f, 0.0f, 0.0f, "% 6.1f");
 
-            if (needs_update) {
-                selected_collider->update_model_matrix();
-            }
         } else {
             Text("None");
         }
@@ -164,13 +156,11 @@ bool LevelEditor::update(const Renderer& renderer,
     }
 
     if (selected_collider) {
-        selected_collider->half_ext_ += input.mouse_wheel_scroll * SCROLL_SPEED;
+        selected_collider->half_ext += input.mouse_wheel_scroll * SCROLL_SPEED;
 
         if (dragging_collider) {
-            selected_collider->position_ += input.mouse_move();
+            selected_collider->position += input.mouse_move();
         }
-
-        selected_collider->update_model_matrix();
     }
 
     return keep_open;
@@ -179,7 +169,9 @@ bool LevelEditor::update(const Renderer& renderer,
 void LevelEditor::render(const Renderer& renderer) {
     if (selected_collider) {
         renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
-        renderer.debug_shader.set_model(&selected_collider->model_matrix());
+        glm::mat3 model = selected_collider->calculate_model_matrix();
+        renderer.debug_shader.set_model(
+            &model);
         renderer.debug_shader.DEFAULT_VAO.draw(GL_LINE_LOOP);
     }
 }

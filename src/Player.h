@@ -7,12 +7,14 @@
 #include "Renderer.h"
 
 class Gamepad;
-class BoxCollider;
+struct BoxCollider;
 
 class Player : public Entity {
     Texture texture;
     Mesh body_mesh;
     RiggedMesh rigged_mesh;
+
+    CircleCollider body_collider = {glm::vec2(0.0f), 1.0f};
 
     Animator animator;
     const Gamepad* gamepad;

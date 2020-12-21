@@ -8,15 +8,11 @@
 class Renderer;
 class LevelEditor;
 
-class BoxCollider : public Entity {
-    glm::vec2 half_ext_;
+struct BoxCollider {
+    glm::vec2 position;
+    glm::vec2 half_ext;
 
-  public:
-    BoxCollider(glm::vec2 position, glm::vec2 half_ext);
-
-    void update_model_matrix();
-
-    glm::vec2 half_ext() const;
+    // BoxCollider(glm::vec2 position, glm::vec2 half_ext);
 
     bool encloses_point(glm::vec2 point) const noexcept;
 
@@ -25,9 +21,14 @@ class BoxCollider : public Entity {
     float top_edge() const noexcept;
     float bottom_edge() const noexcept;
 
-    friend LevelEditor;
+    glm::mat3 calculate_model_matrix() const noexcept;
 };
 
-class CircleCollider : public Entity {
+struct CircleCollider {
+    glm::vec2 position;
     float radius;
 };
+
+const BoxCollider*
+find_first_collision_sweep_prune(CircleCollider circle, glm::vec2 velocity,
+                                 std::list<BoxCollider> boxes);

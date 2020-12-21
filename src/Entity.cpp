@@ -7,11 +7,10 @@ void Entity::update_model_matrix() {
     model = glm::scale(model, scale);
 }
 
-void Entity::init(glm::vec2 pos_, glm::vec2 scale_, const Entity* parent_) {
+void Entity::init(glm::vec2 pos_, glm::vec2 scale_) {
     position_ = pos_;
     scale = scale_;
     update_model_matrix();
-    parent = parent_;
 }
 
 glm::vec2 Entity::world_to_local_space(const glm::vec2& world_pos) const {

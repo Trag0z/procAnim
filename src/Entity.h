@@ -7,12 +7,9 @@ class Entity {
     glm::vec2 scale = glm::vec2(1.0f);
     glm::mat3 model = glm::mat3(1.0f);
 
-    const Entity* parent = nullptr;
-
     void update_model_matrix();
     void init(glm::vec2 pos_ = glm::vec2(0.0f),
-              glm::vec2 scale_ = glm::vec2(1.0f),
-              const Entity* parent_ = nullptr);
+              glm::vec2 scale_ = glm::vec2(1.0f));
 
   public:
     glm::vec2 world_to_local_space(const glm::vec2& world_pos) const;

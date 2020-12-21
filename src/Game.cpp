@@ -162,6 +162,7 @@ void Game::run() {
             player.update(delta_time, level.colliders(), mouse_keyboard_input);
         }
 
+        // Resolve collisions
         glm::vec2 new_player_position =
             player.position() + player.velocity * delta_time;
 
@@ -183,6 +184,41 @@ void Game::run() {
                 player.state = Player::STANDING;
             }
         }
+
+        // Body collisions
+        // glm::vec2 collider_pos =
+        //     new_player_position +
+        //     player.local_to_world_scale(player.body_collider.position);
+
+        // const BoxCollider* closest_object = nullptr;
+        // float smallest_distance = player.body_collider.radius *
+        // player.scale.x;
+
+        // for (const auto& coll : level.colliders()) {
+        //     glm::vec2 test_pos = collider_pos;
+        //     if (collider_pos.x < coll.left_edge()) {
+        //         test_pos.x = coll.left_edge();
+        //     } else if (test_pos.x > coll.right_edge()) {
+        //         test_pos.x = coll.right_edge();
+        //     }
+
+        //     if (collider_pos.y > coll.top_edge()) {
+        //         test_pos.y = coll.top_edge();
+        //     } else if (collider_pos.y < coll.bottom_edge()) {
+        //         test_pos.y = coll.bottom_edge();
+        //     }
+
+        //     SDL_assert(player.scale.x == player.scale.y);
+        //     // It has to be than this radius, otherwise we don't collide
+
+        //     float distance = glm::length(collider_pos - test_pos);
+        //     if (distance < smallest_distance) {
+        //         smallest_distance = distance;
+        //         closest_object = &coll;
+        //     }
+        // }
+
+        // player.velocity = // NEXT
 
         player.position_ = new_player_position;
 

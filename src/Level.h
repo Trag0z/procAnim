@@ -4,7 +4,7 @@
 
 class Renderer;
 class MouseKeyboardInput;
-class BoxCollider;
+struct BoxCollider;
 
 class LevelEditor;
 
