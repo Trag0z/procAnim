@@ -1,18 +1,22 @@
 #pragma once
 #include "pch.h"
 #include "Collider.h"
-#include "Renderer.h"
-
-// BoxCollider::BoxCollider(glm::vec2 position, glm::vec2 half_ext) {
-//     position = position;
-//     half_ext = half_ext;
-// }
 
 bool BoxCollider::encloses_point(glm::vec2 point) const noexcept {
     return point.x > position.x - half_ext.x &&
            point.x < position.x + half_ext.x &&
            point.y > position.y - half_ext.y &&
            point.y < position.y + half_ext.y;
+}
+
+bool BoxCollider::intersects(const BoxCollider& other) const noexcept {
+    // SDL_assert(half_ext.x >= 0.0f && half_ext.y >= 0.0f);
+    SDL_assert(other.half_ext.x >= 0.0f && other.half_ext.y >= 0.0f);
+
+    return (std::abs(position.x - other.position.x) <=
+            half_ext.x + other.half_ext.x) &&
+           (std::abs(position.y - other.position.y) <=
+            half_ext.y + other.half_ext.y);
 }
 
 float BoxCollider::left_edge() const noexcept {
@@ -40,6 +44,159 @@ glm::mat3 BoxCollider::calculate_model_matrix() const noexcept {
     return glm::scale(model, half_ext);
 }
 
-// const BoxCollider*
-// find_first_collision_sweep_prune(CircleCollider circle, glm::vec2 velocity,
-//                                  std::list<BoxCollider> boxes) {}
+bool CircleCollider::intersects(const BoxCollider& other) const noexcept {
+    SDL_assert(radius >= 0.0f);
+    SDL_assert(other.half_ext.x >= 0.0f && other.half_ext.y >= 0.0f);
+
+    return std::abs(position.x - other.position.x) <=
+               radius + other.half_ext.x &&
+           std::abs(position.y - other.position.y) <= radius + other.half_ext.y;
+}
+
+const CollisionData
+find_first_collision_sweep_prune(const CircleCollider& circle,
+                                 const glm::vec2 move,
+                                 const std::list<BoxCollider> boxes) {
+    // if (move == glm::vec2(0.0f)) {
+    //     // TODO: Just check for collisions with the circle?
+    //     return;
+    // }
+
+    // Cull all boxes that are too far away from the circle's trajectory
+    BoxCollider culling_box;
+    {
+        glm::vec2 half_move = move * 0.5f;
+        culling_box.position = circle.position + half_move;
+        culling_box.half_ext.x = std::abs(half_move.x) + circle.radius;
+        culling_box.half_ext.y = std::abs(half_move.y) + circle.radius;
+    }
+
+    std::vector<const BoxCollider*> candidates;
+    for (const auto& box : boxes) {
+        if (culling_box.intersects(box)) {
+            candidates.push_back(&box);
+        }
+    }
+
+    float collision_time = 1.1f;
+
+    CollisionData result = {move, CollisionData::NONE};
+    // Find first collision along x-axis
+    // @OPTIMIZATION: Sorting the array vs. just iterating over all candidates
+    // and choosing the one with the smallest collision_time?
+    if (move.x > 0.0f) { // Moving right
+        std::sort(candidates.begin(), candidates.end(),
+                  [](const auto a, const auto b) {
+                      return a->left_edge() < b->left_edge();
+                  });
+
+        for (const auto c : candidates) {
+            float circle_x_at_collision = c->left_edge() - circle.radius;
+
+            collision_time =
+                move.x / (circle_x_at_collision - circle.position.x);
+            SDL_assert(collision_time > 0.0f);
+
+            glm::vec2 collision_pos = circle.position + collision_time * move;
+
+            if (BoxCollider{collision_pos, glm::vec2(circle.radius)}.intersects(
+                    *c)) {
+                result = {circle.position + move * collision_time,
+                          CollisionData::RIGHT};
+                break; // Since the list is sorted, so the collision has to be
+                       // the first on the path and we don't have to look at the
+                       // others
+            }
+        }
+    } else { // Moving left
+        std::sort(candidates.begin(), candidates.end(),
+                  [](const auto a, const auto b) {
+                      return a->right_edge() < b->right_edge();
+                  });
+
+        for (const auto c : candidates) {
+            float circle_x_at_collision = c->right_edge() + circle.radius;
+
+            collision_time =
+                move.x / (circle_x_at_collision - circle.position.x);
+            SDL_assert(collision_time > 0.0f);
+
+            glm::vec2 collision_pos = circle.position + collision_time * move;
+
+            if (BoxCollider{collision_pos, glm::vec2(circle.radius)}.intersects(
+                    *c)) {
+                result = {circle.position + move * collision_time,
+                          CollisionData::LEFT};
+                break; // Since the list is sorted, so the collision has to be
+                       // the first on the path and we don't have to look at the
+                       // others
+            }
+        }
+    }
+
+    // Do the same along the y-axis, replace result if it's earlier than the
+    // current result
+    if (move.y > 0.0f) { // Moving up
+        std::sort(candidates.begin(), candidates.end(),
+                  [](const auto a, const auto b) {
+                      return a->bottom_edge() < b->bottom_edge();
+                  });
+
+        for (const auto c : candidates) {
+            float circle_y_at_collision = c->bottom_edge() - circle.radius;
+
+            float new_collision_time =
+                move.y / (circle_y_at_collision - circle.position.y);
+            SDL_assert(new_collision_time > 0.0f);
+
+            if (new_collision_time < collision_time) {
+                glm::vec2 collision_pos =
+                    circle.position + collision_time * move;
+                if (BoxCollider{collision_pos, glm::vec2(circle.radius)}
+                        .intersects(*c)) {
+                    result = {circle.position + move * collision_time,
+                              CollisionData::UP};
+                    break; // Since the list is sorted, so the collision has to
+                           // be the first on the path and we don't have to look
+                           // at the others
+                }
+            }
+        }
+    } else { // Moving down
+        std::sort(candidates.begin(), candidates.end(),
+                  [](const auto a, const auto b) {
+                      return a->top_edge() < b->top_edge();
+                  });
+
+        for (const auto c : candidates) {
+            float circle_y_at_collision = c->top_edge() + circle.radius;
+
+            float new_collision_time =
+                move.y / (circle_y_at_collision - circle.position.y);
+            SDL_assert(new_collision_time > 0.0f);
+
+            if (new_collision_time < collision_time) {
+                glm::vec2 collision_pos =
+                    circle.position + collision_time * move;
+                if (BoxCollider{collision_pos, glm::vec2(circle.radius)}
+                        .intersects(*c)) {
+                    result = {circle.position + move * collision_time,
+                              CollisionData::DOWN};
+                    break; // Since the list is sorted, so the collision has to
+                           // be the first on the path and we don't have to look
+                           // at the others
+                }
+            }
+        }
+    }
+
+    return result;
+
+    // NOTE: This would be kinda nice, but we have to check if the result is
+    // the past-the-end iterator before dereferencing, which makes the
+    // correct code ugly again. result =
+    //     *std::find_if(candidates.begin(), candidates.end(),
+    //                   [circle](const auto c) { return
+    //                   circle.intersects(c);
+    //                   });
+}

@@ -27,6 +27,15 @@ glm::vec2 Entity::local_to_world_scale(const glm::vec2& local_vec) const {
     return {local_vec.x * scale.x, local_vec.y * scale.y};
 }
 
+float Entity::world_to_world_scale(const float world) const {
+    SDL_assert(std::abs(scale.x) == std::abs(scale.y));
+    return world / scale.x;
+}
+float Entity::local_to_world_scale(const float local) const {
+    SDL_assert(std::abs(scale.x) == std::abs(scale.y));
+    return local * scale.x;
+}
+
 const glm::mat3& Entity::model_matrix() const { return model; }
 
 glm::vec2 Entity::position() const { return position_; }

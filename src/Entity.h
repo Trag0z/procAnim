@@ -18,6 +18,9 @@ class Entity {
     glm::vec2 world_to_world_scale(const glm::vec2& world_vec) const;
     glm::vec2 local_to_world_scale(const glm::vec2& local_vec) const;
 
+    float world_to_world_scale(const float world) const;
+    float local_to_world_scale(const float local) const;
+
     const glm::mat3& model_matrix() const;
 
     glm::vec2 position() const;

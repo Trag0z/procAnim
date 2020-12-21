@@ -1,20 +1,12 @@
 #pragma once
 #include "pch.h"
-#include "Color.h"
-#include "Texture.h"
-#include "Entity.h"
-#include "Level.h"
-
-class Renderer;
-class LevelEditor;
 
 struct BoxCollider {
     glm::vec2 position;
     glm::vec2 half_ext;
 
-    // BoxCollider(glm::vec2 position, glm::vec2 half_ext);
-
     bool encloses_point(glm::vec2 point) const noexcept;
+    bool intersects(const BoxCollider& other) const noexcept;
 
     float left_edge() const noexcept;
     float right_edge() const noexcept;
@@ -27,8 +19,21 @@ struct BoxCollider {
 struct CircleCollider {
     glm::vec2 position;
     float radius;
+
+    bool intersects(const BoxCollider& other) const noexcept;
 };
 
-const BoxCollider*
-find_first_collision_sweep_prune(CircleCollider circle, glm::vec2 velocity,
-                                 std::list<BoxCollider> boxes);
+struct CollisionData {
+    glm::vec2 move_until_collision;
+    enum { NONE, UP, DOWN, LEFT, RIGHT } direction;
+};
+/*
+Find first collision of circle moving along move.
+NOTE: Treats the circle like a rectangle in order to do the
+sweeping. In some cases (when moving diagonally), the circle might not actually
+be touching the other collider (yet).
+*/
+const CollisionData
+find_first_collision_sweep_prune(const CircleCollider& circle,
+                                 const glm::vec2 move,
+                                 const std::list<BoxCollider> boxes);

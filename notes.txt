@@ -1,6 +1,6 @@
 NEXT:
-- circle rect collision detection
-- movement
+- debug collision detection
+- change the direction of the player texture another way than changing it's scale
 
 TODO:
 - change fix camera

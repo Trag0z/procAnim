@@ -162,63 +162,66 @@ void Game::run() {
             player.update(delta_time, level.colliders(), mouse_keyboard_input);
         }
 
-        // Resolve collisions
-        glm::vec2 new_player_position =
-            player.position() + player.velocity * delta_time;
+        //              Resolve collisions              //
+        const glm::vec2 player_move = player.velocity * delta_time;
+
+        glm::vec2 new_player_position;
+        glm::vec2 new_player_velocity;
+
+        { // Body collisions
+            CircleCollider body_collider = player.body_collider();
+            CollisionData collision = find_first_collision_sweep_prune(
+                body_collider, player_move, level.colliders());
+
+            if (collision.direction == CollisionData::NONE) {
+                new_player_position = player.position() + player_move;
+                new_player_velocity = player.velocity;
+            } else {
+                body_collider.position += collision.move_until_collision;
+
+                CollisionData second_collision;
+                if (collision.direction == CollisionData::DOWN ||
+                    collision.direction == CollisionData::UP) {
+
+                    new_player_velocity = glm::vec2(
+                        player_move.x - collision.move_until_collision.x, 0.0f);
+                    second_collision = find_first_collision_sweep_prune(
+                        body_collider, new_player_velocity, level.colliders());
+
+                } else {
+                    new_player_velocity = glm::vec2(
+                        0.0f, player_move.y - collision.move_until_collision.y);
+                    second_collision = find_first_collision_sweep_prune(
+                        body_collider, new_player_velocity, level.colliders());
+                }
+                SDL_assert(second_collision.direction != collision.direction);
+
+                new_player_position = player.position() +
+                                      collision.move_until_collision +
+                                      second_collision.move_until_collision;
+            }
+        }
 
         // Keep player above ground, check grounded status
         auto ground_under_player = level.find_ground_under(new_player_position);
         if (!ground_under_player ||
             new_player_position.y - ground_under_player->top_edge() >
                 player.distance_to_ground) {
+
             player.grounded = false;
             player.state = Player::FALLING;
+            new_player_velocity.y -= game_config.gravity;
 
         } else {
+            new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
             new_player_position.y =
                 ground_under_player->top_edge() + player.distance_to_ground;
-            player.velocity.y = 0.0f;
 
             player.grounded = true;
             if (player.state == Player::FALLING) {
                 player.state = Player::STANDING;
             }
         }
-
-        // Body collisions
-        // glm::vec2 collider_pos =
-        //     new_player_position +
-        //     player.local_to_world_scale(player.body_collider.position);
-
-        // const BoxCollider* closest_object = nullptr;
-        // float smallest_distance = player.body_collider.radius *
-        // player.scale.x;
-
-        // for (const auto& coll : level.colliders()) {
-        //     glm::vec2 test_pos = collider_pos;
-        //     if (collider_pos.x < coll.left_edge()) {
-        //         test_pos.x = coll.left_edge();
-        //     } else if (test_pos.x > coll.right_edge()) {
-        //         test_pos.x = coll.right_edge();
-        //     }
-
-        //     if (collider_pos.y > coll.top_edge()) {
-        //         test_pos.y = coll.top_edge();
-        //     } else if (collider_pos.y < coll.bottom_edge()) {
-        //         test_pos.y = coll.bottom_edge();
-        //     }
-
-        //     SDL_assert(player.scale.x == player.scale.y);
-        //     // It has to be than this radius, otherwise we don't collide
-
-        //     float distance = glm::length(collider_pos - test_pos);
-        //     if (distance < smallest_distance) {
-        //         smallest_distance = distance;
-        //         closest_object = &coll;
-        //     }
-        // }
-
-        // player.velocity = // NEXT
 
         player.position_ = new_player_position;
 
@@ -281,6 +284,7 @@ void Game::update_gui() {
     Checkbox("Step mode", &game_config.step_mode);
     PushItemWidth(100);
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
+    DragFloat("gravity", &game_config.gravity);
 
     NewLine();
     Text("Mode");
@@ -293,7 +297,6 @@ void Game::update_gui() {
     DragFloat("distance_to_ground", &player.distance_to_ground);
     DragFloat("jump_force", &player.jump_force);
     DragFloat("max_walk_speed", &player.max_walk_speed);
-    DragFloat("gravity", &player.gravity);
 
     NewLine();
     Text("Animation controls");

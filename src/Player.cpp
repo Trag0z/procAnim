@@ -58,10 +58,6 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
             grounded = false;
         }
     }
-
-    if (!grounded) {
-        velocity.y -= gravity;
-    }
 }
 
 void Player::render(const Renderer& renderer) {
@@ -113,3 +109,8 @@ void Player::render(const Renderer& renderer) {
 }
 
 bool Player::is_facing_right() const noexcept { return facing_right; }
+
+CircleCollider Player::body_collider() const noexcept {
+    return {local_to_world_space(body_collider_.position),
+            local_to_world_scale(body_collider_.radius)};
+}
