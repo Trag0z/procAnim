@@ -4,8 +4,9 @@
 #include "Game.h"
 #include "Collider.h"
 
-static const struct PlayerControllerMapping {
+static const struct {
     u32 jump = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
+    u32 jump_alt = SDL_CONTROLLER_BUTTON_A;
 } button_map;
 
 void Player::init(glm::vec3 position, glm::vec3 scale_,
@@ -52,7 +53,8 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
         SDL_assert(grounded);
         velocity.x = left_stick_input.x * max_walk_speed;
 
-        if (gamepad->button_down(button_map.jump)) {
+        if (gamepad->button_down(button_map.jump) ||
+            gamepad->button_down(button_map.jump_alt)) {
             velocity.y += jump_force;
             state = FALLING;
             grounded = false;
