@@ -112,5 +112,5 @@ bool Player::is_facing_right() const noexcept { return facing_right; }
 
 CircleCollider Player::body_collider() const noexcept {
     return {local_to_world_space(body_collider_.position),
-            local_to_world_scale(body_collider_.radius)};
+            std::abs(local_to_world_scale(body_collider_.radius))};
 }

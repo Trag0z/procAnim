@@ -1,5 +1,5 @@
 NEXT:
-- debug collision detection
+- keep upward momentum when jumping into wall
 - change the direction of the player texture another way than changing it's scale
 
 TODO:

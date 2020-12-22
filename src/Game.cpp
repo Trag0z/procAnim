@@ -206,7 +206,7 @@ void Game::run() {
         auto ground_under_player = level.find_ground_under(new_player_position);
         if (!ground_under_player ||
             new_player_position.y - ground_under_player->top_edge() >
-                player.distance_to_ground) {
+                player.ground_hover_distance + 2.0f /* small tolerance */) {
 
             player.grounded = false;
             player.state = Player::FALLING;
@@ -215,7 +215,7 @@ void Game::run() {
         } else {
             new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
             new_player_position.y =
-                ground_under_player->top_edge() + player.distance_to_ground;
+                ground_under_player->top_edge() + player.ground_hover_distance;
 
             player.grounded = true;
             if (player.state == Player::FALLING) {
@@ -223,6 +223,7 @@ void Game::run() {
             }
         }
 
+        player.velocity = new_player_velocity;
         player.position_ = new_player_position;
 
     } else if (game_mode == SPLINE_EDITOR) {
@@ -294,7 +295,7 @@ void Game::update_gui() {
 
     NewLine();
     Text("Player");
-    DragFloat("distance_to_ground", &player.distance_to_ground);
+    DragFloat("ground_hover_distance", &player.ground_hover_distance);
     DragFloat("jump_force", &player.jump_force);
     DragFloat("max_walk_speed", &player.max_walk_speed);
 

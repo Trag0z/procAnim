@@ -10,7 +10,7 @@ bool BoxCollider::encloses_point(glm::vec2 point) const noexcept {
 }
 
 bool BoxCollider::intersects(const BoxCollider& other) const noexcept {
-    // SDL_assert(half_ext.x >= 0.0f && half_ext.y >= 0.0f);
+    SDL_assert(half_ext.x >= 0.0f && half_ext.y >= 0.0f);
     SDL_assert(other.half_ext.x >= 0.0f && other.half_ext.y >= 0.0f);
 
     return (std::abs(position.x - other.position.x) <=
@@ -57,10 +57,10 @@ const CollisionData
 find_first_collision_sweep_prune(const CircleCollider& circle,
                                  const glm::vec2 move,
                                  const std::list<BoxCollider> boxes) {
-    // if (move == glm::vec2(0.0f)) {
-    //     // TODO: Just check for collisions with the circle?
-    //     return;
-    // }
+    if (move == glm::vec2(0.0f)) {
+        // TODO: Just check for collisions with the circle?
+        return {glm::vec2(0.0f), CollisionData::NONE};
+    }
 
     // Cull all boxes that are too far away from the circle's trajectory
     BoxCollider culling_box;
@@ -94,15 +94,15 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
             float circle_x_at_collision = c->left_edge() - circle.radius;
 
             collision_time =
-                move.x / (circle_x_at_collision - circle.position.x);
-            SDL_assert(collision_time > 0.0f);
+                (circle_x_at_collision - circle.position.x) / move.x;
+            if (collision_time < 0.0f)
+                continue;
 
             glm::vec2 collision_pos = circle.position + collision_time * move;
 
             if (BoxCollider{collision_pos, glm::vec2(circle.radius)}.intersects(
                     *c)) {
-                result = {circle.position + move * collision_time,
-                          CollisionData::RIGHT};
+                result = {move * collision_time, CollisionData::RIGHT};
                 break; // Since the list is sorted, so the collision has to be
                        // the first on the path and we don't have to look at the
                        // others
@@ -118,15 +118,15 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
             float circle_x_at_collision = c->right_edge() + circle.radius;
 
             collision_time =
-                move.x / (circle_x_at_collision - circle.position.x);
-            SDL_assert(collision_time > 0.0f);
+                (circle_x_at_collision - circle.position.x) / move.x;
+            if (collision_time < 0.0f)
+                continue;
 
             glm::vec2 collision_pos = circle.position + collision_time * move;
 
             if (BoxCollider{collision_pos, glm::vec2(circle.radius)}.intersects(
                     *c)) {
-                result = {circle.position + move * collision_time,
-                          CollisionData::LEFT};
+                result = {move * collision_time, CollisionData::LEFT};
                 break; // Since the list is sorted, so the collision has to be
                        // the first on the path and we don't have to look at the
                        // others
@@ -146,16 +146,16 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
             float circle_y_at_collision = c->bottom_edge() - circle.radius;
 
             float new_collision_time =
-                move.y / (circle_y_at_collision - circle.position.y);
-            SDL_assert(new_collision_time > 0.0f);
+                (circle_y_at_collision - circle.position.y) / move.y;
+            if (new_collision_time < 0.0f)
+                continue;
 
             if (new_collision_time < collision_time) {
                 glm::vec2 collision_pos =
                     circle.position + collision_time * move;
                 if (BoxCollider{collision_pos, glm::vec2(circle.radius)}
                         .intersects(*c)) {
-                    result = {circle.position + move * collision_time,
-                              CollisionData::UP};
+                    result = {move * collision_time, CollisionData::UP};
                     break; // Since the list is sorted, so the collision has to
                            // be the first on the path and we don't have to look
                            // at the others
@@ -172,16 +172,16 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
             float circle_y_at_collision = c->top_edge() + circle.radius;
 
             float new_collision_time =
-                move.y / (circle_y_at_collision - circle.position.y);
-            SDL_assert(new_collision_time > 0.0f);
+                (circle_y_at_collision - circle.position.y) / move.y;
+            if (new_collision_time < 0.0f)
+                continue;
 
             if (new_collision_time < collision_time) {
                 glm::vec2 collision_pos =
                     circle.position + collision_time * move;
                 if (BoxCollider{collision_pos, glm::vec2(circle.radius)}
                         .intersects(*c)) {
-                    result = {circle.position + move * collision_time,
-                              CollisionData::DOWN};
+                    result = {move * collision_time, CollisionData::DOWN};
                     break; // Since the list is sorted, so the collision has to
                            // be the first on the path and we don't have to look
                            // at the others

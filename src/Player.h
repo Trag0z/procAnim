@@ -25,7 +25,7 @@ class Player : public Entity {
     float walk_speed;
     bool facing_right = true;
 
-    float distance_to_ground = 160.0f;
+    float ground_hover_distance = 160.0f;
     float jump_force = 30.0f;
     float max_walk_speed = 10.0f;
 
