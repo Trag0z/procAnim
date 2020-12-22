@@ -98,16 +98,18 @@ void Game::run() {
     mouse_keyboard_input.update();
     gamepad.update();
 
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        ImGui_ImplSDL2_ProcessEvent(&event);
-        if (event.type == SDL_QUIT ||
-            (event.type == SDL_WINDOWEVENT &&
-             event.window.event == SDL_WINDOWEVENT_CLOSE &&
-             event.window.windowID == SDL_GetWindowID(window))) {
-            is_running = false;
-        } else if (event.type == SDL_MOUSEWHEEL) {
-            mouse_keyboard_input.mouse_wheel_scroll = event.wheel.y;
+    { // Process events
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT ||
+                (event.type == SDL_WINDOWEVENT &&
+                 event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                 event.window.windowID == SDL_GetWindowID(window))) {
+                is_running = false;
+            } else if (event.type == SDL_MOUSEWHEEL) {
+                mouse_keyboard_input.mouse_wheel_scroll = event.wheel.y;
+            }
         }
     }
 
