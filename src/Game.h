@@ -65,5 +65,6 @@ class Game {
 
     enum GameMode { PLAY = 0, SPLINE_EDITOR = 1, LEVEL_EDITOR = 2 } game_mode;
 
+    void simulate_world(float delta_time);
     void update_gui();
 };

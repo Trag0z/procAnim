@@ -159,72 +159,8 @@ void Game::run() {
             (game_config.step_mode &&
              (mouse_keyboard_input.key_down(Keybinds::NEXT_STEP) ||
               mouse_keyboard_input.key(Keybinds::HOLD_TO_STEP)))) {
-            player.update(delta_time, level.colliders(), mouse_keyboard_input);
+            simulate_world(delta_time);
         }
-
-        //              Resolve collisions              //
-        const glm::vec2 player_move = player.velocity * delta_time;
-
-        glm::vec2 new_player_position;
-        glm::vec2 new_player_velocity;
-
-        { // Body collisions
-            CircleCollider body_collider = player.body_collider();
-            CollisionData collision = find_first_collision_sweep_prune(
-                body_collider, player_move, level.colliders());
-
-            if (collision.direction == CollisionData::NONE) {
-                new_player_position = player.position() + player_move;
-                new_player_velocity = player.velocity;
-            } else {
-                body_collider.position += collision.move_until_collision;
-
-                CollisionData second_collision;
-                if (collision.direction == CollisionData::DOWN ||
-                    collision.direction == CollisionData::UP) {
-
-                    new_player_velocity = glm::vec2(
-                        player_move.x - collision.move_until_collision.x, 0.0f);
-                    second_collision = find_first_collision_sweep_prune(
-                        body_collider, new_player_velocity, level.colliders());
-
-                } else {
-                    new_player_velocity = glm::vec2(
-                        0.0f, player_move.y - collision.move_until_collision.y);
-                    second_collision = find_first_collision_sweep_prune(
-                        body_collider, new_player_velocity, level.colliders());
-                }
-                SDL_assert(second_collision.direction != collision.direction);
-
-                new_player_position = player.position() +
-                                      collision.move_until_collision +
-                                      second_collision.move_until_collision;
-            }
-        }
-
-        // Keep player above ground, check grounded status
-        auto ground_under_player = level.find_ground_under(new_player_position);
-        if (!ground_under_player ||
-            new_player_position.y - ground_under_player->top_edge() >
-                player.ground_hover_distance + 2.0f /* small tolerance */) {
-
-            player.grounded = false;
-            player.state = Player::FALLING;
-            new_player_velocity.y -= game_config.gravity;
-
-        } else {
-            new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
-            new_player_position.y =
-                ground_under_player->top_edge() + player.ground_hover_distance;
-
-            player.grounded = true;
-            if (player.state == Player::FALLING) {
-                player.state = Player::STANDING;
-            }
-        }
-
-        player.velocity = new_player_velocity;
-        player.position_ = new_player_position;
 
     } else if (game_mode == SPLINE_EDITOR) {
         if (!player.animator.spline_editor->update(mouse_keyboard_input)) {
@@ -264,6 +200,74 @@ void Game::run() {
     if (game_config.frame_delay > last_frame_time) {
         SDL_Delay(game_config.frame_delay - last_frame_time);
     }
+}
+
+void Game::simulate_world(float delta_time) {
+    player.update(delta_time, level.colliders(), mouse_keyboard_input);
+
+    //              Resolve collisions              //
+    const glm::vec2 player_move = player.velocity * delta_time;
+
+    glm::vec2 new_player_position;
+    glm::vec2 new_player_velocity;
+
+    { // Body collisions
+        CircleCollider body_collider = player.body_collider();
+        CollisionData collision = find_first_collision_sweep_prune(
+            body_collider, player_move, level.colliders());
+
+        if (collision.direction == CollisionData::NONE) {
+            new_player_position = player.position() + player_move;
+            new_player_velocity = player.velocity;
+        } else {
+            body_collider.position += collision.move_until_collision;
+
+            CollisionData second_collision;
+            if (collision.direction == CollisionData::DOWN ||
+                collision.direction == CollisionData::UP) {
+
+                new_player_velocity = glm::vec2(
+                    player_move.x - collision.move_until_collision.x, 0.0f);
+                second_collision = find_first_collision_sweep_prune(
+                    body_collider, new_player_velocity, level.colliders());
+
+            } else {
+                new_player_velocity = glm::vec2(
+                    0.0f, player_move.y - collision.move_until_collision.y);
+                second_collision = find_first_collision_sweep_prune(
+                    body_collider, new_player_velocity, level.colliders());
+            }
+            SDL_assert(second_collision.direction != collision.direction);
+
+            new_player_position = player.position() +
+                                  collision.move_until_collision +
+                                  second_collision.move_until_collision;
+        }
+    }
+
+    // Keep player above ground, check grounded status
+    auto ground_under_player = level.find_ground_under(new_player_position);
+    if (!ground_under_player ||
+        new_player_position.y - ground_under_player->top_edge() >
+            player.ground_hover_distance + 2.0f /* small tolerance */) {
+
+        player.grounded = false;
+        player.state = Player::FALLING;
+        new_player_velocity.y -= game_config.gravity;
+
+    } else {
+        new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
+        new_player_position.y =
+            ground_under_player->top_edge() + player.ground_hover_distance;
+
+        player.grounded = true;
+        if (player.state == Player::FALLING) {
+            player.state = Player::STANDING;
+        }
+    }
+
+    player.velocity = new_player_velocity;
+    player.position_ = new_player_position;
 }
 
 void Game::update_gui() {
