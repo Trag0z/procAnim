@@ -1,8 +1,5 @@
 NEXT:
-- why is upward momentum canceled?
-
-- keep upward momentum when jumping into wall
-- change the direction of the player texture another way than changing it's scale
+- air mobility
 
 TODO:
 - change fix camera
@@ -11,6 +8,7 @@ TODO:
 - handle down/up inputs in step mode better
 
 - fix leg animations
+- change the direction of the player texture another way than changing it's scale
 
 
 

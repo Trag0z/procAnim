@@ -211,7 +211,7 @@ void Game::simulate_world(float delta_time) {
     const glm::vec2 player_move = player.velocity * delta_time;
 
     glm::vec2 new_player_position;
-    glm::vec2 new_player_velocity;
+    glm::vec2 new_player_velocity = player.velocity;
 
     { // Body collisions
         CircleCollider body_collider = player.body_collider();
@@ -220,7 +220,7 @@ void Game::simulate_world(float delta_time) {
 
         if (collision.direction == CollisionData::NONE) {
             new_player_position = player.position() + player_move;
-            new_player_velocity = player.velocity;
+            // player.velocity stays the same
         } else {
             body_collider.position += collision.move_until_collision;
 
@@ -228,18 +228,24 @@ void Game::simulate_world(float delta_time) {
             if (collision.direction == CollisionData::DOWN ||
                 collision.direction == CollisionData::UP) {
 
-                new_player_velocity = glm::vec2(
-                    player_move.x - collision.move_until_collision.x, 0.0f);
+                new_player_velocity.y = 0.0f;
+
+                glm::vec2 remaining_player_move = glm::vec2(player_move.x - collision.move_until_collision.x, 0.0f);
                 second_collision = find_first_collision_sweep_prune(
-                    body_collider, new_player_velocity, level.colliders());
+                    body_collider, remaining_player_move, level.colliders());
 
             } else {
-                new_player_velocity = glm::vec2(
-                    0.0f, player_move.y - collision.move_until_collision.y);
+                new_player_velocity.x = 0.0f;
+
+                glm::vec2 remaining_player_move = glm::vec2(0.0f, player_move.y - collision.move_until_collision.y);
                 second_collision = find_first_collision_sweep_prune(
-                    body_collider, new_player_velocity, level.colliders());
+                    body_collider, remaining_player_move, level.colliders());
             }
             SDL_assert(second_collision.direction != collision.direction);
+
+            if (second_collision.direction != CollisionData::NONE) {
+                new_player_velocity = glm::vec2(0.0f);
+            }
 
             new_player_position = player.position() +
                                   collision.move_until_collision +
