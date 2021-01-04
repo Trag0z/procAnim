@@ -110,9 +110,8 @@ bool LevelEditor::update(const Renderer& renderer,
         NewLine();
 
         if (Button("New collider")) {
-            colliders.emplace_front(BoxCollider{ renderer.camera_position() +
-                                        renderer.window_size() * 0.5f,
-                                    new_collider_dimensions });
+            colliders.emplace_front(
+                BoxCollider{renderer.camera_center(), new_collider_dimensions});
 
             selected_collider = &colliders.front();
         }
@@ -170,8 +169,7 @@ void LevelEditor::render(const Renderer& renderer) {
     if (selected_collider) {
         renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
         glm::mat3 model = selected_collider->calculate_model_matrix();
-        renderer.debug_shader.set_model(
-            &model);
+        renderer.debug_shader.set_model(&model);
         renderer.debug_shader.DEFAULT_VAO.draw(GL_LINE_LOOP);
     }
 }
