@@ -5,12 +5,15 @@
 #include "Background.h"
 #include "Level.h"
 
-void Renderer::update_camera(const glm::vec2& center) {
+void Renderer::update_camera(const glm::vec2& center, float zoom_factor) {
     camera_center_ = center;
 
-    glm::mat3 cam =
-        glm::scale(glm::mat3(1.0f),
-                   glm::vec2(2.0f / window_size_.x, 2.0f / window_size_.y));
+    if (zoom_factor != 0.0f)
+        zoom_factor_ = zoom_factor;
+
+    glm::mat3 cam = glm::scale(glm::mat3(1.0f),
+                               glm::vec2(2.0f / window_size_.x * zoom_factor_,
+                                         2.0f / window_size_.y * zoom_factor_));
     cam = glm::translate(cam, -center);
 
     debug_shader.set_camera(&cam);
@@ -40,3 +43,5 @@ glm::vec2 Renderer::camera_position() const noexcept {
 }
 
 glm::vec2 Renderer::camera_center() const noexcept { return camera_center_; }
+
+float Renderer::zoom_factor() const noexcept { return zoom_factor_; }

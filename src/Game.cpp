@@ -301,10 +301,15 @@ void Game::update_gui() {
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
     DragFloat("gravity", &game_config.gravity);
 
+    // Camera
     glm::vec2 camera_center = renderer.camera_center();
     DragFloat2("Camera position", (float*)&camera_center, 1.0f, 0.0f, 0.0f,
                "%.f");
-    renderer.update_camera(camera_center);
+
+    float zoom_factor = renderer.zoom_factor();
+    DragFloat("Camera zoom", &zoom_factor, 0.1f, 0.001f, 100.0f, "%.2f");
+
+    renderer.update_camera(camera_center, zoom_factor);
 
     NewLine();
     Text("Mode");
