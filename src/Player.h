@@ -29,6 +29,9 @@ class Player : public Entity {
     float jump_force = 30.0f;
     float max_walk_speed = 10.0f;
 
+    float max_air_acceleration = 0.5f;
+    float max_air_speed = 10.0f;
+
     enum State { STANDING, WALKING, FALLING } state = FALLING;
 
   public:

@@ -59,6 +59,12 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
             state = FALLING;
             grounded = false;
         }
+    } else if (state == FALLING) {
+        SDL_assert(!grounded);
+
+        velocity.x =
+            clamp(velocity.x + left_stick_input.x * max_air_acceleration,
+                  -max_air_speed, max_air_speed);
     }
 }
 
