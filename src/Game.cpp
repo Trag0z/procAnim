@@ -84,6 +84,8 @@ void Game::init() {
                 "../assets/playerTexture.png", "../assets/guy.fbx", &gamepad,
                 level.colliders());
 
+    renderer.update_camera(player.position() + glm::vec2(0.0f, 200.0f));
+
     frame_start = SDL_GetTicks();
     is_running = true;
 };
@@ -178,8 +180,6 @@ void Game::run() {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    renderer.update_camera(player.position() + glm::vec2(0.0f, 200.0f));
-
     background.render(renderer, renderer.camera_center());
 
     level.render(renderer);
@@ -230,14 +230,16 @@ void Game::simulate_world(float delta_time) {
 
                 new_player_velocity.y = 0.0f;
 
-                glm::vec2 remaining_player_move = glm::vec2(player_move.x - collision.move_until_collision.x, 0.0f);
+                glm::vec2 remaining_player_move = glm::vec2(
+                    player_move.x - collision.move_until_collision.x, 0.0f);
                 second_collision = find_first_collision_sweep_prune(
                     body_collider, remaining_player_move, level.colliders());
 
             } else {
                 new_player_velocity.x = 0.0f;
 
-                glm::vec2 remaining_player_move = glm::vec2(0.0f, player_move.y - collision.move_until_collision.y);
+                glm::vec2 remaining_player_move = glm::vec2(
+                    0.0f, player_move.y - collision.move_until_collision.y);
                 second_collision = find_first_collision_sweep_prune(
                     body_collider, remaining_player_move, level.colliders());
             }
@@ -298,6 +300,11 @@ void Game::update_gui() {
     PushItemWidth(100);
     DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
     DragFloat("gravity", &game_config.gravity);
+
+    glm::vec2 camera_center = renderer.camera_center();
+    DragFloat2("Camera position", (float*)&camera_center, 1.0f, 0.0f, 0.0f,
+               "%.f");
+    renderer.update_camera(camera_center);
 
     NewLine();
     Text("Mode");
