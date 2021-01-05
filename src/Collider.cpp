@@ -53,6 +53,13 @@ bool CircleCollider::intersects(const BoxCollider& other) const noexcept {
            std::abs(position.y - other.position.y) <= radius + other.half_ext.y;
 }
 
+bool CircleCollider::intersects(const CircleCollider& other) const noexcept {
+    SDL_assert(radius >= 0.0f);
+    SDL_assert(other.radius >= 0.0f);
+
+    return glm::length(position - other.position) < radius + other.radius;
+}
+
 const CollisionData
 find_first_collision_sweep_prune(const CircleCollider& circle,
                                  const glm::vec2 move,
@@ -99,8 +106,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
             if (collision_time < 0.0f)
                 continue;
 
-            circle_collision_pos =
-                circle.position + collision_time * move;
+            circle_collision_pos = circle.position + collision_time * move;
 
             if (std::abs(circle_collision_pos.y - c->position.y) <=
                 circle.radius + c->half_ext.y) {
@@ -126,8 +132,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
             if (collision_time < 0.0f)
                 continue;
 
-            circle_collision_pos =
-                circle.position + collision_time * move;
+            circle_collision_pos = circle.position + collision_time * move;
 
             if (std::abs(circle_collision_pos.y - c->position.y) <=
                 circle.radius + c->half_ext.y) {

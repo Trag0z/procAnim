@@ -55,7 +55,7 @@ class Gamepad {
     Uint32 button_map, button_down_map, button_up_map;
 
   public:
-    void init();
+    void init(size_t index);
     void update();
 
     glm::vec2 stick(StickID id) const;

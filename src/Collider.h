@@ -21,12 +21,14 @@ struct CircleCollider {
     float radius;
 
     bool intersects(const BoxCollider& other) const noexcept;
+    bool intersects(const CircleCollider& other) const noexcept;
 };
 
 struct CollisionData {
     glm::vec2 move_until_collision;
     enum { NONE, UP, DOWN, LEFT, RIGHT } direction;
 };
+
 /*
 Find first collision of circle moving along move.
 NOTE: Treats the circle like a rectangle in order to do the

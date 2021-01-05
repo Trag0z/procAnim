@@ -52,7 +52,7 @@ void MouseKeyboardInput::update() {
         }
     }
 
-        mouse_wheel_scroll = 0;
+    mouse_wheel_scroll = 0;
 }
 
 bool MouseKeyboardInput::mouse_button(MouseButton button) const {
@@ -87,10 +87,10 @@ glm::vec2 MouseKeyboardInput::mouse_move() const noexcept {
     return move;
 }
 
-void Gamepad::init() {
-    sdl_ptr = SDL_GameControllerOpen(0);
+void Gamepad::init(size_t index) {
+    sdl_ptr = SDL_GameControllerOpen(static_cast<int>(index));
     if (!sdl_ptr) {
-        printf("[Input] Error opening gamepad: %s\n", SDL_GetError());
+        printf("[Input] Error opening gamepad %zd: %s\n", index, SDL_GetError());
         SDL_TriggerBreakpoint();
     }
 }

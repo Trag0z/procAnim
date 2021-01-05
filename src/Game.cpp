@@ -70,7 +70,8 @@ void Game::init() {
 
     mouse_keyboard_input.init(&renderer);
 
-    gamepad.init();
+    gamepads[0].init(0);
+    gamepads[1].init(1);
 
     background.init("../assets/background.png");
 
@@ -80,11 +81,18 @@ void Game::init() {
 
     // Player
     glm::vec3 position = {960.0f, 271.0f, 0.0f};
-    player.init(position, glm::vec3(100.0f, 100.0f, 1.0f),
-                "../assets/playerTexture.png", "../assets/guy.fbx", &gamepad,
-                level.colliders());
+    players[0].init(position, glm::vec3(100.0f, 100.0f, 1.0f),
+                    "../assets/playerTexture.png", "../assets/guy.fbx",
+                    &gamepads[0], level.colliders());
 
-    renderer.update_camera(player.position() + glm::vec2(0.0f, 200.0f));
+    position.x += 50.0f;
+    players[1].init(position, glm::vec3(100.0f, 100.0f, 1.0f),
+                    "../assets/playerTexture.png", "../assets/guy.fbx",
+                    &gamepads[1], level.colliders());
+
+    renderer.update_camera(
+        lerp(players[0].position(), players[1].position(), 0.5f) +
+        glm::vec2(0.0f, 200.0f));
 
     frame_start = SDL_GetTicks();
     is_running = true;
@@ -98,7 +106,10 @@ void Game::run() {
 
     // Get inputs
     mouse_keyboard_input.update();
-    gamepad.update();
+
+    for (auto& pad : gamepads) {
+        pad.update();
+    }
 
     { // Process events
         SDL_Event event;
@@ -167,7 +178,7 @@ void Game::run() {
         }
 
     } else if (game_mode == SPLINE_EDITOR) {
-        if (!player.animator.spline_editor->update(mouse_keyboard_input)) {
+        if (!players[0].animator.spline_editor->update(mouse_keyboard_input)) {
             game_mode = PLAY;
         }
     } else if (game_mode == LEVEL_EDITOR) {
@@ -184,10 +195,12 @@ void Game::run() {
 
     level.render(renderer);
 
-    player.render(renderer);
+    for (auto& player : players) {
+        player.render(renderer);
+    }
 
     if (game_mode == SPLINE_EDITOR) {
-        player.animator.spline_editor->render(renderer, true);
+        players[0].animator.spline_editor->render(renderer, true);
     } else if (game_mode == LEVEL_EDITOR) {
         level_editor.render(renderer);
     }
@@ -205,79 +218,102 @@ void Game::run() {
 }
 
 void Game::simulate_world(float delta_time) {
-    player.update(delta_time, level.colliders(), mouse_keyboard_input);
 
-    //              Resolve collisions              //
-    const glm::vec2 player_move = player.velocity * delta_time;
+    glm::vec2 new_player_positions[2];
+    glm::vec2 new_player_velocities[2];
 
-    glm::vec2 new_player_position;
-    glm::vec2 new_player_velocity = player.velocity;
+    for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
+        auto& player = players[n_player];
+        auto& new_player_position = new_player_positions[n_player];
+        auto& new_player_velocity = new_player_velocities[n_player];
 
-    { // Body collisions
-        CircleCollider body_collider = player.body_collider();
-        CollisionData collision = find_first_collision_sweep_prune(
-            body_collider, player_move, level.colliders());
+        player.update(delta_time, level.colliders(), mouse_keyboard_input);
 
-        if (collision.direction == CollisionData::NONE) {
-            new_player_position = player.position() + player_move;
-            // player.velocity stays the same
-        } else {
-            body_collider.position += collision.move_until_collision;
+        //              Resolve collisions              //
+        const glm::vec2 player_move = player.velocity * delta_time;
+        new_player_velocity = player.velocity;
 
-            CollisionData second_collision;
-            if (collision.direction == CollisionData::DOWN ||
-                collision.direction == CollisionData::UP) {
+        { // Body collisions with level
+            CircleCollider body_collider = player.body_collider();
+            CollisionData collision = find_first_collision_sweep_prune(
+                body_collider, player_move, level.colliders());
 
-                new_player_velocity.y = 0.0f;
-
-                glm::vec2 remaining_player_move = glm::vec2(
-                    player_move.x - collision.move_until_collision.x, 0.0f);
-                second_collision = find_first_collision_sweep_prune(
-                    body_collider, remaining_player_move, level.colliders());
-
+            if (collision.direction == CollisionData::NONE) {
+                new_player_position = player.position() + player_move;
+                // player.velocity stays the same
             } else {
-                new_player_velocity.x = 0.0f;
+                body_collider.position += collision.move_until_collision;
 
-                glm::vec2 remaining_player_move = glm::vec2(
-                    0.0f, player_move.y - collision.move_until_collision.y);
-                second_collision = find_first_collision_sweep_prune(
-                    body_collider, remaining_player_move, level.colliders());
+                CollisionData second_collision;
+                if (collision.direction == CollisionData::DOWN ||
+                    collision.direction == CollisionData::UP) {
+
+                    new_player_velocity.y = 0.0f;
+
+                    glm::vec2 remaining_player_move = glm::vec2(
+                        player_move.x - collision.move_until_collision.x, 0.0f);
+                    second_collision = find_first_collision_sweep_prune(
+                        body_collider, remaining_player_move,
+                        level.colliders());
+
+                } else {
+                    new_player_velocity.x = 0.0f;
+
+                    glm::vec2 remaining_player_move = glm::vec2(
+                        0.0f, player_move.y - collision.move_until_collision.y);
+                    second_collision = find_first_collision_sweep_prune(
+                        body_collider, remaining_player_move,
+                        level.colliders());
+                }
+                SDL_assert(second_collision.direction != collision.direction);
+
+                if (second_collision.direction != CollisionData::NONE) {
+                    new_player_velocity = glm::vec2(0.0f);
+                }
+
+                new_player_position = player.position() +
+                                      collision.move_until_collision +
+                                      second_collision.move_until_collision;
             }
-            SDL_assert(second_collision.direction != collision.direction);
-
-            if (second_collision.direction != CollisionData::NONE) {
-                new_player_velocity = glm::vec2(0.0f);
-            }
-
-            new_player_position = player.position() +
-                                  collision.move_until_collision +
-                                  second_collision.move_until_collision;
         }
+
+        // Keep player above ground, check grounded status
+        auto ground_under_player = level.find_ground_under(new_player_position);
+        if (!ground_under_player ||
+            new_player_position.y - ground_under_player->top_edge() >
+                player.ground_hover_distance + 2.0f /* small tolerance */) {
+
+            player.grounded = false;
+            player.state = Player::FALLING;
+            new_player_velocity.y -= game_config.gravity;
+
+        } else {
+            new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
+            new_player_position.y =
+                ground_under_player->top_edge() + player.ground_hover_distance;
+
+            player.grounded = true;
+            if (player.state == Player::FALLING) {
+                player.state = Player::STANDING;
+            }
+        }
+        player.velocity = new_player_velocity;
+        player.position_ = new_player_position;
     }
 
-    // Keep player above ground, check grounded status
-    auto ground_under_player = level.find_ground_under(new_player_position);
-    if (!ground_under_player ||
-        new_player_position.y - ground_under_player->top_edge() >
-            player.ground_hover_distance + 2.0f /* small tolerance */) {
+    { // Player/Player Collisions // TODO
+        CircleCollider colliders[2];
+        colliders[0] = players[0].body_collider();
+        colliders[1] = players[1].body_collider();
 
-        player.grounded = false;
-        player.state = Player::FALLING;
-        new_player_velocity.y -= game_config.gravity;
+        glm::vec2 between_colliders =
+            colliders[0].position - colliders[1].position;
+        float distance = glm::length(between_colliders);
 
-    } else {
-        new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
-        new_player_position.y =
-            ground_under_player->top_edge() + player.ground_hover_distance;
-
-        player.grounded = true;
-        if (player.state == Player::FALLING) {
-            player.state = Player::STANDING;
+        if (distance < colliders[0].radius + colliders[1].radius) {
+            // players[0].velocity +=
         }
     }
-
-    player.velocity = new_player_velocity;
-    player.position_ = new_player_position;
 }
 
 void Game::update_gui() {
@@ -319,24 +355,24 @@ void Game::update_gui() {
 
     NewLine();
     Text("Player");
-    DragFloat("ground_hover_distance", &player.ground_hover_distance);
-    DragFloat("jump_force", &player.jump_force);
-    DragFloat("max_walk_speed", &player.max_walk_speed);
+    DragFloat("ground_hover_distance", &players[0].ground_hover_distance);
+    DragFloat("jump_force", &players[0].jump_force);
+    DragFloat("max_walk_speed", &players[0].max_walk_speed);
 
     NewLine();
     Text("Animation controls");
     DragFloat("Step distance multiplier",
-              &player.animator.step_distance_multiplier, 1.0f, 0.0f, 0.0f,
+              &players[0].animator.step_distance_multiplier, 1.0f, 0.0f, 0.0f,
               "%.1f");
     DragFloat2("Interpolation speed min/max",
-               &player.animator.interpolation_speed_multiplier.min, 0.01f);
+               &players[0].animator.interpolation_speed_multiplier.min, 0.01f);
     PopItemWidth();
 
     End();
 
     //////          Limb data display window            //////
-    // // This is a big window that displays a lot of the data about the player
-    // and
+    // // This is a big window that displays a lot of the data about the
+    // player and
     // // its limbs. It's probably not really useful to show off the
     // functionality
     // // of the program, but it was helpful in debugging.
@@ -346,8 +382,8 @@ void Game::update_gui() {
 
     // sprintf_s(label, "% 6.1f, % 6.1f", player.position_.x,
     // player.position_.y); Text("Player position: "); SameLine();
-    // DragFloat2("Player position", value_ptr(player.position_), 1.0f, 0.0f,
-    // 0.0f,
+    // DragFloat2("Player position", value_ptr(player.position_), 1.0f,
+    // 0.0f, 0.0f,
     //            "% .2f");
 
     // Text("Target Positions");

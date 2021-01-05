@@ -55,9 +55,12 @@ class Game {
     Renderer renderer;
 
     MouseKeyboardInput mouse_keyboard_input;
-    Gamepad gamepad;
 
-    Player player;
+    static const size_t NUM_PLAYERS = 2;
+
+    Gamepad gamepads[NUM_PLAYERS];
+    Player players[NUM_PLAYERS];
+
     Background background;
 
     Level level;
