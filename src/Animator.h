@@ -45,11 +45,12 @@ class Animator {
     void render(const Renderer& renderer);
 
     glm::vec2 tip_pos(LegIndex limb_index) const;
+    const Bone* weapon() const noexcept;
 
   private:
     const Player* parent;
     SplineEditor* spline_editor;
-    Bone* weapon;
+    Bone* weapon_;
     float max_weapon_length = 3.0f;
 
     glm::vec2 right_arm_target_position;

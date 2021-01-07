@@ -3,9 +3,8 @@
 #include "Mesh.h"
 #include "Util.h"
 
-const std::string& Bone::name() const { return name_; }
-const Bone* Bone::parent() const { return parent_; }
-glm::vec2 Bone::tail() const { return tail_; }
+const std::string& Bone::name() const noexcept { return name_; }
+const Bone* Bone::parent() const noexcept { return parent_; }
 const glm::mat3& Bone::bind_pose_transform() const {
     return bind_pose_transform_;
 }
@@ -31,6 +30,11 @@ glm::mat3 Bone::transform() const {
 }
 
 glm::vec2 Bone::head() const { return transform() * bind_pose_transform_[2]; }
+glm::vec2 Bone::tail() const { return transform() * glm::vec3(tail_, 1.0f); }
+
+glm::vec2 Bone::tail_bind_pose() const noexcept {
+    return bind_pose_transform_ * glm::vec3(tail_, 1.0f);
+}
 
 Bone* RiggedMesh::find_bone(const char* str) {
     for (uint i = 0; i < bones.size(); ++i) {

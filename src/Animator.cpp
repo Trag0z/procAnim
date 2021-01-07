@@ -25,11 +25,9 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos_model_space) {
     // zero. Check this assumption here, just to be sure.
     SDL_assert(glm::length(glm::cross(
                    bones[0]->bind_pose_transform()[2] -
-                       bones[0]->bind_pose_transform() *
-                           glm::vec3(bones[0]->tail(), 1.0f),
+                       glm::vec3(bones[0]->tail_bind_pose(), 1.0f),
                    bones[1]->bind_pose_transform()[2] -
-                       bones[1]->bind_pose_transform() *
-                           glm::vec3(bones[1]->tail(), 1.0f))) < 0.1f);
+                       glm::vec3(bones[1]->tail_bind_pose(), 1.0f))) < 0.1f);
 
     float target_distance =
         glm::length(bones[0]->head() - target_pos_model_space);
@@ -112,7 +110,7 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh,
     limbs[RIGHT_LEG].bones[0] = mesh.find_bone("Leg_R_1");
     limbs[RIGHT_LEG].bones[1] = mesh.find_bone("Leg_R_2");
 
-    weapon = mesh.find_bone("Weapon");
+    weapon_ = mesh.find_bone("Weapon");
 
     set_new_splines(0.0f, colliders);
     interpolation_factor_on_spline =
@@ -133,9 +131,9 @@ void Animator::update(float delta_time, float walking_speed,
 
     float weapon_length = glm::length(right_stick_input) * max_weapon_length;
 
-    weapon->rotation = weapon_rotation;
-    SDL_assert(weapon->tail().x == 0.0f);
-    weapon->length = weapon_length;
+    weapon_->rotation = weapon_rotation;
+    SDL_assert(weapon_->tail_bind_pose().x == 0.0f);
+    weapon_->length = weapon_length;
 
     // Walk animation
     if (walking_speed > 0.0f) {
@@ -218,6 +216,8 @@ glm::vec2 Animator::tip_pos(LegIndex limb_index) const {
     return limbs[limb_index].spline.get_point_on_spline(
         interpolation_factor_on_spline);
 }
+
+const Bone* Animator::weapon() const noexcept { return weapon_; }
 
 void Animator::set_new_splines(float walking_speed,
                                const std::list<BoxCollider>& colliders) {

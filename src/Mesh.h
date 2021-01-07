@@ -15,19 +15,22 @@ class Bone {
     float rotation = 0.0f;
     float length;
 
-    const std::string& name() const;
-    const Bone* parent() const;
-    glm::vec2 tail() const;
+    const std::string& name() const noexcept;
+    const Bone* parent() const noexcept;
     const glm::mat3& bind_pose_transform() const;
     const glm::mat3& inverse_bind_pose_transform() const;
 
     // The returned matrix applies the transformation for this bone (and by
-    // extension, all parents of the bone) to a vector in mesh space
+    // extension, all parents of the bone) to a vector in mesh space.
     glm::mat3 transform() const;
 
     // Current position of the bone's head (affacted by parent bones) in mesh
-    // space
+    // space.
     glm::vec2 head() const;
+    // The end of the bone that is affected by it's rotation.
+    glm::vec2 tail() const;
+
+    glm::vec2 tail_bind_pose() const noexcept;
 
   private:
     std::string name_;
