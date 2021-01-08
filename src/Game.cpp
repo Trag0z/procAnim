@@ -68,6 +68,11 @@ void Game::init() {
     // Initialize member variables
     renderer.init();
 
+    {
+        GLuint index = 0;
+        collision_point.vao.init(&index, 1, nullptr, 1, GL_DYNAMIC_DRAW);
+    }
+
     mouse_keyboard_input.init(&renderer);
 
     gamepads[0].init(0);
@@ -199,6 +204,11 @@ void Game::run() {
         player.render(renderer);
     }
 
+    if (collision_point.collision_happened) {
+        renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
+        collision_point.vao.draw(GL_POINTS);
+    }
+
     if (game_mode == SPLINE_EDITOR) {
         players[0].animator.spline_editor->render(renderer, true);
     } else if (game_mode == LEVEL_EDITOR) {
@@ -312,6 +322,28 @@ void Game::simulate_world(float delta_time) {
 
         if (distance < colliders[0].radius + colliders[1].radius) {
             // players[0].velocity +=
+        }
+    }
+
+    { // Collisions between weapons
+        // @OPTIMIZATION: Only do most of this stuff if players actually use
+        // their weapons
+        LineCollider weapons[NUM_PLAYERS];
+        for (size_t i = 0; i < NUM_PLAYERS; ++i) {
+            weapons[i] = players[i].weapon_collider();
+        }
+
+        float t;
+        if (weapons[0].intersects(weapons[1], &t)) {
+            glm::vec2 collision_pos = weapons[0].start + weapons[0].line() * t;
+            printf("Weapons colliding at t=%.2f, pos: %.2f, %.2f\n", t,
+                   collision_pos.x, collision_pos.y);
+
+            DebugShader::Vertex shader_vertex = {collision_pos};
+            collision_point.vao.update_vertex_data(&shader_vertex, 1);
+            collision_point.collision_happened = true;
+        } else {
+            collision_point.collision_happened = false;
         }
     }
 }

@@ -66,6 +66,11 @@ class Game {
     Level level;
     LevelEditor level_editor;
 
+    struct {
+        bool collision_happened;
+        VertexArray<DebugShader::Vertex> vao;
+    } collision_point;
+
     enum GameMode { PLAY = 0, SPLINE_EDITOR = 1, LEVEL_EDITOR = 2 } game_mode;
 
     void simulate_world(float delta_time);

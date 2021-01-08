@@ -48,6 +48,8 @@ class Player : public Entity {
 
     CircleCollider body_collider() const noexcept;
 
+    LineCollider weapon_collider() const;
+
     // The debug UI needs to access the private members of this class. Letting
     // Game access them this way seems cleaner to me then writing a bunch of
     // getters/setters that are only used in one place.

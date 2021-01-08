@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Collider.h"
+#include "Util.h"
 
 bool BoxCollider::encloses_point(glm::vec2 point) const noexcept {
     return point.x > position.x - half_ext.x &&
@@ -59,6 +60,55 @@ bool CircleCollider::intersects(const CircleCollider& other) const noexcept {
 
     return glm::length(position - other.position) < radius + other.radius;
 }
+
+bool LineCollider::intersects(const LineCollider& other,
+                              float* out_t) const noexcept {
+    glm::vec2 line1 = line();
+    glm::vec2 line2 = other.line();
+
+    float length1 = glm::length(line1);
+    float length2 = glm::length(line2);
+
+    // If the line start points are further apart than the
+    // sum of the lenghts, they can't collide. Return false.
+    if (glm::length(start - other.start) > length1 + length2) {
+        return false;
+    }
+
+    // Create f(x)=mx+b form for both lines. Use this->start as the origin of
+    // the coordinate system.
+    float m1 = line1.y / line1.x;
+    float m2 = line2.y / line2.x;
+    float b2 = m2 * (start.x - other.start.x) + other.start.y - start.y;
+
+    if (std::abs(m1 - m2) < 0.01f) {
+        // Lines are parallel (or equivalent, but that should not happen,
+        // realistically). Still check with the following assert.
+        SDL_assert(b2 != 0.0f);
+        return false;
+    }
+
+    float intersection_x = b2 / (m1 - m2) + start.x;
+
+    float t1 = (intersection_x - start.x) / line1.x;
+    float t2 = (intersection_x - other.start.x) / line2.x;
+
+    if (!isfinite(t1) || !isfinite(t2)) {
+        return false;
+    }
+
+    if (t1 > 1.0f || t1 < 0.0f || t2 > 1.0f || t2 < 0.0f) {
+        return false;
+    }
+
+    if (out_t) {
+        *out_t = t1;
+    }
+
+    return true;
+}
+
+glm::vec2 LineCollider::line() const noexcept { return end - start; }
 
 const CollisionData
 find_first_collision_sweep_prune(const CircleCollider& circle,
