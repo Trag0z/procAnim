@@ -66,10 +66,12 @@ class Game {
     Level level;
     LevelEditor level_editor;
 
+#ifdef _DEBUG
     struct {
         bool collision_happened;
         VertexArray<DebugShader::Vertex> vao;
     } collision_point;
+#endif
 
     enum GameMode { PLAY = 0, SPLINE_EDITOR = 1, LEVEL_EDITOR = 2 } game_mode;
 

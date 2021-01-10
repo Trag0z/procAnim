@@ -26,11 +26,15 @@ struct CircleCollider {
 
 struct LineCollider {
     glm::vec2 start;
-    glm::vec2 end;
+    glm::vec2 line;
+
+    LineCollider() {}
+    LineCollider(glm::vec2 start, glm::vec2 end)
+        : start(start), line(end - start) {}
 
     bool intersects(const LineCollider& other,
                     float* out_t = nullptr) const noexcept;
-    glm::vec2 line() const noexcept;
+    bool intersects(const CircleCollider& other) const noexcept;
 };
 
 struct CollisionData {

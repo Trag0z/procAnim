@@ -325,25 +325,34 @@ void Game::simulate_world(float delta_time) {
         }
     }
 
-    { // Collisions between weapons
-        // @OPTIMIZATION: Only do most of this stuff if players actually use
-        // their weapons
-        LineCollider weapons[NUM_PLAYERS];
-        for (size_t i = 0; i < NUM_PLAYERS; ++i) {
-            weapons[i] = players[i].weapon_collider();
-        }
+    // Collisions between weapons and weapons/bodies
+    LineCollider weapons[NUM_PLAYERS];
+    for (size_t i = 0; i < NUM_PLAYERS; ++i) {
+        weapons[i] = players[i].weapon_collider();
+    }
+
+    if (weapons[0].line != glm::vec2(0.0f) ||
+        weapons[1].line != glm::vec2(0.0f)) {
 
         float t;
         if (weapons[0].intersects(weapons[1], &t)) {
-            glm::vec2 collision_pos = weapons[0].start + weapons[0].line() * t;
+            glm::vec2 collision_pos = weapons[0].start + weapons[0].line * t;
             printf("Weapons colliding at t=%.2f, pos: %.2f, %.2f\n", t,
                    collision_pos.x, collision_pos.y);
 
+#ifdef _DEBUG
             DebugShader::Vertex shader_vertex = {collision_pos};
             collision_point.vao.update_vertex_data(&shader_vertex, 1);
             collision_point.collision_happened = true;
         } else {
             collision_point.collision_happened = false;
+#endif
+        }
+
+        for (size_t i = 0; i < NUM_PLAYERS; ++i) {
+            auto& weapon = weapons[i];
+            if (weapon.intersects(players[1 - i].body_collider())) {
+            }
         }
     }
 }

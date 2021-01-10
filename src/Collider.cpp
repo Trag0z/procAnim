@@ -63,22 +63,19 @@ bool CircleCollider::intersects(const CircleCollider& other) const noexcept {
 
 bool LineCollider::intersects(const LineCollider& other,
                               float* out_t) const noexcept {
-    glm::vec2 line1 = line();
-    glm::vec2 line2 = other.line();
-
-    float length1 = glm::length(line1);
-    float length2 = glm::length(line2);
+    float length1 = glm::length(line);
+    float length2 = glm::length(other.line);
 
     // If the line start points are further apart than the
-    // sum of the lenghts, they can't collide. Return false.
+    // sum of the lenghts, they can't collide.
     if (glm::length(start - other.start) > length1 + length2) {
         return false;
     }
 
     // Create f(x)=mx+b form for both lines. Use this->start as the origin of
     // the coordinate system.
-    float m1 = line1.y / line1.x;
-    float m2 = line2.y / line2.x;
+    float m1 = line.y / line.x;
+    float m2 = other.line.y / other.line.x;
     float b2 = m2 * (start.x - other.start.x) + other.start.y - start.y;
 
     if (std::abs(m1 - m2) < 0.01f) {
@@ -90,8 +87,8 @@ bool LineCollider::intersects(const LineCollider& other,
 
     float intersection_x = b2 / (m1 - m2) + start.x;
 
-    float t1 = (intersection_x - start.x) / line1.x;
-    float t2 = (intersection_x - other.start.x) / line2.x;
+    float t1 = (intersection_x - start.x) / line.x;
+    float t2 = (intersection_x - other.start.x) / other.line.x;
 
     if (!isfinite(t1) || !isfinite(t2)) {
         return false;
@@ -108,7 +105,33 @@ bool LineCollider::intersects(const LineCollider& other,
     return true;
 }
 
-glm::vec2 LineCollider::line() const noexcept { return end - start; }
+bool LineCollider::intersects(const CircleCollider& other) const noexcept {
+    if (glm::length(line) + other.radius <
+        glm::length(start - other.position)) {
+        // Too far away, they can not collide.
+        return false;
+    }
+
+    glm::vec2 circle_pos_relative_to_line = other.position - start;
+    // t * line is the point on the line that is closest to the circle's center
+    float t =
+        glm::dot(circle_pos_relative_to_line, line) / glm::dot(line, line);
+
+    if (t < 0.0f) {
+        // The circle is in the wrong direction relative to the line
+        return false;
+    }
+
+    glm::vec2 closest_point = t * line;
+    float distance = glm::length(closest_point - circle_pos_relative_to_line);
+
+    if (distance > other.radius) {
+        // Too far away
+        return false;
+    }
+
+    return true;
+}
 
 const CollisionData
 find_first_collision_sweep_prune(const CircleCollider& circle,

@@ -123,14 +123,13 @@ CircleCollider Player::body_collider() const noexcept {
             std::abs(local_to_world_scale(body_collider_.radius))};
     // Using std::abs() here is a kinda hacky way to get
     // around the fact that when the player is facing
-    // left, it's scale is negative onthe x-axis
+    // left, it's scale is negative on the x-axis
 }
 
 LineCollider Player::weapon_collider() const {
-    LineCollider result;
     auto weapon = animator.weapon();
-    result.start = local_to_world_space(weapon->head());
-    result.end = local_to_world_space(weapon->tail());
+    LineCollider result(local_to_world_space(weapon->head()),
+                        local_to_world_space(weapon->tail()));
 
     return result;
 }
