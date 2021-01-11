@@ -42,7 +42,6 @@ class Animator {
     void update(float delta_time, float walking_speed,
                 glm::vec2 right_stick_input,
                 const std::list<BoxCollider>& colliders);
-    void render(const Renderer& renderer);
 
     glm::vec2 tip_pos(LegIndex limb_index) const;
     const Bone* weapon() const noexcept;

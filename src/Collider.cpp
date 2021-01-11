@@ -227,8 +227,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
                   });
 
         for (const auto c : candidates) {
-            glm::vec2 circle_collision_pos = {c->bottom_edge() - circle.radius,
-                                              0.0f};
+            glm::vec2 circle_collision_pos = { 0.0f, c->bottom_edge() - circle.radius};
 
             float new_collision_time =
                 (circle_collision_pos.y - circle.position.y) / move.y;
@@ -256,8 +255,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
                   });
 
         for (const auto c : candidates) {
-            glm::vec2 circle_collision_pos = {c->top_edge() + circle.radius,
-                                              0.0f};
+            glm::vec2 circle_collision_pos = {0.0f, c->top_edge() + circle.radius };
 
             float new_collision_time =
                 (circle_collision_pos.y - circle.position.y) / move.y;

@@ -90,14 +90,21 @@ glm::vec2 MouseKeyboardInput::mouse_move() const noexcept {
 void Gamepad::init(size_t index) {
     sdl_ptr = SDL_GameControllerOpen(static_cast<int>(index));
     if (!sdl_ptr) {
-        printf("[Input] Error opening gamepad %zd: %s\n", index, SDL_GetError());
-        SDL_TriggerBreakpoint();
+        printf("[Input] Error opening gamepad %zd: %s. Using dummy pad.\n",
+               index, SDL_GetError());
+
+        for (auto& a : axes) {
+            a = 0.0f;
+        }
+        button_map = button_down_map = button_up_map = 0;
     }
 }
 
 void Gamepad::update() {
     // Check if gamepad is still valid
-    SDL_assert(sdl_ptr);
+    if (!sdl_ptr) {
+        return;
+    }
 
     // Poll all the axes on this pad
     Sint16 tempAxis;

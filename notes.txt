@@ -1,5 +1,8 @@
 NEXT:
-- collisions with second player
+- immunity period after hit
+- no collisio with ground in hitstun
+- render body collider
+
 - BUG: leg origin is somehow connected to camera origin?
 
 TODO:

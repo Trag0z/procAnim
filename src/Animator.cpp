@@ -197,21 +197,6 @@ void Animator::update(float delta_time, float walking_speed,
     }
 }
 
-void Animator::render(const Renderer& renderer) {
-    renderer.debug_shader.use();
-    renderer.debug_shader.set_color(&Color::GREEN);
-
-    // All the spline positions are already in world space, so set the model
-    // matrix to unity
-    glm::mat3 model(1.0f);
-    renderer.debug_shader.set_model(&model);
-
-    if (renderer.draw_leg_splines) {
-        limbs[LEFT_LEG].spline.render(renderer, true);
-        limbs[RIGHT_LEG].spline.render(renderer, true);
-    }
-}
-
 glm::vec2 Animator::tip_pos(LegIndex limb_index) const {
     return limbs[limb_index].spline.get_point_on_spline(
         interpolation_factor_on_spline);

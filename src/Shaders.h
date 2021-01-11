@@ -40,7 +40,11 @@ class DebugShader : public ShaderDetail::Shader {
         glm::vec2 pos;
     };
 
-    static VertexArray<Vertex> DEFAULT_VAO;
+    // Vertices for square between -1 and 1 on both axes.
+    static VertexArray<Vertex> SQUARE_VAO;
+
+    // Vertices for circle with radius 1.
+    static VertexArray<Vertex> CIRCLE_VAO;
 };
 
 class TexturedShader : public ShaderDetail::Shader {

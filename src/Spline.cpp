@@ -531,7 +531,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         // the time.
         float radius;
 
-            radius = limbs[Animator::LEFT_LEG].length();
+        radius = limbs[Animator::LEFT_LEG].length();
 
         DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];
 

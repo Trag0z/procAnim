@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Shaders.h"
+#include "Util.h"
 
 static bool check_compile_errors(GLuint object, bool program) {
     GLint success;
@@ -98,7 +99,8 @@ void Shader::set_model(const glm::mat3* mat) const {
 } // namespace ShaderDetail
 
 //                  DebugShader                     //
-VertexArray<DebugShader::Vertex> DebugShader::DEFAULT_VAO;
+VertexArray<DebugShader::Vertex> DebugShader::SQUARE_VAO;
+VertexArray<DebugShader::Vertex> DebugShader::CIRCLE_VAO;
 
 DebugShader::DebugShader(const char* vert_path, const char* frag_path)
     : Shader(vert_path, frag_path) {
@@ -112,7 +114,25 @@ DebugShader::DebugShader(const char* vert_path, const char* frag_path)
     vertices[2] = {{1.0f, -1.0f}};
     vertices[3] = {{1.0f, 1.0f}};
 
-    DEFAULT_VAO.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
+    SQUARE_VAO.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
+
+    // Init render data for rendering circle
+    constexpr size_t CIRCLE_SEGMENTS = 30;
+
+    GLuint circle_indices[CIRCLE_SEGMENTS];
+    DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];
+
+    for (size_t i = 0; i < CIRCLE_SEGMENTS; ++i) {
+        circle_indices[i] = static_cast<GLuint>(i);
+
+        float theta = static_cast<float>(i) /
+                      static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
+
+        circle_vertices[i].pos = glm::vec2(cosf(theta), sinf(theta));
+    }
+
+    CIRCLE_VAO.init(circle_indices, CIRCLE_SEGMENTS, circle_vertices,
+                    CIRCLE_SEGMENTS, GL_STATIC_DRAW);
 }
 
 void DebugShader::set_color(const Color* color) const {

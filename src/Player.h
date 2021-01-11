@@ -25,14 +25,17 @@ class Player : public Entity {
     float walk_speed;
     bool facing_right = true;
 
-    float ground_hover_distance = 160.0f;
-    float jump_force = 30.0f;
-    float max_walk_speed = 10.0f;
+    static float GROUND_HOVER_DISTANCE;
+    static float JUMP_FORCE;
+    static float MAX_WALK_SPEED;
+    static float MAX_AIR_ACCELERATION;
+    static float MAX_AIR_SPEED;
+    static float HIT_SPEED_MULTIPLIER;
 
-    float max_air_acceleration = 0.5f;
-    float max_air_speed = 10.0f;
+    // Tese are in world space!
+    LineCollider weapon_collider, last_weapon_collider;
 
-    enum State { STANDING, WALKING, FALLING } state = FALLING;
+    enum State { STANDING, WALKING, FALLING, HITSTUN } state = FALLING;
 
   public:
     void init(glm::vec3 position, glm::vec3 scale_factor,
@@ -42,13 +45,9 @@ class Player : public Entity {
     void update(float delta_time, const std::list<BoxCollider>& colliders,
                 const MouseKeyboardInput& input);
 
-    void render(const Renderer& renderer);
-
     bool is_facing_right() const noexcept;
 
     CircleCollider body_collider() const noexcept;
-
-    LineCollider weapon_collider() const;
 
     // The debug UI needs to access the private members of this class. Letting
     // Game access them this way seems cleaner to me then writing a bunch of
