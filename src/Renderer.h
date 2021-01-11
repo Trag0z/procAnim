@@ -23,9 +23,10 @@ class Renderer {
     glm::vec2 camera_center() const noexcept;
     float zoom_factor() const noexcept;
 
-    bool draw_body = true;
+    bool draw_body = false;
     bool draw_limbs = true;
     bool draw_bones = false;
     bool draw_wireframe = false;
+    bool draw_colliders = true;
     bool draw_leg_splines = true;
 };

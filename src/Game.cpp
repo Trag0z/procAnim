@@ -201,7 +201,7 @@ void Game::run() {
     level.render(renderer);
 
     // Players
-    glm::mat3* bone_transforms[NUM_PLAYERS];
+    glm::mat3* bone_transforms[NUM_PLAYERS] = {nullptr, nullptr};
     if (renderer.draw_limbs || renderer.draw_wireframe) {
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
@@ -254,6 +254,7 @@ void Game::run() {
     }
 
     if (renderer.draw_bones) {
+        renderer.bone_shader.use();
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
             renderer.bone_shader.set_model(&player.model);
@@ -270,6 +271,21 @@ void Game::run() {
     if (bone_transforms[0] != nullptr) {
         for (auto array : bone_transforms) {
             delete[] array;
+        }
+    }
+
+    if (renderer.draw_colliders) {
+        renderer.debug_shader.use();
+        for (const auto& player : players) {
+            renderer.debug_shader.set_color(&Color::ORANGE);
+
+            const auto collider = player.body_collider();
+            glm::mat3 model =
+                glm::translate(glm::mat3(1.0f), collider.position);
+            model = glm::scale(model, glm::vec2(collider.radius));
+
+            renderer.debug_shader.set_model(&model);
+            renderer.debug_shader.CIRCLE_VAO.draw(GL_LINE_LOOP);
         }
     }
 
@@ -485,10 +501,8 @@ void Game::update_gui() {
     Checkbox("Render player body", &renderer.draw_body);
     Checkbox("Render bones", &renderer.draw_bones);
     Checkbox("Render wireframe", &renderer.draw_wireframe);
-
-    NewLine();
-    Text("Render splines for:");
-    Checkbox("Arms", &renderer.draw_leg_splines);
+    Checkbox("Render colliders", &renderer.draw_colliders);
+    Checkbox("Render leg splines", &renderer.draw_leg_splines);
 
     NewLine();
     Checkbox("Use constant delta time", &game_config.use_const_delta_time);
