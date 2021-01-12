@@ -201,16 +201,15 @@ void Game::run() {
     level.render(renderer);
 
     // Players
-    glm::mat3* bone_transforms[NUM_PLAYERS] = {nullptr, nullptr};
+    std::array<glm::mat3, RiggedShader::NUMBER_OF_BONES>
+        bone_transforms[NUM_PLAYERS];
     if (renderer.draw_limbs || renderer.draw_wireframe) {
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
 
-            bone_transforms[n_player] =
-                new glm::mat3[RiggedShader::NUMBER_OF_BONES];
-
             SDL_assert(player.rigged_mesh.bones.size() <=
                        RiggedShader::NUMBER_OF_BONES);
+
             for (size_t n_bone = 0; n_bone < player.rigged_mesh.bones.size();
                  ++n_bone) {
                 bone_transforms[n_player][n_bone] =
@@ -226,7 +225,7 @@ void Game::run() {
 
             renderer.rigged_shader.set_model(&player.model);
             renderer.rigged_shader.set_bone_transforms(
-                bone_transforms[n_player]);
+                bone_transforms[n_player].data());
             renderer.rigged_shader.set_texture(player.texture);
 
             player.rigged_mesh.vao.draw(GL_TRIANGLES);
@@ -244,12 +243,19 @@ void Game::run() {
     }
 
     if (renderer.draw_wireframe) {
-        // TODO: The wireframes are not correct because they don't use the bone
-        // transforms!
-        renderer.debug_shader.use();
-        for (const auto& player : players) {
-            renderer.debug_shader.set_model(&player.model);
-            player.rigged_mesh.vao.draw(GL_LINE_LOOP);
+        renderer.rigged_debug_shader.use();
+        for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
+            const auto& player = players[n_player];
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            // NEXT: Why does this not display anything?
+            renderer.rigged_debug_shader.set_model(&player.model);
+            renderer.rigged_debug_shader.set_color(Color::BLUE);
+            renderer.rigged_debug_shader.set_bone_transforms(
+                bone_transforms[n_player].data());
+
+            player.rigged_mesh.vao.draw(GL_TRIANGLES);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
     }
 
@@ -258,8 +264,9 @@ void Game::run() {
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
             renderer.bone_shader.set_model(&player.model);
-            renderer.bone_shader.set_color(&Color::RED);
-            renderer.bone_shader.set_bone_transforms(bone_transforms[n_player]);
+            renderer.bone_shader.set_color(Color::RED);
+            renderer.bone_shader.set_bone_transforms(
+                bone_transforms[n_player].data());
 
             glLineWidth(2.0f);
             player.rigged_mesh.bones_vao.draw(GL_LINES);
@@ -268,16 +275,10 @@ void Game::run() {
         }
     }
 
-    if (bone_transforms[0] != nullptr) {
-        for (auto array : bone_transforms) {
-            delete[] array;
-        }
-    }
-
     if (renderer.draw_colliders) {
         renderer.debug_shader.use();
         for (const auto& player : players) {
-            renderer.debug_shader.set_color(&Color::ORANGE);
+            renderer.debug_shader.set_color(Color::ORANGE);
 
             const auto collider = player.body_collider();
             glm::mat3 model =
@@ -291,7 +292,7 @@ void Game::run() {
 
     if (renderer.draw_leg_splines) {
         renderer.debug_shader.use();
-        renderer.debug_shader.set_color(&Color::GREEN);
+        renderer.debug_shader.set_color(Color::GREEN);
 
         // All the spline positions are already in world space, so set the model
         // matrix to unity
@@ -308,7 +309,7 @@ void Game::run() {
 
     // Debug data
     if (collision_point.collision_happened) {
-        renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
+        renderer.debug_shader.set_color(Color::LIGHT_BLUE);
         glPointSize(2.0f);
         collision_point.vao.draw(GL_POINTS);
     }
@@ -461,8 +462,8 @@ void Game::simulate_world(float delta_time) {
                    collision_pos.x, collision_pos.y);
 
 #ifdef _DEBUG
-            DebugShader::Vertex shader_vertex = {collision_pos};
-            collision_point.vao.update_vertex_data(&shader_vertex, 1);
+            std::array<DebugShader::Vertex, 1> shader_vertex = {collision_pos};
+            collision_point.vao.update_vertex_data(shader_vertex);
             collision_point.collision_happened = true;
         } else {
             collision_point.collision_happened = false;

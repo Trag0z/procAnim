@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.81.16 commit date:2019-12-04, commit time:11:32, hash:f1aa4d18d49d</authoring_tool>
     </contributor>
-    <created>2020-12-18T11:55:31</created>
-    <modified>2020-12-18T11:55:31</modified>
+    <created>2021-01-12T22:30:27</created>
+    <modified>2021-01-12T22:30:27</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -50,41 +50,83 @@
     </material>
   </library_materials>
   <library_geometries>
-    <geometry id="Plane-mesh" name="Plane">
+    <geometry id="BodyPart-mesh" name="BodyPart">
       <mesh>
-        <source id="Plane-mesh-positions">
-          <float_array id="Plane-mesh-positions-array" count="75">-0.4629757 -0.4136235 0 -0.09989875 -1.058277 0 -0.3928301 -1.061237 0 -0.1251921 -1.168506 0 -0.3635854 -1.161571 0 -0.1681658 -1.756739 0 -0.3436689 -1.757139 0 -0.254029 -1.855103 -0.01286715 0.4629757 -0.4136235 0 0 -0.4622698 0 0.09989875 -1.058277 0 0.3928301 -1.061237 0 0.1251921 -1.168506 0 0.3635854 -1.161571 0 0.1681658 -1.756739 -2.49639e-4 0.3436689 -1.757139 2.49639e-4 0.254029 -1.855103 0 -1 -1 0.00999999 1 -1 0.00999999 -1 1 0.00999999 1 1 0.00999999 -0.15 0 0 0.15 0 -0.00999999 -0.15 1 0 0.15 1 0</float_array>
+        <source id="BodyPart-mesh-positions">
+          <float_array id="BodyPart-mesh-positions-array" count="12">-1 -1 0 1 -1 0 -1 1 0 1 1 0</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-positions-array" count="25" stride="3">
+            <accessor source="#BodyPart-mesh-positions-array" count="4" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Plane-mesh-normals">
-          <float_array id="Plane-mesh-normals-array" count="18">0 0 1 2.96253e-4 -0.1299608 0.9915192 -0.002843618 5.14255e-4 0.9999958 1.23204e-5 -4.23488e-4 1 -0.002844691 5.47221e-5 0.999996 0.03331315 -0.00999391 0.9993951</float_array>
+        <source id="BodyPart-mesh-normals">
+          <float_array id="BodyPart-mesh-normals-array" count="3">0 0 1</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-normals-array" count="6" stride="3">
+            <accessor source="#BodyPart-mesh-normals-array" count="1" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Plane-mesh-map-0">
-          <float_array id="Plane-mesh-map-0-array" count="108">0.8442415 0.9458582 0.853264 0.564604 0.9347486 0.9484643 0.853264 0.564604 0.9166468 0.5626852 0.9347486 0.9484643 0.9166468 0.5626852 0.8599375 0.5218381 0.9112244 0.5213889 0.8630183 0.1772219 0.8876579 0.15654 0.9108405 0.1763889 0.8452951 0.9454939 0.931904 0.9443992 0.852024 0.564604 0.852024 0.564604 0.931904 0.9443992 0.9180061 0.5635346 0.9180061 0.5635346 0.8593174 0.5218381 0.852024 0.564604 0.9108406 0.1745287 0.8617782 0.1766018 0.8593174 0.5218381 0.7891734 0.2046259 0.003720462 0.9975197 -0.001240134 0.2083463 0.02970284 0.1214314 0.8182309 0.01087778 0.8197758 0.120587 0.9166468 0.5626852 0.853264 0.564604 0.8599375 0.5218381 0.9108405 0.1763889 0.9112244 0.5213889 0.8599375 0.5218381 0.8599375 0.5218381 0.8630183 0.1772219 0.9108405 0.1763889 0.9180061 0.5635346 0.9106042 0.522009 0.8593174 0.5218381 0.8593174 0.5218381 0.9106042 0.522009 0.9108406 0.1745287 0.9108406 0.1745287 0.8876579 0.1584003 0.8617782 0.1766018 0.7891734 0.2046259 0.7935138 0.9968996 0.003720462 0.9975197 0.02970284 0.1214314 0.03012853 0.009168982 0.8182309 0.01087778</float_array>
+        <source id="BodyPart-mesh-map-0">
+          <float_array id="BodyPart-mesh-map-0-array" count="12">0.7952629 0.2067058 0 1 0 0.2067058 0.7952629 0.2067058 0.7942786 1 0 1</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-map-0-array" count="54" stride="2">
+            <accessor source="#BodyPart-mesh-map-0-array" count="6" stride="2">
               <param name="S" type="float"/>
               <param name="T" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Plane-mesh-colors-Col" name="Col">
-          <float_array id="Plane-mesh-colors-Col-array" count="216">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+        <vertices id="BodyPart-mesh-vertices">
+          <input semantic="POSITION" source="#BodyPart-mesh-positions"/>
+        </vertices>
+        <triangles material="DefalutMat-material" count="2">
+          <input semantic="VERTEX" source="#BodyPart-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#BodyPart-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#BodyPart-mesh-map-0" offset="2" set="0"/>
+          <p>1 0 0 2 0 1 0 0 2 1 0 3 3 0 4 2 0 5</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="RiggedPart-mesh" name="RiggedPart">
+      <mesh>
+        <source id="RiggedPart-mesh-positions">
+          <float_array id="RiggedPart-mesh-positions-array" count="63">-0.4629757 -0.4136235 0 -0.09989875 -1.058277 0 -0.3928301 -1.061237 0 -0.1251921 -1.168506 0 -0.3635854 -1.161571 0 -0.1681658 -1.756739 0 -0.3436689 -1.757139 0 -0.254029 -1.855103 -0.01286715 0.4629757 -0.4136235 0 0 -0.4622698 0 0.09989875 -1.058277 0 0.3928301 -1.061237 0 0.1251921 -1.168506 0 0.3635854 -1.161571 0 0.1681658 -1.756739 -2.49639e-4 0.3436689 -1.757139 2.49639e-4 0.254029 -1.855103 0 -0.15 0 0 0.15 0 -0.00999999 -0.15 1 0 0.15 1 0</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-colors-Col-array" count="54" stride="4">
+            <accessor source="#RiggedPart-mesh-positions-array" count="21" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="RiggedPart-mesh-normals">
+          <float_array id="RiggedPart-mesh-normals-array" count="18">0 0 1 2.96253e-4 -0.1299608 0.9915192 -0.002843618 5.14255e-4 0.9999958 1.23204e-5 -4.23488e-4 1 -0.002844691 5.47221e-5 0.999996 0.03331315 -0.00999391 0.9993951</float_array>
+          <technique_common>
+            <accessor source="#RiggedPart-mesh-normals-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="RiggedPart-mesh-map-0">
+          <float_array id="RiggedPart-mesh-map-0-array" count="96">0.8442415 0.9458582 0.853264 0.564604 0.9347486 0.9484643 0.853264 0.564604 0.9166468 0.5626852 0.9347486 0.9484643 0.9166468 0.5626852 0.8599375 0.5218381 0.9112244 0.5213889 0.8630183 0.1772219 0.8876579 0.15654 0.9108405 0.1763889 0.8452951 0.9454939 0.931904 0.9443992 0.852024 0.564604 0.852024 0.564604 0.931904 0.9443992 0.9180061 0.5635346 0.9180061 0.5635346 0.8593174 0.5218381 0.852024 0.564604 0.9108406 0.1745287 0.8617782 0.1766018 0.8593174 0.5218381 0.02970284 0.1214314 0.8182309 0.01087778 0.8197758 0.120587 0.9166468 0.5626852 0.853264 0.564604 0.8599375 0.5218381 0.9108405 0.1763889 0.9112244 0.5213889 0.8599375 0.5218381 0.8599375 0.5218381 0.8630183 0.1772219 0.9108405 0.1763889 0.9180061 0.5635346 0.9106042 0.522009 0.8593174 0.5218381 0.8593174 0.5218381 0.9106042 0.522009 0.9108406 0.1745287 0.9108406 0.1745287 0.8876579 0.1584003 0.8617782 0.1766018 0.02970284 0.1214314 0.03012853 0.009168982 0.8182309 0.01087778</float_array>
+          <technique_common>
+            <accessor source="#RiggedPart-mesh-map-0-array" count="48" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="RiggedPart-mesh-colors-Col" name="Col">
+          <float_array id="RiggedPart-mesh-colors-Col-array" count="192">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+          <technique_common>
+            <accessor source="#RiggedPart-mesh-colors-Col-array" count="48" stride="4">
               <param name="R" type="float"/>
               <param name="G" type="float"/>
               <param name="B" type="float"/>
@@ -92,56 +134,56 @@
             </accessor>
           </technique_common>
         </source>
-        <vertices id="Plane-mesh-vertices">
-          <input semantic="POSITION" source="#Plane-mesh-positions"/>
+        <vertices id="RiggedPart-mesh-vertices">
+          <input semantic="POSITION" source="#RiggedPart-mesh-positions"/>
         </vertices>
-        <triangles material="DefalutMat-material" count="18">
-          <input semantic="VERTEX" source="#Plane-mesh-vertices" offset="0"/>
-          <input semantic="NORMAL" source="#Plane-mesh-normals" offset="1"/>
-          <input semantic="TEXCOORD" source="#Plane-mesh-map-0" offset="2" set="0"/>
-          <input semantic="COLOR" source="#Plane-mesh-colors-Col" offset="3" set="0"/>
-          <p>0 0 0 0 2 0 1 1 9 0 2 2 2 0 3 3 1 0 4 4 9 0 5 5 1 0 6 6 4 0 7 7 3 0 8 8 6 1 9 9 7 1 10 10 5 1 11 11 8 0 12 12 9 0 13 13 11 0 14 14 11 0 15 15 9 0 16 16 10 0 17 17 10 0 18 18 13 0 19 19 11 0 20 20 14 2 21 21 15 2 22 22 13 2 23 23 18 0 24 24 19 0 25 25 17 0 26 26 21 0 27 27 24 0 28 28 23 0 29 29 1 0 30 30 2 0 31 31 4 0 32 32 5 0 33 33 3 0 34 34 4 0 35 35 4 0 36 36 6 0 37 37 5 0 38 38 10 0 39 39 12 0 40 40 13 0 41 41 13 3 42 42 12 3 43 43 14 3 44 44 14 4 45 45 16 4 46 46 15 4 47 47 18 0 48 48 20 0 49 49 19 0 50 50 21 5 51 51 22 5 52 52 24 5 53 53</p>
+        <triangles material="DefalutMat-material" count="16">
+          <input semantic="VERTEX" source="#RiggedPart-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#RiggedPart-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#RiggedPart-mesh-map-0" offset="2" set="0"/>
+          <input semantic="COLOR" source="#RiggedPart-mesh-colors-Col" offset="3" set="0"/>
+          <p>0 0 0 0 2 0 1 1 9 0 2 2 2 0 3 3 1 0 4 4 9 0 5 5 1 0 6 6 4 0 7 7 3 0 8 8 6 1 9 9 7 1 10 10 5 1 11 11 8 0 12 12 9 0 13 13 11 0 14 14 11 0 15 15 9 0 16 16 10 0 17 17 10 0 18 18 13 0 19 19 11 0 20 20 14 2 21 21 15 2 22 22 13 2 23 23 17 0 24 24 20 0 25 25 19 0 26 26 1 0 27 27 2 0 28 28 4 0 29 29 5 0 30 30 3 0 31 31 4 0 32 32 4 0 33 33 6 0 34 34 5 0 35 35 10 0 36 36 12 0 37 37 13 0 38 38 13 3 39 39 12 3 40 40 14 3 41 41 14 4 42 42 16 4 43 43 15 4 44 44 17 5 45 45 18 5 46 46 20 5 47 47</p>
         </triangles>
       </mesh>
     </geometry>
   </library_geometries>
   <library_controllers>
-    <controller id="Rig_Guy-skin" name="Rig">
-      <skin source="#Plane-mesh">
+    <controller id="Rig_Rigged-skin" name="Rig">
+      <skin source="#RiggedPart-mesh">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
-        <source id="Rig_Guy-skin-joints">
-          <Name_array id="Rig_Guy-skin-joints-array" count="7">Leg_L_1 Leg_R_1 Weapon Leg_L_2 Leg_R_2 Hip_R Hip_L</Name_array>
+        <source id="Rig_Rigged-skin-joints">
+          <Name_array id="Rig_Rigged-skin-joints-array" count="7">Leg_L_1 Leg_R_1 Weapon Leg_L_2 Leg_R_2 Hip_R Hip_L</Name_array>
           <technique_common>
-            <accessor source="#Rig_Guy-skin-joints-array" count="7" stride="1">
+            <accessor source="#Rig_Rigged-skin-joints-array" count="7" stride="1">
               <param name="JOINT" type="name"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Rig_Guy-skin-bind_poses">
-          <float_array id="Rig_Guy-skin-bind_poses-array" count="112">-0.9998261 0.01860171 0 -0.2420159 -0.01860213 -0.9998269 0 -0.4314502 0 0 1 0 0 0 0 1 -0.9998261 -0.01860171 0 0.2420159 0.01860213 -0.9998269 0 -0.4314502 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -0.9997183 -0.02370297 0 -0.2895526 0.0237025 -0.999719 0 -1.117795 0 0 1 0 0 0 0 1 -0.9997183 0.02370297 0 0.2895526 -0.0237025 -0.999719 0 -1.117795 0 0 1 0 0 0 0 1 -0.8629056 -0.5053637 0 0 0.5053637 -0.8629065 0 0 0 0 1 0 0 0 0 1 -0.8629056 0.5053637 0 0 -0.5053637 -0.8629065 0 0 0 0 1 0 0 0 0 1</float_array>
+        <source id="Rig_Rigged-skin-bind_poses">
+          <float_array id="Rig_Rigged-skin-bind_poses-array" count="112">-0.9998261 0.01860171 0 -0.2420159 -0.01860213 -0.9998269 0 -0.4314502 0 0 1 0 0 0 0 1 -0.9998261 -0.01860171 0 0.2420159 0.01860213 -0.9998269 0 -0.4314502 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -0.9997183 -0.02370297 0 -0.2895526 0.0237025 -0.999719 0 -1.117795 0 0 1 0 0 0 0 1 -0.9997183 0.02370297 0 0.2895526 -0.0237025 -0.999719 0 -1.117795 0 0 1 0 0 0 0 1 -0.8629056 -0.5053637 0 0 0.5053637 -0.8629065 0 0 0 0 1 0 0 0 0 1 -0.8629056 0.5053637 0 0 -0.5053637 -0.8629065 0 0 0 0 1 0 0 0 0 1</float_array>
           <technique_common>
-            <accessor source="#Rig_Guy-skin-bind_poses-array" count="7" stride="16">
+            <accessor source="#Rig_Rigged-skin-bind_poses-array" count="7" stride="16">
               <param name="TRANSFORM" type="float4x4"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Rig_Guy-skin-weights">
-          <float_array id="Rig_Guy-skin-weights-array" count="27">1 1 1 1 1 0.01182872 0.9881713 1 1 1 0.5 0.5 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+        <source id="Rig_Rigged-skin-weights">
+          <float_array id="Rig_Rigged-skin-weights-array" count="23">1 1 1 1 1 0.01182872 0.9881713 1 1 1 0.5 0.5 1 1 1 1 1 1 1 1 1 1 1</float_array>
           <technique_common>
-            <accessor source="#Rig_Guy-skin-weights-array" count="27" stride="1">
+            <accessor source="#Rig_Rigged-skin-weights-array" count="23" stride="1">
               <param name="WEIGHT" type="float"/>
             </accessor>
           </technique_common>
         </source>
         <joints>
-          <input semantic="JOINT" source="#Rig_Guy-skin-joints"/>
-          <input semantic="INV_BIND_MATRIX" source="#Rig_Guy-skin-bind_poses"/>
+          <input semantic="JOINT" source="#Rig_Rigged-skin-joints"/>
+          <input semantic="INV_BIND_MATRIX" source="#Rig_Rigged-skin-bind_poses"/>
         </joints>
-        <vertex_weights count="25">
-          <input semantic="JOINT" source="#Rig_Guy-skin-joints" offset="0"/>
-          <input semantic="WEIGHT" source="#Rig_Guy-skin-weights" offset="1"/>
-          <vcount>1 1 1 1 1 2 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </vcount>
-          <v>0 0 0 1 0 2 3 3 3 4 0 5 3 6 3 7 3 8 1 9 5 10 6 11 1 12 1 13 4 14 4 15 4 16 4 17 4 18 6 19 6 20 6 21 6 22 2 23 2 24 2 25 2 26</v>
+        <vertex_weights count="21">
+          <input semantic="JOINT" source="#Rig_Rigged-skin-joints" offset="0"/>
+          <input semantic="WEIGHT" source="#Rig_Rigged-skin-weights" offset="1"/>
+          <vcount>1 1 1 1 1 2 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 </vcount>
+          <v>0 0 0 1 0 2 3 3 3 4 0 5 3 6 3 7 3 8 1 9 5 10 6 11 1 12 1 13 4 14 4 15 4 16 4 17 4 18 2 19 2 20 2 21 2 22</v>
         </vertex_weights>
       </skin>
     </controller>
@@ -219,9 +261,9 @@
             </technique>
           </extra>
         </node>
-        <node id="Guy" name="Guy" type="NODE">
+        <node id="Rigged" name="Rigged" type="NODE">
           <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
-          <instance_controller url="#Rig_Guy-skin">
+          <instance_controller url="#Rig_Rigged-skin">
             <skeleton>#Rig_Weapon</skeleton>
             <skeleton>#Rig_Hip_R</skeleton>
             <skeleton>#Rig_Hip_L</skeleton>
@@ -233,6 +275,18 @@
               </technique_common>
             </bind_material>
           </instance_controller>
+        </node>
+        <node id="Body" name="Body" type="NODE">
+          <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0.01 0 0 0 1</matrix>
+          <instance_geometry url="#BodyPart-mesh" name="Body">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="DefalutMat-material" target="#DefalutMat-material">
+                  <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+                </instance_material>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
         </node>
       </node>
     </visual_scene>

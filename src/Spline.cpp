@@ -59,7 +59,7 @@ void Spline::init(const glm::vec2 points[NUM_POINTS]) {
 void Spline::render(const Renderer& renderer, bool draw_points) const {
     SDL_assert(vertices_initialized);
     renderer.debug_shader.use();
-    renderer.debug_shader.set_color(&Color::GREEN);
+    renderer.debug_shader.set_color(Color::GREEN);
 
     line_vao.draw(GL_LINE_STRIP);
 
@@ -109,17 +109,13 @@ void Spline::update_render_data() {
         line_shader_vertices[i].pos = get_point_on_spline(t);
     }
 
-    line_vao.update_vertex_data(
-        line_shader_vertices.data(),
-        static_cast<GLuint>(line_shader_vertices.size()));
+    line_vao.update_vertex_data(line_shader_vertices);
 
     // Points
     point_shader_vertices[0].pos = points_[P1];
     point_shader_vertices[1].pos = points_[P2];
 
-    point_vao.update_vertex_data(
-        point_shader_vertices.data(),
-        static_cast<GLuint>(point_shader_vertices.size()));
+    point_vao.update_vertex_data(point_shader_vertices);
 }
 
 glm::vec2 Spline::get_point_on_spline(float t) const {
@@ -525,7 +521,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
     if (selected_spline_index < NUM_SPLINES_PER_ANIMATION && spline_edit_mode) {
         // Draw circle for selected limb
         renderer.debug_shader.set_model(&parent->model_matrix());
-        renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
+        renderer.debug_shader.set_color(Color::LIGHT_BLUE);
 
         // NOTE: This is calculated every frame, but is not necessary most of
         // the time.
@@ -533,7 +529,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
 
         radius = limbs[Animator::LEFT_LEG].length();
 
-        DebugShader::Vertex circle_vertices[CIRCLE_SEGMENTS];
+        std::array<DebugShader::Vertex, CIRCLE_SEGMENTS> circle_vertices;
 
         for (size_t n_segment = 0; n_segment < CIRCLE_SEGMENTS; ++n_segment) {
             float theta = static_cast<float>(n_segment) /
@@ -543,12 +539,12 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
                 glm::vec2(radius * cosf(theta), radius * sinf(theta));
         }
 
-        circle_vao.update_vertex_data(circle_vertices, CIRCLE_SEGMENTS);
+        circle_vao.update_vertex_data(circle_vertices);
         circle_vao.draw(GL_LINE_LOOP);
     }
 
     // Draw splines
-    renderer.debug_shader.set_color(&Color::GREEN);
+    renderer.debug_shader.set_color(Color::GREEN);
 
     if (selected_animation != NONE &&
         selected_spline_index < NUM_SPLINES_PER_ANIMATION &&
@@ -569,7 +565,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
         if (spline_edit_mode) {
             const glm::vec2* spline_points = spline->points();
 
-            DebugShader::Vertex points[4];
+            std::array<DebugShader::Vertex, 4> points;
             points[P1].pos = glm::vec4(spline_points[P1], 0.0f, 1.0f);
             points[T1].pos =
                 glm::vec4(spline_points[P1] + spline_points[T1], 0.0f, 1.0f);
@@ -577,12 +573,12 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
                 glm::vec4(spline_points[P2] + spline_points[T2], 0.0f, 1.0f);
             points[P2].pos = glm::vec4(spline_points[P2], 0.0f, 1.0f);
 
-            tangents_vao.update_vertex_data(points, 4);
+            tangents_vao.update_vertex_data(points);
 
-            renderer.debug_shader.set_color(&Color::LIGHT_PURPLE);
+            renderer.debug_shader.set_color(Color::LIGHT_PURPLE);
             tangents_vao.draw(GL_LINES);
 
-            renderer.debug_shader.set_color(&Color::PURPLE);
+            renderer.debug_shader.set_color(Color::PURPLE);
             tangents_vao.draw(GL_POINTS);
         }
     }

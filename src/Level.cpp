@@ -167,7 +167,7 @@ bool LevelEditor::update(const Renderer& renderer,
 
 void LevelEditor::render(const Renderer& renderer) {
     if (selected_collider) {
-        renderer.debug_shader.set_color(&Color::LIGHT_BLUE);
+        renderer.debug_shader.set_color(Color::LIGHT_BLUE);
         glm::mat3 model = selected_collider->calculate_model_matrix();
         renderer.debug_shader.set_model(&model);
         renderer.debug_shader.SQUARE_VAO.draw(GL_LINE_LOOP);

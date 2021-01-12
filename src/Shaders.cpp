@@ -135,9 +135,9 @@ DebugShader::DebugShader(const char* vert_path, const char* frag_path)
                     CIRCLE_SEGMENTS, GL_STATIC_DRAW);
 }
 
-void DebugShader::set_color(const Color* color) const {
+void DebugShader::set_color(const Color& color) const {
     use();
-    glUniform4fv(color_loc, 1, (const GLfloat*)color);
+    glUniform4fv(color_loc, 1, (const GLfloat*)&color);
 }
 
 //                  TexturedShader                  //
@@ -178,6 +178,25 @@ void RiggedShader::set_bone_transforms(const glm::mat3* transforms) const {
                        (const GLfloat*)transforms);
 }
 
+//                  RiggedDebugShader               //
+RiggedDebugShader::RiggedDebugShader(const char* vert_path,
+                                     const char* frag_path)
+    : Shader(vert_path, frag_path) {
+    bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
+    color_loc = glGetUniformLocation(id, "color");
+}
+
+void RiggedDebugShader::set_color(const Color& color) const {
+    use();
+    glUniform4fv(color_loc, 1, (const GLfloat*)&color);
+}
+
+void RiggedDebugShader::set_bone_transforms(const glm::mat3* transforms) const {
+    use();
+    glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
+                       (const GLfloat*)transforms);
+}
+
 //                  BoneShader                      //
 BoneShader::BoneShader(const char* vert_path, const char* frag_path)
     : Shader(vert_path, frag_path) {
@@ -185,9 +204,9 @@ BoneShader::BoneShader(const char* vert_path, const char* frag_path)
     bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
 }
 
-void BoneShader::set_color(const Color* color) const {
+void BoneShader::set_color(const Color& color) const {
     use();
-    glUniform4fv(color_loc, 1, (const GLfloat*)color);
+    glUniform4fv(color_loc, 1, (const GLfloat*)&color);
 }
 
 void BoneShader::set_bone_transforms(const glm::mat3* transforms) const {

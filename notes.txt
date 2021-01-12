@@ -1,10 +1,9 @@
 NEXT:
-- BUG: leg origin is somehow connected to camera origin?
 
 TODO:
 - hitboxes/attacks
 
-- handle down/up inputs in step mode better
+- handle jump inputs in step mode better
 
 - fix leg animations
 - change the direction of the player texture another way than changing it's scale

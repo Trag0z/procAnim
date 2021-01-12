@@ -14,6 +14,7 @@ class Renderer {
     DebugShader debug_shader;
     TexturedShader textured_shader;
     RiggedShader rigged_shader;
+    RiggedDebugShader rigged_debug_shader;
     BoneShader bone_shader;
 
     void init();

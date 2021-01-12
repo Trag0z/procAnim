@@ -162,6 +162,15 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
         }
         delete[] vertex_bone_counts;
 
+#ifdef _DEBUG
+        for (const auto& v : shader_vertices) {
+            float sum_of_weights = 0.0f;
+            for (size_t i = 0; i < RiggedShader::MAX_BONES_PER_VERTEX; ++i) {
+                sum_of_weights += v.bone_weights[i];
+            }
+            SDL_assert(sum_of_weights == 1.0f || sum_of_weights == 0.0f);
+        }
+#endif
         rigged_mesh.vao.init(
             indices.data(), static_cast<GLuint>(indices.size()),
             shader_vertices.data(), static_cast<GLuint>(shader_vertices.size()),
