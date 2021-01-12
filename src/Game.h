@@ -1,14 +1,14 @@
 #pragma once
 #include "pch.h"
 #include "Types.h"
-#include "Renderer.h"
-#include "Texture.h"
+#include "rendering/Renderer.h"
+#include "rendering/Texture.h"
 #include "Util.h"
-#include "Mesh.h"
+#include "rendering/Mesh.h"
 #include "Player.h"
 #include "Input.h"
 #include "Background.h"
-#include "Renderer.h"
+#include "rendering/Renderer.h"
 #include "Level.h"
 
 namespace Keybinds {

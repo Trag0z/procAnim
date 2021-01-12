@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Input.h"
-#include "Renderer.h"
+#include "rendering/Renderer.h"
 
 void MouseKeyboardInput::init(const Renderer* renderer_) {
     sdl_keyboard = SDL_GetKeyboardState(&num_keys);

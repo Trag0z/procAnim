@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "../pch.h"
 
 // Manages an array of vertices of type vertex_t in GPU memory.
 template <typename vertex_t> class VertexArray {

@@ -2,8 +2,8 @@
 #include "pch.h"
 #include "Animator.h"
 #include "Util.h"
-#include "Mesh.h"
-#include "Renderer.h"
+#include "rendering/Mesh.h"
+#include "rendering/Renderer.h"
 #include "Player.h"
 
 // Moves all points in src by move and write them to dst. src and dst can point

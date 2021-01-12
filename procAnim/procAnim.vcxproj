@@ -147,21 +147,21 @@
     <ClCompile Include="..\src\Animator.cpp" />
     <ClCompile Include="..\src\Background.cpp" />
     <ClCompile Include="..\src\Collider.cpp" />
-    <ClCompile Include="..\src\Color.cpp" />
     <ClCompile Include="..\src\Entity.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\Input.cpp" />
     <ClCompile Include="..\src\Level.cpp" />
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Mesh.cpp" />
     <ClCompile Include="..\src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\Player.cpp" />
-    <ClCompile Include="..\src\Renderer.cpp" />
-    <ClCompile Include="..\src\Shaders.cpp" />
+    <ClCompile Include="..\src\rendering\Color.cpp" />
+    <ClCompile Include="..\src\rendering\Mesh.cpp" />
+    <ClCompile Include="..\src\rendering\Renderer.cpp" />
+    <ClCompile Include="..\src\rendering\Shaders.cpp" />
+    <ClCompile Include="..\src\rendering\Texture.cpp" />
     <ClCompile Include="..\src\Spline.cpp" />
-    <ClCompile Include="..\src\Texture.cpp" />
     <ClCompile Include="..\src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -176,23 +176,23 @@
     <ClInclude Include="..\src\Animator.h" />
     <ClInclude Include="..\src\Background.h" />
     <ClInclude Include="..\src\Collider.h" />
-    <ClInclude Include="..\src\Color.h" />
     <ClInclude Include="..\src\DebugCallback.h" />
     <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Input.h" />
     <ClInclude Include="..\src\Level.h" />
-    <ClInclude Include="..\src\Mesh.h" />
     <ClInclude Include="..\src\pch.h" />
     <ClInclude Include="..\src\Player.h" />
-    <ClInclude Include="..\src\Renderer.h" />
-    <ClInclude Include="..\src\Shaders.h" />
+    <ClInclude Include="..\src\rendering\Color.h" />
+    <ClInclude Include="..\src\rendering\Mesh.h" />
+    <ClInclude Include="..\src\rendering\Renderer.h" />
+    <ClInclude Include="..\src\rendering\Shaders.h" />
+    <ClInclude Include="..\src\rendering\Texture.h" />
+    <ClInclude Include="..\src\rendering\VertexArray.h" />
     <ClInclude Include="..\src\Spline.h" />
     <ClInclude Include="..\src\Systems.h" />
-    <ClInclude Include="..\src\Texture.h" />
     <ClInclude Include="..\src\Types.h" />
     <ClInclude Include="..\src\Util.h" />
-    <ClInclude Include="..\src\VertexArray.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\debug.vert" />

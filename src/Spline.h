@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Input.h"
-#include "Shaders.h"
+#include "rendering/Shaders.h"
 #include "Entity.h"
 
 class Renderer;

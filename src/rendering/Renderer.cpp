@@ -1,9 +1,9 @@
 #pragma once
 #include "pch.h"
 #include "Renderer.h"
-#include "Player.h"
-#include "Background.h"
-#include "Level.h"
+#include "../Player.h"
+#include "../Background.h"
+#include "../Level.h"
 
 void Renderer::update_camera(const glm::vec2& center, float zoom_factor) {
     camera_center_ = center;

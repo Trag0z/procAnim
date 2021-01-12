@@ -1,10 +1,10 @@
 #pragma once
 #include "pch.h"
-#include "Texture.h"
-#include "Mesh.h"
+#include "rendering/Texture.h"
+#include "rendering/Mesh.h"
 #include "Animator.h"
 #include "Entity.h"
-#include "Renderer.h"
+#include "rendering/Renderer.h"
 
 class Gamepad;
 struct BoxCollider;

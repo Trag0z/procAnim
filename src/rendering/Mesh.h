@@ -1,6 +1,6 @@
 #pragma once
-#include "pch.h"
-#include "Types.h"
+#include "../pch.h"
+#include "../Types.h"
 #include "Shaders.h"
 
 struct Mesh;

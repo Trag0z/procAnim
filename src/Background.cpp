@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Background.h"
-#include "Renderer.h"
+#include "rendering/Renderer.h"
 
 void Background::init(const char* texture_path) {
     Entity::init();

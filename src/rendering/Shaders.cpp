@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Shaders.h"
-#include "Util.h"
+#include "../Util.h"
 
 static bool check_compile_errors(GLuint object, bool program) {
     GLint success;

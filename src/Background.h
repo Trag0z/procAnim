@@ -1,8 +1,8 @@
 #pragma once
 #include "pch.h"
-#include "Texture.h"
+#include "rendering/Texture.h"
 #include "Entity.h"
-#include "Shaders.h"
+#include "rendering/Shaders.h"
 
 class Renderer;
 

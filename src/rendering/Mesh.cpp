@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Mesh.h"
-#include "Util.h"
+#include "../Util.h"
 
 const std::string& Bone::name() const noexcept { return name_; }
 const Bone* Bone::parent() const noexcept { return parent_; }

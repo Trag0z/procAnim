@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "VertexArray.h"
+#include "rendering/VertexArray.h"
 #include "Spline.h"
 #include "Collider.h"
 

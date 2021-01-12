@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Collider.h"
-#include "Texture.h"
+#include "rendering/Texture.h"
 
 class Renderer;
 class MouseKeyboardInput;

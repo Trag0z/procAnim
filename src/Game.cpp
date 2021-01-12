@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Game.h"
 #include "DebugCallback.h"
-#include "Shaders.h"
+#include "rendering/Shaders.h"
 
 void Game::init() {
     // Initialize SDL

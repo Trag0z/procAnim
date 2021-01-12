@@ -1,9 +1,9 @@
 #pragma once
-#include "pch.h"
+#include "../pch.h"
 #include "Color.h"
 #include "Texture.h"
 #include "VertexArray.h"
-#include "Types.h"
+#include "../Types.h"
 
 static bool check_compile_errors(GLuint object, bool program);
 
