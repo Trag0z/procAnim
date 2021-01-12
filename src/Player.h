@@ -24,6 +24,7 @@ class Player : public Entity {
 
     float walk_speed;
     bool facing_right = true;
+    float time_since_last_hit = 0.0f;
 
     static float GROUND_HOVER_DISTANCE;
     static float JUMP_FORCE;
@@ -31,8 +32,9 @@ class Player : public Entity {
     static float MAX_AIR_ACCELERATION;
     static float MAX_AIR_SPEED;
     static float HIT_SPEED_MULTIPLIER;
+    static float HIT_COOLDOWN;
 
-    // Tese are in world space!
+    // These are in world space!
     LineCollider weapon_collider, last_weapon_collider;
 
     enum State { STANDING, WALKING, FALLING, HITSTUN } state = FALLING;

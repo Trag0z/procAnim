@@ -1,6 +1,9 @@
 #pragma once
 #include "pch.h"
 
+// NOTE: All intersects() functions should return false if the objects' edges
+// exactly overlap
+
 struct BoxCollider {
     glm::vec2 position;
     glm::vec2 half_ext;

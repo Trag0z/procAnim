@@ -49,9 +49,9 @@ bool CircleCollider::intersects(const BoxCollider& other) const noexcept {
     SDL_assert(radius >= 0.0f);
     SDL_assert(other.half_ext.x >= 0.0f && other.half_ext.y >= 0.0f);
 
-    return std::abs(position.x - other.position.x) <=
+    return std::abs(position.x - other.position.x) <
                radius + other.half_ext.x &&
-           std::abs(position.y - other.position.y) <= radius + other.half_ext.y;
+           std::abs(position.y - other.position.y) < radius + other.half_ext.y;
 }
 
 bool CircleCollider::intersects(const CircleCollider& other) const noexcept {
@@ -142,7 +142,8 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
         return {glm::vec2(0.0f), CollisionData::NONE};
     }
 
-    // Cull all boxes that are too far away from the circle's trajectory
+    // All colliders that are outside the culling box won't collide, so we don't
+    // have to care about them.
     BoxCollider culling_box;
     {
         glm::vec2 half_move = move * 0.5f;
@@ -158,8 +159,12 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
         }
     }
 
-    float collision_time = 1.1f;
+    // We first look for collisions along the x-axis and set collision_time to
+    // the one that the circle would collide with first. Afterwards, we do the
+    // same for the y-axis and choose the smaller collision time as the
+    // collision that happens first.
 
+    float collision_time = 1.1f;
     CollisionData result = {move, CollisionData::NONE};
     // Find first collision along x-axis
     // @OPTIMIZATION: Sorting the array vs. just iterating over all candidates
@@ -170,24 +175,28 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
                       return a->left_edge() < b->left_edge();
                   });
 
-        for (const auto c : candidates) {
-            glm::vec2 circle_collision_pos = {c->left_edge() - circle.radius,
-                                              0.0f};
+        for (const auto cand : candidates) {
+            glm::vec2 circle_pos_at_collision = {
+                cand->left_edge() - circle.radius, 0.0f};
 
             collision_time =
-                (circle_collision_pos.x - circle.position.x) / move.x;
-            if (collision_time < 0.0f)
+                (circle_pos_at_collision.x - circle.position.x) / move.x;
+            if (collision_time < 0.0f) {
+                SDL_assert(!circle.intersects(*cand));
                 continue;
+            }
 
-            circle_collision_pos = circle.position + collision_time * move;
+            circle_pos_at_collision = circle.position + collision_time * move;
 
-            if (std::abs(circle_collision_pos.y - c->position.y) <=
-                circle.radius + c->half_ext.y) {
+            if (std::abs(circle_pos_at_collision.y - cand->position.y) <=
+                circle.radius + cand->half_ext.y) {
+                // The circle actually intersects the the candidate at
+                // collision_time.
 
                 result = {move * collision_time, CollisionData::RIGHT};
                 break; // Since the list is sorted, the collision has to be
                        // the first on the path and we don't have to look at the
-                       // others
+                       // others.
             }
         }
     } else if (move.x < 0.0f) { // Moving left
@@ -196,24 +205,28 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
                       return a->right_edge() < b->right_edge();
                   });
 
-        for (const auto c : candidates) {
-            glm::vec2 circle_collision_pos = {c->right_edge() + circle.radius,
-                                              0.0f};
+        for (const auto cand : candidates) {
+            glm::vec2 circle_pos_at_collision = {
+                cand->right_edge() + circle.radius, 0.0f};
 
             collision_time =
-                (circle_collision_pos.x - circle.position.x) / move.x;
-            if (collision_time < 0.0f)
+                (circle_pos_at_collision.x - circle.position.x) / move.x;
+            if (collision_time < 0.0f) {
+                SDL_assert(!circle.intersects(*cand));
                 continue;
+            }
 
-            circle_collision_pos = circle.position + collision_time * move;
+            circle_pos_at_collision = circle.position + collision_time * move;
 
-            if (std::abs(circle_collision_pos.y - c->position.y) <=
-                circle.radius + c->half_ext.y) {
+            if (std::abs(circle_pos_at_collision.y - cand->position.y) <=
+                circle.radius + cand->half_ext.y) {
+                // The circle actually intersects the the candidate at
+                // collision_time.
 
                 result = {move * collision_time, CollisionData::LEFT};
                 break; // Since the list is sorted, the collision has to be
                        // the first on the path and we don't have to look at the
-                       // others
+                       // others.
             }
         }
     }
@@ -230,25 +243,31 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
                       return a->bottom_edge() < b->bottom_edge();
                   });
 
-        for (const auto c : candidates) {
-            glm::vec2 circle_collision_pos = { 0.0f, c->bottom_edge() - circle.radius};
+        for (const auto cand : candidates) {
+            glm::vec2 circle_pos_at_collision = {0.0f, cand->bottom_edge() -
+                                                           circle.radius};
 
             float new_collision_time =
-                (circle_collision_pos.y - circle.position.y) / move.y;
-            if (new_collision_time < 0.0f)
+                (circle_pos_at_collision.y - circle.position.y) / move.y;
+            if (new_collision_time < 0.0f) {
+                SDL_assert(!circle.intersects(*cand));
                 continue;
+            }
 
             if (new_collision_time < collision_time) {
-                circle_collision_pos = circle.position + collision_time * move;
+                circle_pos_at_collision =
+                    circle.position + collision_time * move;
 
-                if (std::abs(circle_collision_pos.x - c->position.x) <=
-                    circle.radius + c->half_ext.x) {
+                if (std::abs(circle_pos_at_collision.x - cand->position.x) <=
+                    circle.radius + cand->half_ext.x) {
+                    // The circle actually intersects the the candidate at
+                    // collision_time.
 
                     glm::vec2 move_to_collision = move * new_collision_time;
                     result = {move_to_collision, CollisionData::UP};
                     break; // Since the list is sorted, so the collision has to
                            // be the first on the path and we don't have to look
-                           // at the others
+                           // at the others.
                 }
             }
         }
@@ -258,25 +277,42 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
                       return a->top_edge() < b->top_edge();
                   });
 
-        for (const auto c : candidates) {
-            glm::vec2 circle_collision_pos = {0.0f, c->top_edge() + circle.radius };
+        for (const auto cand : candidates) {
+            glm::vec2 circle_pos_at_collision = {0.0f, cand->top_edge() +
+                                                           circle.radius};
+
+            // Next: Check here if there was definitely a collision and deal
+            // with it, even if new_collision_time < 0
 
             float new_collision_time =
-                (circle_collision_pos.y - circle.position.y) / move.y;
-            if (new_collision_time < 0.0f)
+                (circle_pos_at_collision.y - circle.position.y) / move.y;
+            if (new_collision_time < 0.0f) {
+                SDL_assert(!circle.intersects(*cand));
                 continue;
+            }
 
             if (new_collision_time < collision_time) {
-                circle_collision_pos = circle.position + collision_time * move;
+#ifdef _DEBUG
+                float cand_top_edge = cand->top_edge();
+                float circle_bottom_edge = circle.position.y - circle.radius;
+                SDL_assert(cand_top_edge <= circle_bottom_edge);
+#endif
 
-                if (std::abs(circle_collision_pos.x - c->position.x) <=
-                    circle.radius + c->half_ext.x) {
+                glm::vec2 move_to_collision = move * new_collision_time;
+                SDL_assert(circle.position.y + move_to_collision.y >=
+                           circle_pos_at_collision.y);
+                circle_pos_at_collision.x =
+                    circle.position.x + move_to_collision.x;
 
-                    glm::vec2 move_to_collision = move * new_collision_time;
+                if (std::abs(circle_pos_at_collision.x - cand->position.x) <=
+                    circle.radius + cand->half_ext.x) {
+                    // The circle actually intersects the the candidate at
+                    // collision_time.
+
                     result = {move_to_collision, CollisionData::DOWN};
-                    break; // Since the list is sorted, so the collision has to
-                           // be the first on the path and we don't have to look
-                           // at the others
+                    break; // Since the list is sorted, so the collision has
+                           // to be the first on the path and we don't have
+                           // to look at the others.
                 }
             }
         }
@@ -288,7 +324,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
     // the past-the-end iterator before dereferencing, which makes the
     // correct code ugly again. result =
     //     *std::find_if(candidates.begin(), candidates.end(),
-    //                   [circle](const auto c) { return
-    //                   circle.intersects(c);
+    //                   [circle](const auto cand) { return
+    //                   circle.intersects(cand);
     //                   });
 }

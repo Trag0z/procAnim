@@ -367,7 +367,7 @@ void Game::simulate_world(float delta_time) {
                         body_collider, remaining_player_move,
                         level.colliders());
 
-                } else {
+                } else { // collision.direction == LEFT || RIGHT
                     new_player_velocity.x = 0.0f;
 
                     glm::vec2 remaining_player_move = glm::vec2(
@@ -399,9 +399,7 @@ void Game::simulate_world(float delta_time) {
                                       second_collision.move_until_collision;
             }
 
-            if (player.state == Player::HITSTUN &&
-                collision.direction != CollisionData::DOWN &&
-                second_collision.direction != CollisionData::DOWN) {
+            if (player.state == Player::HITSTUN) {
                 new_player_velocity.y -= game_config.gravity;
             }
         }
@@ -475,7 +473,8 @@ void Game::simulate_world(float delta_time) {
             auto& weapon = weapons[i];
             auto& attacking_player = players[i];
             auto& hit_player = players[1 - i];
-            if (weapon->intersects(hit_player.body_collider())) {
+            if (attacking_player.time_since_last_hit >= Player::HIT_COOLDOWN &&
+                weapon->intersects(hit_player.body_collider())) {
                 hit_player.state = Player::HITSTUN;
 
                 glm::vec2 hit_direction =
@@ -484,6 +483,8 @@ void Game::simulate_world(float delta_time) {
 
                 hit_player.velocity =
                     hit_direction * players[i].HIT_SPEED_MULTIPLIER;
+
+                attacking_player.time_since_last_hit = 0.0f;
 
                 printf("Player %zd hit with %f, %f\n", i, hit_direction.x,
                        hit_direction.y);

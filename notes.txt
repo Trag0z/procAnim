@@ -1,6 +1,4 @@
 NEXT:
-- immunity period after hit
-
 - BUG: leg origin is somehow connected to camera origin?
 
 TODO:

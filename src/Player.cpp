@@ -10,6 +10,7 @@ float Player::MAX_WALK_SPEED = 10.0f;
 float Player::MAX_AIR_ACCELERATION = 0.5f;
 float Player::MAX_AIR_SPEED = 10.0f;
 float Player::HIT_SPEED_MULTIPLIER = 0.2f;
+float Player::HIT_COOLDOWN = 30.0f;
 
 static const struct {
     u32 jump = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
@@ -29,6 +30,10 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
 
 void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
                     const MouseKeyboardInput& input) {
+    if (time_since_last_hit < HIT_COOLDOWN) {
+        time_since_last_hit += delta_time;
+    }
+
     if (state == HITSTUN) {
         update_model_matrix();
         return;
