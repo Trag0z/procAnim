@@ -220,6 +220,10 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
 
     // Do the same along the y-axis, replace result if it's earlier than the
     // current result
+    if (collision_time < 0.0f) {
+        collision_time = 1.1f;
+    }
+
     if (move.y > 0.0f) { // Moving up
         std::sort(candidates.begin(), candidates.end(),
                   [](const auto a, const auto b) {
