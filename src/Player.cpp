@@ -64,9 +64,11 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
     animator.update(delta_time, walk_speed, gamepad->stick(StickID::RIGHT),
                     colliders);
     auto weapon = animator.weapon();
-    weapon_collider = LineCollider(local_to_world_space(weapon->head()),
-                                   local_to_world_space(weapon->tail()));
-
+    {
+        glm::vec2 head_world = local_to_world_space(weapon->head());
+        weapon_collider = LineCollider(
+            head_world, local_to_world_space(weapon->tail()) - head_world);
+    }
     update_model_matrix();
 
     // Movement

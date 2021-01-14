@@ -348,44 +348,40 @@ void Game::simulate_world(float delta_time) {
             CollisionData collision = find_first_collision_sweep_prune(
                 body_collider, player_move, level.colliders());
 
-            CollisionData second_collision = {glm::vec2(0.0f),
-                                              CollisionData::NONE};
-
-            if (collision.direction == CollisionData::NONE) {
+            if (collision.direction == Direction::NONE) {
                 new_player_position = player.position() + player_move;
                 // player.velocity stays the same
             } else {
                 body_collider.position += collision.move_until_collision;
 
-                if (collision.direction == CollisionData::DOWN ||
-                    collision.direction == CollisionData::UP) {
+                glm::vec2 remaining_player_move;
+                if (collision.direction == Direction::DOWN ||
+                    collision.direction == Direction::UP) {
 
                     new_player_velocity.y = 0.0f;
 
-                    glm::vec2 remaining_player_move = glm::vec2(
+                    remaining_player_move = glm::vec2(
                         player_move.x - collision.move_until_collision.x, 0.0f);
-                    second_collision = find_first_collision_sweep_prune(
-                        body_collider, remaining_player_move,
-                        level.colliders());
 
                 } else { // collision.direction == LEFT || RIGHT
                     new_player_velocity.x = 0.0f;
 
-                    glm::vec2 remaining_player_move = glm::vec2(
+                    remaining_player_move = glm::vec2(
                         0.0f, player_move.y - collision.move_until_collision.y);
-                    second_collision = find_first_collision_sweep_prune(
-                        body_collider, remaining_player_move,
-                        level.colliders());
                 }
+                CollisionData second_collision =
+                    find_first_collision_sweep_prune(body_collider,
+                                                     remaining_player_move,
+                                                     level.colliders());
                 SDL_assert(second_collision.direction != collision.direction);
 
-                if (second_collision.direction != CollisionData::NONE) {
+                if (second_collision.direction != Direction::NONE) {
                     // The player hit a corner, can't move any further
                     new_player_velocity = glm::vec2(0.0f);
                 }
 
-                // if (collision.direction == CollisionData::DOWN ||
-                //     second_collision.direction == CollisionData::DOWN) {
+                // if (collision.direction == Direction::DOWN ||
+                //     second_collision.direction == Direction::DOWN) {
                 //     // NOTE: Doing ground check here is hard because the
                 //     player
                 //     // needs to also stay grounded if he is
