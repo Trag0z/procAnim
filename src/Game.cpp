@@ -472,11 +472,15 @@ void Game::simulate_world(float delta_time) {
             auto& hit_player = players[1 - i];
             if (attacking_player.time_since_last_hit >= Player::HIT_COOLDOWN &&
                 weapon->intersects(hit_player.body_collider())) {
-                hit_player.state = Player::HITSTUN;
 
                 glm::vec2 hit_direction =
                     attacking_player.weapon_collider.line -
                     attacking_player.last_weapon_collider.line;
+
+                hit_player.state = Player::HITSTUN;
+                hit_player.hitstun_duration =
+                    glm::length(hit_direction) *
+                    Player::HITSTUN_DURATION_MULTIPLIER;
 
                 hit_player.velocity =
                     hit_direction * players[i].HIT_SPEED_MULTIPLIER;
@@ -526,11 +530,26 @@ void Game::update_gui() {
     RadioButton("Level editor", (int*)&game_mode, GameMode::LEVEL_EDITOR);
 
     NewLine();
-    Text("Player");
+    Text("Player statics");
     DragFloat("ground_hover_distance", &Player::GROUND_HOVER_DISTANCE);
     DragFloat("jump_force", &Player::JUMP_FORCE);
     DragFloat("max_walk_speed", &Player::MAX_WALK_SPEED);
     DragFloat("hit_speed_multiplier", &Player::HIT_SPEED_MULTIPLIER);
+    DragFloat("hitstun_duration_multiplier",
+              &Player::HITSTUN_DURATION_MULTIPLIER);
+
+    {
+        Text("Display player windows");
+        static bool player_window_open[2] = {true, true};
+        for (size_t i = 0; i < NUM_PLAYERS; ++i) {
+            char label[10];
+            sprintf_s(label, "Player %zd", i);
+            Checkbox(label, &player_window_open[i]);
+            if (player_window_open[i]) {
+                player_window_open[i] = players[i].display_debug_ui_window(i);
+            }
+        }
+    }
 
     NewLine();
     Text("Animation controls");

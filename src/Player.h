@@ -25,6 +25,7 @@ class Player : public Entity {
     float walk_speed;
     bool facing_right = true;
     float time_since_last_hit = 0.0f;
+    float hitstun_duration = 0.0f;
 
     static float GROUND_HOVER_DISTANCE;
     static float JUMP_FORCE;
@@ -33,11 +34,17 @@ class Player : public Entity {
     static float MAX_AIR_SPEED;
     static float HIT_SPEED_MULTIPLIER;
     static float HIT_COOLDOWN;
+    static float HITSTUN_DURATION_MULTIPLIER;
 
     // These are in world space!
     LineCollider weapon_collider, last_weapon_collider;
 
-    enum State { STANDING, WALKING, FALLING, HITSTUN } state = FALLING;
+    enum State {
+        STANDING = 0,
+        WALKING = 1,
+        FALLING = 2,
+        HITSTUN = 3
+    } state = FALLING;
 
   public:
     void init(glm::vec3 position, glm::vec3 scale_factor,
@@ -50,6 +57,9 @@ class Player : public Entity {
     bool is_facing_right() const noexcept;
 
     CircleCollider body_collider() const noexcept;
+
+    // Return value signifies if the window should be kept open.
+    bool display_debug_ui_window(size_t player_index);
 
     // The debug UI needs to access the private members of this class. Letting
     // Game access them this way seems cleaner to me then writing a bunch of

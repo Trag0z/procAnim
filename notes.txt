@@ -1,6 +1,8 @@
 NEXT:
-- collision detection still bugs sometimes
+- react to collisions in hitstun
+
 - bug: if player 1 stands inside player 2 and attacks, they both get hit
+- bug: player is never in walking state
 
 TODO:
 - hitboxes/attacks

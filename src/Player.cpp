@@ -11,6 +11,7 @@ float Player::MAX_AIR_ACCELERATION = 0.5f;
 float Player::MAX_AIR_SPEED = 10.0f;
 float Player::HIT_SPEED_MULTIPLIER = 0.2f;
 float Player::HIT_COOLDOWN = 30.0f;
+float Player::HITSTUN_DURATION_MULTIPLIER = 0.8f;
 
 static const struct {
     u32 jump = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
@@ -35,8 +36,16 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
     }
 
     if (state == HITSTUN) {
-        update_model_matrix();
-        return;
+        hitstun_duration -= delta_time;
+
+        if (hitstun_duration > 0.0f) {
+            update_model_matrix();
+            return;
+        } else {
+            hitstun_duration = 0.0f;
+            state = FALLING;
+            grounded = false;
+        }
     }
 
     auto left_stick_input = gamepad->stick(StickID::LEFT);
@@ -99,4 +108,42 @@ CircleCollider Player::body_collider() const noexcept {
     // Using std::abs() here is a kinda hacky way to get
     // around the fact that when the player is facing
     // left, it's scale is negative on the x-axis
+}
+
+bool Player::display_debug_ui_window(size_t player_index) {
+    using namespace ImGui;
+
+    bool keep_open = true;
+    {
+        char window_name[10];
+        sprintf_s(window_name, "Player %zd", player_index);
+        Begin(window_name, &keep_open);
+    }
+
+    PushItemWidth(100);
+    DragFloat2("position", value_ptr(position_), 1.0f, 0.0f, 0.0f, "%.2f");
+    DragFloat2("velocity", value_ptr(velocity), 1.0f, 0.0f, 0.0f, "%.2f");
+
+    Checkbox("grounded", &grounded);
+
+    {
+        const char* items[] = {"STANDING", "WALKING", "FALLING", "HITSTUN"};
+        int current_state = static_cast<int>(state);
+        if (Combo("state", &current_state, items, IM_ARRAYSIZE(items))) {
+            state = static_cast<State>(current_state);
+        }
+    }
+
+    DragFloat("walk_speed", &walk_speed, 1.0f, 0.0f, 0.0f, "%.2f");
+
+    Checkbox("facing_right", &facing_right);
+
+    DragFloat("time_since_last_hit", &time_since_last_hit, 1.0f, 0.0f, 0.0f,
+              "%.2f");
+    DragFloat("hitstun_duration", &hitstun_duration, 1.0f, 0.0f, 0.0f, "%.2f");
+    PopItemWidth();
+
+    End();
+
+    return keep_open;
 }
