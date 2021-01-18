@@ -533,12 +533,14 @@ void Game::simulate_world(float delta_time) {
 #endif
         }
 
-        // weapon vs. body
+        // Weapon vs. body
         for (size_t i = 0; i < NUM_PLAYERS; ++i) {
             auto& weapon = weapons[i];
             auto& attacking_player = players[i];
             auto& hit_player = players[1 - i];
             if (attacking_player.time_since_last_hit >= Player::HIT_COOLDOWN &&
+                glm::length(weapon->line) >
+                    attacking_player.body_collider().radius &&
                 weapon->intersects(hit_player.body_collider())) {
 
                 glm::vec2 hit_direction =
