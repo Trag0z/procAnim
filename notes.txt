@@ -2,7 +2,6 @@ NEXT:
 - react to collisions in hitstun
 
 - bug: if player 1 stands inside player 2 and attacks, they both get hit
-- bug: player is never in walking state
 
 TODO:
 - hitboxes/attacks
@@ -15,6 +14,7 @@ TODO:
 
 
 Bugs:               (@BUG)
+- level editor selection does't work if camera is not on starting zoom
 - when zoomed out and moving the camera, the player's leg origin position moves 
 - one frame leg glitch into ground when starting to move
 - SplineEditor sets connected tangents in wrong direction since it still assumes what has been true some time ago

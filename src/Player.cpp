@@ -85,6 +85,12 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
         SDL_assert(grounded);
         velocity.x = left_stick_input.x * MAX_WALK_SPEED;
 
+        if (left_stick_input.x != 0.0f) {
+            state = WALKING;
+        } else {
+            state = STANDING;
+        }
+
         if (gamepad->button_down(button_map.jump) ||
             gamepad->button_down(button_map.jump_alt)) {
             velocity.y += JUMP_FORCE;
