@@ -345,59 +345,121 @@ void Game::simulate_world(float delta_time) {
 
         { // Body collisions with level
             CircleCollider body_collider = player.body_collider();
-            CollisionData collision = find_first_collision_sweep_prune(
+            CollisionData first_collision = find_first_collision_sweep_prune(
                 body_collider, player_move, level.colliders());
 
-            if (collision.direction == Direction::NONE) {
+            if (first_collision.direction == Direction::NONE) {
                 new_player_position = player.position() + player_move;
                 // player.velocity stays the same
             } else {
-                body_collider.position += collision.move_until_collision;
+                body_collider.position += first_collision.move_until_collision;
 
-                glm::vec2 remaining_player_move;
-                if (collision.direction == Direction::DOWN ||
-                    collision.direction == Direction::UP) {
+                if (player.state == Player::HITSTUN) {
 
-                    new_player_velocity.y = 0.0f;
+                    // Finds the next collision, resolves it, sets
+                    // new_player_velocity and and body_collider to new values
+                    // and also sets player_grounded if the player hit the
+                    // ground.
+                    auto resolve_next_hitstun_collision =
+                        [delta_time, &new_player_velocity,
+                         &body_collider](bool& player_grounded,
+                                         const CollisionData& last_collision,
+                                         const std::list<BoxCollider> boxes)
+                        -> CollisionData {
+                        SDL_assert(last_collision.direction != NONE);
 
-                    remaining_player_move = glm::vec2(
-                        player_move.x - collision.move_until_collision.x, 0.0f);
+                        CollisionData next_collision;
+                        if (last_collision.direction == LEFT ||
+                            last_collision.direction == RIGHT) {
 
-                } else { // collision.direction == LEFT || RIGHT
-                    new_player_velocity.x = 0.0f;
+                            new_player_velocity.x *= -1.0f;
 
-                    remaining_player_move = glm::vec2(
-                        0.0f, player_move.y - collision.move_until_collision.y);
+                            glm::vec2 remaining_player_move =
+                                new_player_velocity *
+                                (delta_time - last_collision.time);
+                            next_collision = find_first_collision_sweep_prune(
+                                body_collider, remaining_player_move, boxes);
+
+                        } else if (last_collision.direction == UP) {
+                            new_player_velocity.y *= -1.0f;
+
+                            glm::vec2 remaining_player_move =
+                                new_player_velocity *
+                                (delta_time - last_collision.time);
+                            next_collision = find_first_collision_sweep_prune(
+                                body_collider, remaining_player_move, boxes);
+
+                        } else { // last_collison.direction == DOWN
+                            new_player_velocity = glm::vec2(0.0f);
+                            next_collision.move_until_collision =
+                                glm::vec2(0.0f);
+                            next_collision.direction = NONE;
+                            player_grounded = true;
+
+                            SDL_assert(
+                                find_first_collision_sweep_prune(
+                                    body_collider, new_player_velocity, boxes)
+                                    .direction == NONE);
+                        }
+                        return next_collision;
+                    };
+
+                    const size_t max_collision_iterations = 5;
+                    size_t collision_iteration = 0;
+                    CollisionData next_collision = first_collision;
+                    glm::vec2 complete_player_move =
+                        first_collision.move_until_collision;
+
+                    do {
+                        next_collision = resolve_next_hitstun_collision(
+                            player.grounded, next_collision, level.colliders());
+                        complete_player_move +=
+                            next_collision.move_until_collision;
+                    } while (next_collision.direction != NONE &&
+                             ++collision_iteration < max_collision_iterations);
+
+                    SDL_assert(collision_iteration < max_collision_iterations);
+
+                    new_player_position =
+                        player.position() +
+                        complete_player_move *
+                            0.95f; // TODO: Remove this margin?
+
+                } else { // state != Player::HITSTUN
+                    glm::vec2 remaining_player_move;
+                    if (first_collision.direction == Direction::DOWN ||
+                        first_collision.direction == Direction::UP) {
+
+                        new_player_velocity.y = 0.0f;
+
+                        remaining_player_move = glm::vec2(
+                            player_move.x -
+                                first_collision.move_until_collision.x,
+                            0.0f);
+
+                    } else { // collision.direction == LEFT || RIGHT
+                        new_player_velocity.x = 0.0f;
+
+                        remaining_player_move = glm::vec2(
+                            0.0f, player_move.y -
+                                      first_collision.move_until_collision.y);
+                    }
+                    CollisionData second_collision =
+                        find_first_collision_sweep_prune(body_collider,
+                                                         remaining_player_move,
+                                                         level.colliders());
+                    SDL_assert(second_collision.direction !=
+                               first_collision.direction);
+
+                    if (second_collision.direction != Direction::NONE) {
+                        // The player hit a corner, can't move any further
+                        new_player_velocity = glm::vec2(0.0f);
+                    }
+
+                    new_player_position = player.position() +
+                                          first_collision.move_until_collision +
+                                          second_collision.move_until_collision;
                 }
-                CollisionData second_collision =
-                    find_first_collision_sweep_prune(body_collider,
-                                                     remaining_player_move,
-                                                     level.colliders());
-                SDL_assert(second_collision.direction != collision.direction);
-
-                if (second_collision.direction != Direction::NONE) {
-                    // The player hit a corner, can't move any further
-                    new_player_velocity = glm::vec2(0.0f);
-                }
-
-                // if (collision.direction == Direction::DOWN ||
-                //     second_collision.direction == Direction::DOWN) {
-                //     // NOTE: Doing ground check here is hard because the
-                //     player
-                //     // needs to also stay grounded if he is
-                //     // palyer.gound_hover_distance above the ground, and
-                //     the
-                //     // collision detection alone would not find that
-                //     collision.
-                // }
-
-                new_player_position = player.position() +
-                                      collision.move_until_collision +
-                                      second_collision.move_until_collision;
-            }
-
-            if (player.state == Player::HITSTUN) {
-                new_player_velocity.y -= game_config.gravity;
             }
         }
 
@@ -411,7 +473,6 @@ void Game::simulate_world(float delta_time) {
 
                 player.grounded = false;
                 player.state = Player::FALLING;
-                new_player_velocity.y -= game_config.gravity;
 
             } else {
                 new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
@@ -424,6 +485,11 @@ void Game::simulate_world(float delta_time) {
                 }
             }
         }
+
+        if (!player.grounded) {
+            new_player_velocity.y -= game_config.gravity;
+        }
+
         player.velocity = new_player_velocity;
         player.position_ = new_player_position;
     }
@@ -451,6 +517,7 @@ void Game::simulate_world(float delta_time) {
     if (weapons[0]->line != glm::vec2(0.0f) ||
         weapons[1]->line != glm::vec2(0.0f)) {
 
+        // Weapon vs. weapon
         float t;
         if (weapons[0]->intersects(*weapons[1], &t)) {
             glm::vec2 collision_pos = weapons[0]->start + weapons[0]->line * t;
@@ -466,6 +533,7 @@ void Game::simulate_world(float delta_time) {
 #endif
         }
 
+        // weapon vs. body
         for (size_t i = 0; i < NUM_PLAYERS; ++i) {
             auto& weapon = weapons[i];
             auto& attacking_player = players[i];
@@ -481,6 +549,7 @@ void Game::simulate_world(float delta_time) {
                 hit_player.hitstun_duration =
                     glm::length(hit_direction) *
                     Player::HITSTUN_DURATION_MULTIPLIER;
+                hit_player.grounded = false;
 
                 hit_player.velocity =
                     hit_direction * players[i].HIT_SPEED_MULTIPLIER;

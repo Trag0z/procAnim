@@ -1,6 +1,4 @@
 NEXT:
-- react to collisions in hitstun
-
 - bug: if player 1 stands inside player 2 and attacks, they both get hit
 
 TODO:

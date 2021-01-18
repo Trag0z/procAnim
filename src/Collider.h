@@ -49,6 +49,7 @@ struct LineCollider {
 
 struct CollisionData {
     glm::vec2 move_until_collision;
+    float time;
     Direction direction;
 };
 

@@ -529,6 +529,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
 
     CollisionData result;
     result.move_until_collision = move * first_collision_time;
+    result.time = first_collision_time;
     result.direction = first_collision_direction;
 
     // NOTE: These 1.0f margins seem to be pretty large, but without them we hit
