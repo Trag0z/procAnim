@@ -24,6 +24,8 @@ class Renderer {
     glm::vec2 camera_center() const noexcept;
     float zoom_factor() const noexcept;
 
+    glm::vec2 screen_to_world_space(glm::vec2 screen_pos) const noexcept;
+
     bool draw_body = false;
     bool draw_limbs = true;
     bool draw_bones = false;

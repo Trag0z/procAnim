@@ -10,7 +10,6 @@ TODO:
 
 
 Bugs:               (@BUG)
-- level editor selection does't work if camera is not on starting zoom
 - when zoomed out and moving the camera, the player's leg origin position moves 
 - one frame leg glitch into ground when starting to move
 - SplineEditor sets connected tangents in wrong direction since it still assumes what has been true some time ago

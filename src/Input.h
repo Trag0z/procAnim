@@ -36,9 +36,10 @@ class MouseKeyboardInput {
     bool key_down(SDL_Scancode key) const;
 
     glm::vec2 mouse_pos_world() const noexcept;
-    glm::vec2 mouse_screen_pos() const noexcept;
+    glm::ivec2 mouse_pos_screen() const noexcept;
 
-    glm::vec2 mouse_move() const noexcept;
+    glm::vec2 mouse_move_world() const noexcept;
+    glm::ivec2 mouse_move_screen() const noexcept;
 };
 
 enum class StickID : size_t { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };

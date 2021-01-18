@@ -72,19 +72,20 @@ bool MouseKeyboardInput::key_down(SDL_Scancode key) const {
 }
 
 glm::vec2 MouseKeyboardInput::mouse_pos_world() const noexcept {
-    return renderer->camera_position() + mouse_screen_pos();
+    return renderer->screen_to_world_space(static_cast<glm::vec2>(mouse_pos));
 }
 
-glm::vec2 MouseKeyboardInput::mouse_screen_pos() const noexcept {
-    return glm::vec2(static_cast<float>(mouse_pos.x),
-                     renderer->window_size().y -
-                         static_cast<float>(mouse_pos.y));
+glm::ivec2 MouseKeyboardInput::mouse_pos_screen() const noexcept {
+    return mouse_pos;
 }
 
-glm::vec2 MouseKeyboardInput::mouse_move() const noexcept {
-    glm::vec2 move = static_cast<glm::vec2>(mouse_pos - last_mouse_pos);
-    move.y *= -1.0f;
-    return move;
+glm::vec2 MouseKeyboardInput::mouse_move_world() const noexcept {
+    return renderer->screen_to_world_space(mouse_pos) -
+           renderer->screen_to_world_space(last_mouse_pos);
+}
+
+glm::ivec2 MouseKeyboardInput::mouse_move_screen() const noexcept {
+    return mouse_pos - last_mouse_pos;
 }
 
 void Gamepad::init(size_t index) {

@@ -158,7 +158,7 @@ bool LevelEditor::update(const Renderer& renderer,
         selected_collider->half_ext += input.mouse_wheel_scroll * SCROLL_SPEED;
 
         if (dragging_collider) {
-            selected_collider->position += input.mouse_move();
+            selected_collider->position += input.mouse_move_world();
         }
     }
 

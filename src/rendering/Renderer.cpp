@@ -43,9 +43,18 @@ void Renderer::init() {
 glm::vec2 Renderer::window_size() const noexcept { return window_size_; }
 
 glm::vec2 Renderer::camera_position() const noexcept {
-    return camera_center_ - window_size_ * 0.5f;
+    return camera_center_ - window_size_ * 0.5f / zoom_factor_;
 }
 
 glm::vec2 Renderer::camera_center() const noexcept { return camera_center_; }
 
 float Renderer::zoom_factor() const noexcept { return zoom_factor_; }
+
+// NOTE: The screen space origin is on the top left!
+glm::vec2 Renderer::screen_to_world_space(glm::vec2 screen_pos) const noexcept {
+    glm::vec2 result =
+        camera_position() +
+        glm::vec2(screen_pos.x / zoom_factor_,
+                  (window_size_.y - screen_pos.y) / zoom_factor_);
+    return result;
+}
