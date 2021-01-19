@@ -1,6 +1,5 @@
 TODO:
-- camera
-
+- player sometimes glitches into level colliders when in hitstun
 - when hit, turn off gravity for a time? or at least lower it
 
 - handle jump inputs in step mode better
