@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include <list>
+#include <map>
 #include <codecvt>
 
 #include <shobjidl.h>
@@ -20,6 +21,7 @@
 
 #include <sdl/SDL.h>
 #include <sdl/SDL_image.h>
+#include <sdl/SDL_mixer.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

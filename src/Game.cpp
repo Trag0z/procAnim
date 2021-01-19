@@ -37,6 +37,7 @@ void Game::init() {
     GLenum glewError = glewInit();
     if (glewError != GLEW_OK) {
         printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
+        SDL_TriggerBreakpoint();
     }
 
     // OpenGL configuration
@@ -65,8 +66,16 @@ void Game::init() {
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
+    // Initialize SDL_mixer
+    if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096) ==
+        -1) {
+        printf("Error initializing SDL_Mixer: %s", Mix_GetError());
+        SDL_TriggerBreakpoint();
+    }
+
     // Initialize member variables
     renderer.init();
+    audio_manager.load_sounds();
 
     {
         GLuint index = 0;
@@ -353,6 +362,7 @@ void Game::simulate_world(float delta_time) {
                 body_collider.position += first_collision.move_until_collision;
 
                 if (player.state == Player::HITSTUN) {
+                    audio_manager.play(Sound::WALL_BOUNCE);
 
                     // Finds the next collision, resolves it, sets
                     // new_player_velocity and and body_collider to new values
@@ -541,6 +551,7 @@ void Game::simulate_world(float delta_time) {
                     attacking_player.body_collider().radius &&
                 weapon->intersects(hit_player.body_collider())) {
 
+                // A player was hit
                 glm::vec2 hit_direction =
                     attacking_player.weapon_collider.line -
                     attacking_player.last_weapon_collider.line;
@@ -558,6 +569,8 @@ void Game::simulate_world(float delta_time) {
 
                 printf("Player %zd hit with %f, %f\n", i, hit_direction.x,
                        hit_direction.y);
+
+                audio_manager.play(Sound::HIT_2);
             }
         }
     }

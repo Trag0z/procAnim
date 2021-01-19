@@ -10,6 +10,7 @@
 #include "Background.h"
 #include "rendering/Renderer.h"
 #include "Level.h"
+#include "Audio.h"
 
 namespace Keybinds {
 constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F1;
@@ -53,6 +54,7 @@ class Game {
     SDL_GLContext gl_context;
 
     Renderer renderer;
+    AudioManager audio_manager;
 
     MouseKeyboardInput mouse_keyboard_input;
 
