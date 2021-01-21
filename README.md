@@ -1,6 +1,6 @@
 # procAnim
 
-This is the project I developed for my bachelor's thesis. 
+This is the project I developed for my bachelor's thesis. Since then, I used it as a starting point for a hobby game project.
 
 Abstract:
 
