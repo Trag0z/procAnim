@@ -104,7 +104,7 @@ void Game::init() {
                     "../assets/playerTexture.png", "../assets/guy.fbx",
                     &gamepads[1], level.colliders());
 
-    renderer.update_camera(glm::vec2(1022.0f, 693.0f));
+    renderer.update_camera(glm::vec2(1022.0f, 625.0f));
 
     frame_start = SDL_GetTicks();
     is_running = true;

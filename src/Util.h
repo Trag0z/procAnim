@@ -17,6 +17,8 @@ constexpr const T& clamp(const T& v, const T& low, const T& high) {
     return (v < low) ? low : (high < v) ? high : v;
 }
 
+float length_squared(glm::vec2 v);
+
 typedef const wchar_t* cwstrptr_t;
 bool get_save_path(std::string& path, cwstrptr_t filter_name = nullptr,
                    cwstrptr_t filter_pattern = nullptr,

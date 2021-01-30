@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "Util.h"
 
+float length_squared(glm::vec2 v) { return v.x * v.x + v.y * v.y; }
+
 bool get_save_path(std::string& out_path, cwstrptr_t filter_name,
                    cwstrptr_t filter_pattern, cwstrptr_t default_extension) {
     HRESULT hr =
