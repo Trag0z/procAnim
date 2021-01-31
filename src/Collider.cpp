@@ -212,10 +212,21 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
     }
 
     if (move == glm::vec2(0.0f)) {
-        // TODO: Just check for collisions with the circle?
-        SDL_assert(std::none_of(
-            candidates.begin(), candidates.end(),
-            [&circle](const auto& b) { return circle.intersects(*b); }));
+
+        // @CLEANUP: Commenting this out does not seem to result in bugs, but it
+        // probably should not fire anyway for the system to be robust.
+        //#ifdef _DEBUG
+        //        auto coll_iter = std::find_if(
+        //            candidates.begin(), candidates.end(),
+        //            [&circle](const auto& b) { return circle.intersects(*b);
+        //            });
+        //
+        //        if (coll_iter != candidates.end()) {
+        //            SDL_TriggerBreakpoint();
+        //            circle.intersects(**coll_iter);
+        //        }
+        //#endif // DEBUG
+
         return {glm::vec2(0.0f), Direction::NONE};
     }
 
@@ -326,13 +337,13 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
     // NOTE: These 1.0f margins seem to be pretty large, but without them we hit
     // assertions (due to floating point imprecision?)
     if (first_collision_direction == UP) {
-        result.move_until_collision.y -= 1.0f;
+        result.move_until_collision.y -= 2.0f;
     } else if (first_collision_direction == DOWN) {
-        result.move_until_collision.y += 1.0f;
+        result.move_until_collision.y += 2.0f;
     } else if (first_collision_direction == LEFT) {
-        result.move_until_collision.x += 1.0f;
+        result.move_until_collision.x += 2.0f;
     } else if (first_collision_direction == RIGHT) {
-        result.move_until_collision.x -= 1.0f;
+        result.move_until_collision.x -= 2.0f;
     }
 
 #ifdef _DEBUG

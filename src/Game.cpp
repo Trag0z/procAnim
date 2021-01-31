@@ -397,7 +397,9 @@ void Game::simulate_world(float delta_time) {
                             next_collision = find_first_collision_sweep_prune(
                                 body_collider, remaining_player_move, boxes);
 
-                        } else { // last_collison.direction == DOWN
+                        } else {
+                            SDL_assert(last_collision.direction == DOWN);
+
                             new_player_velocity = glm::vec2(0.0f);
                             next_collision.move_until_collision =
                                 glm::vec2(0.0f);
