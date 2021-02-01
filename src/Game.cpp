@@ -9,6 +9,8 @@ void Game::init() {
     SDL_assert_always(SDL_Init(SDL_INIT_EVERYTHING) == 0);
     SDL_assert_always(IMG_Init(IMG_INIT_PNG) != 0);
 
+    config_loader.load_config("../assets/config.ini", &game_config, &renderer);
+
     glm::ivec2 window_size = static_cast<glm::ivec2>(renderer.window_size());
 
     window = SDL_CreateWindow("procAnim", game_config.window_position.x,

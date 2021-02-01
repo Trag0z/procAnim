@@ -11,6 +11,7 @@ void Renderer::update_camera(const glm::vec2& center, float zoom_factor) {
     if (zoom_factor != 0.0f)
         zoom_factor_ = zoom_factor;
 
+    // NOTE: We don't use glm::ortho or something similar here. Is that correct?
     glm::mat3 cam = glm::scale(glm::mat3(1.0f),
                                glm::vec2(2.0f / window_size_.x * zoom_factor_,
                                          2.0f / window_size_.y * zoom_factor_));

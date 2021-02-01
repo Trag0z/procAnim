@@ -1,7 +1,10 @@
 TODO:
-- player sometimes glitches into level colliders when in hitstun
+- config debug window
+- player weapon length changes when rotating stick
 - when hit, turn off gravity for a time? or at least lower it
 
+
+TODO LATER:
 - handle jump inputs in step mode better
 - fix leg animations
 - change the direction of the player texture another way than changing it's scale

@@ -3,6 +3,9 @@
 #include "Input.h"
 #include "rendering/Renderer.h"
 
+s32 Gamepad::STICK_DEADZONE_IN = 3000;
+s32 Gamepad::STICK_DEADZONE_OUT = std::numeric_limits<s32>::max() - 1000;
+
 void MouseKeyboardInput::init(const Renderer* renderer_) {
     sdl_keyboard = SDL_GetKeyboardState(&num_keys);
     key_ = (bool*)malloc(sizeof(bool) * (num_keys * 3));

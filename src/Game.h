@@ -11,6 +11,7 @@
 #include "rendering/Renderer.h"
 #include "Level.h"
 #include "Audio.h"
+#include "ConfigLoader.h"
 
 namespace Keybinds {
 constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F1;
@@ -25,7 +26,7 @@ constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
 
 struct GameConfig {
     const u32 window_flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
-    const glm::ivec2 window_position = {0, 0};
+    glm::ivec2 window_position = {0, 0};
 
     const u32 fps = 60;
     const u32 frame_delay = 1000 / fps;
@@ -67,6 +68,8 @@ class Game {
 
     Level level;
     LevelEditor level_editor;
+
+    ConfigLoader config_loader;
 
 #ifdef _DEBUG
     struct {
