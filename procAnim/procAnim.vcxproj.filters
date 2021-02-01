@@ -99,7 +99,7 @@
     <ClCompile Include="..\src\Audio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ConfigLoader.cpp">
+    <ClCompile Include="..\src\ConfigManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -191,7 +191,7 @@
     <ClInclude Include="..\src\Audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ConfigLoader.h">
+    <ClInclude Include="..\src\ConfigManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

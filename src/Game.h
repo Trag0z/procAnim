@@ -11,7 +11,7 @@
 #include "rendering/Renderer.h"
 #include "Level.h"
 #include "Audio.h"
-#include "ConfigLoader.h"
+#include "ConfigManager.h"
 
 namespace Keybinds {
 constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F1;
@@ -69,7 +69,7 @@ class Game {
     Level level;
     LevelEditor level_editor;
 
-    ConfigLoader config_loader;
+    ConfigManager config_loader;
 
 #ifdef _DEBUG
     struct {

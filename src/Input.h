@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Types.h"
 #include "Util.h"
-#include "ConfigLoader.h"
+#include "ConfigManager.h"
 
 class Renderer;
 
@@ -68,5 +68,5 @@ class Gamepad {
     bool button_down(u32 n) const;
     bool button_up(u32 n) const;
 
-    friend ConfigLoader;
+    friend ConfigManager;
 };

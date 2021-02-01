@@ -1,9 +1,9 @@
 #pragma once
 #include "pch.h"
-#include "ConfigLoader.h"
+#include "ConfigManager.h"
 #include "Game.h"
 
-void ConfigLoader::init(GameConfig& game_config, Renderer& renderer) {
+void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     // GameConfig
     items.emplace("window_position", &game_config.window_position);
     items.emplace("gravity", &game_config.gravity);
@@ -38,7 +38,7 @@ void ConfigLoader::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("stick_deadzone_out", &Gamepad::STICK_DEADZONE_OUT);
 }
 
-void ConfigLoader::load_config(const char* path) {
+void ConfigManager::load_config(const char* path) {
     if (path) {
         SDL_assert(save_path.empty());
         save_path = std::string(path);
@@ -61,18 +61,36 @@ void ConfigLoader::load_config(const char* path) {
 
         std::visit(ParseVisitor{stream}, items[word]);
     }
+
+    file_stream.close();
 }
 
-void ConfigLoader::save_config(const char* path) {
-    if (path) {
-        SDL_assert(save_path.empty());
-        save_path = std::string(path);
-    } else {
-        SDL_assert(!save_path.empty());
+void ConfigManager::save_config() {
+    SDL_assert(!save_path.empty());
+    std::stringstream stream;
+
+    const size_t buf_size = 1024;
+    char buf[buf_size];
+
+    SaveVisitor::write_pos = buf;
+    SaveVisitor::buf_end = buf + buf_size;
+
+    for (auto& item : items) {
+        std::visit(SaveVisitor{item.first}, item.second);
     }
+
+    SDL_RWops* file = SDL_RWFromFile(save_path.c_str(), "w");
+
+    size_t num_bytes_to_write = SaveVisitor::write_pos - buf;
+    size_t num_bytes_written =
+        SDL_RWwrite(file, buf, sizeof(char), num_bytes_to_write);
+
+    SDL_assert(num_bytes_written == num_bytes_to_write);
+
+    SDL_RWclose(file);
 }
 
-bool ConfigLoader::display_ui_window() {
+bool ConfigManager::display_ui_window() {
     using namespace ImGui;
     bool keep_open = true;
 
@@ -96,26 +114,26 @@ bool ConfigLoader::display_ui_window() {
 }
 
 //                    Visitor Object Methods                        //
-void ConfigLoader::ParseVisitor::operator()(bool* val) {
+void ConfigManager::ParseVisitor::operator()(bool* val) {
     std::string word;
     std::getline(stream, word);
     SDL_assert(word.length() >= 0);
     *val = std::stoi(word);
     SDL_assert(*val == 0 || *val == 1);
 }
-void ConfigLoader::ParseVisitor::operator()(float* val) {
+void ConfigManager::ParseVisitor::operator()(float* val) {
     std::string word;
     std::getline(stream, word);
     SDL_assert(word.length() >= 0);
     *val = std::stof(word);
 }
-void ConfigLoader::ParseVisitor::operator()(s32* val) {
+void ConfigManager::ParseVisitor::operator()(s32* val) {
     std::string word;
     std::getline(stream, word);
     SDL_assert(word.length() >= 0);
     *val = static_cast<s32>(std::stoi(word));
 }
-void ConfigLoader::ParseVisitor::operator()(glm::vec2* val) {
+void ConfigManager::ParseVisitor::operator()(glm::vec2* val) {
     std::string word;
 
     std::getline(stream, word, ',');
@@ -126,7 +144,7 @@ void ConfigLoader::ParseVisitor::operator()(glm::vec2* val) {
     SDL_assert(word.length() >= 0);
     val->y = std::stof(word);
 }
-void ConfigLoader::ParseVisitor::operator()(glm::ivec2* val) {
+void ConfigManager::ParseVisitor::operator()(glm::ivec2* val) {
     std::string word;
 
     std::getline(stream, word, ',');
@@ -138,19 +156,54 @@ void ConfigLoader::ParseVisitor::operator()(glm::ivec2* val) {
     val->y = static_cast<glm::i32>(std::stod(word));
 }
 
-void ConfigLoader::UIVisitor::operator()(bool* val) {
+char* ConfigManager::SaveVisitor::write_pos = nullptr;
+const char* ConfigManager::SaveVisitor::buf_end = nullptr;
+
+void ConfigManager::SaveVisitor::operator()(bool* val) {
+    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d\n",
+                                item_name.c_str(), static_cast<int>(*val));
+    SDL_assert(num_written != -1);
+    write_pos += num_written;
+}
+void ConfigManager::SaveVisitor::operator()(float* val) {
+    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %f\n",
+                                item_name.c_str(), *val);
+    SDL_assert(num_written != -1);
+    write_pos += num_written;
+}
+void ConfigManager::SaveVisitor::operator()(s32* val) {
+    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d\n",
+                                item_name.c_str(), static_cast<int>(*val));
+    SDL_assert(num_written != -1);
+    write_pos += num_written;
+}
+void ConfigManager::SaveVisitor::operator()(glm::vec2* val) {
+    int num_written =
+        sprintf_s(write_pos, buf_end - write_pos, "%s %.2f,%.2f\n",
+                  item_name.c_str(), val->x, val->y);
+    SDL_assert(num_written != -1);
+    write_pos += num_written;
+}
+void ConfigManager::SaveVisitor::operator()(glm::ivec2* val) {
+    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d,%d\n",
+                                item_name.c_str(), val->x, val->y);
+    SDL_assert(num_written != -1);
+    write_pos += num_written;
+}
+
+void ConfigManager::UIVisitor::operator()(bool* val) {
     ImGui::Checkbox(item_name.c_str(), val);
 }
-void ConfigLoader::UIVisitor::operator()(float* val) {
+void ConfigManager::UIVisitor::operator()(float* val) {
     ImGui::InputFloat(item_name.c_str(), val, 1.0f, 10.0f, 2);
 }
-void ConfigLoader::UIVisitor::operator()(s32* val) {
+void ConfigManager::UIVisitor::operator()(s32* val) {
     const s32 step = 1;
     ImGui::InputScalar(item_name.c_str(), ImGuiDataType_U32, val, &step);
 }
-void ConfigLoader::UIVisitor::operator()(glm::vec2* val) {
+void ConfigManager::UIVisitor::operator()(glm::vec2* val) {
     ImGui::DragFloat2(item_name.c_str(), value_ptr(*val));
 }
-void ConfigLoader::UIVisitor::operator()(glm::ivec2* val) {
+void ConfigManager::UIVisitor::operator()(glm::ivec2* val) {
     ImGui::DragInt2(item_name.c_str(), value_ptr(*val));
 }

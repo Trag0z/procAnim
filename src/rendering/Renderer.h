@@ -2,7 +2,7 @@
 #include "../pch.h"
 #include "Shaders.h"
 #include "Texture.h"
-#include "../ConfigLoader.h"
+#include "../ConfigManager.h"
 
 class Renderer {
     glm::vec2 window_size_ = {1920.0f, 1080.0f};
@@ -34,5 +34,5 @@ class Renderer {
     bool draw_colliders = true;
     bool draw_leg_splines = true;
 
-    friend ConfigLoader;
+    friend ConfigManager;
 };
