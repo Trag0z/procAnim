@@ -9,7 +9,8 @@ void Game::init() {
     SDL_assert_always(SDL_Init(SDL_INIT_EVERYTHING) == 0);
     SDL_assert_always(IMG_Init(IMG_INIT_PNG) != 0);
 
-    config_loader.load_config("../assets/config.ini", &game_config, &renderer);
+    config_loader.init(game_config, renderer);
+    config_loader.load_config("../assets/config.ini");
 
     glm::ivec2 window_size = static_cast<glm::ivec2>(renderer.window_size());
 
@@ -105,8 +106,6 @@ void Game::init() {
     players[1].init(position, glm::vec3(100.0f, 100.0f, 1.0f),
                     "../assets/playerTexture.png", "../assets/guy.fbx",
                     &gamepads[1], level.colliders());
-
-    renderer.update_camera(glm::vec2(1022.0f, 625.0f));
 
     frame_start = SDL_GetTicks();
     is_running = true;
@@ -212,7 +211,7 @@ void Game::run() {
     // Players
     std::array<glm::mat3, RiggedShader::NUMBER_OF_BONES>
         bone_transforms[NUM_PLAYERS];
-    if (renderer.draw_limbs || renderer.draw_wireframe) {
+    if (renderer.draw_limbs || renderer.draw_wireframes) {
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
 
@@ -251,7 +250,7 @@ void Game::run() {
         }
     }
 
-    if (renderer.draw_wireframe) {
+    if (renderer.draw_wireframes) {
         renderer.rigged_debug_shader.use();
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
@@ -582,51 +581,29 @@ void Game::simulate_world(float delta_time) {
 
 void Game::update_gui() {
     using namespace ImGui;
-
     //////          Debug controls window           //////
     Begin("Debug control", NULL, ImGuiWindowFlags_NoTitleBar);
-    Checkbox("Render player limbs", &renderer.draw_limbs);
-    Checkbox("Render player body", &renderer.draw_body);
-    Checkbox("Render bones", &renderer.draw_bones);
-    Checkbox("Render wireframe", &renderer.draw_wireframe);
-    Checkbox("Render colliders", &renderer.draw_colliders);
-    Checkbox("Render leg splines", &renderer.draw_leg_splines);
 
-    NewLine();
-    Checkbox("Use constant delta time", &game_config.use_const_delta_time);
-    Checkbox("Step mode", &game_config.step_mode);
-    PushItemWidth(100);
-    DragFloat("Game speed", &game_config.speed, 0.1f, 0.0f, 100.0f, "%.2f");
-    DragFloat("gravity", &game_config.gravity);
-
-    // Camera
-    glm::vec2 camera_center = renderer.camera_center();
-    DragFloat2("Camera position", (float*)&camera_center, 1.0f, 0.0f, 0.0f,
-               "%.f");
-
-    float zoom_factor = renderer.zoom_factor();
-    DragFloat("Camera zoom", &zoom_factor, 0.1f, 0.001f, 100.0f, "%.2f");
-
-    renderer.update_camera(camera_center, zoom_factor);
-
-    NewLine();
     Text("Mode");
     RadioButton("Play", (int*)&game_mode, GameMode::PLAY);
     RadioButton("Spline editor", (int*)&game_mode, GameMode::SPLINE_EDITOR);
     RadioButton("Level editor", (int*)&game_mode, GameMode::LEVEL_EDITOR);
 
+    // Config editor
     NewLine();
-    Text("Player statics");
-    DragFloat("ground_hover_distance", &Player::GROUND_HOVER_DISTANCE);
-    DragFloat("jump_force", &Player::JUMP_FORCE);
-    DragFloat("max_walk_speed", &Player::MAX_WALK_SPEED);
-    DragFloat("hit_speed_multiplier", &Player::HIT_SPEED_MULTIPLIER);
-    DragFloat("hitstun_duration_multiplier",
-              &Player::HITSTUN_DURATION_MULTIPLIER);
+    static bool show_config_window = true;
+    Checkbox("Show config editor", &show_config_window);
 
-    {
+    if (show_config_window) {
+        show_config_window = config_loader.display_ui_window();
+        renderer.update_camera();
+    }
+
+    Separator();
+    { // Player windows
         Text("Display player windows");
-        static bool player_window_open[2] = {true, true};
+        static bool player_window_open[2] = {
+            true, true}; // NOTE: This is not saved in config file
         for (size_t i = 0; i < NUM_PLAYERS; ++i) {
             char label[10];
             sprintf_s(label, "Player %zd", i);
@@ -637,8 +614,9 @@ void Game::update_gui() {
         }
     }
 
-    NewLine();
+    Separator();
     Text("Animation controls");
+    PushItemWidth(100);
     DragFloat("Step distance multiplier",
               &players[0].animator.step_distance_multiplier, 1.0f, 0.0f, 0.0f,
               "%.1f");

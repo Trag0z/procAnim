@@ -43,7 +43,8 @@
         "exception": "cpp",
         "stdexcept": "cpp",
         "xstddef": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "variant": "cpp"
     },
     "spellright.language": [
         "en"

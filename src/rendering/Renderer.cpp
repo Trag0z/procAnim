@@ -5,17 +5,12 @@
 #include "../Background.h"
 #include "../Level.h"
 
-void Renderer::update_camera(const glm::vec2& center, float zoom_factor) {
-    camera_center_ = center;
-
-    if (zoom_factor != 0.0f)
-        zoom_factor_ = zoom_factor;
-
+void Renderer::update_camera() {
     // NOTE: We don't use glm::ortho or something similar here. Is that correct?
     glm::mat3 cam = glm::scale(glm::mat3(1.0f),
                                glm::vec2(2.0f / window_size_.x * zoom_factor_,
                                          2.0f / window_size_.y * zoom_factor_));
-    cam = glm::translate(cam, -center);
+    cam = glm::translate(cam, -camera_center_);
 
     debug_shader.set_camera(&cam);
     textured_shader.set_camera(&cam);
@@ -39,6 +34,8 @@ void Renderer::init() {
 
     bone_shader =
         BoneShader("../src/shaders/bone.vert", "../src/shaders/bone.frag");
+
+    update_camera();
 }
 
 glm::vec2 Renderer::window_size() const noexcept { return window_size_; }

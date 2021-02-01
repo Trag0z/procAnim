@@ -10,7 +10,7 @@ class Renderer {
     float zoom_factor_ = 1.0f;
 
   public:
-    void update_camera(const glm::vec2& center, float zoom_factor = 0.0f);
+    void update_camera();
 
     DebugShader debug_shader;
     TexturedShader textured_shader;
@@ -30,7 +30,7 @@ class Renderer {
     bool draw_body = false;
     bool draw_limbs = true;
     bool draw_bones = false;
-    bool draw_wireframe = false;
+    bool draw_wireframes = false;
     bool draw_colliders = true;
     bool draw_leg_splines = true;
 

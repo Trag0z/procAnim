@@ -7,6 +7,7 @@
 #include "rendering/Renderer.h"
 
 class Gamepad;
+class ConfigLoader;
 struct BoxCollider;
 
 class Player : public Entity {
@@ -65,4 +66,5 @@ class Player : public Entity {
     // Game access them this way seems cleaner to me then writing a bunch of
     // getters/setters that are only used in one place.
     friend Game;
+    friend ConfigLoader;
 };

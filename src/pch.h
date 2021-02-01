@@ -1,4 +1,5 @@
 #pragma once
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
 #include <array>
 #include <vector>
@@ -8,6 +9,7 @@
 #include <list>
 #include <map>
 #include <codecvt>
+#include <variant>
 
 #include <shobjidl.h>
 

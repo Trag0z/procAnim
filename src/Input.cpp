@@ -4,7 +4,7 @@
 #include "rendering/Renderer.h"
 
 s32 Gamepad::STICK_DEADZONE_IN = 3000;
-s32 Gamepad::STICK_DEADZONE_OUT = std::numeric_limits<s32>::max() - 1000;
+s32 Gamepad::STICK_DEADZONE_OUT = 32767 - 1000;
 
 void MouseKeyboardInput::init(const Renderer* renderer_) {
     sdl_keyboard = SDL_GetKeyboardState(&num_keys);
@@ -124,25 +124,28 @@ void Gamepad::update() {
         }
 
         // If it's a stick, calculate and set it's value
+        const s32 effective_stick_deadzone_out =
+            32767 - Gamepad::STICK_DEADZONE_OUT;
+
         tempAxis = SDL_GameControllerGetAxis(
             sdl_ptr, static_cast<SDL_GameControllerAxis>(i));
         if (tempAxis > -Gamepad::STICK_DEADZONE_IN &&
             tempAxis < Gamepad::STICK_DEADZONE_IN) {
             axes[i] = 0.0F;
-        } else if (tempAxis > Gamepad::STICK_DEADZONE_OUT) {
+        } else if (tempAxis > effective_stick_deadzone_out) {
             axes[i] = 1.0F;
-        } else if (tempAxis < -Gamepad::STICK_DEADZONE_OUT) {
+        } else if (tempAxis < -effective_stick_deadzone_out) {
             axes[i] = -1.0F;
         } else {
             if (tempAxis > 0) {
                 axes[i] =
                     static_cast<float>(tempAxis - Gamepad::STICK_DEADZONE_IN) /
-                    static_cast<float>(Gamepad::STICK_DEADZONE_OUT -
+                    static_cast<float>(effective_stick_deadzone_out -
                                        Gamepad::STICK_DEADZONE_IN);
             } else {
                 axes[i] =
                     static_cast<float>(tempAxis + Gamepad::STICK_DEADZONE_IN) /
-                    static_cast<float>(Gamepad::STICK_DEADZONE_OUT -
+                    static_cast<float>(effective_stick_deadzone_out -
                                        Gamepad::STICK_DEADZONE_IN);
             }
         }
