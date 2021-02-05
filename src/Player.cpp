@@ -116,7 +116,7 @@ CircleCollider Player::body_collider() const noexcept {
     // left, it's scale is negative on the x-axis
 }
 
-bool Player::display_debug_ui_window(size_t player_index) {
+bool Player::display_debug_ui(size_t player_index) {
     using namespace ImGui;
 
     bool keep_open = true;

@@ -60,7 +60,7 @@ class Player : public Entity {
     CircleCollider body_collider() const noexcept;
 
     // Return value signifies if the window should be kept open.
-    bool display_debug_ui_window(size_t player_index);
+    bool display_debug_ui(size_t player_index);
 
     // The debug UI needs to access the private members of this class. Letting
     // Game access them this way seems cleaner to me then writing a bunch of

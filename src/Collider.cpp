@@ -79,6 +79,12 @@ bool CircleCollider::intersects(const CircleCollider& other) const noexcept {
     return glm::length(position - other.position) < radius + other.radius;
 }
 
+CircleCollider
+CircleCollider::local_to_world_space(const Entity& entity) const noexcept {
+    return {entity.local_to_world_space(position),
+            entity.local_to_world_scale(radius)};
+}
+
 bool LineCollider::intersects(
     const BoxCollider& other, float* out_collision_time = nullptr,
     Direction* out_hit_side = nullptr) const noexcept {
@@ -192,7 +198,7 @@ bool LineCollider::intersects(const CircleCollider& other) const noexcept {
 const CollisionData
 find_first_collision_sweep_prune(const CircleCollider& circle,
                                  const glm::vec2 move,
-                                 const std::list<BoxCollider> boxes) {
+                                 const std::list<BoxCollider>& boxes) {
 
     // All colliders that are outside the culling box won't collide, so we don't
     // have to care about them
@@ -358,4 +364,49 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
 #endif
 
     return result;
+}
+
+const BallisticMoveResult
+get_ballistic_move(const CircleCollider& coll, const glm::vec2 velocity,
+                   const float delta_time, const std::list<BoxCollider>& level,
+                   const size_t max_collision_iterations) {
+
+    glm::vec2 move = velocity * delta_time;
+    CollisionData collision;
+
+    collision = find_first_collision_sweep_prune(coll, move, level);
+
+    // NOTE: This condition could be removed and we would still have the same
+    // result, but it seems more clear (and efficient) to have it.
+    if (collision.direction == NONE) {
+        return {coll.position + move, velocity};
+    }
+
+    glm::vec2 updated_velocity = velocity;
+    CircleCollider updated_collider = coll;
+    float remaining_time = delta_time;
+
+    for (size_t num_iterations = 1; num_iterations < max_collision_iterations;
+         ++num_iterations) {
+
+        remaining_time -= remaining_time * collision.time;
+        updated_collider.position += collision.move_until_collision;
+
+        if (collision.direction == NONE) {
+            return {updated_collider.position, updated_velocity};
+
+        } else if (collision.direction == LEFT ||
+                   collision.direction == RIGHT) {
+            updated_velocity.x *= -1.0f;
+        } else {
+            SDL_assert(collision.direction == UP ||
+                       collision.direction == DOWN);
+            updated_velocity.y *= -1.0f;
+        }
+
+        collision = find_first_collision_sweep_prune(
+            updated_collider, updated_velocity * remaining_time, level);
+    }
+    SDL_TriggerBreakpoint();
+    return {};
 }

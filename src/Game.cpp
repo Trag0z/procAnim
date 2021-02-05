@@ -107,6 +107,9 @@ void Game::init() {
                     "../assets/playerTexture.png", "../assets/guy.fbx",
                     &gamepads[1], level.colliders());
 
+    // Ball
+    ball.init(renderer.camera_center(), 100.0f, "../assets/ball.png");
+
     frame_start = SDL_GetTicks();
     is_running = true;
 };
@@ -207,6 +210,9 @@ void Game::run() {
     background.render(renderer, renderer.camera_center());
 
     level.render(renderer);
+
+    // Ball
+    ball.render(renderer);
 
     // Players
     std::array<glm::mat3, RiggedShader::NUMBER_OF_BONES>
@@ -503,7 +509,7 @@ void Game::simulate_world(float delta_time) {
 
         player.velocity = new_player_velocity;
         player.position_ = new_player_position;
-    }
+    } // End for each player
 
     { // Player/Player Collisions // TODO
         CircleCollider colliders[2];
@@ -519,7 +525,7 @@ void Game::simulate_world(float delta_time) {
         }
     }
 
-    // Collisions between weapons and weapons/bodies
+    // Collisions between weapon and weapon/ball
     const LineCollider* weapons[NUM_PLAYERS];
     for (size_t i = 0; i < NUM_PLAYERS; ++i) {
         weapons[i] = &players[i].weapon_collider;
@@ -544,31 +550,21 @@ void Game::simulate_world(float delta_time) {
 #endif
         }
 
-        // Weapon vs. body
+        // Weapon vs. ball
         for (size_t i = 0; i < NUM_PLAYERS; ++i) {
             auto& weapon = weapons[i];
-            auto& attacking_player = players[i];
-            auto& hit_player = players[1 - i];
-            if (attacking_player.time_since_last_hit >= Player::HIT_COOLDOWN &&
-                glm::length(weapon->line) >
-                    attacking_player.body_collider().radius &&
-                weapon->intersects(hit_player.body_collider())) {
+            auto& player = players[i];
+            if (player.time_since_last_hit >= Player::HIT_COOLDOWN &&
+                glm::length(weapon->line) > player.body_collider().radius &&
+                weapon->intersects(ball.collider())) {
 
-                // A player was hit
-                glm::vec2 hit_direction =
-                    attacking_player.weapon_collider.line -
-                    attacking_player.last_weapon_collider.line;
+                // The ball was hit
+                glm::vec2 hit_direction = player.weapon_collider.line -
+                                          player.last_weapon_collider.line;
 
-                hit_player.state = Player::HITSTUN;
-                hit_player.hitstun_duration =
-                    glm::length(hit_direction) *
-                    Player::HITSTUN_DURATION_MULTIPLIER;
-                hit_player.grounded = false;
+                ball.set_velocity(hit_direction * Player::HIT_SPEED_MULTIPLIER);
 
-                hit_player.velocity =
-                    hit_direction * players[i].HIT_SPEED_MULTIPLIER;
-
-                attacking_player.time_since_last_hit = 0.0f;
+                player.time_since_last_hit = 0.0f;
 
                 printf("Player %zd hit with %f, %f\n", i, hit_direction.x,
                        hit_direction.y);
@@ -577,6 +573,7 @@ void Game::simulate_world(float delta_time) {
             }
         }
     }
+    ball.update(game_config.gravity, delta_time, level.colliders());
 }
 
 void Game::update_gui() {
@@ -600,8 +597,8 @@ void Game::update_gui() {
     }
 
     Separator();
+    Text("Display debug windows");
     { // Player windows
-        Text("Display player windows");
         static bool player_window_open[2] = {
             true, true}; // NOTE: This is not saved in config file
         for (size_t i = 0; i < NUM_PLAYERS; ++i) {
@@ -609,8 +606,15 @@ void Game::update_gui() {
             sprintf_s(label, "Player %zd", i);
             Checkbox(label, &player_window_open[i]);
             if (player_window_open[i]) {
-                player_window_open[i] = players[i].display_debug_ui_window(i);
+                player_window_open[i] = players[i].display_debug_ui(i);
             }
+        }
+    }
+    {
+        static bool ball_window_open = true;
+        Checkbox("Ball", &ball_window_open);
+        if (ball_window_open) {
+            ball.display_debug_ui();
         }
     }
 

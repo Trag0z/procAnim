@@ -1,7 +1,9 @@
 #pragma once
 #include "pch.h"
+#include "Entity.h"
 
 struct LineCollider;
+class Entity;
 
 enum Direction { NONE, UP, DOWN, LEFT, RIGHT };
 
@@ -31,6 +33,8 @@ struct CircleCollider {
 
     bool intersects(const BoxCollider& other) const noexcept;
     bool intersects(const CircleCollider& other) const noexcept;
+
+    CircleCollider local_to_world_space(const Entity& entity) const noexcept;
 };
 
 struct LineCollider {
@@ -53,18 +57,17 @@ struct CollisionData {
     Direction direction;
 };
 
-/*
-Find first collision of circle moving along move.
-NOTE: Treats the circle like a rectangle in order to do the
-sweeping. In some cases (when moving diagonally), the circle might not actually
-be touching the other collider (yet).
-*/
-// const CollisionData
-// find_first_collision_sweep_prune(const CircleCollider& circle,
-//                                  const glm::vec2 move,
-//                                  const std::list<BoxCollider> boxes);
-
 const CollisionData
 find_first_collision_sweep_prune(const CircleCollider& circle,
                                  const glm::vec2 move,
-                                 const std::list<BoxCollider> boxes);
+                                 const std::list<BoxCollider>& boxes);
+
+struct BallisticMoveResult {
+    glm::vec2 new_position;
+    glm::vec2 new_velocity;
+};
+
+const BallisticMoveResult
+get_ballistic_move(const CircleCollider& coll, const glm::vec2 velocity,
+                   const float delta_time, const std::list<BoxCollider>& level,
+                   const size_t max_collision_iterations = 5);

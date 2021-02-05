@@ -147,6 +147,7 @@
     <ClCompile Include="..\src\Animator.cpp" />
     <ClCompile Include="..\src\Audio.cpp" />
     <ClCompile Include="..\src\Background.cpp" />
+    <ClCompile Include="..\src\Ball.cpp" />
     <ClCompile Include="..\src\Collider.cpp" />
     <ClCompile Include="..\src\ConfigManager.cpp" />
     <ClCompile Include="..\src\Entity.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="..\src\Animator.h" />
     <ClInclude Include="..\src\Audio.h" />
     <ClInclude Include="..\src\Background.h" />
+    <ClInclude Include="..\src\Ball.h" />
     <ClInclude Include="..\src\Collider.h" />
     <ClInclude Include="..\src\ConfigManager.h" />
     <ClInclude Include="..\src\DebugCallback.h" />

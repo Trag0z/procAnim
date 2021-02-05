@@ -12,6 +12,7 @@
 #include "Level.h"
 #include "Audio.h"
 #include "ConfigManager.h"
+#include "Ball.h"
 
 namespace Keybinds {
 constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F1;
@@ -63,6 +64,8 @@ class Game {
 
     Gamepad gamepads[NUM_PLAYERS];
     Player players[NUM_PLAYERS];
+
+    Ball ball;
 
     Background background;
 

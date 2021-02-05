@@ -1,5 +1,6 @@
 TODO:
-- saving config file
+- ball collided wrong with gorund
+    > also needs dampening factor to not bounce indefinitely
 - player weapon length changes when rotating stick
 - when hit, turn off gravity for a time? or at least lower it
 
@@ -24,3 +25,4 @@ Cleanup:            (@CLEANUP)
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time
 - move IK calculations to shader?
+
