@@ -1,6 +1,4 @@
 TODO:
-- ball collided wrong with gorund
-    > also needs dampening factor to not bounce indefinitely
 - player weapon length changes when rotating stick
 - when hit, turn off gravity for a time? or at least lower it
 

@@ -3,9 +3,10 @@
 #include "Ball.h"
 #include "rendering/Renderer.h"
 
-void Ball::init(glm::vec2 position, float radius, const char* texture_path) {
-    Entity::init(position, glm::vec2(radius));
-    collider_ = {glm::vec2(0.0f), radius};
+void Ball::init(glm::vec2 position, float radius_, const char* texture_path) {
+    Entity::init(position, glm::vec2(radius_));
+    radius = radius_;
+    collider_ = {glm::vec2(0.0f), 1.0f};
     texture.load_from_file(texture_path);
 }
 
@@ -39,8 +40,8 @@ bool Ball::display_debug_ui() {
     DragFloat2("position", value_ptr(position_));
     DragFloat2("velocity", value_ptr(velocity));
 
-    if (DragFloat("radius", &collider_.radius)) {
-        scale = glm::vec2(collider_.radius);
+    if (DragFloat("radius", &radius)) {
+        scale = glm::vec2(radius);
         update_model_matrix();
     }
 
@@ -52,4 +53,6 @@ bool Ball::display_debug_ui() {
 
 void Ball::set_velocity(glm::vec2 velo) { velocity = velo; }
 
-const CircleCollider& Ball::collider() const { return collider_; }
+const CircleCollider Ball::collider() const {
+    return collider_.local_to_world_space(*this);
+}

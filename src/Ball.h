@@ -8,12 +8,13 @@ class Renderer;
 
 class Ball : Entity {
     glm::vec2 velocity;
+    float radius;
     CircleCollider collider_;
 
     Texture texture;
 
   public:
-    void init(glm::vec2 position, float radius, const char* texture_path);
+    void init(glm::vec2 position, float radius_, const char* texture_path);
     void update(const float gravity, const float delta_time,
                 const std::list<BoxCollider>& level);
     void render(const Renderer& renderer) const;
@@ -21,5 +22,5 @@ class Ball : Entity {
 
     void set_velocity(glm::vec2 velocity);
 
-    const CircleCollider& collider() const;
+    const CircleCollider collider() const;
 };
