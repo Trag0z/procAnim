@@ -126,7 +126,7 @@ bool Player::display_debug_ui(size_t player_index) {
         Begin(window_name, &keep_open);
     }
 
-    PushItemWidth(100);
+    PushItemWidth(150);
     DragFloat2("position", value_ptr(position_), 1.0f, 0.0f, 0.0f, "%.2f");
     DragFloat2("velocity", value_ptr(velocity), 1.0f, 0.0f, 0.0f, "%.2f");
 

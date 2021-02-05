@@ -33,6 +33,10 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("hitstun_duration_multiplier",
                   &Player::HITSTUN_DURATION_MULTIPLIER);
 
+    // Ball
+    items.emplace("damping_factor", &Ball::REBOUND);
+    items.emplace("ball_radius", &Ball::RADIUS);
+
     // Gamepad
     items.emplace("stick_deadzone_in", &Gamepad::STICK_DEADZONE_IN);
     items.emplace("stick_deadzone_out", &Gamepad::STICK_DEADZONE_OUT);

@@ -108,7 +108,7 @@ void Game::init() {
                     &gamepads[1], level.colliders());
 
     // Ball
-    ball.init(renderer.camera_center(), 100.0f, "../assets/ball.png");
+    ball.init(renderer.camera_center(), "../assets/ball.png");
 
     frame_start = SDL_GetTicks();
     is_running = true;

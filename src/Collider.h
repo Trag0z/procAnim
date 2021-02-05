@@ -67,7 +67,7 @@ struct BallisticMoveResult {
     glm::vec2 new_velocity;
 };
 
-const BallisticMoveResult
-get_ballistic_move(const CircleCollider& coll, const glm::vec2 velocity,
-                   const float delta_time, const std::list<BoxCollider>& level,
-                   const size_t max_collision_iterations = 5);
+const BallisticMoveResult get_ballistic_move_result(
+    const CircleCollider& coll, const glm::vec2 velocity,
+    const float delta_time, const std::list<BoxCollider>& level,
+    float rebound = 1.0f, const size_t max_collision_iterations = 5);

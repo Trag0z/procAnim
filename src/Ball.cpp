@@ -3,18 +3,25 @@
 #include "Ball.h"
 #include "rendering/Renderer.h"
 
-void Ball::init(glm::vec2 position, float radius_, const char* texture_path) {
-    Entity::init(position, glm::vec2(radius_));
-    radius = radius_;
+float Ball::REBOUND = 1.0f;
+float Ball::RADIUS = 50.0f;
+
+void Ball::init(glm::vec2 position, const char* texture_path) {
+    Entity::init(position, glm::vec2(RADIUS));
     collider_ = {glm::vec2(0.0f), 1.0f};
     texture.load_from_file(texture_path);
 }
 
 void Ball::update(const float gravity, const float delta_time,
                   const std::list<BoxCollider>& level) {
+    if (RADIUS != scale.x) {
+        SDL_assert(scale.x == scale.y);
+        scale = glm::vec2(RADIUS);
+    }
 
-    BallisticMoveResult move_result = get_ballistic_move(
-        collider_.local_to_world_space(*this), velocity, delta_time, level);
+    BallisticMoveResult move_result =
+        get_ballistic_move_result(collider_.local_to_world_space(*this),
+                                  velocity, delta_time, level, REBOUND);
 
     position_ = move_result.new_position;
     velocity = move_result.new_velocity;
@@ -36,14 +43,9 @@ bool Ball::display_debug_ui() {
 
     Begin("Ball", &keep_open);
 
-    PushItemWidth(100);
+    PushItemWidth(150);
     DragFloat2("position", value_ptr(position_));
     DragFloat2("velocity", value_ptr(velocity));
-
-    if (DragFloat("radius", &radius)) {
-        scale = glm::vec2(radius);
-        update_model_matrix();
-    }
 
     PopItemWidth();
     End();

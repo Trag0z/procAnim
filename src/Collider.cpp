@@ -367,9 +367,10 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
 }
 
 const BallisticMoveResult
-get_ballistic_move(const CircleCollider& coll, const glm::vec2 velocity,
-                   const float delta_time, const std::list<BoxCollider>& level,
-                   const size_t max_collision_iterations) {
+get_ballistic_move_result(const CircleCollider& coll, const glm::vec2 velocity,
+                          const float delta_time,
+                          const std::list<BoxCollider>& level, float rebound,
+                          const size_t max_collision_iterations) {
 
     glm::vec2 move = velocity * delta_time;
     CollisionData collision;
@@ -397,11 +398,11 @@ get_ballistic_move(const CircleCollider& coll, const glm::vec2 velocity,
 
         } else if (collision.direction == LEFT ||
                    collision.direction == RIGHT) {
-            updated_velocity.x *= -1.0f;
+            updated_velocity.x *= -rebound;
         } else {
             SDL_assert(collision.direction == UP ||
                        collision.direction == DOWN);
-            updated_velocity.y *= -1.0f;
+            updated_velocity.y *= -rebound;
         }
 
         collision = find_first_collision_sweep_prune(
