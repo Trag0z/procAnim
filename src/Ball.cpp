@@ -33,12 +33,7 @@ void Ball::update(const float delta_time, const std::list<BoxCollider>& level) {
         velocity.x *= 1.0f / ROLLING_FRICTION;
         velocity.y = 0.0f;
 
-        rotation += -ROLLING_ROTATION_SPEED * velocity.x;
-        if (rotation > 2.0f * PI) {
-            rotation -= 2.0f * PI;
-        } else if (rotation < 2.0f * PI) {
-            rotation += 2.0f * PI;
-        }
+        rotation_speed = -ROLLING_ROTATION_SPEED * velocity.x;
     } else {
         if (move_result.last_hit_diretcion == DOWN &&
             move_result.new_velocity.y <= GRAVITY * delta_time) {
@@ -50,9 +45,23 @@ void Ball::update(const float delta_time, const std::list<BoxCollider>& level) {
         } else {
             velocity.y -= GRAVITY;
         }
-    }
 
+        if (move_result.last_hit_diretcion == UP ||
+            move_result.last_hit_diretcion == DOWN) {
+            rotation_speed = -ROLLING_ROTATION_SPEED * velocity.x;
+        } else if (move_result.last_hit_diretcion == RIGHT ||
+                   move_result.last_hit_diretcion == RIGHT) {
+            rotation_speed = -ROLLING_ROTATION_SPEED * velocity.y;
+        }
+    }
     update_model_matrix();
+
+    rotation += rotation_speed;
+    if (rotation > 2.0f * PI) {
+        rotation -= 2.0f * PI;
+    } else if (rotation < 2.0f * PI) {
+        rotation += 2.0f * PI;
+    }
 }
 
 void Ball::render(const Renderer& renderer) const {
