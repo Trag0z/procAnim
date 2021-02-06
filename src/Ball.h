@@ -17,11 +17,11 @@ class Ball : Entity {
     static float REBOUND;
     static float RADIUS;
     static float ROLLING_FRICTION;
+    static float GRAVITY;
 
   public:
     void init(glm::vec2 position, const char* texture_path);
-    void update(const float gravity, const float delta_time,
-                const std::list<BoxCollider>& level);
+    void update(const float delta_time, const std::list<BoxCollider>& level);
     void render(const Renderer& renderer) const;
     bool display_debug_ui();
 

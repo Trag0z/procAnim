@@ -45,6 +45,7 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("damping_factor", &Ball::REBOUND);
     items.emplace("radius", &Ball::RADIUS);
     items.emplace("rolling_friction", &Ball::ROLLING_FRICTION);
+    items.emplace("gravity", &Ball::GRAVITY);
     objects.emplace("Ball", std::move(items));
 
     // Gamepad

@@ -573,7 +573,7 @@ void Game::simulate_world(float delta_time) {
             }
         }
     }
-    ball.update(game_config.gravity, delta_time, level.colliders());
+    ball.update(delta_time, level.colliders());
 }
 
 void Game::update_gui() {

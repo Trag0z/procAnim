@@ -6,6 +6,7 @@
 float Ball::REBOUND = 1.0f;
 float Ball::RADIUS = 50.0f;
 float Ball::ROLLING_FRICTION = 1.5f;
+float Ball::GRAVITY = 1.0f;
 
 void Ball::init(glm::vec2 position, const char* texture_path) {
     Entity::init(position, glm::vec2(RADIUS));
@@ -13,8 +14,7 @@ void Ball::init(glm::vec2 position, const char* texture_path) {
     texture.load_from_file(texture_path);
 }
 
-void Ball::update(const float gravity, const float delta_time,
-                  const std::list<BoxCollider>& level) {
+void Ball::update(const float delta_time, const std::list<BoxCollider>& level) {
     if (RADIUS != scale.x) {
         SDL_assert(scale.x == scale.y);
         scale = glm::vec2(RADIUS);
@@ -32,14 +32,14 @@ void Ball::update(const float gravity, const float delta_time,
         velocity.y = 0.0f;
     } else {
         if (move_result.last_hit_diretcion == DOWN &&
-            move_result.new_velocity.y <= gravity * delta_time) {
+            move_result.new_velocity.y <= GRAVITY * delta_time) {
 
             velocity.y = 0.0f;
             grounded = true;
 
             position_.y = move_result.last_hit_object->top_edge() + RADIUS;
         } else {
-            velocity.y -= gravity;
+            velocity.y -= GRAVITY;
         }
     }
 
