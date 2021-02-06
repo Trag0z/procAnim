@@ -16,6 +16,7 @@ class Ball : Entity {
 
     static float REBOUND;
     static float RADIUS;
+    static float ROLLING_FRICTION;
 
   public:
     void init(glm::vec2 position, const char* texture_path);

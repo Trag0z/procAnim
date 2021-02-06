@@ -5,6 +5,7 @@
 
 float Ball::REBOUND = 1.0f;
 float Ball::RADIUS = 50.0f;
+float Ball::ROLLING_FRICTION = 1.5f;
 
 void Ball::init(glm::vec2 position, const char* texture_path) {
     Entity::init(position, glm::vec2(RADIUS));
@@ -27,6 +28,7 @@ void Ball::update(const float gravity, const float delta_time,
     velocity = move_result.new_velocity;
 
     if (grounded) {
+        velocity.x *= 1.0f / ROLLING_FRICTION;
         velocity.y = 0.0f;
     } else {
         if (move_result.last_hit_diretcion == DOWN &&
