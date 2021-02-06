@@ -55,6 +55,7 @@ struct CollisionData {
     glm::vec2 move_until_collision;
     float time;
     Direction direction;
+    const BoxCollider* hit_object;
 };
 
 const CollisionData
@@ -65,6 +66,8 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
 struct BallisticMoveResult {
     glm::vec2 new_position;
     glm::vec2 new_velocity;
+    Direction last_hit_diretcion;
+    const BoxCollider* last_hit_object;
 };
 
 const BallisticMoveResult get_ballistic_move_result(

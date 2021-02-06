@@ -10,6 +10,7 @@ class ConfigManager;
 class Ball : Entity {
     glm::vec2 velocity;
     CircleCollider collider_;
+    bool grounded = false;
 
     Texture texture;
 

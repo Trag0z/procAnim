@@ -25,7 +25,21 @@ void Ball::update(const float gravity, const float delta_time,
 
     position_ = move_result.new_position;
     velocity = move_result.new_velocity;
-    velocity.y -= gravity;
+
+    if (grounded) {
+        velocity.y = 0.0f;
+    } else {
+        if (move_result.last_hit_diretcion == DOWN &&
+            move_result.new_velocity.y <= gravity * delta_time) {
+
+            velocity.y = 0.0f;
+            grounded = true;
+
+            position_.y = move_result.last_hit_object->top_edge() + RADIUS;
+        } else {
+            velocity.y -= gravity;
+        }
+    }
 
     update_model_matrix();
 }
@@ -53,7 +67,10 @@ bool Ball::display_debug_ui() {
     return keep_open;
 }
 
-void Ball::set_velocity(glm::vec2 velo) { velocity = velo; }
+void Ball::set_velocity(glm::vec2 velo) {
+    velocity = velo;
+    grounded = false;
+}
 
 const CircleCollider Ball::collider() const {
     return collider_.local_to_world_space(*this);

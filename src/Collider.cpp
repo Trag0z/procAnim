@@ -143,7 +143,7 @@ bool LineCollider::intersects(const LineCollider& other,
     if (std::abs(m1 - m2) < 0.01f) {
         // Lines are parallel (or equivalent, but that should not happen,
         // realistically). Still check with the following assert.
-        SDL_assert(b2 != 0.0f);
+        // SDL_assert(b2 != 0.0f);
         return false;
     }
 
@@ -233,7 +233,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
         //        }
         //#endif // DEBUG
 
-        return {glm::vec2(0.0f), Direction::NONE};
+        return {glm::vec2(0.0f), 1.0f, Direction::NONE, nullptr};
     }
 
     glm::vec2 normals[2] = {glm::vec2(-move.y, move.x),
@@ -246,6 +246,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
 
     float first_collision_time = 1.0f;
     Direction first_collision_direction = NONE;
+    const BoxCollider* first_collision_object = nullptr;
 
     // Find collisions with the collider lines
     for (const auto cand : candidates) {
@@ -258,6 +259,8 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
                 SDL_assert(collision_time >= 0.0f);
 
                 first_collision_time = collision_time;
+                first_collision_object = cand;
+
                 if (hit_side == UP) {
                     first_collision_direction = DOWN;
                 } else if (hit_side == DOWN) {
@@ -313,7 +316,10 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
             // touching the candidate box, so it's the furthest it can move
             if (collision_time.x > collision_time.y) {
                 if (collision_time.x < first_collision_time) {
+
                     first_collision_time = collision_time.x;
+                    first_collision_object = cand;
+
                     if (move.x > 0.0f) {
                         first_collision_direction = RIGHT;
                     } else {
@@ -323,7 +329,10 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
                 }
             } else { // colision_times.y > collision_time.x
                 if (collision_time.y < first_collision_time) {
+
                     first_collision_time = collision_time.y;
+                    first_collision_object = cand;
+
                     if (move.y > 0.0f) {
                         first_collision_direction = UP;
                     } else {
@@ -339,6 +348,7 @@ find_first_collision_sweep_prune(const CircleCollider& circle,
     result.move_until_collision = move * first_collision_time;
     result.time = first_collision_time;
     result.direction = first_collision_direction;
+    result.hit_object = first_collision_object;
 
     // NOTE: These 1.0f margins seem to be pretty large, but without them we hit
     // assertions (due to floating point imprecision?)
@@ -380,11 +390,15 @@ get_ballistic_move_result(const CircleCollider& coll, const glm::vec2 velocity,
     // NOTE: This condition could be removed and we would still have the same
     // result, but it seems more clear (and efficient) to have it.
     if (collision.direction == NONE) {
-        return {coll.position + move, velocity};
+        return {coll.position + move, velocity, collision.direction,
+                collision.hit_object};
     }
 
     glm::vec2 updated_velocity = velocity;
     CircleCollider updated_collider = coll;
+    Direction last_hit_direction = collision.direction;
+    const BoxCollider* last_hit_object = collision.hit_object;
+
     float remaining_time = delta_time;
 
     for (size_t num_iterations = 1; num_iterations < max_collision_iterations;
@@ -394,7 +408,8 @@ get_ballistic_move_result(const CircleCollider& coll, const glm::vec2 velocity,
         updated_collider.position += collision.move_until_collision;
 
         if (collision.direction == NONE) {
-            return {updated_collider.position, updated_velocity};
+            return {updated_collider.position, updated_velocity,
+                    last_hit_direction, last_hit_object};
 
         } else if (collision.direction == LEFT ||
                    collision.direction == RIGHT) {
@@ -404,6 +419,8 @@ get_ballistic_move_result(const CircleCollider& coll, const glm::vec2 velocity,
                        collision.direction == DOWN);
             updated_velocity.y *= -rebound;
         }
+        last_hit_direction = collision.direction;
+        last_hit_object = collision.hit_object;
 
         collision = find_first_collision_sweep_prune(
             updated_collider, updated_velocity * remaining_time, level);
