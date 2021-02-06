@@ -15,11 +15,12 @@ class ConfigManager {
 
   private:
     typedef std::variant<bool*, float*, s32*, glm::ivec2*, glm::vec2*>
-        item_values;
+        property_value;
+    typedef std::map<std::string, property_value> property_map;
 
     std::string save_path;
 
-    std::map<std::string, item_values> items;
+    std::map<std::string, property_map> objects;
 
     struct ParseVisitor {
         std::stringstream& stream;
@@ -33,6 +34,8 @@ class ConfigManager {
     struct SaveVisitor {
         static char* write_pos;
         static const char* buf_end;
+        static void write_comment(const std::string& str);
+
         const std::string& item_name;
 
         void operator()(bool*);

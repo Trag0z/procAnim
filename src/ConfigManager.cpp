@@ -4,14 +4,18 @@
 #include "Game.h"
 
 void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
+    property_map items;
+
     // GameConfig
     items.emplace("window_position", &game_config.window_position);
     items.emplace("gravity", &game_config.gravity);
     items.emplace("use_const_delta_time", &game_config.use_const_delta_time);
     items.emplace("step_mode", &game_config.step_mode);
     items.emplace("speed", &game_config.speed);
+    objects.emplace("GameConfig", std::move(items));
 
     // Renderer
+    items.clear();
     items.emplace("window_size", &renderer.window_size_);
     items.emplace("camera_center", &renderer.camera_center_);
     items.emplace("zoom_factor", &renderer.zoom_factor_);
@@ -21,8 +25,10 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("draw_wireframes", &renderer.draw_wireframes);
     items.emplace("draw_colliders", &renderer.draw_colliders);
     items.emplace("draw_leg_splines", &renderer.draw_leg_splines);
+    objects.emplace("Renderer", std::move(items));
 
     // Player
+    items.clear();
     items.emplace("ground_hover_distance", &Player::GROUND_HOVER_DISTANCE);
     items.emplace("jump_force", &Player::JUMP_FORCE);
     items.emplace("max_walk_speed", &Player::MAX_WALK_SPEED);
@@ -32,14 +38,20 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("hit_cooldown", &Player::HIT_COOLDOWN);
     items.emplace("hitstun_duration_multiplier",
                   &Player::HITSTUN_DURATION_MULTIPLIER);
+    objects.emplace("Player", std::move(items));
 
     // Ball
+    items.clear();
     items.emplace("damping_factor", &Ball::REBOUND);
-    items.emplace("ball_radius", &Ball::RADIUS);
+    items.emplace("radius", &Ball::RADIUS);
+    items.emplace("rolling_friction", &Ball::ROLLING_FRICTION);
+    objects.emplace("Ball", std::move(items));
 
     // Gamepad
+    items.clear();
     items.emplace("stick_deadzone_in", &Gamepad::STICK_DEADZONE_IN);
     items.emplace("stick_deadzone_out", &Gamepad::STICK_DEADZONE_OUT);
+    objects.emplace("Gamepad", std::move(items));
 }
 
 void ConfigManager::load_config(const char* path) {
@@ -53,17 +65,24 @@ void ConfigManager::load_config(const char* path) {
     std::ifstream file_stream(save_path);
     SDL_assert(file_stream.is_open());
 
+    property_map* current_property = nullptr;
     for (std::string line; std::getline(file_stream, line);) {
-        if (line.empty() || line.at(0) == '#') {
+        if (line.empty()) {
             continue;
         }
-
         std::stringstream stream{line};
 
         std::string word;
         std::getline(stream, word, ' ');
 
-        std::visit(ParseVisitor{stream}, items[word]);
+        if (line.at(0) == '#') {
+            std::getline(stream, word);
+            current_property = &objects[word];
+            continue;
+        }
+
+        SDL_assert(current_property);
+        std::visit(ParseVisitor{stream}, (*current_property)[word]);
     }
 
     file_stream.close();
@@ -79,8 +98,12 @@ void ConfigManager::save_config() {
     SaveVisitor::write_pos = buf;
     SaveVisitor::buf_end = buf + buf_size;
 
-    for (auto& item : items) {
-        std::visit(SaveVisitor{item.first}, item.second);
+    for (const auto& obj : objects) {
+        SaveVisitor::write_comment(obj.first);
+
+        for (const auto& property : obj.second) {
+            std::visit(SaveVisitor{property.first}, property.second);
+        }
     }
 
     SDL_RWops* file = SDL_RWFromFile(save_path.c_str(), "w");
@@ -108,8 +131,13 @@ bool ConfigManager::display_ui_window() {
     }
 
     PushItemWidth(150);
-    for (auto item : items) {
-        std::visit(UIVisitor{item.first}, item.second);
+    for (auto& obj : objects) {
+        if (CollapsingHeader(obj.first.c_str())) {
+
+            for (auto& property : obj.second) {
+                std::visit(UIVisitor{property.first}, property.second);
+            }
+        }
     }
     PopItemWidth();
     End();
@@ -191,6 +219,12 @@ void ConfigManager::SaveVisitor::operator()(glm::vec2* val) {
 void ConfigManager::SaveVisitor::operator()(glm::ivec2* val) {
     int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d,%d\n",
                                 item_name.c_str(), val->x, val->y);
+    SDL_assert(num_written != -1);
+    write_pos += num_written;
+}
+void ConfigManager::SaveVisitor::write_comment(const std::string& str) {
+    int num_written =
+        sprintf_s(write_pos, buf_end - write_pos, "# %s\n", str.c_str());
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }
