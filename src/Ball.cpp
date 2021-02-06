@@ -2,10 +2,12 @@
 #include "pch.h"
 #include "Ball.h"
 #include "rendering/Renderer.h"
+#include "Util.h"
 
 float Ball::REBOUND = 1.0f;
 float Ball::RADIUS = 50.0f;
 float Ball::ROLLING_FRICTION = 1.5f;
+float Ball::ROLLING_ROTATION_SPEED = 1.0f;
 float Ball::GRAVITY = 1.0f;
 
 void Ball::init(glm::vec2 position, const char* texture_path) {
@@ -30,6 +32,13 @@ void Ball::update(const float delta_time, const std::list<BoxCollider>& level) {
     if (grounded) {
         velocity.x *= 1.0f / ROLLING_FRICTION;
         velocity.y = 0.0f;
+
+        rotation += -ROLLING_ROTATION_SPEED * velocity.x;
+        if (rotation > 2.0f * PI) {
+            rotation -= 2.0f * PI;
+        } else if (rotation < 2.0f * PI) {
+            rotation += 2.0f * PI;
+        }
     } else {
         if (move_result.last_hit_diretcion == DOWN &&
             move_result.new_velocity.y <= GRAVITY * delta_time) {
