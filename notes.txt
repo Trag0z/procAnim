@@ -1,6 +1,6 @@
 TODO:
+- FIX: ball can clip into ground when hitting it from the top
 - player weapon length changes when rotating stick
-- when hit, turn off gravity for a time? or at least lower it
 
 
 
@@ -13,7 +13,6 @@ TODO LATER:
 
 
 Bugs:               (@BUG)
-- when zoomed out and moving the camera, the player's leg origin position moves 
 - one frame leg glitch into ground when starting to move
 - SplineEditor sets connected tangents in wrong direction since it still assumes what has been true some time ago
 - sometimes turns around due to stick snap-back?
