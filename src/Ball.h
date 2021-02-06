@@ -9,6 +9,7 @@ class ConfigManager;
 
 class Ball : Entity {
     glm::vec2 velocity;
+    float rotation = 0.0f;
     CircleCollider collider_;
     bool grounded = false;
 

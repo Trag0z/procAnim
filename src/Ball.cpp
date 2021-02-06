@@ -48,7 +48,10 @@ void Ball::update(const float delta_time, const std::list<BoxCollider>& level) {
 
 void Ball::render(const Renderer& renderer) const {
     renderer.textured_shader.use();
-    renderer.textured_shader.set_model(&model);
+
+    glm::mat3 rotated_model = glm::rotate(model, rotation);
+    renderer.textured_shader.set_model(&rotated_model);
+
     renderer.textured_shader.set_texture(texture);
     renderer.textured_shader.DEFAULT_VAO.draw(GL_TRIANGLES);
 }
@@ -62,6 +65,7 @@ bool Ball::display_debug_ui() {
     PushItemWidth(150);
     DragFloat2("position", value_ptr(position_));
     DragFloat2("velocity", value_ptr(velocity));
+    DragFloat("rotation", &rotation, 0.1f);
 
     PopItemWidth();
     End();
