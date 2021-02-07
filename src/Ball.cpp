@@ -36,7 +36,7 @@ void Ball::update(const float delta_time, const std::list<BoxCollider>& level) {
         rotation_speed = -ROLLING_ROTATION_SPEED * velocity.x;
     } else {
         if (move_result.last_hit_diretcion == DOWN &&
-            move_result.new_velocity.y <= GRAVITY * delta_time) {
+            move_result.new_velocity.y <= GRAVITY * delta_time * 2.0f) {
 
             velocity.y = 0.0f;
             grounded = true;
