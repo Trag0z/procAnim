@@ -1,6 +1,4 @@
 TODO:
-- zoom out, tune physics so player can jump and hit the ball in the air easily
-
 - FIX: ball can clip into ground when hitting it from the top
 - player weapon length changes when rotating stick
 
