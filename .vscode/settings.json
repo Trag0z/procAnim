@@ -44,7 +44,9 @@
         "stdexcept": "cpp",
         "xstddef": "cpp",
         "*.rh": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "ctime": "cpp",
+        "iomanip": "cpp"
     },
     "spellright.language": [
         "en"
