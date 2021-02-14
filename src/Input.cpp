@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "Input.h"
 #include "rendering/Renderer.h"
 

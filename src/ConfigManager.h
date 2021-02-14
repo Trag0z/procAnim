@@ -1,5 +1,6 @@
 #pragma once
-#include "pch.h"
+#include <variant>
+#include <map>
 #include "Types.h"
 
 struct GameConfig;

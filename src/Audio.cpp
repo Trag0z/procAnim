@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "Audio.h"
 
 void AudioManager::load_sounds() {

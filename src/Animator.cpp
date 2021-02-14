@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "Animator.h"
 #include "Util.h"
 #include "rendering/Mesh.h"
@@ -90,7 +90,7 @@ float Limb::length() const { return bones[0]->length + bones[1]->length; }
 //                          //
 
 void Animator::init(const Player* parent_, RiggedMesh& mesh,
-                    const std::list<BoxCollider>& colliders) {
+                    const std::list<AABB>& colliders) {
     parent = parent_;
     spline_editor = new SplineEditor();
     spline_editor->init(parent, &spline_prototypes, limbs,
@@ -120,7 +120,7 @@ void Animator::init(const Player* parent_, RiggedMesh& mesh,
 
 void Animator::update(float delta_time, float walking_speed,
                       glm::vec2 right_stick_input,
-                      const std::list<BoxCollider>& colliders) {
+                      const std::list<AABB>& colliders) {
     // Weapon animation
     if (!parent->is_facing_right()) {
         right_stick_input.x *= -1.0f;
@@ -205,16 +205,16 @@ glm::vec2 Animator::tip_pos(LegIndex limb_index) const {
 const Bone* Animator::weapon() const noexcept { return weapon_; }
 
 void Animator::set_new_splines(float walking_speed,
-                               const std::list<BoxCollider>& colliders) {
+                               const std::list<AABB>& colliders) {
 
     auto find_highest_ground_at =
         [&colliders](glm::vec2 world_pos) -> glm::vec2 {
         glm::vec2 result = glm::vec2(world_pos.x, 0.0f);
         for (auto& coll : colliders) {
-            if (coll.left_edge() <= world_pos.x &&
-                coll.right_edge() >= world_pos.x) {
-                if (result.y == 0.0f || coll.top_edge() > result.y) {
-                    result.y = coll.top_edge();
+            if (coll.min(0) <= world_pos.x &&
+                coll.max(0) >= world_pos.x) {
+                if (result.y == 0.0f || coll.max(1) > result.y) {
+                    result.y = coll.max(1);
                 }
             }
         }

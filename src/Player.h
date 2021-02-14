@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include <list>
 #include "rendering/Texture.h"
 #include "rendering/Mesh.h"
 #include "Animator.h"
@@ -8,14 +8,14 @@
 
 class Gamepad;
 class ConfigLoader;
-struct BoxCollider;
+struct AABB;
 
 class Player : public Entity {
     Texture texture;
     Mesh body_mesh;
     RiggedMesh rigged_mesh;
 
-    CircleCollider body_collider_ = {glm::vec2(0.0f), 1.0f};
+    Circle body_collider_ = {glm::vec2(0.0f), 1.0f};
 
     Animator animator;
     const Gamepad* gamepad;
@@ -38,7 +38,7 @@ class Player : public Entity {
     static float HITSTUN_DURATION_MULTIPLIER;
 
     // These are in world space!
-    LineCollider weapon_collider, last_weapon_collider;
+    Segment weapon_collider, last_weapon_collider;
 
     enum State {
         STANDING = 0,
@@ -50,14 +50,14 @@ class Player : public Entity {
   public:
     void init(glm::vec3 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,
-              const Gamepad* pad, const std::list<BoxCollider>& colliders);
+              const Gamepad* pad, const std::list<AABB>& colliders);
 
-    void update(float delta_time, const std::list<BoxCollider>& colliders,
+    void update(float delta_time, const std::list<AABB>& colliders,
                 const MouseKeyboardInput& input);
 
     bool is_facing_right() const noexcept;
 
-    CircleCollider body_collider() const noexcept;
+    Circle body_collider() const noexcept;
 
     // Return value signifies if the window should be kept open.
     bool display_debug_ui(size_t player_index);

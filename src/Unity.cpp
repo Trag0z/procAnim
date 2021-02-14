@@ -1,4 +1,4 @@
-#include "pch.h"
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
 #include "main.cpp"
 #include "Animator.cpp"
@@ -27,3 +27,6 @@
 #include "imgui/imgui_draw.cpp"
 #include "imgui/imgui_impl_sdl.cpp"
 #include "imgui/imgui_impl_opengl3.cpp"
+
+#include "glm/glm.hpp"
+#include <glm/gtx/matrix_transform_2d.hpp>

@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "Types.h"
 #include "Util.h"
 #include "ConfigManager.h"

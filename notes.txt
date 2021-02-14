@@ -1,8 +1,11 @@
 TODO:
+- replace std::abs with glm::abs
+
 - FIX: ball can clip into ground when hitting it from the top
 - player weapon length changes when rotating stick
 
-
+- easier camera control with middle mouse button/wheel to zoom
+- snap level elements to grid
 
 TODO LATER:
 - remove first #define from pch.h and replace the deprecated functions

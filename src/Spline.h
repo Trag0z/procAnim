@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include <array>
 #include "Input.h"
 #include "rendering/Shaders.h"
 #include "Entity.h"

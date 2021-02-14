@@ -1,8 +1,9 @@
 #pragma once
-#include "pch.h"
+
 #include "Game.h"
 #include "DebugCallback.h"
 #include "rendering/Shaders.h"
+#include "CollisionDetection.h"
 
 void Game::init() {
     // Initialize SDL
@@ -80,10 +81,12 @@ void Game::init() {
     renderer.init();
     audio_manager.load_sounds();
 
+#ifdef _DEBUG
     {
         GLuint index = 0;
         collision_point.vao.init(&index, 1, nullptr, 1, GL_DYNAMIC_DRAW);
     }
+#endif
 
     mouse_keyboard_input.init(&renderer);
 
@@ -295,8 +298,7 @@ void Game::run() {
             renderer.debug_shader.set_color(Color::ORANGE);
 
             const auto collider = player.body_collider();
-            glm::mat3 model =
-                glm::translate(glm::mat3(1.0f), collider.position);
+            glm::mat3 model = glm::translate(glm::mat3(1.0f), collider.center);
             model = glm::scale(model, glm::vec2(collider.radius));
 
             renderer.debug_shader.set_model(&model);
@@ -321,12 +323,14 @@ void Game::run() {
         }
     }
 
+#ifdef _DEBUG
     // Debug data
     if (collision_point.collision_happened) {
         renderer.debug_shader.set_color(Color::LIGHT_BLUE);
         glPointSize(2.0f);
         collision_point.vao.draw(GL_POINTS);
     }
+#endif
 
     if (game_mode == SPLINE_EDITOR) {
         players[0].animator.spline_editor->render(renderer, true);
@@ -353,130 +357,67 @@ void Game::simulate_world(float delta_time) {
         player.update(delta_time, level.colliders(), mouse_keyboard_input);
 
         //              Resolve collisions              //
-        glm::vec2 new_player_position;
-        glm::vec2 new_player_velocity = player.velocity;
-        const glm::vec2 player_move = player.velocity * delta_time;
+        Point new_player_position;
+        Vector new_player_velocity = player.velocity;
 
-        { // Body collisions with level
-            CircleCollider body_collider = player.body_collider();
-            CollisionData first_collision = find_first_collision_sweep_prune(
-                body_collider, player_move, level.colliders());
+        // Body collisions with level
+        if (player.state == Player::HITSTUN) {
+            BallisticMoveResult result = get_ballistic_move_result(
+                player.body_collider(), player.velocity, delta_time,
+                level.colliders());
+
+            new_player_position = result.new_position;
+            new_player_velocity = result.new_velocity;
+
+            if (result.last_hit_diretcion != Direction::NONE) {
+                audio_manager.play(Sound::WALL_BOUNCE);
+            }
+
+        } else { // player.state != Player::HITSTUN
+            Vector player_move = player.velocity * delta_time;
+            CollisionData first_collision = find_first_collision_moving_circle(
+                player.body_collider(), player_move, level.colliders());
 
             if (first_collision.direction == Direction::NONE) {
                 new_player_position = player.position() + player_move;
-                // player.velocity stays the same
+
             } else {
-                body_collider.position += first_collision.move_until_collision;
+                Vector remaining_player_move;
+                if (first_collision.direction == Direction::DOWN ||
+                    first_collision.direction == Direction::UP) {
 
-                if (player.state == Player::HITSTUN) {
-                    audio_manager.play(Sound::WALL_BOUNCE);
+                    new_player_velocity.y = 0.0f;
 
-                    // Finds the next collision, resolves it, sets
-                    // new_player_velocity and and body_collider to new values
-                    // and also sets player_grounded if the player hit the
-                    // ground.
-                    auto resolve_next_hitstun_collision =
-                        [delta_time, &new_player_velocity,
-                         &body_collider](bool& player_grounded,
-                                         const CollisionData& last_collision,
-                                         const std::list<BoxCollider> boxes)
-                        -> CollisionData {
-                        SDL_assert(last_collision.direction != NONE);
+                    remaining_player_move = Vector(
+                        player_move.x * (1.0f - first_collision.t), 0.0f);
 
-                        CollisionData next_collision;
-                        if (last_collision.direction == LEFT ||
-                            last_collision.direction == RIGHT) {
+                } else { // collision.direction == Direction::LEFT ||
+                         // Direction::RIGHT
+                    new_player_velocity.x = 0.0f;
 
-                            new_player_velocity.x *= -1.0f;
-
-                            glm::vec2 remaining_player_move =
-                                new_player_velocity *
-                                (delta_time - last_collision.time);
-                            next_collision = find_first_collision_sweep_prune(
-                                body_collider, remaining_player_move, boxes);
-
-                        } else if (last_collision.direction == UP) {
-                            new_player_velocity.y *= -1.0f;
-
-                            glm::vec2 remaining_player_move =
-                                new_player_velocity *
-                                (delta_time - last_collision.time);
-                            next_collision = find_first_collision_sweep_prune(
-                                body_collider, remaining_player_move, boxes);
-
-                        } else {
-                            SDL_assert(last_collision.direction == DOWN);
-
-                            new_player_velocity = glm::vec2(0.0f);
-                            next_collision.move_until_collision =
-                                glm::vec2(0.0f);
-                            next_collision.direction = NONE;
-                            player_grounded = true;
-
-                            SDL_assert(
-                                find_first_collision_sweep_prune(
-                                    body_collider, new_player_velocity, boxes)
-                                    .direction == NONE);
-                        }
-                        return next_collision;
-                    };
-
-                    const size_t max_collision_iterations = 5;
-                    size_t collision_iteration = 0;
-                    CollisionData next_collision = first_collision;
-                    glm::vec2 complete_player_move =
-                        first_collision.move_until_collision;
-
-                    do {
-                        next_collision = resolve_next_hitstun_collision(
-                            player.grounded, next_collision, level.colliders());
-                        complete_player_move +=
-                            next_collision.move_until_collision;
-                    } while (next_collision.direction != NONE &&
-                             ++collision_iteration < max_collision_iterations);
-
-                    SDL_assert(collision_iteration < max_collision_iterations);
-
-                    new_player_position =
-                        player.position() +
-                        complete_player_move *
-                            0.95f; // TODO: Remove this margin?
-
-                } else { // state != Player::HITSTUN
-                    glm::vec2 remaining_player_move;
-                    if (first_collision.direction == Direction::DOWN ||
-                        first_collision.direction == Direction::UP) {
-
-                        new_player_velocity.y = 0.0f;
-
-                        remaining_player_move = glm::vec2(
-                            player_move.x -
-                                first_collision.move_until_collision.x,
-                            0.0f);
-
-                    } else { // collision.direction == LEFT || RIGHT
-                        new_player_velocity.x = 0.0f;
-
-                        remaining_player_move = glm::vec2(
-                            0.0f, player_move.y -
-                                      first_collision.move_until_collision.y);
-                    }
-                    CollisionData second_collision =
-                        find_first_collision_sweep_prune(body_collider,
-                                                         remaining_player_move,
-                                                         level.colliders());
-                    SDL_assert(second_collision.direction !=
-                               first_collision.direction);
-
-                    if (second_collision.direction != Direction::NONE) {
-                        // The player hit a corner, can't move any further
-                        new_player_velocity = glm::vec2(0.0f);
-                    }
-
-                    new_player_position = player.position() +
-                                          first_collision.move_until_collision +
-                                          second_collision.move_until_collision;
+                    remaining_player_move = Vector(
+                        0.0f, player_move.y - (1.0f - first_collision.t));
                 }
+
+                Circle body_collider = player.body_collider();
+                body_collider.center += player_move * first_collision.t;
+
+                CollisionData second_collision =
+                    find_first_collision_moving_circle(body_collider,
+                                                       remaining_player_move,
+                                                       level.colliders());
+
+                SDL_assert(second_collision.direction !=
+                           first_collision.direction);
+
+                if (second_collision.direction != Direction::NONE) {
+                    // The player hit a corner, can't move any further
+                    new_player_velocity = Vector(0.0f);
+                }
+
+                new_player_position =
+                    body_collider.center +
+                    remaining_player_move * second_collision.t;
             }
         }
 
@@ -485,7 +426,7 @@ void Game::simulate_world(float delta_time) {
             auto ground_under_player =
                 level.find_ground_under(new_player_position);
             if (!ground_under_player ||
-                new_player_position.y - ground_under_player->top_edge() >
+                new_player_position.y - ground_under_player->max(1) >
                     player.GROUND_HOVER_DISTANCE + 2.0f /* small tolerance */) {
 
                 player.grounded = false;
@@ -493,8 +434,8 @@ void Game::simulate_world(float delta_time) {
 
             } else {
                 new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
-                new_player_position.y = ground_under_player->top_edge() +
-                                        player.GROUND_HOVER_DISTANCE;
+                new_player_position.y =
+                    ground_under_player->max(1) + player.GROUND_HOVER_DISTANCE;
 
                 player.grounded = true;
                 if (player.state == Player::FALLING) {
@@ -512,12 +453,11 @@ void Game::simulate_world(float delta_time) {
     } // End for each player
 
     { // Player/Player Collisions // TODO
-        CircleCollider colliders[2];
+        Circle colliders[2];
         colliders[0] = players[0].body_collider();
         colliders[1] = players[1].body_collider();
 
-        glm::vec2 between_colliders =
-            colliders[0].position - colliders[1].position;
+        glm::vec2 between_colliders = colliders[0].center - colliders[1].center;
         float distance = glm::length(between_colliders);
 
         if (distance < colliders[0].radius + colliders[1].radius) {
@@ -526,18 +466,19 @@ void Game::simulate_world(float delta_time) {
     }
 
     // Collisions between weapon and weapon/ball
-    const LineCollider* weapons[NUM_PLAYERS];
+    const Segment* weapons[NUM_PLAYERS];
     for (size_t i = 0; i < NUM_PLAYERS; ++i) {
         weapons[i] = &players[i].weapon_collider;
     }
 
-    if (weapons[0]->line != glm::vec2(0.0f) ||
-        weapons[1]->line != glm::vec2(0.0f)) {
+    if (weapons[0]->line() != glm::vec2(0.0f) ||
+        weapons[1]->line() != glm::vec2(0.0f)) {
 
         // Weapon vs. weapon
         float t;
-        if (weapons[0]->intersects(*weapons[1], &t)) {
-            glm::vec2 collision_pos = weapons[0]->start + weapons[0]->line * t;
+        Point collision_pos;
+        if (intersect_segment_segment(*weapons[0], *weapons[1], &t,
+                                      &collision_pos)) {
             printf("Weapons colliding at t=%.2f, pos: %.2f, %.2f\n", t,
                    collision_pos.x, collision_pos.y);
 
@@ -555,12 +496,12 @@ void Game::simulate_world(float delta_time) {
             auto& weapon = weapons[i];
             auto& player = players[i];
             if (player.time_since_last_hit >= Player::HIT_COOLDOWN &&
-                glm::length(weapon->line) > player.body_collider().radius &&
-                weapon->intersects(ball.collider())) {
+                glm::length(weapon->line()) > player.body_collider().radius &&
+                intersect_segment_circle(*weapon, ball.collider())) {
 
                 // The ball was hit
-                glm::vec2 hit_direction = player.weapon_collider.line -
-                                          player.last_weapon_collider.line;
+                glm::vec2 hit_direction = player.weapon_collider.line() -
+                                          player.last_weapon_collider.line();
 
                 ball.set_velocity(hit_direction * Player::HIT_SPEED_MULTIPLIER);
 

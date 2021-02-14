@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include <iostream>
 
 #pragma warning(push, 0)
 

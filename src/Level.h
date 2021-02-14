@@ -1,11 +1,11 @@
 #pragma once
-#include "pch.h"
+#include <list>
 #include "Collider.h"
 #include "rendering/Texture.h"
 
 class Renderer;
 class MouseKeyboardInput;
-struct BoxCollider;
+struct AABB;
 
 class LevelEditor;
 
@@ -13,7 +13,7 @@ class Level {
     // Linked lists are probably a bad choice for performance here, but they
     // allow for deletion of random elements which the LevelEditor uses
     // frequently.
-    std::list<BoxCollider> colliders_;
+    std::list<AABB> colliders_;
     std::string opened_path;
 
     Texture wall_texture;
@@ -21,9 +21,9 @@ class Level {
   public:
     void render(const Renderer& renderer) const;
 
-    const std::list<BoxCollider> colliders() const noexcept;
+    const std::list<AABB> colliders() const noexcept;
 
-    const BoxCollider* find_ground_under(glm::vec2 position) const;
+    const AABB* find_ground_under(glm::vec2 position) const;
 
     void save_to_file(const char* path) const;
     void load_from_file(const char* path);
@@ -34,7 +34,7 @@ class Level {
 
 class LevelEditor {
     Level* level;
-    BoxCollider* selected_collider;
+    AABB* selected_collider;
 
     glm::vec2 new_collider_dimensions = glm::vec2(100.0f);
 

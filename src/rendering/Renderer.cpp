@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "Renderer.h"
 #include "../Player.h"
 #include "../Background.h"

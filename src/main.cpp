@@ -1,10 +1,9 @@
 #pragma once
-#include "pch.h"
 #include "Game.h"
 
-#pragma warning(push, 0)
+// #pragma warning(push, 0)
 
-int main(int argc, char* argv[]) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
     Game game;
     game.init();
     while (game.is_running) {
@@ -16,4 +15,4 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-#pragma warning(pop)
+// #pragma warning(pop)

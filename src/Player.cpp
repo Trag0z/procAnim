@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "Player.h"
 #include "Game.h"
 #include "Collider.h"
@@ -20,7 +20,7 @@ static const struct {
 
 void Player::init(glm::vec3 position, glm::vec3 scale_,
                   const char* texture_path, const char* model_path,
-                  const Gamepad* pad, const std::list<BoxCollider>& colliders) {
+                  const Gamepad* pad, const std::list<AABB>& colliders) {
     Entity::init(position, scale_);
     texture.load_from_file(texture_path);
     load_character_model_from_file(model_path, body_mesh, rigged_mesh);
@@ -29,7 +29,7 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
     gamepad = pad;
 }
 
-void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
+void Player::update(float delta_time, const std::list<AABB>& colliders,
                     const MouseKeyboardInput& input) {
     if (time_since_last_hit < HIT_COOLDOWN) {
         time_since_last_hit += delta_time;
@@ -75,8 +75,8 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
     auto weapon = animator.weapon();
     {
         glm::vec2 head_world = local_to_world_space(weapon->head());
-        weapon_collider = LineCollider(
-            head_world, local_to_world_space(weapon->tail()) - head_world);
+        weapon_collider =
+            Segment{head_world, local_to_world_space(weapon->tail())};
     }
     update_model_matrix();
 
@@ -108,8 +108,8 @@ void Player::update(float delta_time, const std::list<BoxCollider>& colliders,
 
 bool Player::is_facing_right() const noexcept { return facing_right; }
 
-CircleCollider Player::body_collider() const noexcept {
-    return {local_to_world_space(body_collider_.position),
+Circle Player::body_collider() const noexcept {
+    return {local_to_world_space(body_collider_.center),
             std::abs(local_to_world_scale(body_collider_.radius))};
     // Using std::abs() here is a kinda hacky way to get
     // around the fact that when the player is facing

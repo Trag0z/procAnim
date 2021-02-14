@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "rendering/Texture.h"
 #include "Entity.h"
 #include "rendering/Shaders.h"

@@ -1,14 +1,15 @@
 #pragma once
-#include "pch.h"
+
 #include "Level.h"
 #include "rendering/Renderer.h"
 #include "Input.h"
+#include "CollisionDetection.h"
 
 void Level::render(const Renderer& renderer) const {
     renderer.textured_shader.set_texture(wall_texture);
 
     for (const auto& coll : colliders_) {
-        glm::mat3 model = glm::translate(glm::mat3(1.0f), coll.position);
+        glm::mat3 model = glm::translate(glm::mat3(1.0f), coll.center);
         model = glm::scale(model, coll.half_ext);
         renderer.textured_shader.set_model(&model);
 
@@ -16,24 +17,24 @@ void Level::render(const Renderer& renderer) const {
     }
 }
 
-const std::list<BoxCollider> Level::colliders() const noexcept {
+const std::list<AABB> Level::colliders() const noexcept {
     return colliders_;
 }
 
-const BoxCollider* Level::find_ground_under(glm::vec2 position) const {
-    const BoxCollider* candidate = nullptr;
-    for (const BoxCollider& coll : colliders_) {
-        if (coll.left_edge() <= position.x && coll.right_edge() >= position.x &&
-            position.y > coll.top_edge()) {
+const AABB* Level::find_ground_under(glm::vec2 position) const {
+    const AABB* candidate = nullptr;
+    for (const AABB& coll : colliders_) {
+        if (coll.min(0) <= position.x && coll.max(0) >= position.x &&
+            position.y > coll.max(1)) {
 
-            if (!candidate || coll.top_edge() > candidate->top_edge()) {
+            if (!candidate || coll.max(1) > candidate->max(1)) {
                 candidate = &coll;
             }
         }
     }
     return candidate;
 }
-typedef BoxCollider BoxColliderSaveFormat;
+typedef AABB BoxColliderSaveFormat;
 
 void Level::load_from_file(const char* path) {
     SDL_assert_always(path != nullptr);
@@ -69,7 +70,7 @@ void Level::save_to_file(const char* path) const {
 
     size_t i = 0;
     for (auto& coll : colliders_) {
-        save_data[i].position = coll.position;
+        save_data[i].center = coll.center;
         save_data[i].half_ext = coll.half_ext;
         ++i;
     }
@@ -111,7 +112,7 @@ bool LevelEditor::update(const Renderer& renderer,
 
         if (Button("New collider")) {
             colliders.emplace_front(
-                BoxCollider{renderer.camera_center(), new_collider_dimensions});
+                AABB{renderer.camera_center(), new_collider_dimensions});
 
             selected_collider = &colliders.front();
         }
@@ -121,7 +122,7 @@ bool LevelEditor::update(const Renderer& renderer,
         NewLine();
         Text("Selected Collider");
         if (selected_collider) {
-            DragFloat2("Position", value_ptr(selected_collider->position), 1.0f,
+            DragFloat2("Position", value_ptr(selected_collider->center), 1.0f,
                        0.0f, 0.0f, "% 6.1f");
             DragFloat2("Half ext.", value_ptr(selected_collider->half_ext),
                        0.1f, 0.0f, 0.0f, "% 6.1f");
@@ -138,7 +139,7 @@ bool LevelEditor::update(const Renderer& renderer,
         glm::vec2 mouse_pos = input.mouse_pos_world();
 
         for (auto& coll : colliders) {
-            if (coll.encloses_point(mouse_pos)) {
+            if (test_point_AABB(mouse_pos, coll)) {
                 dragging_collider = true;
                 selected_collider = &coll;
                 break;
@@ -158,7 +159,7 @@ bool LevelEditor::update(const Renderer& renderer,
         selected_collider->half_ext += input.mouse_wheel_scroll * SCROLL_SPEED;
 
         if (dragging_collider) {
-            selected_collider->position += input.mouse_move_world();
+            selected_collider->center += input.mouse_move_world();
         }
     }
 

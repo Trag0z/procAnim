@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "Entity.h"
 
 void Entity::update_model_matrix() {

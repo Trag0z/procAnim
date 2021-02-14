@@ -1,8 +1,9 @@
 #pragma once
-#include "pch.h"
+
 #include "Ball.h"
 #include "rendering/Renderer.h"
 #include "Util.h"
+#include "CollisionDetection.h"
 
 float Ball::REBOUND = 1.0f;
 float Ball::RADIUS = 50.0f;
@@ -16,7 +17,7 @@ void Ball::init(glm::vec2 position, const char* texture_path) {
     texture.load_from_file(texture_path);
 }
 
-void Ball::update(const float delta_time, const std::list<BoxCollider>& level) {
+void Ball::update(const float delta_time, const std::list<AABB>& level) {
     if (RADIUS != scale.x) {
         SDL_assert(scale.x == scale.y);
         scale = glm::vec2(RADIUS);
@@ -35,22 +36,32 @@ void Ball::update(const float delta_time, const std::list<BoxCollider>& level) {
 
         rotation_speed = -ROLLING_ROTATION_SPEED * velocity.x;
     } else {
-        if (move_result.last_hit_diretcion == DOWN &&
+        if (move_result.last_hit_diretcion == Direction::DOWN &&
             move_result.new_velocity.y <= GRAVITY * delta_time * 2.0f) {
 
             velocity.y = 0.0f;
             grounded = true;
 
-            position_.y = move_result.last_hit_object->top_edge() + RADIUS;
+            position_.y = move_result.last_hit_object->max(1) + RADIUS;
+
+#if _DEBUG
+            update_model_matrix();
+            {
+                Circle global_circle = collider_.local_to_world_space(*this);
+                for (const auto& box : level) {
+                    SDL_assert(!test_circle_AABB(global_circle, box));
+                }
+            }
+#endif
         } else {
             velocity.y -= GRAVITY;
         }
 
-        if (move_result.last_hit_diretcion == UP ||
-            move_result.last_hit_diretcion == DOWN) {
+        if (move_result.last_hit_diretcion == Direction::UP ||
+            move_result.last_hit_diretcion == Direction::DOWN) {
             rotation_speed = -ROLLING_ROTATION_SPEED * velocity.x;
-        } else if (move_result.last_hit_diretcion == RIGHT ||
-                   move_result.last_hit_diretcion == RIGHT) {
+        } else if (move_result.last_hit_diretcion == Direction::RIGHT ||
+                   move_result.last_hit_diretcion == Direction::RIGHT) {
             rotation_speed = -ROLLING_ROTATION_SPEED * velocity.y;
         }
     }
@@ -96,6 +107,6 @@ void Ball::set_velocity(glm::vec2 velo) {
     grounded = false;
 }
 
-const CircleCollider Ball::collider() const {
+const Circle Ball::collider() const {
     return collider_.local_to_world_space(*this);
 }

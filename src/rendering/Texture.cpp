@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+
 #include "Texture.h"
 
 void Texture::load_from_file(const char* path) {

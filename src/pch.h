@@ -1,17 +1,17 @@
 #pragma once
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
-#include <array>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <list>
-#include <map>
-#include <codecvt>
-#include <variant>
+// #include <array>
+// #include <vector>
+// #include <fstream>
+// #include <sstream>
+// #include <iostream>
+// #include <list>
+// #include <map>
+// #include <codecvt>
+// #include <variant>
 
-#include <shobjidl.h>
+// #include <shobjidl.h>
 
 // These both raise warnings on /W4
 #pragma warning(push, 0)

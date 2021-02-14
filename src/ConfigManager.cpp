@@ -1,5 +1,6 @@
 #pragma once
-#include "pch.h"
+#include <fstream>
+#include <sstream>
 #include "ConfigManager.h"
 #include "Game.h"
 
