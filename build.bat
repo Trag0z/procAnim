@@ -12,9 +12,11 @@ set compiler_flags= /MDd /Od /W4 /WX /permissive- /std:c++17 /ZI /sdl /Zc:inline
 set linker_flags=/OUT:"procAnim.exe" /PDB:"procAnim.pdb" /DEBUG:FULL /MACHINE:X64 /SUBSYSTEM:CONSOLE /NOLOGO /LIBPATH:"..\lib" "OpenGL32.lib" "glew32.lib" "SDL2.lib" "SDL2main.lib" "SDL2_image.lib" "SDL2_ttf.lib" "SDL2_mixer.lib" "assimp-vc142-mt.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib"
 
 
+"D:\Dev\remedybg\remedybg.exe" stop-debugging
 pushd bin
-    cl %compiler_flags% "..\src\unity.cpp" /link %linker_flags%  
+    cl %compiler_flags% "..\src\unity.cpp" /link %linker_flags% 
 popd
+"D:\Dev\remedybg\remedybg.exe" start-debugging
 
 @REM Maybe add later:
 @REM /MDd /D "_MBCS"
