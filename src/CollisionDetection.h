@@ -1,12 +1,12 @@
 #pragma once
 #include "Collider.h"
+#include <list>
 
 enum class Direction { NONE, UP, DOWN, LEFT, RIGHT };
 
 bool test_point_AABB(const Point& p, const AABB& box);
 
 bool test_circle_AABB(const Circle& circle, const AABB& box);
-
 
 bool intersect_segment_segment(const Segment& seg1, const Segment& seg2,
                                float* t = nullptr, Point* p = nullptr);
