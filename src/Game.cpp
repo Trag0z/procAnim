@@ -169,6 +169,28 @@ void Game::run() {
         }
     }
 
+    // Move/zoom camera
+    if (mouse_keyboard_input.mouse_button(MouseButton::MIDDLE)) {
+        Vector mouse_move =
+            static_cast<glm::vec2>(mouse_keyboard_input.mouse_move_screen());
+        mouse_move.x *= -1.0f;
+
+        renderer.camera_center_ += mouse_move;
+        renderer.update_camera();
+    }
+
+    {
+        int scroll = mouse_keyboard_input.mouse_wheel_scroll;
+        if (scroll != 0) {
+            if (scroll > 0) {
+                renderer.zoom_factor_ += static_cast<float>(scroll) / 5.0f;
+            } else {
+                renderer.zoom_factor_ += static_cast<float>(scroll) / 10.0f;
+            }
+            renderer.update_camera();
+        }
+    }
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
     ImGui::NewFrame();

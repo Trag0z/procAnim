@@ -4,6 +4,8 @@
 #include "Texture.h"
 #include "../ConfigManager.h"
 
+class Game;
+
 class Renderer {
     glm::vec2 window_size_ = {1920.0f, 1080.0f};
     glm::vec2 camera_center_ = {0.0f, 0.0f};
@@ -35,4 +37,5 @@ class Renderer {
     bool draw_leg_splines = true;
 
     friend ConfigManager;
+    friend Game;
 };
