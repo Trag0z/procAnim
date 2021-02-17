@@ -12,9 +12,11 @@ bool intersect_segment_segment(const Segment& seg1, const Segment& seg2,
                                float* t = nullptr, Point* p = nullptr);
 
 bool intersect_segment_circle(const Segment& seg, const Circle& circle,
-                              float* t = nullptr, Point* p = nullptr);
+                              float* t = nullptr, Point* p = nullptr,
+                              Direction* dir = nullptr);
 
 struct CollisionData {
+    Point position;
     float t;
     Direction direction;
     const AABB* hit_object;

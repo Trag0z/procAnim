@@ -42,7 +42,8 @@ void Ball::update(const float delta_time, const std::list<AABB>& level) {
             velocity.y = 0.0f;
             grounded = true;
 
-            position_.y = move_result.last_hit_object->max(1) + RADIUS;
+            // position_.y = move_result.last_hit_object->max(1) + RADIUS
+            // + 2.0f;
 
 #if _DEBUG
             update_model_matrix();
