@@ -246,9 +246,26 @@ static Point corner(const AABB& box, Corner c) {
     return result;
 }
 
+// Applies a small margin to p in the opposite direction of dir so it does not
+// intersect with box anymore
+static Point apply_margins(Point p, Direction dir, const AABB& box) {
+    const float MARGIN = 2.0f;
+    if (dir == Direction::LEFT && p.x <= box.max(0)) {
+        p.x = box.max(0) + MARGIN;
+    } else if (dir == Direction::RIGHT && p.x >= box.min(0)) {
+        p.x = box.min(0) - MARGIN;
+    } else if (dir == Direction::DOWN && p.y <= box.max(1)) {
+        p.y = box.max(1) + MARGIN;
+    } else if (dir == Direction::UP && p.y >= box.min(1)) {
+        p.y = box.min(1) - MARGIN;
+    }
+    return p;
+}
+
 static bool intersect_moving_circle_AABB(const Circle& circle,
                                          const Vector& move, const AABB& box,
                                          float& t, Point& p, Direction& dir) {
+
     // Compute the AABB resulting from expanding the box by circle.radius
     AABB expanded_box = box;
     expanded_box.half_ext += Vector(circle.radius);
@@ -285,17 +302,7 @@ static bool intersect_moving_circle_AABB(const Circle& circle,
         if (intersect_segment_circle(
                 seg, Circle{corner(box, intersection_corner), circle.radius},
                 &t, &p, &dir)) {
-
-            const float MARGIN = 2.0f;
-            if (dir == Direction::LEFT && p.x <= expanded_box.max(0)) {
-                p.x = expanded_box.max(0) + MARGIN;
-            } else if (dir == Direction::RIGHT && p.x >= expanded_box.min(0)) {
-                p.x = expanded_box.min(0) - MARGIN;
-            } else if (dir == Direction::DOWN && p.y <= expanded_box.max(1)) {
-                p.y = expanded_box.max(1) + MARGIN;
-            } else if (dir == Direction::UP && p.y >= expanded_box.min(1)) {
-                p.y = expanded_box.min(1) - MARGIN;
-            }
+            p = apply_margins(p, dir, expanded_box);
 
 #ifdef VERIFY_COLLISION_OUTCOMES
             {
@@ -309,16 +316,7 @@ static bool intersect_moving_circle_AABB(const Circle& circle,
         return false;
     }
 
-    const float MARGIN = 2.0f;
-    if (dir == Direction::LEFT && p.x <= box.max(0)) {
-        p.x = box.max(0) + MARGIN;
-    } else if (dir == Direction::RIGHT && p.x >= box.min(0)) {
-        p.x = box.min(0) - MARGIN;
-    } else if (dir == Direction::DOWN && p.y <= box.max(1)) {
-        p.y = box.max(1) + MARGIN;
-    } else if (dir == Direction::UP && p.y >= box.min(1)) {
-        p.y = box.min(1) - MARGIN;
-    }
+    p = apply_margins(p, dir, expanded_box);
 
 #ifdef VERIFY_COLLISION_OUTCOMES
     SDL_assert(t != 0.0f);
@@ -369,6 +367,9 @@ find_first_collision_moving_circle(const Circle& circle, const Vector move,
 #ifdef VERIFY_COLLISION_OUTCOMES
     {
         Circle final_pos{result.position, circle.radius};
+        for (const auto& box : candidates) {
+            SDL_assert(!test_circle_AABB(final_pos, *box));
+        }
         for (const auto& box : boxes) {
             SDL_assert(!test_circle_AABB(final_pos, box));
         }
