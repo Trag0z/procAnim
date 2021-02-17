@@ -1,5 +1,5 @@
 #pragma once
-
+#include "sdl\SDL_assert.h"
 #include "Audio.h"
 
 void AudioManager::load_sounds() {

@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <sdl/SDL_mixer.h>
 
 enum class Sound { HIT_1, HIT_2, WALL_BOUNCE };
 
