@@ -4,6 +4,9 @@
 #include "sdl/SDL_assert.h"
 #include "CollisionDetection.h"
 #include "Types.h"
+#include "Util.h"
+
+#define VERIFY_COLLISION_OUTCOMES
 
 struct Ray {
     Point origin;
@@ -110,7 +113,7 @@ bool intersect_ray_circle(const Ray& ray, const Circle& circle,
 // Test if seg intersects the circle. Returns t value iof intersection and
 // intersection point p
 bool intersect_segment_circle(const Segment& seg, const Circle& circle,
-                              float* t, Point* p) {
+                              float* t, Point* p, Direction* dir) {
     Vector seg_vec = seg.b - seg.a;
     float seg_length = glm::length(seg_vec);
     Ray ray = {seg.a, seg_vec / seg_length};
@@ -119,39 +122,83 @@ bool intersect_segment_circle(const Segment& seg, const Circle& circle,
     if (!t) {
         t = &t_if_nullptr;
     }
+    Point p_if_nullptr;
+    if (!p) {
+        p = &p_if_nullptr;
+    }
 
-    if (intersect_ray_circle(ray, circle, t, p) && *t <= seg_length)
+    if (intersect_ray_circle(ray, circle, t, p) && *t <= seg_length) {
+        if (dir) {
+            Vector circle_to_p = *p - circle.center;
+            float angle = glm::atan(circle_to_p.y, circle_to_p.x);
+
+            SDL_assert(circle_to_p != Vector(0.0f));
+
+            constexpr float PI_4 = PI / 4.0f;
+            if (angle > PI_4 && angle < PI_4 * 3.0f) {
+                // Vector from circle center to intersection point (p) points
+                // up, so (from the segments point of view) the intersection
+                // direction is downwards. Same procedure for the other
+                // directions.
+                *dir = Direction::DOWN;
+            } else if (angle < PI_4 && angle > -PI_4) {
+                *dir = Direction::LEFT;
+            } else if (angle < -PI_4 && angle > -PI_4 * 3.0f) {
+                *dir = Direction::UP;
+            } else {
+                SDL_assert(angle > PI_4 * 3.0f || angle < -PI_4 * 3.0f);
+                *dir = Direction::RIGHT;
+            }
+        }
         return true;
+    }
     return false;
 }
 
-// Intersects ray R(t) = p + t * d against AABB a. When intersecting, return
-// intersection distance t and point q of intersection (see
+// Intersects ray R(t) = p + t * d against AABB box. When intersecting, return
+// intersection distance t and point p of intersection (see
 // Real-Time Collision Detection p.180)
-bool intersect_ray_AABB(const Point& p, const Point& d, const AABB& a, float& t,
-                        Point& q) {
+bool intersect_ray_AABB(Ray ray, const AABB& box, float& t, Point& p,
+                        Direction& dir) {
     t = 0.0f;
     float t_max = FLT_MAX;
 
     // For all two dimensions of the AABB
     for (int i = 0; i < 2; ++i) {
-        if (std::abs(d[i]) < FLT_EPSILON) {
+        if (std::abs(ray.direction[i]) < FLT_EPSILON) {
             // Ray is parallel to this side. No hit if origin is not within
             // [min, max] on this axis
-            if (p[i] <= a.min(i) || p[i] >= a.max(i))
+            if (ray.origin[i] <= box.min(i) || ray.origin[i] >= box.max(i))
                 return false;
         } else {
             // Compute intersection t value of ray with near and far side of
             // AABB
-            float ood = 1.0f / d[i];
-            float t1 = (a.min(i) - p[i]) * ood;
-            float t2 = (a.max(i) - p[i]) * ood;
+            float ood = 1.0f / ray.direction[i];
+            float t1 = (box.min(i) - ray.origin[i]) * ood;
+            float t2 = (box.max(i) - ray.origin[i]) * ood;
             // Make t1 be the intersection with near side, t2 with far side
             if (t1 > t2)
                 std::swap(t1, t2);
             // Compute the intersection of slab intersection intervals
-            if (t1 > t)
+            if (t1 > t) {
                 t = t1;
+
+                // Set the collision direction
+                if (i == 0) { // x-axis
+                    if (ray.direction.x < 0.0f) {
+                        dir = Direction::LEFT;
+                    } else {
+                        dir = Direction::RIGHT;
+                    }
+                } else { // y-axis
+                    SDL_assert(i == 1);
+                    if (ray.direction.y < 0.0f) {
+                        dir = Direction::DOWN;
+                    } else {
+                        dir = Direction::UP;
+                    }
+                }
+            }
             if (t2 < t_max)
                 t_max = t2;
 
@@ -160,12 +207,9 @@ bool intersect_ray_AABB(const Point& p, const Point& d, const AABB& a, float& t,
                 return false;
         }
     }
-    // Ray intersects on both dimensions. Return point (q) and intersection t
+    // Ray intersects on both dimensions. Return point (p) and intersection t
     // value (t)
-    q = p + d * t;
-
-    SDL_assert(!test_point_AABB(q, a));
-
+    p = ray.origin + ray.direction * t;
     return true;
 }
 
@@ -204,19 +248,18 @@ static Point corner(const AABB& box, Corner c) {
 
 static bool intersect_moving_circle_AABB(const Circle& circle,
                                          const Vector& move, const AABB& box,
-                                         float& t, Point& p) {
+                                         float& t, Point& p, Direction& dir) {
     // Compute the AABB resulting from expanding the box by circle.radius
     AABB expanded_box = box;
     expanded_box.half_ext += Vector(circle.radius);
 
     // Intersect ray against expanded_box. Exit with no itnersection if ray
     // misses, else get intersection point and time t as result
-    if (!intersect_ray_AABB(circle.center, move, expanded_box, t, p))
+    if (!intersect_ray_AABB(Ray{circle.center, move}, expanded_box, t, p, dir))
         return false;
 
     // If the intersection lies in the Voronoi region of a corner, set
     // intersection_corner to that one
-    // TODO: the value of corner is not really used?
     Corner intersection_corner = Corner::NONE;
     if (p.x < box.min(0)) {
         if (p.y < box.min(1)) {
@@ -241,11 +284,50 @@ static bool intersect_moving_circle_AABB(const Circle& circle,
         // as a hit.
         if (intersect_segment_circle(
                 seg, Circle{corner(box, intersection_corner), circle.radius},
-                &t, &p))
+                &t, &p, &dir)) {
+
+            const float MARGIN = 2.0f;
+            if (dir == Direction::LEFT && p.x <= expanded_box.max(0)) {
+                p.x = expanded_box.max(0) + MARGIN;
+            } else if (dir == Direction::RIGHT && p.x >= expanded_box.min(0)) {
+                p.x = expanded_box.min(0) - MARGIN;
+            } else if (dir == Direction::DOWN && p.y <= expanded_box.max(1)) {
+                p.y = expanded_box.max(1) + MARGIN;
+            } else if (dir == Direction::UP && p.y >= expanded_box.min(1)) {
+                p.y = expanded_box.min(1) - MARGIN;
+            }
+
+#ifdef VERIFY_COLLISION_OUTCOMES
+            {
+                Circle final_pos{p, circle.radius};
+                SDL_assert(!test_circle_AABB(final_pos, box));
+            }
+#endif
             return true;
+        }
 
         return false;
     }
+
+    const float MARGIN = 2.0f;
+    if (dir == Direction::LEFT && p.x <= box.max(0)) {
+        p.x = box.max(0) + MARGIN;
+    } else if (dir == Direction::RIGHT && p.x >= box.min(0)) {
+        p.x = box.min(0) - MARGIN;
+    } else if (dir == Direction::DOWN && p.y <= box.max(1)) {
+        p.y = box.max(1) + MARGIN;
+    } else if (dir == Direction::UP && p.y >= box.min(1)) {
+        p.y = box.min(1) - MARGIN;
+    }
+
+#ifdef VERIFY_COLLISION_OUTCOMES
+    SDL_assert(t != 0.0f);
+    SDL_assert(!test_point_AABB(circle.center, expanded_box));
+    {
+        Circle final_pos{p, circle.radius};
+        SDL_assert(!test_circle_AABB(final_pos, box));
+    }
+#endif
 
     // p is in an edge region. p and t are already correct.
     return true;
@@ -269,47 +351,29 @@ find_first_collision_moving_circle(const Circle& circle, const Vector move,
         }
     }
 
-    CollisionData result{1.0f, Direction::NONE, nullptr};
+    CollisionData result{circle.center + move, 1.0f, Direction::NONE, nullptr};
     for (const auto& box : candidates) {
         float t;
         Point p;
-        if (intersect_moving_circle_AABB(circle, move, *box, t, p)) {
+        Direction dir;
+        if (intersect_moving_circle_AABB(circle, move, *box, t, p, dir)) {
             if (t < result.t) {
+                result.position = p;
                 result.t = t;
+                result.direction = dir;
                 result.hit_object = box;
-
-                // Compute the vector from the circle's center to the
-                // intersection point (p). It points in the direction where the
-                // collision happened. Map the direction to one of the 4
-                // directions for the return value.
-                Vector c_p = p - circle.center;
-                if (c_p == Vector(0.0f)) {
-                    // Circle didn't move, so it was already in contact with the
-                    // object.
-                    if (p.x + circle.radius == result.hit_object->min(0)) {
-                        result.direction = Direction::RIGHT;
-                    } else if (p.x - circle.radius ==
-                               result.hit_object->max(0)) {
-                        result.direction = Direction::LEFT;
-                    } else if (p.y + circle.radius ==
-                               result.hit_object->min(1)) {
-                        result.direction = Direction::UP;
-                    } else if (p.y - circle.radius ==
-                               result.hit_object->max(1)) {
-                        result.direction = Direction::DOWN;
-                    } else {
-                        SDL_TriggerBreakpoint();
-                    }
-                } else if (glm::abs(c_p.x) > glm::abs(c_p.y)) {
-                    result.direction =
-                        ((c_p.x < 0.0f) ? Direction::LEFT : Direction::RIGHT);
-                } else {
-                    result.direction =
-                        ((c_p.y < 0.0f) ? Direction::DOWN : Direction::UP);
-                }
             }
         }
     }
+
+#ifdef VERIFY_COLLISION_OUTCOMES
+    {
+        Circle final_pos{result.position, circle.radius};
+        for (const auto& box : boxes) {
+            SDL_assert(!test_circle_AABB(final_pos, box));
+        }
+    }
+#endif
 
     return result;
 }
@@ -331,10 +395,18 @@ get_ballistic_move_result(const Circle& coll, const Vector velocity,
         collision = find_first_collision_moving_circle(
             circle, updated_velocity * remaining_time, level);
 
-        circle.center += updated_velocity * collision.t;
-
         if (collision.direction == Direction::NONE) {
-            return {circle.center, updated_velocity, last_hit_direction,
+
+#ifdef VERIFY_COLLISION_OUTCOMES
+            {
+                Circle final_pos{collision.position, circle.radius};
+                for (const auto& box : level) {
+                    SDL_assert(!test_circle_AABB(final_pos, box));
+                }
+            }
+#endif
+
+            return {collision.position, updated_velocity, last_hit_direction,
                     last_hit_object};
 
         } else if (collision.direction == Direction::LEFT ||
@@ -347,6 +419,7 @@ get_ballistic_move_result(const Circle& coll, const Vector velocity,
         }
 
         remaining_time -= remaining_time * collision.t;
+        circle.center = collision.position;
         last_hit_direction = collision.direction;
         last_hit_object = collision.hit_object;
     }
