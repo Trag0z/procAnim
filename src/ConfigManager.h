@@ -1,6 +1,7 @@
 #pragma once
 #include <variant>
 #include <map>
+#include <string>
 #include "Types.h"
 
 struct GameConfig;

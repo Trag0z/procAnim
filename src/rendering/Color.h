@@ -1,5 +1,4 @@
 #pragma once
-#include "../pch.h"
 
 struct Color {
     float b, g, r, a;

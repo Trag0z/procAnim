@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Input.h"
 #include "rendering/Renderer.h"
 

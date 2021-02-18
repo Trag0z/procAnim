@@ -10,8 +10,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
         game.run();
     }
 
-    IMG_Quit();
-    SDL_Quit();
     return 0;
 }
 

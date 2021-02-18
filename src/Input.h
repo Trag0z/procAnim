@@ -1,5 +1,5 @@
 #pragma once
-
+#include <sdl/SDL.h>
 #include "Types.h"
 #include "Util.h"
 #include "ConfigManager.h"
@@ -10,7 +10,7 @@ enum class MouseButton : uint { LEFT = 1, MIDDLE = 2, RIGHT = 4 };
 
 class MouseKeyboardInput {
     const static uint NUM_MOUSE_BUTTONS = 3;
-    const Uint8* sdl_keyboard;
+    const u8* sdl_keyboard;
     int num_keys;
 
     bool *key_, *key_up_, *key_down_;

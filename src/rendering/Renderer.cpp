@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Renderer.h"
 #include "../Player.h"
 #include "../Background.h"

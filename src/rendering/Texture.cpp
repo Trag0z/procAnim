@@ -1,6 +1,7 @@
 #pragma once
-
 #include "Texture.h"
+#include <sdl/SDL_image.h>
+#include <gl/glew.h>
 
 void Texture::load_from_file(const char* path) {
     SDL_Surface* img = IMG_Load(path);

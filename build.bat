@@ -14,6 +14,8 @@ set linker_flags=/OUT:"procAnim.exe" /PDB:"procAnim.pdb" /DEBUG:FULL /MACHINE:X6
 
 cl %compiler_flags% "..\src\unity.cpp" /link %linker_flags% 
 
+exit %ERRORLEVEL%
+
 @REM Maybe add later:
 @REM /MDd /D "_MBCS"
 

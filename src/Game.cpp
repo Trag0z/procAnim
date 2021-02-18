@@ -1,9 +1,13 @@
 #pragma once
-
 #include "Game.h"
 #include "DebugCallback.h"
 #include "rendering/Shaders.h"
 #include "CollisionDetection.h"
+#include <sdl/SDL.h>
+#include <sdl/SDL_image.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_impl_sdl.h>
 
 void Game::init() {
     // Initialize SDL

@@ -1,3 +1,4 @@
+#pragma warning(push, 0)
 /*
 ** The OpenGL Extension Wrangler Library
 ** Copyright (C) 2008-2017, Nigel Stewart <nigels[]users sourceforge net>
@@ -23684,3 +23685,4 @@ GLEWAPI const GLubyte * GLEWAPIENTRY glewGetString (GLenum name);
 /* #undef GLEWAPI */
 
 #endif /* __glew_h__ */
+#pragma warning(pop)

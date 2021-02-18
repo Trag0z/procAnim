@@ -1,5 +1,5 @@
 #pragma once
-#include "../pch.h"
+#include <gl/glew.h>
 #include "Color.h"
 #include "Texture.h"
 #include "VertexArray.h"

@@ -3,7 +3,6 @@ TODO:
 
 - player weapon length changes when rotating stick
 
-- easier camera control with middle mouse button/wheel to zoom
 - snap level elements to grid
 
 TODO LATER:

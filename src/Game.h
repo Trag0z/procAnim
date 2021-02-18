@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Types.h"
 #include "rendering/Renderer.h"
 #include "rendering/Texture.h"
@@ -13,6 +12,7 @@
 #include "Audio.h"
 #include "ConfigManager.h"
 #include "Ball.h"
+#include <sdl\SDL.h>
 
 namespace Keybinds {
 constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F1;

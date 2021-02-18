@@ -1,10 +1,11 @@
 #pragma once
-#include "../pch.h"
+#include <glm/glm.hpp>
+#include "Types.h"
 
 struct Texture {
     GLuint id;
     GLuint w, h;
-    glm::vec2 dimensions;
+    vec2 dimensions;
 
     void load_from_file(const char* path);
 };

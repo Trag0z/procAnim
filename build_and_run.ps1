@@ -6,8 +6,13 @@ Push-Location bin
 ..\build.bat
 Pop-Location
 
-Write-Host "Compile time:"$stopwatch.ElapsedMilliseconds"ms"
-
 $stopwatch.Stop()
 
-D:\Dev\remedybg\remedybg.exe start-debugging
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Compile time:"$stopwatch.ElapsedMilliseconds"ms"
+    D:\Dev\remedybg\remedybg.exe start-debugging
+}
+else {
+    Write-Host "Compilation failed."
+}
+

@@ -1,9 +1,11 @@
 #pragma once
-
 #include "Ball.h"
 #include "rendering/Renderer.h"
 #include "Util.h"
 #include "CollisionDetection.h"
+#include <glm/ext.hpp>
+#include <imgui/imgui.h>
+#include <glm/glm.hpp>
 
 float Ball::REBOUND = 1.0f;
 float Ball::RADIUS = 50.0f;

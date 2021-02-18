@@ -1,5 +1,4 @@
 #pragma once
-#include "../pch.h"
 #include "Shaders.h"
 #include "Texture.h"
 #include "../ConfigManager.h"
