@@ -1,9 +1,11 @@
 #pragma once
-
 #include "Level.h"
 #include "rendering/Renderer.h"
 #include "Input.h"
 #include "CollisionDetection.h"
+#include <imgui/imgui.h>
+#include <glm/gtx/matrix_transform_2d.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void Level::render(const Renderer& renderer) const {
     renderer.textured_shader.set_texture(wall_texture);
@@ -17,9 +19,7 @@ void Level::render(const Renderer& renderer) const {
     }
 }
 
-const std::list<AABB> Level::colliders() const noexcept {
-    return colliders_;
-}
+const std::list<AABB> Level::colliders() const noexcept { return colliders_; }
 
 const AABB* Level::find_ground_under(glm::vec2 position) const {
     const AABB* candidate = nullptr;

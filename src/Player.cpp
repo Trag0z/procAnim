@@ -2,6 +2,8 @@
 #include "Player.h"
 #include "Game.h"
 #include "Collider.h"
+#include <imgui/imgui.h>
+#include "glm/gtc/type_ptr.hpp"
 
 float Player::GROUND_HOVER_DISTANCE = 160.0f;
 float Player::JUMP_FORCE = 30.0f;

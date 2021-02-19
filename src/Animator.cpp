@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Animator.h"
 #include "Util.h"
 #include "rendering/Mesh.h"
@@ -211,8 +210,7 @@ void Animator::set_new_splines(float walking_speed,
         [&colliders](glm::vec2 world_pos) -> glm::vec2 {
         glm::vec2 result = glm::vec2(world_pos.x, 0.0f);
         for (auto& coll : colliders) {
-            if (coll.min(0) <= world_pos.x &&
-                coll.max(0) >= world_pos.x) {
+            if (coll.min(0) <= world_pos.x && coll.max(0) >= world_pos.x) {
                 if (result.y == 0.0f || coll.max(1) > result.y) {
                     result.y = coll.max(1);
                 }
