@@ -73,7 +73,7 @@ void Ball::update(const float delta_time, const std::list<AABB>& level) {
     rotation += rotation_speed;
     if (rotation > 2.0f * PI) {
         rotation -= 2.0f * PI;
-    } else if (rotation < 2.0f * PI) {
+    } else if (rotation < -2.0f * PI) {
         rotation += 2.0f * PI;
     }
 }
