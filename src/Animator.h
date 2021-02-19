@@ -40,8 +40,7 @@ class Animator {
     void init(const Player* parent_, RiggedMesh& mesh,
               const std::list<AABB>& colliders);
     void update(float delta_time, float walking_speed,
-                glm::vec2 right_stick_input,
-                const std::list<AABB>& colliders);
+                glm::vec2 right_stick_input, const std::list<AABB>& colliders);
 
     glm::vec2 tip_pos(LegIndex limb_index) const;
     const Bone* weapon() const noexcept;
@@ -79,8 +78,7 @@ class Animator {
         float min = 0.02f, max = 0.08f;
     } interpolation_speed_multiplier;
 
-    void set_new_splines(float walking_speed,
-                         const std::list<AABB>& colliders);
+    void set_new_splines(float walking_speed, const std::list<AABB>& colliders);
 
     void interpolate_splines(glm::vec2 dst[Spline::NUM_POINTS],
                              SplineIndex spline_index) const;
@@ -89,4 +87,5 @@ class Animator {
     // Game access them this way seems cleaner to me then writing a bunch of
     // getters/setters that are only used in one place.
     friend Game;
+    friend Player;
 };

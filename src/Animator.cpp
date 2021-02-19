@@ -128,7 +128,10 @@ void Animator::update(float delta_time, float walking_speed,
     float weapon_rotation =
         atan2f(right_stick_input.y, right_stick_input.x) - PI * 0.5f;
 
-    float weapon_length = glm::length(right_stick_input) * max_weapon_length;
+    float right_stick_input_length =
+        glm::min(glm::length(right_stick_input), 1.0f);
+
+    float weapon_length = right_stick_input_length * max_weapon_length;
 
     weapon_->rotation = weapon_rotation;
     SDL_assert(weapon_->tail_bind_pose().x == 0.0f);

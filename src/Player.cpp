@@ -148,8 +148,12 @@ bool Player::display_debug_ui(size_t player_index) {
     DragFloat("time_since_last_hit", &time_since_last_hit, 1.0f, 0.0f, 0.0f,
               "%.2f");
     DragFloat("hitstun_duration", &hitstun_duration, 1.0f, 0.0f, 0.0f, "%.2f");
-    PopItemWidth();
+    DragFloat("max_weapon_length", &animator.max_weapon_length);
+    float current_length =
+        glm::length(animator.weapon()->tail() - animator.weapon()->head());
+    DragFloat("current_weapon_length", &current_length);
 
+    PopItemWidth();
     End();
 
     return keep_open;
