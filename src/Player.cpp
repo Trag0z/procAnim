@@ -20,7 +20,7 @@ static const struct {
 
 void Player::init(glm::vec3 position, glm::vec3 scale_,
                   const char* texture_path, const char* model_path,
-                  const Gamepad* pad, const std::list<AABB>& colliders) {
+                  const Gamepad* pad, const MemArena<AABB>& colliders) {
     Entity::init(position, scale_);
     texture.load_from_file(texture_path);
     load_character_model_from_file(model_path, body_mesh, rigged_mesh);
@@ -29,7 +29,7 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
     gamepad = pad;
 }
 
-void Player::update(float delta_time, const std::list<AABB>& colliders,
+void Player::update(float delta_time, const MemArena<AABB>& colliders,
                     const MouseKeyboardInput& input) {
     if (time_since_last_hit < HIT_COOLDOWN) {
         time_since_last_hit += delta_time;
