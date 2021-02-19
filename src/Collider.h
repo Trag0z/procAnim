@@ -22,6 +22,10 @@ struct AABB {
     glm::mat3 calculate_model_matrix() const noexcept;
 };
 
+bool operator==(const AABB& lhs, const AABB& rhs) {
+    return lhs.center == rhs.center && lhs.half_ext == rhs.half_ext;
+}
+
 struct Circle {
     Point center;
     float radius;

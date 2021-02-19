@@ -1,5 +1,7 @@
 TODO:
 - player weapon length changes when rotating stick
+- screen shake/freeze frames
+- player acceleration/deceleration
 
 - snap level elements to grid
 

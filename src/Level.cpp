@@ -156,10 +156,18 @@ bool LevelEditor::update(const Renderer& renderer,
     }
 
     if (selected_collider) {
+
         selected_collider->half_ext += input.mouse_wheel_scroll * SCROLL_SPEED;
 
         if (dragging_collider) {
             selected_collider->center += input.mouse_move_world();
+        }
+
+        // Remove at the end so the other operations can happen before
+        if (input.key_down(SDL_SCANCODE_DELETE)) {
+            colliders.remove(*selected_collider);
+            selected_collider = nullptr;
+            dragging_collider = false;
         }
     }
 
