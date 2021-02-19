@@ -1,6 +1,6 @@
 TODO:
-- screen shake/freeze frames
 - player acceleration/deceleration
+- screen shake/freeze frames
 
 - snap level elements to grid
 
