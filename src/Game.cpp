@@ -381,7 +381,7 @@ void Game::simulate_world(float delta_time) {
 
     for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
         auto& player = players[n_player];
-        player.update(delta_time, level.colliders(), mouse_keyboard_input);
+        player.update(delta_time, level.colliders());
 
         //              Resolve collisions              //
         Point new_player_position;

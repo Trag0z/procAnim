@@ -7,6 +7,7 @@
 
 float Player::GROUND_HOVER_DISTANCE = 160.0f;
 float Player::JUMP_FORCE = 30.0f;
+float Player::WALK_ACCELERATION = 1.0f;
 float Player::MAX_WALK_SPEED = 10.0f;
 float Player::MAX_AIR_ACCELERATION = 0.5f;
 float Player::MAX_AIR_SPEED = 10.0f;
@@ -30,8 +31,7 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
     gamepad = pad;
 }
 
-void Player::update(float delta_time, const std::list<AABB>& colliders,
-                    const MouseKeyboardInput& input) {
+void Player::update(float delta_time, const std::list<AABB>& colliders) {
     if (time_since_last_hit < HIT_COOLDOWN) {
         time_since_last_hit += delta_time;
     }
@@ -51,40 +51,27 @@ void Player::update(float delta_time, const std::list<AABB>& colliders,
 
     auto left_stick_input = gamepad->stick(StickID::LEFT);
 
-    if (input.key(SDL_SCANCODE_LEFT) || input.key(SDL_SCANCODE_RIGHT)) {
-        if ((input.key(SDL_SCANCODE_LEFT) && facing_right) ||
-            (input.key(SDL_SCANCODE_RIGHT) && !facing_right)) {
-            walk_speed = 1.0f;
-            facing_right = !facing_right;
-            scale.x *= -1.0f;
-        }
-    } else if (left_stick_input.x != 0.0f) {
-        walk_speed = std::abs(left_stick_input.x);
+    if (left_stick_input.x != 0.0f) {
         if ((left_stick_input.x < 0.0f && facing_right) ||
             (left_stick_input.x > 0.0f && !facing_right)) {
             facing_right = !facing_right;
             scale.x *= -1.0f;
-            update_model_matrix();
+            update_model_matrix(); // TODO: remove
         }
-    } else {
-        walk_speed = 0.0f;
     }
-
-    last_weapon_collider = weapon_collider;
-    animator.update(delta_time, walk_speed, gamepad->stick(StickID::RIGHT),
-                    colliders);
-    auto weapon = animator.weapon();
-    {
-        glm::vec2 head_world = local_to_world_space(weapon->head());
-        weapon_collider =
-            Segment{head_world, local_to_world_space(weapon->tail())};
-    }
-    update_model_matrix();
 
     // Movement
     if (state == STANDING || state == WALKING) {
         SDL_assert(grounded);
-        velocity.x = left_stick_input.x * MAX_WALK_SPEED;
+        float target_velocity_x = left_stick_input.x * MAX_WALK_SPEED;
+
+        if (velocity.x > target_velocity_x) {
+            velocity.x =
+                glm::max(target_velocity_x, velocity.x - WALK_ACCELERATION);
+        } else if (velocity.x < target_velocity_x) {
+            velocity.x =
+                glm::min(target_velocity_x, velocity.x + WALK_ACCELERATION);
+        }
 
         if (left_stick_input.x != 0.0f) {
             state = WALKING;
@@ -102,9 +89,21 @@ void Player::update(float delta_time, const std::list<AABB>& colliders,
         SDL_assert(!grounded);
 
         velocity.x =
-            clamp(velocity.x + left_stick_input.x * MAX_AIR_ACCELERATION,
-                  -MAX_AIR_SPEED, MAX_AIR_SPEED);
+            glm::clamp(velocity.x + left_stick_input.x * MAX_AIR_ACCELERATION,
+                       -MAX_AIR_SPEED, MAX_AIR_SPEED);
     }
+
+    // Leg and weapon animation
+    last_weapon_collider = weapon_collider;
+    animator.update(delta_time, velocity.x, gamepad->stick(StickID::RIGHT),
+                    colliders);
+    auto weapon = animator.weapon();
+    {
+        glm::vec2 head_world = local_to_world_space(weapon->head());
+        weapon_collider =
+            Segment{head_world, local_to_world_space(weapon->tail())};
+    }
+    update_model_matrix();
 }
 
 bool Player::is_facing_right() const noexcept { return facing_right; }
@@ -140,8 +139,6 @@ bool Player::display_debug_ui(size_t player_index) {
             state = static_cast<State>(current_state);
         }
     }
-
-    DragFloat("walk_speed", &walk_speed, 1.0f, 0.0f, 0.0f, "%.2f");
 
     Checkbox("facing_right", &facing_right);
 

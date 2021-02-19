@@ -23,13 +23,13 @@ class Player : public Entity {
     glm::vec2 velocity = glm::vec2(0.0f); // In world space
     bool grounded = false;
 
-    float walk_speed;
     bool facing_right = true;
     float time_since_last_hit = 0.0f;
     float hitstun_duration = 0.0f;
 
     static float GROUND_HOVER_DISTANCE;
     static float JUMP_FORCE;
+    static float WALK_ACCELERATION;
     static float MAX_WALK_SPEED;
     static float MAX_AIR_ACCELERATION;
     static float MAX_AIR_SPEED;
@@ -52,8 +52,7 @@ class Player : public Entity {
               const char* texture_path, const char* mesh_path,
               const Gamepad* pad, const std::list<AABB>& colliders);
 
-    void update(float delta_time, const std::list<AABB>& colliders,
-                const MouseKeyboardInput& input);
+    void update(float delta_time, const std::list<AABB>& colliders);
 
     bool is_facing_right() const noexcept;
 

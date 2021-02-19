@@ -34,6 +34,7 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.clear();
     items.emplace("ground_hover_distance", &Player::GROUND_HOVER_DISTANCE);
     items.emplace("jump_force", &Player::JUMP_FORCE);
+    items.emplace("max_walk_acceleration", &Player::WALK_ACCELERATION);
     items.emplace("max_walk_speed", &Player::MAX_WALK_SPEED);
     items.emplace("max_air_acceleration", &Player::MAX_AIR_ACCELERATION);
     items.emplace("max_air_speed", &Player::MAX_AIR_SPEED);
