@@ -1,9 +1,10 @@
 #pragma once
-
 #include "Level.h"
 #include "rendering/Renderer.h"
 #include "Input.h"
 #include "CollisionDetection.h"
+#include <imgui/imgui.h>
+#include <glm/gtx/transform.hpp>
 
 void Level::render(const Renderer& renderer) const {
     renderer.textured_shader.set_texture(wall_texture);
@@ -17,9 +18,7 @@ void Level::render(const Renderer& renderer) const {
     }
 }
 
-const std::list<AABB> Level::colliders() const noexcept {
-    return colliders_;
-}
+const MemArena<AABB>& Level::colliders() const noexcept { return colliders_; }
 
 const AABB* Level::find_ground_under(glm::vec2 position) const {
     const AABB* candidate = nullptr;
@@ -42,6 +41,7 @@ void Level::load_from_file(const char* path) {
     opened_path = std::string(path);
 
     colliders_.clear();
+    colliders_.init(100);
 
     // Read data from file
     SDL_RWops* file = SDL_RWFromFile(path, "rb");
@@ -56,7 +56,7 @@ void Level::load_from_file(const char* path) {
 
     // Create list of colliders from data
     for (size_t i = 0; i < num_colliders; ++i) {
-        colliders_.emplace_back(save_data[i]);
+        colliders_.add(save_data[i]);
     }
 
     delete[] save_data;
@@ -65,7 +65,7 @@ void Level::load_from_file(const char* path) {
 }
 
 void Level::save_to_file(const char* path) const {
-    size_t num_colliders = colliders_.size();
+    size_t num_colliders = colliders_.num_elems();
     BoxColliderSaveFormat* save_data = new BoxColliderSaveFormat[num_colliders];
 
     size_t i = 0;
@@ -111,10 +111,8 @@ bool LevelEditor::update(const Renderer& renderer,
         NewLine();
 
         if (Button("New collider")) {
-            colliders.emplace_front(
-                AABB{renderer.camera_center(), new_collider_dimensions});
-
-            selected_collider = &colliders.front();
+            AABB new_coll{renderer.camera_center(), new_collider_dimensions};
+            selected_collider = colliders.add(new_coll);
         }
         DragFloat2("Dimensions", value_ptr(new_collider_dimensions), 1.0f, 0.0f,
                    0.0f, "% 6.1f");
@@ -156,6 +154,10 @@ bool LevelEditor::update(const Renderer& renderer,
     }
 
     if (selected_collider) {
+        // if (input.key_down(SDL_SCANCODE_DELETE)) {
+        //     level->colliders_.erase(selected_collider)
+        // }
+
         selected_collider->half_ext += input.mouse_wheel_scroll * SCROLL_SPEED;
 
         if (dragging_collider) {

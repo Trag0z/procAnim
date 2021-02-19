@@ -1,7 +1,7 @@
 #pragma once
-#include <list>
 #include "Collider.h"
 #include "rendering/Texture.h"
+#include "MemArena.h"
 
 class Renderer;
 class MouseKeyboardInput;
@@ -10,10 +10,7 @@ struct AABB;
 class LevelEditor;
 
 class Level {
-    // Linked lists are probably a bad choice for performance here, but they
-    // allow for deletion of random elements which the LevelEditor uses
-    // frequently.
-    std::list<AABB> colliders_;
+    MemArena<AABB> colliders_;
     std::string opened_path;
 
     Texture wall_texture;
@@ -21,7 +18,7 @@ class Level {
   public:
     void render(const Renderer& renderer) const;
 
-    const std::list<AABB> colliders() const noexcept;
+    const MemArena<AABB>& colliders() const noexcept;
 
     const AABB* find_ground_under(glm::vec2 position) const;
 

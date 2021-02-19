@@ -1,6 +1,6 @@
 #pragma once
+#include "MemArena.h"
 #include "Collider.h"
-#include <list>
 
 enum class Direction { NONE, UP, DOWN, LEFT, RIGHT };
 
@@ -24,17 +24,7 @@ struct CollisionData {
 
 const CollisionData
 find_first_collision_moving_circle(const Circle& circle, const Vector move,
-                                   const std::list<AABB>& level);
-
-// const CollisionData find_first_collision(const CircleCollider& circle,
-//                                          const glm::vec2 move,
-//                                          const std::list<BoxCollider>&
-//                                          level);
-
-// const CollisionData
-// find_first_collision_sweep_prune(const CircleCollider& circle,
-//                                  const glm::vec2 move,
-//                                  const std::list<BoxCollider>& boxes);
+                                   const MemArena<AABB>& level);
 
 struct BallisticMoveResult {
     glm::vec2 new_position;
@@ -45,6 +35,6 @@ struct BallisticMoveResult {
 
 const BallisticMoveResult
 get_ballistic_move_result(const Circle& coll, const Vector velocity,
-                          const float delta_time, const std::list<AABB>& level,
+                          const float delta_time, const MemArena<AABB>& level,
                           float rebound = 1.0f,
                           const size_t max_collision_iterations = 5);

@@ -1,5 +1,5 @@
 #pragma once
-#include <list>
+#include "MemArena.h"
 #include "rendering/Texture.h"
 #include "rendering/Mesh.h"
 #include "Animator.h"
@@ -50,9 +50,9 @@ class Player : public Entity {
   public:
     void init(glm::vec3 position, glm::vec3 scale_factor,
               const char* texture_path, const char* mesh_path,
-              const Gamepad* pad, const std::list<AABB>& colliders);
+              const Gamepad* pad, const MemArena<AABB>& colliders);
 
-    void update(float delta_time, const std::list<AABB>& colliders,
+    void update(float delta_time, const MemArena<AABB>& colliders,
                 const MouseKeyboardInput& input);
 
     bool is_facing_right() const noexcept;

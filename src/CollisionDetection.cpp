@@ -333,7 +333,7 @@ static bool intersect_moving_circle_AABB(const Circle& circle,
 
 const CollisionData
 find_first_collision_moving_circle(const Circle& circle, const Vector move,
-                                   const std::list<AABB>& boxes) {
+                                   const MemArena<AABB>& boxes) {
     AABB culling_box;
     {
         Vector half_move = move * 0.5f;
@@ -381,7 +381,7 @@ find_first_collision_moving_circle(const Circle& circle, const Vector move,
 
 const BallisticMoveResult
 get_ballistic_move_result(const Circle& coll, const Vector velocity,
-                          const float delta_time, const std::list<AABB>& level,
+                          const float delta_time, const MemArena<AABB>& level,
                           float rebound,
                           const size_t max_collision_iterations) {
 

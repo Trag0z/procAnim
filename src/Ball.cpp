@@ -19,7 +19,7 @@ void Ball::init(glm::vec2 position, const char* texture_path) {
     texture.load_from_file(texture_path);
 }
 
-void Ball::update(const float delta_time, const std::list<AABB>& level) {
+void Ball::update(const float delta_time, const MemArena<AABB>& level) {
     if (RADIUS != scale.x) {
         SDL_assert(scale.x == scale.y);
         scale = glm::vec2(RADIUS);

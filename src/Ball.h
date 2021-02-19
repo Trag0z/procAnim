@@ -24,7 +24,7 @@ class Ball : Entity {
 
   public:
     void init(glm::vec2 position, const char* texture_path);
-    void update(const float delta_time, const std::list<AABB>& level);
+    void update(const float delta_time, const MemArena<AABB>& level);
     void render(const Renderer& renderer) const;
     bool display_debug_ui();
 

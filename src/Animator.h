@@ -1,5 +1,5 @@
 #pragma once
-#include <list>
+#include "MemArena.h"
 #include "rendering/VertexArray.h"
 #include "Spline.h"
 #include "Collider.h"
@@ -38,10 +38,9 @@ class Animator {
     enum LegIndex { LEFT_LEG = 0, RIGHT_LEG = 1 };
 
     void init(const Player* parent_, RiggedMesh& mesh,
-              const std::list<AABB>& colliders);
+              const MemArena<AABB>& colliders);
     void update(float delta_time, float walking_speed,
-                glm::vec2 right_stick_input,
-                const std::list<AABB>& colliders);
+                glm::vec2 right_stick_input, const MemArena<AABB>& colliders);
 
     glm::vec2 tip_pos(LegIndex limb_index) const;
     const Bone* weapon() const noexcept;
@@ -79,8 +78,7 @@ class Animator {
         float min = 0.02f, max = 0.08f;
     } interpolation_speed_multiplier;
 
-    void set_new_splines(float walking_speed,
-                         const std::list<AABB>& colliders);
+    void set_new_splines(float walking_speed, const MemArena<AABB>& colliders);
 
     void interpolate_splines(glm::vec2 dst[Spline::NUM_POINTS],
                              SplineIndex spline_index) const;
