@@ -1,9 +1,10 @@
 #pragma once
 #include "Input.h"
 #include "rendering/Renderer.h"
+#include <stdlib.h>
 
-s32 Gamepad::STICK_DEADZONE_IN = 3000;
-s32 Gamepad::STICK_DEADZONE_OUT = 32767 - 1000;
+s16 Gamepad::STICK_DEADZONE_IN = 3000;
+s16 Gamepad::STICK_DEADZONE_OUT = 32767 - 1000;
 
 void MouseKeyboardInput::init(const Renderer* renderer_) {
     sdl_keyboard = SDL_GetKeyboardState(&num_keys);
@@ -109,66 +110,79 @@ void Gamepad::update() {
         return;
     }
 
-    // Poll all the axes on this pad
-    Sint16 tempAxis;
-    for (size_t i = 0; i < Gamepad::NUM_AXES; ++i) {
-
-        // If it's a trigger, normalize and set the value
-        if (i == SDL_CONTROLLER_AXIS_TRIGGERLEFT ||
-            i == SDL_CONTROLLER_AXIS_TRIGGERRIGHT) {
-            axes[i] = static_cast<float>(SDL_GameControllerGetAxis(
-                          sdl_ptr, static_cast<SDL_GameControllerAxis>(i))) /
-                      32767.0F;
-            continue;
+    { // Poll all the axes on this pad and parse their values into (axes[])
+        s16 raw_axis_inputs[NUM_AXES];
+        for (size_t n_axis = 0; n_axis < NUM_AXES; ++n_axis) {
+            raw_axis_inputs[n_axis] = SDL_GameControllerGetAxis(
+                sdl_ptr, static_cast<SDL_GameControllerAxis>(n_axis));
         }
+
+        // For the triggers, normalize and set the value
+        axes[SDL_CONTROLLER_AXIS_TRIGGERLEFT] =
+            static_cast<float>(
+                raw_axis_inputs[SDL_CONTROLLER_AXIS_TRIGGERLEFT]) /
+            32767.0f;
+        axes[SDL_CONTROLLER_AXIS_TRIGGERRIGHT] =
+            static_cast<float>(
+                raw_axis_inputs[SDL_CONTROLLER_AXIS_TRIGGERRIGHT]) /
+            32767.0f;
 
         // If it's a stick, calculate and set it's value
-        const s32 effective_stick_deadzone_out =
-            32767 - Gamepad::STICK_DEADZONE_OUT;
+        // const s32 effective_stick_deadzone_out =
+        //     32767 - Gamepad::STICK_DEADZONE_OUT;
 
-        tempAxis = SDL_GameControllerGetAxis(
-            sdl_ptr, static_cast<SDL_GameControllerAxis>(i));
-        if (tempAxis > -Gamepad::STICK_DEADZONE_IN &&
-            tempAxis < Gamepad::STICK_DEADZONE_IN) {
-            axes[i] = 0.0F;
-        } else if (tempAxis > effective_stick_deadzone_out) {
-            axes[i] = 1.0F;
-        } else if (tempAxis < -effective_stick_deadzone_out) {
-            axes[i] = -1.0F;
+        // For both of the sticks, apply the deadzones if necessary. Otherwise,
+        // just parse the values. Both y-axes are inverted by default, so
+        // re-invert them here.
+        if (std::abs(raw_axis_inputs[SDL_CONTROLLER_AXIS_LEFTX]) <
+                Gamepad::STICK_DEADZONE_IN &&
+            std::abs(raw_axis_inputs[SDL_CONTROLLER_AXIS_LEFTY]) <
+                Gamepad::STICK_DEADZONE_IN) {
+            axes[SDL_CONTROLLER_AXIS_LEFTX] = 0.0f;
+            axes[SDL_CONTROLLER_AXIS_LEFTY] = 0.0f;
         } else {
-            if (tempAxis > 0) {
-                axes[i] =
-                    static_cast<float>(tempAxis - Gamepad::STICK_DEADZONE_IN) /
-                    static_cast<float>(effective_stick_deadzone_out -
-                                       Gamepad::STICK_DEADZONE_IN);
-            } else {
-                axes[i] =
-                    static_cast<float>(tempAxis + Gamepad::STICK_DEADZONE_IN) /
-                    static_cast<float>(effective_stick_deadzone_out -
-                                       Gamepad::STICK_DEADZONE_IN);
-            }
+            axes[SDL_CONTROLLER_AXIS_LEFTX] =
+                static_cast<float>(raw_axis_inputs[SDL_CONTROLLER_AXIS_LEFTX]) /
+                MAX_STICK_VALUE;
+            axes[SDL_CONTROLLER_AXIS_LEFTY] =
+                static_cast<float>(raw_axis_inputs[SDL_CONTROLLER_AXIS_LEFTY]) /
+                -MAX_STICK_VALUE;
         }
-        // Invert Y axis cause it's the wrong way by default
-        if (i == SDL_CONTROLLER_AXIS_LEFTY || i == SDL_CONTROLLER_AXIS_RIGHTY)
-            axes[i] *= -1.0f;
+
+        if (std::abs(raw_axis_inputs[SDL_CONTROLLER_AXIS_RIGHTX]) <
+                Gamepad::STICK_DEADZONE_IN &&
+            std::abs(raw_axis_inputs[SDL_CONTROLLER_AXIS_RIGHTY]) <
+                Gamepad::STICK_DEADZONE_IN) {
+            axes[SDL_CONTROLLER_AXIS_RIGHTX] = 0.0f;
+            axes[SDL_CONTROLLER_AXIS_RIGHTY] = 0.0f;
+        } else {
+            axes[SDL_CONTROLLER_AXIS_RIGHTX] =
+                static_cast<float>(
+                    raw_axis_inputs[SDL_CONTROLLER_AXIS_RIGHTX]) /
+                MAX_STICK_VALUE;
+            axes[SDL_CONTROLLER_AXIS_RIGHTY] =
+                static_cast<float>(
+                    raw_axis_inputs[SDL_CONTROLLER_AXIS_RIGHTY]) /
+                -MAX_STICK_VALUE;
+        }
     }
 
     // Poll all the buttons on this pad
-    for (u32 i = 0; i < Gamepad::NUM_BUTTONS; ++i) {
+    for (u32 n_button = 0; n_button < Gamepad::NUM_BUTTONS; ++n_button) {
         if (SDL_GameControllerGetButton(
-                sdl_ptr, static_cast<SDL_GameControllerButton>(i))) {
-            if (!button(i)) {
-                setNthBitTo(button_down_map, i, 1);
+                sdl_ptr, static_cast<SDL_GameControllerButton>(n_button))) {
+            if (!button(n_button)) {
+                setNthBitTo(button_down_map, n_button, 1);
             } else {
-                setNthBitTo(button_down_map, i, 0);
+                setNthBitTo(button_down_map, n_button, 0);
             }
-            setNthBitTo(button_map, i, 1);
-        } else if (button(i)) {
-            setNthBitTo(button_down_map, i, 0);
-            setNthBitTo(button_up_map, i, 1);
-            setNthBitTo(button_map, i, 0);
+            setNthBitTo(button_map, n_button, 1);
+        } else if (button(n_button)) {
+            setNthBitTo(button_down_map, n_button, 0);
+            setNthBitTo(button_up_map, n_button, 1);
+            setNthBitTo(button_map, n_button, 0);
         } else {
-            setNthBitTo(button_up_map, i, 0);
+            setNthBitTo(button_up_map, n_button, 0);
         }
     }
 }

@@ -16,7 +16,7 @@ class ConfigManager {
     bool display_ui_window();
 
   private:
-    typedef std::variant<bool*, float*, s32*, glm::ivec2*, glm::vec2*>
+    typedef std::variant<bool*, float*, s16*, s32*, glm::ivec2*, glm::vec2*>
         property_value;
     typedef std::map<std::string, property_value> property_map;
 
@@ -28,6 +28,7 @@ class ConfigManager {
         std::stringstream& stream;
         void operator()(bool*);
         void operator()(float*);
+        void operator()(s16*);
         void operator()(s32*);
         void operator()(glm::vec2*);
         void operator()(glm::ivec2*);
@@ -42,6 +43,7 @@ class ConfigManager {
 
         void operator()(bool*);
         void operator()(float*);
+        void operator()(s16*);
         void operator()(s32*);
         void operator()(glm::vec2*);
         void operator()(glm::ivec2*);
@@ -51,6 +53,7 @@ class ConfigManager {
         const std::string& item_name;
         void operator()(bool*);
         void operator()(float*);
+        void operator()(s16*);
         void operator()(s32*);
         void operator()(glm::vec2*);
         void operator()(glm::ivec2*);

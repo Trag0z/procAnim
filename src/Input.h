@@ -46,17 +46,17 @@ class MouseKeyboardInput {
 enum class StickID : size_t { LEFT = 0, RIGHT = 1, TRIGGERS = 2 };
 
 class Gamepad {
-    static constexpr s32 MAX_STICK_VALUE = 32767;
+    static constexpr s16 MAX_STICK_VALUE = 32767;
 
     static const u32 NUM_AXES = SDL_CONTROLLER_AXIS_MAX;
     static const u32 NUM_BUTTONS = SDL_CONTROLLER_BUTTON_MAX;
-    static s32 STICK_DEADZONE_IN;
-    static s32 STICK_DEADZONE_OUT;
+    static s16 STICK_DEADZONE_IN;
+    static s16 STICK_DEADZONE_OUT;
 
     SDL_GameController* sdl_ptr = nullptr;
 
     float axes[NUM_AXES];
-    Uint32 button_map, button_down_map, button_up_map;
+    u32 button_map, button_down_map, button_up_map;
 
   public:
     void init(size_t index);

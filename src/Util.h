@@ -5,7 +5,7 @@ constexpr float PI = 3.14159265358979323846f;
 
 #define BIT(X) (1u << X)
 
-inline void setNthBitTo(unsigned int& bitField, unsigned int n, int value) {
+inline void setNthBitTo(uint& bitField, uint n, int value) {
     bitField ^= (-value ^ bitField) & (1u << n);
 }
 

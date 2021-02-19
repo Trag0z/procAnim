@@ -96,7 +96,7 @@ void Game::init() {
     mouse_keyboard_input.init(&renderer);
 
     gamepads[0].init(0);
-    gamepads[1].init(1);
+    // gamepads[1].init(1);
 
     background.init("../assets/background.png");
 

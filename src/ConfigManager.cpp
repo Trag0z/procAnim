@@ -1,8 +1,10 @@
 #pragma once
-#include <fstream>
-#include <sstream>
 #include "ConfigManager.h"
 #include "Game.h"
+#include <fstream>
+#include <sstream>
+#include <imgui/imgui.h>
+#include <glm/gtc/type_ptr.hpp>
 
 void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     property_map items;
@@ -162,6 +164,12 @@ void ConfigManager::ParseVisitor::operator()(float* val) {
     SDL_assert(word.length() >= 0);
     *val = std::stof(word);
 }
+void ConfigManager::ParseVisitor::operator()(s16* val) {
+    std::string word;
+    std::getline(stream, word);
+    SDL_assert(word.length() >= 0);
+    *val = static_cast<s16>(std::stoi(word));
+}
 void ConfigManager::ParseVisitor::operator()(s32* val) {
     std::string word;
     std::getline(stream, word);
@@ -206,6 +214,12 @@ void ConfigManager::SaveVisitor::operator()(float* val) {
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }
+void ConfigManager::SaveVisitor::operator()(s16* val) {
+    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d\n",
+                                item_name.c_str(), static_cast<int>(*val));
+    SDL_assert(num_written != -1);
+    write_pos += num_written;
+}
 void ConfigManager::SaveVisitor::operator()(s32* val) {
     int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d\n",
                                 item_name.c_str(), static_cast<int>(*val));
@@ -237,6 +251,10 @@ void ConfigManager::UIVisitor::operator()(bool* val) {
 }
 void ConfigManager::UIVisitor::operator()(float* val) {
     ImGui::InputFloat(item_name.c_str(), val, 1.0f, 10.0f, 2);
+}
+void ConfigManager::UIVisitor::operator()(s16* val) {
+    const s32 step = 1;
+    ImGui::InputScalar(item_name.c_str(), ImGuiDataType_U16, val, &step);
 }
 void ConfigManager::UIVisitor::operator()(s32* val) {
     const s32 step = 1;
