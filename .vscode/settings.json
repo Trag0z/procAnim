@@ -46,7 +46,13 @@
         "*.rh": "cpp",
         "variant": "cpp",
         "ctime": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "atomic": "cpp",
+        "array": "cpp",
+        "initializer_list": "cpp",
+        "string": "cpp",
+        "typeinfo": "cpp",
+        "utility": "cpp"
     },
     "spellright.language": [
         "en"

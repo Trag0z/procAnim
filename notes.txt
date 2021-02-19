@@ -1,6 +1,4 @@
 TODO:
-- replace std::abs with glm::abs
-
 - player weapon length changes when rotating stick
 
 - snap level elements to grid
@@ -18,6 +16,7 @@ Bugs:               (@BUG)
 - sometimes turns around due to stick snap-back?
 
 Cleanup:            (@CLEANUP)
+- replace std::abs with glm::abs
 
 Optimizations:      (@OPTIMIZE)
 - bone.get_transform() is called often, calculates recursively every time

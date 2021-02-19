@@ -12,6 +12,7 @@
                 "isDefault": true
             },
             "presentation": {
+                "panel": "shared",
                 "reveal": "always"
             },
             "problemMatcher": "$msCompile"
