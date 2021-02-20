@@ -3,9 +3,9 @@
 #include "rendering/Renderer.h"
 #include "Util.h"
 #include "CollisionDetection.h"
-#include <glm/ext.hpp>
+#include <glm/gtx/matrix_transform_2d.hpp>
 #include <imgui/imgui.h>
-#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 float Ball::REBOUND = 1.0f;
 float Ball::RADIUS = 50.0f;
