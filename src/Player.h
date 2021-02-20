@@ -27,6 +27,8 @@ class Player : public Entity {
     float time_since_last_hit = 0.0f;
     float hitstun_duration = 0.0f;
 
+    float freeze_duration = 0.0f;
+
     static float GROUND_HOVER_DISTANCE;
     static float JUMP_FORCE;
     static float WALK_ACCELERATION;

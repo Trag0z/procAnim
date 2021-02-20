@@ -20,6 +20,11 @@ void Ball::init(glm::vec2 position, const char* texture_path) {
 }
 
 void Ball::update(const float delta_time, const std::list<AABB>& level) {
+    if (freeze_duration > 0.0f) {
+        freeze_duration -= delta_time;
+        return;
+    }
+
     if (RADIUS != scale.x) {
         SDL_assert(scale.x == scale.y);
         scale = glm::vec2(RADIUS);

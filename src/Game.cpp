@@ -377,8 +377,12 @@ void Game::run() {
 
 void Game::simulate_world(float delta_time) {
 
-    for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
-        auto& player = players[n_player];
+    for (auto& player : players) {
+        if (player.freeze_duration > 0.0f) {
+            player.freeze_duration -= delta_time;
+            continue;
+        }
+
         player.update(delta_time, level.colliders());
 
         //              Resolve collisions              //
@@ -535,12 +539,17 @@ void Game::simulate_world(float delta_time) {
                 printf("Player %zd hit with %f, %f\n", i, hit_direction.x,
                        hit_direction.y);
 
-                audio_manager.play(Sound::HIT_2);
+                const float screen_shake_duration =
+                    game_config.hit_screen_shake_duration *
+                    glm::length(hit_direction);
+
+                player.freeze_duration = screen_shake_duration;
+                ball.freeze_duration = screen_shake_duration;
                 renderer.shake_screen(game_config.hit_screen_shake_intensity *
                                           glm::length(hit_direction),
-                                      game_config.hit_screen_shake_duration *
-                                          glm::length(hit_direction),
+                                      screen_shake_duration,
                                       game_config.hit_screen_shake_speed);
+                audio_manager.play(Sound::HIT_2);
             }
         }
     }

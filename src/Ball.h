@@ -23,6 +23,8 @@ class Ball : Entity {
     static float ROLLING_ROTATION_SPEED;
 
   public:
+    float freeze_duration = 0.0f;
+
     void init(glm::vec2 position, const char* texture_path);
     void update(const float delta_time, const std::list<AABB>& level);
     void render(const Renderer& renderer) const;
