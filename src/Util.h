@@ -11,12 +11,6 @@ inline void setNthBitTo(uint& bitField, uint n, int value) {
 
 template <typename T> T lerp(T a, T b, float t) { return a + (b - a) * t; }
 
-template <typename T>
-constexpr const T& clamp(const T& v, const T& low, const T& high) {
-    SDL_assert(low < high);
-    return (v < low) ? low : (high < v) ? high : v;
-}
-
 float length_squared(glm::vec2 v);
 
 typedef const wchar_t* cwstrptr_t;

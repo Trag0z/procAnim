@@ -61,7 +61,7 @@ static void solve_ik(Bone* const bones[2], glm::vec2 target_pos_model_space) {
                              length2[0] - length2[1]) /
                             (2 * bones[0]->length * bones[1]->length);
 
-        long_factor = clamp(long_factor, -1.0f, 1.0f);
+        long_factor = glm::clamp(long_factor, -1.0f, 1.0f);
 
         bones[1]->rotation =
             atan2f(sqrtf(1.0f - long_factor * long_factor), long_factor);
