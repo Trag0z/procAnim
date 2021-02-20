@@ -11,10 +11,16 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
 
     // GameConfig
     items.emplace("window_position", &game_config.window_position);
-    items.emplace("gravity", &game_config.gravity);
+    items.emplace("speed", &game_config.speed);
     items.emplace("use_const_delta_time", &game_config.use_const_delta_time);
     items.emplace("step_mode", &game_config.step_mode);
-    items.emplace("speed", &game_config.speed);
+    items.emplace("gravity", &game_config.gravity);
+    items.emplace("hit_screen_shake_intensity",
+                  &game_config.hit_screen_shake_intensity);
+    items.emplace("hit_screen_shake_duration",
+                  &game_config.hit_screen_shake_duration);
+    items.emplace("hit_screen_shake_speed",
+                  &game_config.hit_screen_shake_speed);
     objects.emplace("GameConfig", std::move(items));
 
     // Renderer

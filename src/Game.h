@@ -37,6 +37,10 @@ struct GameConfig {
     bool use_const_delta_time = true;
 
     float gravity = 2.0f;
+
+    float hit_screen_shake_intensity = 5.0f;
+    float hit_screen_shake_duration = 30.0f;
+    float hit_screen_shake_speed = 0.5f;
 };
 
 class Game {

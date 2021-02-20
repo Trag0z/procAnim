@@ -2,6 +2,7 @@
 #include "Shaders.h"
 #include "Texture.h"
 #include "../ConfigManager.h"
+#include <PerlinNoise.hpp>
 
 class Game;
 
@@ -10,9 +11,18 @@ class Renderer {
     glm::vec2 camera_center_ = {0.0f, 0.0f};
     float zoom_factor_ = 1.0f;
 
-  public:
-    void update_camera();
+    struct {
+        float intensity;
+        float duration;
+        float speed;
 
+        float noise_pos = 0.0f;
+        const siv::BasicPerlinNoise<float> noise[2] = {
+            siv::BasicPerlinNoise<float>(1337),
+            siv::BasicPerlinNoise<float>(5345)};
+    } screen_shake;
+
+  public:
     DebugShader debug_shader;
     TexturedShader textured_shader;
     RiggedShader rigged_shader;
@@ -20,6 +30,8 @@ class Renderer {
     BoneShader bone_shader;
 
     void init();
+    void update(float delta_time);
+    void shake_screen(float intensity, float duration, float speed);
 
     glm::vec2 window_size() const noexcept;
     glm::vec2 camera_position() const noexcept;

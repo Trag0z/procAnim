@@ -181,7 +181,6 @@ void Game::run() {
         mouse_move.x *= -1.0f;
 
         renderer.camera_center_ += mouse_move;
-        renderer.update_camera();
     }
 
     {
@@ -192,7 +191,6 @@ void Game::run() {
             } else {
                 renderer.zoom_factor_ += static_cast<float>(scroll) / 10.0f;
             }
-            renderer.update_camera();
         }
     }
 
@@ -527,8 +525,8 @@ void Game::simulate_world(float delta_time) {
                 intersect_segment_circle(*weapon, ball.collider())) {
 
                 // The ball was hit
-                glm::vec2 hit_direction = player.weapon_collider.line() -
-                                          player.last_weapon_collider.line();
+                vec2 hit_direction = player.weapon_collider.line() -
+                                     player.last_weapon_collider.line();
 
                 ball.set_velocity(hit_direction * Player::HIT_SPEED_MULTIPLIER);
 
@@ -538,10 +536,17 @@ void Game::simulate_world(float delta_time) {
                        hit_direction.y);
 
                 audio_manager.play(Sound::HIT_2);
+                renderer.shake_screen(game_config.hit_screen_shake_intensity *
+                                          glm::length(hit_direction),
+                                      game_config.hit_screen_shake_duration *
+                                          glm::length(hit_direction),
+                                      game_config.hit_screen_shake_speed);
             }
         }
     }
+
     ball.update(delta_time, level.colliders());
+    renderer.update(delta_time);
 }
 
 void Game::update_gui() {
@@ -561,7 +566,6 @@ void Game::update_gui() {
 
     if (show_config_window) {
         show_config_window = config_loader.display_ui_window();
-        renderer.update_camera();
     }
 
     Separator();
