@@ -3,7 +3,10 @@
 #include "Game.h"
 #include "Collider.h"
 #include <imgui/imgui.h>
-#include "glm/gtc/type_ptr.hpp"
+#include <glm/gtc/type_ptr.hpp>
+#include <stb_perlin.h>
+
+#define STB_PERLIN_IMPLEMENTATION
 
 float Player::GROUND_HOVER_DISTANCE = 160.0f;
 float Player::JUMP_FORCE = 30.0f;
@@ -56,7 +59,6 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
             (left_stick_input.x > 0.0f && !facing_right)) {
             facing_right = !facing_right;
             scale.x *= -1.0f;
-            update_model_matrix(); // TODO: remove
         }
     }
 
