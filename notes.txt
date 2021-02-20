@@ -1,8 +1,8 @@
 TODO:
-- freeze frames
-- player acceleration/deceleration
+- tune player acceleration/deceleration
+- wall jump
+- better default jump?
 
-- snap level elements to grid
 
 TODO LATER:
 - handle jump inputs in step mode better

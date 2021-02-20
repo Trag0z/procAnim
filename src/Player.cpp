@@ -7,10 +7,15 @@
 
 float Player::GROUND_HOVER_DISTANCE = 160.0f;
 float Player::JUMP_FORCE = 30.0f;
+float Player::DOUBLE_JUMP_FORCE = 15.0f;
+float Player::GRAVITY = 2.0f;
+
 float Player::WALK_ACCELERATION = 1.0f;
 float Player::MAX_WALK_SPEED = 10.0f;
+
 float Player::MAX_AIR_ACCELERATION = 0.5f;
 float Player::MAX_AIR_SPEED = 10.0f;
+
 float Player::HIT_SPEED_MULTIPLIER = 0.2f;
 float Player::HIT_COOLDOWN = 30.0f;
 float Player::HITSTUN_DURATION_MULTIPLIER = 0.8f;
@@ -80,7 +85,9 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
 
         if (gamepad->button_down(button_map.jump) ||
             gamepad->button_down(button_map.jump_alt)) {
-            velocity.y += JUMP_FORCE;
+            velocity.x = left_stick_input.x * MAX_AIR_SPEED;
+            velocity.y = JUMP_FORCE;
+
             state = FALLING;
             grounded = false;
         }
@@ -90,6 +97,14 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
         velocity.x =
             glm::clamp(velocity.x + left_stick_input.x * MAX_AIR_ACCELERATION,
                        -MAX_AIR_SPEED, MAX_AIR_SPEED);
+
+        if (can_double_jump && (gamepad->button_down(button_map.jump) ||
+                                gamepad->button_down(button_map.jump_alt))) {
+            velocity.x = left_stick_input.x * MAX_AIR_SPEED;
+            velocity.y = DOUBLE_JUMP_FORCE;
+
+            can_double_jump = false;
+        }
     }
 
     // Leg and weapon animation

@@ -456,7 +456,8 @@ void Game::simulate_world(float delta_time) {
                 level.find_ground_under(new_player_position);
             if (!ground_under_player ||
                 new_player_position.y - ground_under_player->max(1) >
-                    player.GROUND_HOVER_DISTANCE + 2.0f /* small tolerance */) {
+                    Player::GROUND_HOVER_DISTANCE +
+                        2.0f /* small tolerance */) {
 
                 player.grounded = false;
                 player.state = Player::FALLING;
@@ -464,9 +465,10 @@ void Game::simulate_world(float delta_time) {
             } else {
                 new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
                 new_player_position.y =
-                    ground_under_player->max(1) + player.GROUND_HOVER_DISTANCE;
+                    ground_under_player->max(1) + Player::GROUND_HOVER_DISTANCE;
 
                 player.grounded = true;
+                player.can_double_jump = true;
                 if (player.state == Player::FALLING) {
                     player.state = Player::STANDING;
                 }
@@ -474,7 +476,7 @@ void Game::simulate_world(float delta_time) {
         }
 
         if (!player.grounded) {
-            new_player_velocity.y -= game_config.gravity;
+            new_player_velocity.y -= Player::GRAVITY;
         }
 
         player.velocity = new_player_velocity;

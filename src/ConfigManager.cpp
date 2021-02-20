@@ -14,7 +14,6 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("speed", &game_config.speed);
     items.emplace("use_const_delta_time", &game_config.use_const_delta_time);
     items.emplace("step_mode", &game_config.step_mode);
-    items.emplace("gravity", &game_config.gravity);
     items.emplace("hit_screen_shake_intensity",
                   &game_config.hit_screen_shake_intensity);
     items.emplace("hit_screen_shake_duration",
@@ -40,10 +39,15 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.clear();
     items.emplace("ground_hover_distance", &Player::GROUND_HOVER_DISTANCE);
     items.emplace("jump_force", &Player::JUMP_FORCE);
+    items.emplace("double_jump_force", &Player::DOUBLE_JUMP_FORCE);
+    items.emplace("gravity", &Player::GRAVITY);
+
     items.emplace("max_walk_acceleration", &Player::WALK_ACCELERATION);
     items.emplace("max_walk_speed", &Player::MAX_WALK_SPEED);
+
     items.emplace("max_air_acceleration", &Player::MAX_AIR_ACCELERATION);
     items.emplace("max_air_speed", &Player::MAX_AIR_SPEED);
+
     items.emplace("hit_speed_multiplier", &Player::HIT_SPEED_MULTIPLIER);
     items.emplace("hit_cooldown", &Player::HIT_COOLDOWN);
     items.emplace("hitstun_duration_multiplier",

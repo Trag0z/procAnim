@@ -29,12 +29,19 @@ class Player : public Entity {
 
     float freeze_duration = 0.0f;
 
+    bool can_double_jump = false;
+
     static float GROUND_HOVER_DISTANCE;
     static float JUMP_FORCE;
+    static float DOUBLE_JUMP_FORCE;
+    static float GRAVITY;
+
     static float WALK_ACCELERATION;
     static float MAX_WALK_SPEED;
+
     static float MAX_AIR_ACCELERATION;
     static float MAX_AIR_SPEED;
+
     static float HIT_SPEED_MULTIPLIER;
     static float HIT_COOLDOWN;
     static float HITSTUN_DURATION_MULTIPLIER;

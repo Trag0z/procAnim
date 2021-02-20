@@ -20,8 +20,8 @@ constexpr SDL_Scancode DRAW_SPLINES = SDL_SCANCODE_F2;
 constexpr SDL_Scancode STEP_MODE = SDL_SCANCODE_P;
 constexpr SDL_Scancode NEXT_STEP = SDL_SCANCODE_N;
 constexpr SDL_Scancode HOLD_TO_STEP = SDL_SCANCODE_M;
-constexpr SDL_Scancode SPEED_UP = SDL_SCANCODE_COMMA;
-constexpr SDL_Scancode SPEED_DOWN = SDL_SCANCODE_PERIOD;
+constexpr SDL_Scancode SPEED_UP = SDL_SCANCODE_B;
+constexpr SDL_Scancode SPEED_DOWN = SDL_SCANCODE_V;
 constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
 }; // namespace Keybinds
 
@@ -35,8 +35,6 @@ struct GameConfig {
     float speed = 1.0f;
     bool step_mode = false;
     bool use_const_delta_time = true;
-
-    float gravity = 2.0f;
 
     float hit_screen_shake_intensity = 5.0f;
     float hit_screen_shake_duration = 30.0f;
