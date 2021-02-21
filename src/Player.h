@@ -25,13 +25,14 @@ class Player : public Entity {
     bool grounded = false;
     bool facing_right = true;
 
-    float time_since_last_hit = 0.0f;
+    float hit_cooldown = 0.0f;
     float hitstun_duration = 0.0f;
 
     float freeze_duration = 0.0f;
 
     bool can_double_jump = false;
     Direction wall_direction = Direction::NONE;
+    float wall_jump_cotyote_time = 0.0f;
 
     enum State {
         STANDING = 0,
@@ -48,8 +49,10 @@ class Player : public Entity {
     static float GROUND_HOVER_DISTANCE;
     static float JUMP_FORCE;
     static float DOUBLE_JUMP_FORCE;
-    static float WALL_JUMP_FORCE;
     static float GRAVITY;
+
+    static float WALL_JUMP_FORCE;
+    static float MAX_WALL_JUMP_COYOTE_TIME;
 
     static float WALK_ACCELERATION;
     static float MAX_WALK_SPEED;
@@ -60,7 +63,7 @@ class Player : public Entity {
     static float MAX_WALL_CLIMB_SPEED;
 
     static float HIT_SPEED_MULTIPLIER;
-    static float HIT_COOLDOWN;
+    static float MAX_HIT_COOLDOWN;
     static float HITSTUN_DURATION_MULTIPLIER;
 
   public:

@@ -539,7 +539,7 @@ void Game::simulate_world(float delta_time) {
         for (size_t i = 0; i < NUM_PLAYERS; ++i) {
             auto& weapon = weapons[i];
             auto& player = players[i];
-            if (player.time_since_last_hit >= Player::HIT_COOLDOWN &&
+            if (player.hit_cooldown <= 0.0f &&
                 glm::length(weapon->line()) > player.body_collider().radius &&
                 intersect_segment_circle(*weapon, ball.collider())) {
 
@@ -549,7 +549,7 @@ void Game::simulate_world(float delta_time) {
 
                 ball.set_velocity(hit_direction * Player::HIT_SPEED_MULTIPLIER);
 
-                player.time_since_last_hit = 0.0f;
+                player.hit_cooldown = Player::MAX_HIT_COOLDOWN;
 
                 printf("Player %zd hit with %f, %f\n", i, hit_direction.x,
                        hit_direction.y);

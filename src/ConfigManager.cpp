@@ -40,8 +40,11 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("ground_hover_distance", &Player::GROUND_HOVER_DISTANCE);
     items.emplace("jump_force", &Player::JUMP_FORCE);
     items.emplace("double_jump_force", &Player::DOUBLE_JUMP_FORCE);
-    items.emplace("wall_jump_force", &Player::WALL_JUMP_FORCE);
     items.emplace("gravity", &Player::GRAVITY);
+
+    items.emplace("wall_jump_force", &Player::WALL_JUMP_FORCE);
+    items.emplace("max_wall_jump_coyote_time",
+                  &Player::MAX_WALL_JUMP_COYOTE_TIME);
 
     items.emplace("max_walk_acceleration", &Player::WALK_ACCELERATION);
     items.emplace("max_walk_speed", &Player::MAX_WALK_SPEED);
@@ -52,7 +55,7 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("max_wall_climb_speed", &Player::MAX_WALL_CLIMB_SPEED);
 
     items.emplace("hit_speed_multiplier", &Player::HIT_SPEED_MULTIPLIER);
-    items.emplace("hit_cooldown", &Player::HIT_COOLDOWN);
+    items.emplace("hit_cooldown", &Player::MAX_HIT_COOLDOWN);
     items.emplace("hitstun_duration_multiplier",
                   &Player::HITSTUN_DURATION_MULTIPLIER);
     objects.emplace("Player", std::move(items));
