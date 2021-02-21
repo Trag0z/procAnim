@@ -117,6 +117,22 @@ class BoneShader : public ShaderDetail::Shader {
     };
 };
 
+class TrailShader : public ShaderDetail::Shader {
+    GLuint old_color_loc;
+    GLuint recent_color_loc;
+
+  public:
+    TrailShader() {}
+    TrailShader(const char* vert_path, const char* frag_path);
+
+    void set_colors(const Color& old_color, const Color& recent_color);
+
+    struct Vertex {
+        vec2 pos;
+        GLfloat age;
+    };
+};
+
 //                                                              //
 //          Template specifications for VertexArray<>           //
 //                                                              //
@@ -277,4 +293,39 @@ void VertexArray<BoneShader::Vertex>::init(const GLuint* indices,
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(BoneShader::Vertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
+}
+
+void VertexArray<TrailShader::Vertex>::init(const GLuint* indices,
+                                            GLuint num_indices,
+                                            const TrailShader::Vertex* vertices,
+                                            GLuint num_vertices, GLenum usage) {
+    num_indices_ = num_indices;
+    num_vertices_ = num_vertices;
+    usage_ = usage;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    // Create index buffer
+    glGenBuffers(1, &ebo_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * num_indices, indices,
+                 usage);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(TrailShader::Vertex) * num_vertices,
+                 vertices, usage);
+
+    // position attribute
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(TrailShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+    // age attribute
+    glVertexAttribPointer(
+        1, 1, GL_FLOAT, GL_FALSE, sizeof(TrailShader::Vertex),
+        reinterpret_cast<void*>(offsetof(TrailShader::Vertex, age)));
+    glEnableVertexAttribArray(1);
 }

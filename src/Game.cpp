@@ -349,11 +349,11 @@ void Game::run() {
     }
 
     if (renderer.draw_weapon_trails) {
-        renderer.debug_shader.use();
-        renderer.debug_shader.set_color(Color::RED);
+        renderer.trail_shader.use();
+        renderer.trail_shader.set_colors(Color::LIGHT_BLUE, Color::RED);
 
         for (auto& player : players) {
-            renderer.debug_shader.set_model(&player.model_matrix());
+            renderer.trail_shader.set_model(&player.model_matrix());
             player.weapon_trail.render();
         }
     }

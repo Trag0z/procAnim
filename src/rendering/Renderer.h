@@ -28,6 +28,7 @@ class Renderer {
     RiggedShader rigged_shader;
     RiggedDebugShader rigged_debug_shader;
     BoneShader bone_shader;
+    TrailShader trail_shader;
 
     void init();
     void update(float delta_time);

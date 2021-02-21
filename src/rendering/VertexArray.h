@@ -50,4 +50,10 @@ template <typename vertex_t> class VertexArray {
         glBindVertexArray(vao_id);
         glDrawElements(mode, num_indices_, GL_UNSIGNED_INT, 0);
     }
+
+    void draw(GLenum mode, GLsizei num_indices, const uint* indices) {
+        glBindVertexArray(vao_id);
+        glDrawElements(mode, num_indices, GL_UNSIGNED_INT,
+                       (const void*)indices);
+    }
 };

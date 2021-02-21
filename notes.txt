@@ -4,6 +4,8 @@ TODO:
 - tune player acceleration/deceleration
 - better default jump?
 
+- in the shader init functions, glVertexAttribPointer(0, 4, ...) is called, but the vertices have 2 components so the 4 should probably be a 2
+
 
 TODO LATER:
 - remove Player::State::HITSTUN because it is not used anymore
