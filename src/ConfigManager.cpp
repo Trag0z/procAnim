@@ -46,13 +46,14 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("max_wall_jump_coyote_time",
                   &Player::MAX_WALL_JUMP_COYOTE_TIME);
 
+    items.emplace("wall_slide_speed", &Player::WALL_SLIDE_SPEED);
+    items.emplace("max_wall_slide_speed", &Player::MAX_WALL_SLIDE_SPEED);
+
     items.emplace("max_walk_acceleration", &Player::WALK_ACCELERATION);
     items.emplace("max_walk_velocity", &Player::MAX_WALK_VELOCITY);
 
     items.emplace("max_air_acceleration", &Player::MAX_AIR_ACCELERATION);
     items.emplace("max_air_velocity", &Player::MAX_AIR_VELOCITY);
-
-    items.emplace("max_wall_climb_speed", &Player::MAX_WALL_CLIMB_SPEED);
 
     items.emplace("hit_speed_multiplier", &Player::HIT_SPEED_MULTIPLIER);
     items.emplace("hit_cooldown", &Player::MAX_HIT_COOLDOWN);

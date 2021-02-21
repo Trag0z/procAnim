@@ -54,13 +54,14 @@ class Player : public Entity {
     static float WALL_JUMP_FORCE;
     static float MAX_WALL_JUMP_COYOTE_TIME;
 
+    static float WALL_SLIDE_SPEED;
+    static float MAX_WALL_SLIDE_SPEED;
+
     static float WALK_ACCELERATION;
     static float MAX_WALK_VELOCITY;
 
     static float MAX_AIR_ACCELERATION;
     static float MAX_AIR_VELOCITY;
-
-    static float MAX_WALL_CLIMB_SPEED;
 
     static float HIT_SPEED_MULTIPLIER;
     static float MAX_HIT_COOLDOWN;

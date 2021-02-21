@@ -13,13 +13,14 @@ float Player::GRAVITY = 2.0f;
 float Player::WALL_JUMP_FORCE = 15.0f;
 float Player::MAX_WALL_JUMP_COYOTE_TIME = 5.0f;
 
+float Player::WALL_SLIDE_SPEED = 5.0f;
+float Player::MAX_WALL_SLIDE_SPEED = 15.0f;
+
 float Player::WALK_ACCELERATION = 1.0f;
 float Player::MAX_WALK_VELOCITY = 10.0f;
 
 float Player::MAX_AIR_ACCELERATION = 0.5f;
 float Player::MAX_AIR_VELOCITY = 10.0f;
-
-float Player::MAX_WALL_CLIMB_SPEED = 10.0f;
 
 float Player::HIT_SPEED_MULTIPLIER = 0.2f;
 float Player::MAX_HIT_COOLDOWN = 30.0f;
@@ -97,7 +98,21 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
             grounded = false;
         }
     } else if (state == WALL_CLING) {
-        velocity.y = left_stick_input.y * MAX_WALL_CLIMB_SPEED;
+        const bool pushing_towards_wall =
+            (wall_direction == Direction::LEFT && left_stick_input.x < 0.0f) ||
+            (wall_direction == Direction::RIGHT && left_stick_input.x > 0.0f);
+
+        if (left_stick_input.y > 0.0f || pushing_towards_wall) {
+            velocity.y = 0.0f;
+
+        } else if (left_stick_input.y < 0.0f) {
+            velocity.y =
+                -WALL_SLIDE_SPEED + (left_stick_input.y *
+                                     (MAX_WALL_SLIDE_SPEED - WALL_SLIDE_SPEED));
+
+        } else {
+            velocity.y = -WALL_SLIDE_SPEED;
+        }
 
         if ((wall_direction == Direction::LEFT && left_stick_input.x > 0.2f) ||
             (wall_direction == Direction::RIGHT &&
