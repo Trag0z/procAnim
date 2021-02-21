@@ -14,10 +14,10 @@ float Player::WALL_JUMP_FORCE = 15.0f;
 float Player::MAX_WALL_JUMP_COYOTE_TIME = 5.0f;
 
 float Player::WALK_ACCELERATION = 1.0f;
-float Player::MAX_WALK_SPEED = 10.0f;
+float Player::MAX_WALK_VELOCITY = 10.0f;
 
 float Player::MAX_AIR_ACCELERATION = 0.5f;
-float Player::MAX_AIR_SPEED = 10.0f;
+float Player::MAX_AIR_VELOCITY = 10.0f;
 
 float Player::MAX_WALL_CLIMB_SPEED = 10.0f;
 
@@ -73,7 +73,7 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
     // Movement
     if (state == STANDING || state == WALKING) {
         SDL_assert(grounded);
-        float target_velocity_x = left_stick_input.x * MAX_WALK_SPEED;
+        float target_velocity_x = left_stick_input.x * MAX_WALK_VELOCITY;
 
         if (velocity.x > target_velocity_x) {
             velocity.x =
@@ -91,7 +91,6 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
 
         if (gamepad->button_down(button_map.jump) ||
             gamepad->button_down(button_map.jump_alt)) {
-            velocity.x = left_stick_input.x * MAX_AIR_SPEED;
             velocity.y = JUMP_FORCE;
 
             state = FALLING;
@@ -100,9 +99,9 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
     } else if (state == WALL_CLING) {
         velocity.y = left_stick_input.y * MAX_WALL_CLIMB_SPEED;
 
-        if ((wall_direction == Direction::LEFT && left_stick_input.x > 0.5f) ||
+        if ((wall_direction == Direction::LEFT && left_stick_input.x > 0.2f) ||
             (wall_direction == Direction::RIGHT &&
-             left_stick_input.x < -0.5f)) {
+             left_stick_input.x < -0.2f)) {
             wall_jump_cotyote_time = MAX_WALL_JUMP_COYOTE_TIME;
             velocity.y = 0.0f;
             state = FALLING;
@@ -110,13 +109,26 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
     } else if (state == FALLING) {
         SDL_assert(!grounded);
 
-        velocity.x =
-            glm::clamp(velocity.x + left_stick_input.x * MAX_AIR_ACCELERATION,
-                       -MAX_AIR_SPEED, MAX_AIR_SPEED);
+        float target_velocity_x =
+            velocity.x + left_stick_input.x * MAX_AIR_ACCELERATION;
+
+        if (left_stick_input.x > 0.0f) {
+            if (velocity.x < MAX_AIR_VELOCITY) {
+                velocity.x = glm::min(target_velocity_x, MAX_AIR_VELOCITY);
+            } else {
+                velocity.x = glm::min(target_velocity_x, velocity.x);
+            }
+        } else {
+            if (velocity.x > -MAX_AIR_VELOCITY) {
+                velocity.x = glm::max(target_velocity_x, -MAX_AIR_VELOCITY);
+            } else {
+                velocity.x = glm::max(target_velocity_x, velocity.x);
+            }
+        }
 
         if (can_double_jump && (gamepad->button_down(button_map.jump) ||
                                 gamepad->button_down(button_map.jump_alt))) {
-            velocity.x = left_stick_input.x * MAX_AIR_SPEED;
+            velocity.x = left_stick_input.x * MAX_AIR_VELOCITY;
             velocity.y = DOUBLE_JUMP_FORCE;
 
             can_double_jump = false;
@@ -124,12 +136,19 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
     }
 
     // Wall jump
-    if (wall_jump_cotyote_time > 0.0f &&
-        (gamepad->button_down(button_map.jump) ||
-         gamepad->button_down(button_map.jump_alt))) {
+    {
+        const bool jump_button_down = gamepad->button_down(button_map.jump) ||
+                                      gamepad->button_down(button_map.jump_alt);
+        const bool pushing_away_from_wall =
+            (wall_direction == Direction::LEFT && left_stick_input.x > 0.0f) ||
+            (wall_direction == Direction::RIGHT && left_stick_input.x < -0.0f);
 
-        velocity = glm::normalize(left_stick_input) * WALL_JUMP_FORCE;
-        state = FALLING;
+        if (jump_button_down && pushing_away_from_wall &&
+            wall_jump_cotyote_time > 0.0f && left_stick_input.y >= 0.0f) {
+
+            velocity = glm::normalize(left_stick_input) * WALL_JUMP_FORCE;
+            state = FALLING;
+        }
     }
 
     // Leg and weapon animation
