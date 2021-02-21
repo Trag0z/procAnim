@@ -33,6 +33,7 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("draw_wireframes", &renderer.draw_wireframes);
     items.emplace("draw_colliders", &renderer.draw_colliders);
     items.emplace("draw_leg_splines", &renderer.draw_leg_splines);
+    items.emplace("draw_weapon_trails", &renderer.draw_weapon_trails);
     objects.emplace("Renderer", std::move(items));
 
     // Player

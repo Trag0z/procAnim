@@ -15,6 +15,7 @@
 #include "Player.cpp"
 #include "Spline.cpp"
 #include "Util.cpp"
+#include "WeaponTrail.cpp"
 #include "rendering/Color.cpp"
 #include "rendering/Mesh.cpp"
 #include "rendering/Renderer.cpp"

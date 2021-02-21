@@ -110,10 +110,10 @@ DebugShader::DebugShader(const char* vert_path, const char* frag_path)
     GLuint indices[6] = {0, 1, 2, 2, 3, 0};
 
     Vertex vertices[4];
-    vertices[0] = {{-1.0f, 1.0f}};
-    vertices[1] = {{-1.0f, -1.0f}};
-    vertices[2] = {{1.0f, -1.0f}};
-    vertices[3] = {{1.0f, 1.0f}};
+    vertices[0] = glm::vec2(-1.0f, 1.0f);
+    vertices[1] = glm::vec2(-1.0f, -1.0f);
+    vertices[2] = glm::vec2(1.0f, -1.0f);
+    vertices[3] = glm::vec2(1.0f, 1.0f);
 
     SQUARE_VAO.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
 
@@ -129,7 +129,7 @@ DebugShader::DebugShader(const char* vert_path, const char* frag_path)
         float theta = static_cast<float>(i) /
                       static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
 
-        circle_vertices[i].pos = glm::vec2(cosf(theta), sinf(theta));
+        circle_vertices[i] = glm::vec2(cosf(theta), sinf(theta));
     }
 
     CIRCLE_VAO.init(circle_indices, CIRCLE_SEGMENTS, circle_vertices,

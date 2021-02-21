@@ -348,6 +348,16 @@ void Game::run() {
         }
     }
 
+    if (renderer.draw_weapon_trails) {
+        renderer.debug_shader.use();
+        renderer.debug_shader.set_color(Color::RED);
+
+        for (auto& player : players) {
+            renderer.debug_shader.set_model(&player.model_matrix());
+            player.weapon_trail.render();
+        }
+    }
+
 #ifdef _DEBUG
     // Debug data
     if (collision_point.collision_happened) {

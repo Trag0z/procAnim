@@ -40,6 +40,8 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
     animator.init(this, rigged_mesh, colliders);
     SDL_assert(pad);
     gamepad = pad;
+
+    weapon_trail.init();
 }
 
 void Player::update(float delta_time, const std::list<AABB>& colliders) {
@@ -150,8 +152,7 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
         }
     }
 
-    // Wall jump
-    {
+    { // Wall jump
         const bool jump_button_down = gamepad->button_down(button_map.jump) ||
                                       gamepad->button_down(button_map.jump_alt);
         const bool pushing_away_from_wall =
@@ -177,6 +178,8 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
             Segment{head_world, local_to_world_space(weapon->tail())};
     }
     update_model_matrix();
+
+    weapon_trail.update(weapon->tail());
 }
 
 bool Player::is_facing_right() const noexcept { return facing_right; }

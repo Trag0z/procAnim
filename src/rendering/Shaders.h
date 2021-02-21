@@ -36,9 +36,7 @@ class DebugShader : public ShaderDetail::Shader {
 
     void set_color(const Color& color) const;
 
-    struct Vertex {
-        glm::vec2 pos;
-    };
+    using Vertex = glm::vec2;
 
     // Vertices for square between -1 and 1 on both axes.
     static VertexArray<Vertex> SQUARE_VAO;

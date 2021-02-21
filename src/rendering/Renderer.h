@@ -46,6 +46,7 @@ class Renderer {
     bool draw_wireframes = false;
     bool draw_colliders = true;
     bool draw_leg_splines = true;
+    bool draw_weapon_trails = true;
 
     friend ConfigManager;
     friend Game;

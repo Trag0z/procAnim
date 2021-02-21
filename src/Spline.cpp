@@ -1,8 +1,9 @@
 #pragma once
-
 #include "Spline.h"
 #include "Game.h"
 #include "Util.h"
+#include <imgui/imgui.h>
+#include <glm/gtc/type_ptr.hpp>
 
 /////                                   /////
 /////               Spline              /////
@@ -35,7 +36,7 @@ void Spline::init(const glm::vec2 points[NUM_POINTS]) {
         for (size_t i = 0; i < RENDER_STEPS; ++i) {
             float t = static_cast<float>(i) / static_cast<float>(RENDER_STEPS);
             interpolation_vector = {t * t * t, t * t, t, 1.0f};
-            line_shader_vertices[i].pos =
+            line_shader_vertices[i] =
                 parameter_matrix * HERMITE_MATRIX * interpolation_vector;
 
             indices[i] = static_cast<GLuint>(i);
@@ -45,8 +46,8 @@ void Spline::init(const glm::vec2 points[NUM_POINTS]) {
                       GL_DYNAMIC_DRAW);
 
         // Init point render data
-        point_shader_vertices[0].pos = glm::vec4(points_[P1], 0.0f, 1.0f);
-        point_shader_vertices[1].pos = glm::vec4(points_[P2], 0.0f, 1.0f);
+        point_shader_vertices[0] = glm::vec4(points_[P1], 0.0f, 1.0f);
+        point_shader_vertices[1] = glm::vec4(points_[P2], 0.0f, 1.0f);
 
         point_vao.init(indices, 2, point_shader_vertices.data(),
                        static_cast<GLuint>(point_shader_vertices.size()),
@@ -106,14 +107,14 @@ void Spline::update_render_data() {
     for (size_t i = 0; i < RENDER_STEPS; ++i) {
         float t = static_cast<float>(i) / static_cast<float>(RENDER_STEPS - 1);
 
-        line_shader_vertices[i].pos = get_point_on_spline(t);
+        line_shader_vertices[i] = get_point_on_spline(t);
     }
 
     line_vao.update_vertex_data(line_shader_vertices);
 
     // Points
-    point_shader_vertices[0].pos = points_[P1];
-    point_shader_vertices[1].pos = points_[P2];
+    point_shader_vertices[0] = points_[P1];
+    point_shader_vertices[1] = points_[P2];
 
     point_vao.update_vertex_data(point_shader_vertices);
 }
@@ -535,7 +536,7 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
             float theta = static_cast<float>(n_segment) /
                           static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
 
-            circle_vertices[n_segment].pos =
+            circle_vertices[n_segment] =
                 glm::vec2(radius * cosf(theta), radius * sinf(theta));
         }
 
@@ -566,12 +567,12 @@ void SplineEditor::render(const Renderer& renderer, bool spline_edit_mode) {
             const glm::vec2* spline_points = spline->points();
 
             std::array<DebugShader::Vertex, 4> points;
-            points[P1].pos = glm::vec4(spline_points[P1], 0.0f, 1.0f);
-            points[T1].pos =
+            points[P1] = glm::vec4(spline_points[P1], 0.0f, 1.0f);
+            points[T1] =
                 glm::vec4(spline_points[P1] + spline_points[T1], 0.0f, 1.0f);
-            points[T2].pos =
+            points[T2] =
                 glm::vec4(spline_points[P2] + spline_points[T2], 0.0f, 1.0f);
-            points[P2].pos = glm::vec4(spline_points[P2], 0.0f, 1.0f);
+            points[P2] = glm::vec4(spline_points[P2], 0.0f, 1.0f);
 
             tangents_vao.update_vertex_data(points);
 

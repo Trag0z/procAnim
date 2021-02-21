@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "rendering/Renderer.h"
 #include "CollisionDetection.h"
+#include "WeaponTrail.h"
 
 class Gamepad;
 class ConfigLoader;
@@ -44,6 +45,8 @@ class Player : public Entity {
 
     // These are in world space!
     Segment weapon_collider, last_weapon_collider;
+
+    WeaponTrail weapon_trail;
 
     // Connfigurable constants
     static float GROUND_HOVER_DISTANCE;
