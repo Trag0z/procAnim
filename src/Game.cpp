@@ -409,7 +409,6 @@ void Game::simulate_world(float delta_time) {
 
             if (first_collision.direction == Direction::NONE) {
                 new_player_position = player.position() + player_move;
-                // player.touching_wall = Direction::NONE;
 
             } else {
                 vec2 remaining_player_move;
@@ -420,7 +419,6 @@ void Game::simulate_world(float delta_time) {
 
                     remaining_player_move =
                         vec2(player_move.x * (1.0f - first_collision.t), 0.0f);
-                    // player.touching_wall = Direction::NONE;
 
                 } else {
                     SDL_assert(first_collision.direction == Direction::LEFT ||
@@ -430,8 +428,8 @@ void Game::simulate_world(float delta_time) {
                     remaining_player_move =
                         vec2(0.0f, player_move.y - (1.0f - first_collision.t));
 
-                    // player.touching_wall = first_collision.direction;
                     if (!player.grounded) {
+                        player.wall_direction = first_collision.direction;
                         player.state = Player::WALL_CLING;
                         player.velocity.y = 0.0f;
                     }
@@ -453,8 +451,8 @@ void Game::simulate_world(float delta_time) {
                     new_player_velocity = vec2(0.0f);
                 } else if (second_collision.direction == Direction::LEFT ||
                            second_collision.direction == Direction::RIGHT) {
-                    // player.touching_wall = second_collision.direction;
                     if (!player.grounded) {
+                        player.wall_direction = second_collision.direction;
                         player.state = Player::WALL_CLING;
                         SDL_assert(player.velocity.y == 0.0f);
                     }

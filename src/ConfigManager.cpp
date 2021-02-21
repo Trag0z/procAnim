@@ -40,6 +40,7 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("ground_hover_distance", &Player::GROUND_HOVER_DISTANCE);
     items.emplace("jump_force", &Player::JUMP_FORCE);
     items.emplace("double_jump_force", &Player::DOUBLE_JUMP_FORCE);
+    items.emplace("wall_jump_force", &Player::WALL_JUMP_FORCE);
     items.emplace("gravity", &Player::GRAVITY);
 
     items.emplace("max_walk_acceleration", &Player::WALK_ACCELERATION);

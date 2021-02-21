@@ -8,6 +8,7 @@
 float Player::GROUND_HOVER_DISTANCE = 160.0f;
 float Player::JUMP_FORCE = 30.0f;
 float Player::DOUBLE_JUMP_FORCE = 15.0f;
+float Player::WALL_JUMP_FORCE = 15.0f;
 float Player::GRAVITY = 2.0f;
 
 float Player::WALK_ACCELERATION = 1.0f;
@@ -95,6 +96,25 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
         }
     } else if (state == WALL_CLING) {
         velocity.y = left_stick_input.y * MAX_WALL_CLIMB_SPEED;
+
+        // Wall jump
+        const bool jump_button_down = gamepad->button_down(button_map.jump) ||
+                                      gamepad->button_down(button_map.jump_alt);
+        if (jump_button_down &&
+            ((wall_direction == Direction::LEFT && left_stick_input.x > 0.0f) ||
+             (wall_direction == Direction::RIGHT &&
+              left_stick_input.x < 0.0f))) {
+
+            velocity = glm::normalize(left_stick_input) * WALL_JUMP_FORCE;
+            state = FALLING;
+
+        } else if ((wall_direction == Direction::LEFT &&
+                    left_stick_input.x > 0.5f) ||
+                   (wall_direction == Direction::RIGHT &&
+                    left_stick_input.x < -0.5f)) {
+            velocity.y = 0.0f;
+            state = FALLING;
+        }
     } else if (state == FALLING) {
         SDL_assert(!grounded);
 
@@ -151,7 +171,8 @@ bool Player::display_debug_ui(size_t player_index) {
     Checkbox("grounded", &grounded);
 
     {
-        const char* items[] = {"STANDING", "WALKING", "FALLING", "HITSTUN"};
+        const char* items[] = {"STANDING", "WALKING", "FALLING", "HITSTUN",
+                               "WALL_CLING"};
         int current_state = static_cast<int>(state);
         if (Combo("state", &current_state, items, IM_ARRAYSIZE(items))) {
             state = static_cast<State>(current_state);

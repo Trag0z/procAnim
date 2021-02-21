@@ -1,6 +1,6 @@
 TODO:
-- walllcling state + movement
 - visualization of path of weapon movement -> calculate force and direction of hit from that line
+- add coyote time to wall jump
 
 - tune player acceleration/deceleration
 - wall jump

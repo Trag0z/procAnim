@@ -31,7 +31,7 @@ class Player : public Entity {
     float freeze_duration = 0.0f;
 
     bool can_double_jump = false;
-    Direction touching_wall = Direction::NONE;
+    Direction wall_direction = Direction::NONE;
 
     enum State {
         STANDING = 0,
@@ -48,6 +48,7 @@ class Player : public Entity {
     static float GROUND_HOVER_DISTANCE;
     static float JUMP_FORCE;
     static float DOUBLE_JUMP_FORCE;
+    static float WALL_JUMP_FORCE;
     static float GRAVITY;
 
     static float WALK_ACCELERATION;
