@@ -37,7 +37,8 @@ class Player : public Entity {
         STANDING = 0,
         WALKING = 1,
         FALLING = 2,
-        HITSTUN = 3
+        HITSTUN = 3,
+        WALL_CLING = 4
     } state = FALLING;
 
     // These are in world space!
@@ -54,6 +55,8 @@ class Player : public Entity {
 
     static float MAX_AIR_ACCELERATION;
     static float MAX_AIR_SPEED;
+
+    static float MAX_WALL_CLIMB_SPEED;
 
     static float HIT_SPEED_MULTIPLIER;
     static float HIT_COOLDOWN;

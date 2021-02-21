@@ -16,6 +16,8 @@ float Player::MAX_WALK_SPEED = 10.0f;
 float Player::MAX_AIR_ACCELERATION = 0.5f;
 float Player::MAX_AIR_SPEED = 10.0f;
 
+float Player::MAX_WALL_CLIMB_SPEED = 10.0f;
+
 float Player::HIT_SPEED_MULTIPLIER = 0.2f;
 float Player::HIT_COOLDOWN = 30.0f;
 float Player::HITSTUN_DURATION_MULTIPLIER = 0.8f;
@@ -91,6 +93,8 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
             state = FALLING;
             grounded = false;
         }
+    } else if (state == WALL_CLING) {
+        velocity.y = left_stick_input.y * MAX_WALL_CLIMB_SPEED;
     } else if (state == FALLING) {
         SDL_assert(!grounded);
 

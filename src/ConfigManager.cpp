@@ -48,6 +48,8 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("max_air_acceleration", &Player::MAX_AIR_ACCELERATION);
     items.emplace("max_air_speed", &Player::MAX_AIR_SPEED);
 
+    items.emplace("max_wall_climb_speed", &Player::MAX_WALL_CLIMB_SPEED);
+
     items.emplace("hit_speed_multiplier", &Player::HIT_SPEED_MULTIPLIER);
     items.emplace("hit_cooldown", &Player::HIT_COOLDOWN);
     items.emplace("hitstun_duration_multiplier",

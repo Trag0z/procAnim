@@ -1,4 +1,7 @@
 TODO:
+- walllcling state + movement
+- visualization of path of weapon movement -> calculate force and direction of hit from that line
+
 - tune player acceleration/deceleration
 - wall jump
 - better default jump?
