@@ -138,41 +138,41 @@ void Animator::update(float delta_time, float walking_speed,
     weapon_->length = weapon_length;
 
     // Walk animation
-    if (walking_speed > 0.0f) {
-        if (leg_state == NEUTRAL) {
-            // Start to walk
-            last_leg_state = leg_state;
-            leg_state = RIGHT_LEG_UP;
-            interpolation_factor_between_splines = walking_speed;
-            set_new_splines(walking_speed, colliders);
+    // if (walking_speed > 0.0f) {
+    //     if (leg_state == NEUTRAL) {
+    //         // Start to walk
+    //         last_leg_state = leg_state;
+    //         leg_state = RIGHT_LEG_UP;
+    //         interpolation_factor_between_splines = walking_speed;
+    //         set_new_splines(walking_speed, colliders);
 
-        } else if (interpolation_factor_on_spline == 1.0f) {
-            // Is walking and has reached the end of the current spline
-            interpolation_factor_between_splines = walking_speed;
-            if (leg_state == LEFT_LEG_UP) {
-                last_leg_state = leg_state;
-                leg_state = RIGHT_LEG_UP;
-                set_new_splines(walking_speed, colliders);
+    //     } else if (interpolation_factor_on_spline == 1.0f) {
+    //         // Is walking and has reached the end of the current spline
+    //         interpolation_factor_between_splines = walking_speed;
+    //         if (leg_state == LEFT_LEG_UP) {
+    //             last_leg_state = leg_state;
+    //             leg_state = RIGHT_LEG_UP;
+    //             set_new_splines(walking_speed, colliders);
 
-            } else {
-                last_leg_state = leg_state;
-                leg_state = LEFT_LEG_UP;
-                set_new_splines(walking_speed, colliders);
-            }
-        }
-    } else {
-        // Player is standing
-        if (leg_state != NEUTRAL) {
-            last_leg_state = leg_state;
-            leg_state = NEUTRAL;
+    //         } else {
+    //             last_leg_state = leg_state;
+    //             leg_state = LEFT_LEG_UP;
+    //             set_new_splines(walking_speed, colliders);
+    //         }
+    //     }
+    // } else {
+    // Player is standing
+    if (leg_state != NEUTRAL) {
+        last_leg_state = leg_state;
+        leg_state = NEUTRAL;
 
-            set_new_splines(walking_speed, colliders);
+        set_new_splines(walking_speed, colliders);
 
-        } else if (interpolation_factor_on_spline == 1.0f) {
-            last_leg_state = NEUTRAL;
-            set_new_splines(walking_speed, colliders);
-        }
+    } else if (interpolation_factor_on_spline == 1.0f) {
+        last_leg_state = NEUTRAL;
+        set_new_splines(walking_speed, colliders);
     }
+    // }
 
     // Update legs
     float interpolation_speed =
