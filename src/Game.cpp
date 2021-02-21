@@ -176,7 +176,7 @@ void Game::run() {
 
     // Move/zoom camera
     if (mouse_keyboard_input.mouse_button(MouseButton::MIDDLE)) {
-        Vector mouse_move =
+        vec2 mouse_move =
             static_cast<glm::vec2>(mouse_keyboard_input.mouse_move_screen());
         mouse_move.x *= -1.0f;
 
@@ -387,7 +387,7 @@ void Game::simulate_world(float delta_time) {
 
         //              Resolve collisions              //
         Point new_player_position;
-        Vector new_player_velocity = player.velocity;
+        vec2 new_player_velocity = player.velocity;
 
         // Body collisions with level
         if (player.state == Player::HITSTUN) {
@@ -403,33 +403,37 @@ void Game::simulate_world(float delta_time) {
             }
 
         } else { // player.state != Player::HITSTUN
-            Vector player_move = player.velocity * delta_time;
+            vec2 player_move = player.velocity * delta_time;
             CollisionData first_collision = find_first_collision_moving_circle(
                 player.body_collider(), player_move, level.colliders());
 
             if (first_collision.direction == Direction::NONE) {
                 new_player_position = player.position() + player_move;
+                player.touching_wall = Direction::NONE;
 
             } else {
-                Vector remaining_player_move;
+                vec2 remaining_player_move;
                 if (first_collision.direction == Direction::DOWN ||
                     first_collision.direction == Direction::UP) {
 
                     new_player_velocity.y = 0.0f;
 
-                    remaining_player_move = Vector(
-                        player_move.x * (1.0f - first_collision.t), 0.0f);
+                    remaining_player_move =
+                        vec2(player_move.x * (1.0f - first_collision.t), 0.0f);
+                    player.touching_wall = Direction::NONE;
 
-                } else { // collision.direction == Direction::LEFT ||
-                         // Direction::RIGHT
+                } else {
+                    SDL_assert(first_collision.direction == Direction::LEFT ||
+                               first_collision.direction == Direction::RIGHT);
                     new_player_velocity.x = 0.0f;
 
-                    remaining_player_move = Vector(
-                        0.0f, player_move.y - (1.0f - first_collision.t));
+                    remaining_player_move =
+                        vec2(0.0f, player_move.y - (1.0f - first_collision.t));
+                    player.touching_wall = first_collision.direction;
                 }
 
                 Circle body_collider = player.body_collider();
-                body_collider.center += player_move * first_collision.t;
+                body_collider.center = first_collision.position;
 
                 CollisionData second_collision =
                     find_first_collision_moving_circle(body_collider,
@@ -441,12 +445,13 @@ void Game::simulate_world(float delta_time) {
 
                 if (second_collision.direction != Direction::NONE) {
                     // The player hit a corner, can't move any further
-                    new_player_velocity = Vector(0.0f);
+                    new_player_velocity = vec2(0.0f);
+                } else if (second_collision.direction == Direction::LEFT ||
+                           second_collision.direction == Direction::RIGHT) {
+                    player.touching_wall = second_collision.direction;
                 }
 
-                new_player_position =
-                    body_collider.center +
-                    remaining_player_move * second_collision.t;
+                new_player_position = second_collision.position;
             }
         }
 
@@ -475,7 +480,9 @@ void Game::simulate_world(float delta_time) {
             }
         }
 
-        if (!player.grounded) {
+        if (player.touching_wall != Direction::NONE) {
+            new_player_velocity.y = 0.0f;
+        } else if (!player.grounded) {
             new_player_velocity.y -= Player::GRAVITY;
         }
 

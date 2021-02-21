@@ -5,6 +5,8 @@ TODO:
 
 
 TODO LATER:
+- remove Player::State::HITSTUN because it is not used anymore
+
 - handle jump inputs in step mode better
 - fix leg animations
 - change the direction of the player texture another way than changing it's scale
@@ -17,6 +19,7 @@ Bugs:               (@BUG)
 - sometimes turns around due to stick snap-back?
 
 Cleanup:            (@CLEANUP)
+- In some places, Game::simulate_world() uses CollisionData::t to determine a new position/move. Maybe it should use CollisionData::position instead, because that's more precise than t?
 - replace std::abs with glm::abs
 
 Optimizations:      (@OPTIMIZE)
