@@ -554,8 +554,8 @@ void Game::simulate_world(float delta_time) {
                 intersect_segment_circle(*weapon, ball.collider())) {
 
                 // The ball was hit
-                vec2 hit_direction = player.weapon_collider.line() -
-                                     player.last_weapon_collider.line();
+                vec2 hit_direction =
+                    player.weapon_collider.b - player.last_weapon_collider.b;
 
                 ball.set_velocity(hit_direction * Player::HIT_SPEED_MULTIPLIER);
 
