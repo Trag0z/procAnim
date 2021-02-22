@@ -1,13 +1,13 @@
 #pragma once
 #include "rendering/Renderer.h"
 #include "Types.h"
+#include <list>
 
 class WeaponTrail {
-    static const size_t NUM_SEGMENTS = 40;
+    static const size_t NUM_SEGMENTS = 30;
     static const size_t NUM_VERTICES = NUM_SEGMENTS + 1;
 
-    size_t next_weapon_position_index = 0;
-    std::array<TrailShader::Vertex, NUM_VERTICES> weapon_positions;
+    std::list<TrailShader::Vertex> weapon_positions;
 
     VertexArray<TrailShader::Vertex> vao;
 
@@ -15,4 +15,6 @@ class WeaponTrail {
     void init();
     void update(vec2 new_position);
     void render();
+
+    float continuous_trail_length(float max_angle_between_segments);
 };
