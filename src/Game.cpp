@@ -350,7 +350,7 @@ void Game::run() {
 
     if (renderer.draw_weapon_trails) {
         renderer.trail_shader.use();
-        renderer.trail_shader.set_colors(Color::LIGHT_BLUE, Color::RED);
+        renderer.trail_shader.set_colors(Color::GREEN, Color::RED);
 
         for (auto& player : players) {
             renderer.trail_shader.set_model(&player.model_matrix());

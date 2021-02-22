@@ -20,6 +20,9 @@ void Renderer::init() {
 
     bone_shader =
         BoneShader("../src/shaders/bone.vert", "../src/shaders/bone.frag");
+
+    trail_shader =
+        TrailShader("../src/shaders/trail.vert", "../src/shaders/trail.frag");
 }
 
 void Renderer::update(float delta_time) {
@@ -48,6 +51,7 @@ void Renderer::update(float delta_time) {
     rigged_shader.set_camera(&cam);
     rigged_debug_shader.set_camera(&cam);
     bone_shader.set_camera(&cam);
+    trail_shader.set_camera(&cam);
 }
 
 void Renderer::shake_screen(float intensity, float duration, float speed) {

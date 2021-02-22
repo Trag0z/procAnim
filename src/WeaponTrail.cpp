@@ -1,17 +1,10 @@
 #pragma once
 #include "WeaponTrail.h"
 
-bool WeaponTrail::statics_initialized = false;
-uint WeaponTrail::indices[WeaponTrail::num_indices];
-
 void WeaponTrail::init() {
-    if (!statics_initialized) {
-        for (uint n_index = 1, n_trail = 0; n_index < num_indices;
-             n_index += 2, ++n_trail) {
-            indices[n_index - 1] = n_trail;
-            indices[n_index] = n_trail + 1;
-        }
-        statics_initialized = true;
+    uint indices[NUM_VERTICES];
+    for (uint n_index = 0; n_index < NUM_VERTICES; ++n_index) {
+        indices[n_index] = n_index;
     }
 
     for (auto& pos : weapon_positions) {
@@ -19,7 +12,7 @@ void WeaponTrail::init() {
         pos.age = 1.0f;
     }
 
-    vao.init(indices, num_indices, weapon_positions.data(),
+    vao.init(indices, NUM_VERTICES, weapon_positions.data(),
              static_cast<GLuint>(weapon_positions.size()), GL_DYNAMIC_DRAW);
 }
 
@@ -39,16 +32,23 @@ void WeaponTrail::update(vec2 new_position) {
 }
 
 void WeaponTrail::render() {
-    vao.update_vertex_data(weapon_positions);
+    std::array<TrailShader::Vertex, NUM_VERTICES> ordered_vertices;
+    ordered_vertices[0] = weapon_positions[0];
+    size_t ordered_vertices_index = 0;
 
-    uint oldest_elem_index = static_cast<uint>(next_weapon_position_index) * 2;
-    if (oldest_elem_index >= num_indices) {
-        oldest_elem_index = 0;
+    for (size_t i = next_weapon_position_index; i < NUM_VERTICES; ++i) {
+        ordered_vertices[ordered_vertices_index++] = weapon_positions[i];
     }
 
-    vao.draw(GL_LINES, num_indices - oldest_elem_index,
-             &indices[oldest_elem_index]);
+    for (size_t i = 0; ordered_vertices_index < NUM_VERTICES; ++i) {
+        ordered_vertices[ordered_vertices_index++] = weapon_positions[i];
+    }
+    // #pragma warning(disable : 4701)
+    vao.update_vertex_data(ordered_vertices);
 
-    uint remaining_indices = num_indices - (num_indices - oldest_elem_index);
-    vao.draw(GL_LINES, remaining_indices, indices);
+    vao.draw(GL_LINE_STRIP);
+
+    uint indices[2] = {NUM_VERTICES - 5, NUM_VERTICES - 1};
+
+    vao.draw(GL_POINTS, 2, indices);
 }

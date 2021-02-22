@@ -3,14 +3,12 @@
 #include "Types.h"
 
 class WeaponTrail {
-    static const size_t SEGMENTS = 40;
-    static const uint num_indices = WeaponTrail::SEGMENTS * 2;
-    static uint indices[num_indices];
-    static bool statics_initialized;
+    static const size_t NUM_SEGMENTS = 40;
+    static const size_t NUM_VERTICES = NUM_SEGMENTS + 1;
 
     VertexArray<TrailShader::Vertex> vao;
     size_t next_weapon_position_index = 0;
-    std::array<TrailShader::Vertex, SEGMENTS + 1> weapon_positions;
+    std::array<TrailShader::Vertex, NUM_VERTICES> weapon_positions;
 
   public:
     void init();
