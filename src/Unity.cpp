@@ -1,4 +1,5 @@
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+// #define SHADER_DEBUG
 
 #include "main.cpp"
 #include "Animator.cpp"

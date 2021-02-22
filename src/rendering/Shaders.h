@@ -141,7 +141,7 @@ void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
                                             GLuint num_indices,
                                             const DebugShader::Vertex* vertices,
                                             GLuint num_vertices, GLenum usage) {
-#ifdef _DEBUG
+#ifdef SHADER_DEBUG
     if (vertices)
         vertex_data.assign(num_vertices, *vertices);
 #endif
@@ -175,7 +175,7 @@ void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
 void VertexArray<TexturedShader::Vertex>::init(
     const GLuint* indices, GLuint num_indices,
     const TexturedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
-#ifdef _DEBUG
+#ifdef SHADER_DEBUG
     if (vertices)
         vertex_data.assign(num_vertices, *vertices);
 #endif
@@ -215,7 +215,7 @@ void VertexArray<TexturedShader::Vertex>::init(
 void VertexArray<RiggedShader::Vertex>::init(
     const GLuint* indices, GLuint num_indices,
     const RiggedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
-#ifdef _DEBUG
+#ifdef SHADER_DEBUG
     if (vertices)
         vertex_data.assign(num_vertices, *vertices);
 #endif
@@ -265,7 +265,7 @@ void VertexArray<BoneShader::Vertex>::init(const GLuint* indices,
                                            GLuint num_indices,
                                            const BoneShader::Vertex* vertices,
                                            GLuint num_vertices, GLenum usage) {
-#ifdef _DEBUG
+#ifdef SHADER_DEBUG
     if (vertices)
         vertex_data.assign(num_vertices, *vertices);
 #endif
