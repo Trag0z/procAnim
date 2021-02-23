@@ -568,9 +568,6 @@ void Game::simulate_world(float delta_time) {
 
                 player.hit_cooldown = Player::MAX_HIT_COOLDOWN;
 
-                printf("Player %zd hit with %f, %f\n", i, hit_direction.x,
-                       hit_direction.y);
-
                 const float screen_shake_duration =
                     game_config.hit_screen_shake_duration * trail_length;
 
@@ -584,7 +581,7 @@ void Game::simulate_world(float delta_time) {
         }
     }
 
-    ball.update(delta_time, level.colliders());
+    ball.update(delta_time, level.colliders(), audio_manager);
     renderer.update(delta_time);
 }
 

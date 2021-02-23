@@ -1,8 +1,8 @@
 TODO:
-- visualization of path of weapon movement -> calculate force and direction of hit from that line
-
 - tune player acceleration/deceleration
 - better default jump?
+
+- pass audio_manager as const reference to Ball::update()
 
 - in the shader init functions, glVertexAttribPointer(0, 4, ...) is called, but the vertices have 2 components so the 4 should probably be a 2
 

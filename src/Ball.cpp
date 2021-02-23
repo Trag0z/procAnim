@@ -19,7 +19,8 @@ void Ball::init(glm::vec2 position, const char* texture_path) {
     texture.load_from_file(texture_path);
 }
 
-void Ball::update(const float delta_time, const std::list<AABB>& level) {
+void Ball::update(const float delta_time, const std::list<AABB>& level,
+                  AudioManager& audio_manager) {
     if (freeze_duration > 0.0f) {
         freeze_duration -= delta_time;
         return;
@@ -36,6 +37,11 @@ void Ball::update(const float delta_time, const std::list<AABB>& level) {
 
     position_ = move_result.new_position;
     velocity = move_result.new_velocity;
+
+    if (move_result.last_hit_diretcion != Direction::NONE &&
+        move_result.last_hit_diretcion != Direction::DOWN) {
+        audio_manager.play(Sound::WALL_BOUNCE);
+    }
 
     if (grounded) {
         velocity.x *= 1.0f / ROLLING_FRICTION;
