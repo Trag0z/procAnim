@@ -554,10 +554,17 @@ void Game::simulate_world(float delta_time) {
                 intersect_segment_circle(*weapon, ball.collider())) {
 
                 // The ball was hit
-                vec2 hit_direction =
-                    player.weapon_collider.b - player.last_weapon_collider.b;
+                vec2 hit_direction = glm::normalize(
+                    player.weapon_collider.b - player.last_weapon_collider.b);
 
-                ball.set_velocity(hit_direction * Player::HIT_SPEED_MULTIPLIER);
+                float trail_length =
+                    player.weapon_trail.continuous_trail_length(
+                        Player::MAX_HIT_TRAIL_ANGLE);
+
+                vec2 hit_velocity =
+                    hit_direction * trail_length * Player::HIT_SPEED_MULTIPLIER;
+
+                ball.set_velocity(hit_velocity);
 
                 player.hit_cooldown = Player::MAX_HIT_COOLDOWN;
 
@@ -565,15 +572,13 @@ void Game::simulate_world(float delta_time) {
                        hit_direction.y);
 
                 const float screen_shake_duration =
-                    game_config.hit_screen_shake_duration *
-                    glm::length(hit_direction);
+                    game_config.hit_screen_shake_duration * trail_length;
 
                 player.freeze_duration = screen_shake_duration;
                 ball.freeze_duration = screen_shake_duration;
-                renderer.shake_screen(game_config.hit_screen_shake_intensity *
-                                          glm::length(hit_direction),
-                                      screen_shake_duration,
-                                      game_config.hit_screen_shake_speed);
+                renderer.shake_screen(
+                    game_config.hit_screen_shake_intensity * trail_length,
+                    screen_shake_duration, game_config.hit_screen_shake_speed);
                 audio_manager.play(Sound::HIT_2);
             }
         }

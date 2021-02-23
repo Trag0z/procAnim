@@ -24,6 +24,7 @@ float Player::MAX_AIR_VELOCITY = 10.0f;
 
 float Player::HIT_SPEED_MULTIPLIER = 0.2f;
 float Player::MAX_HIT_COOLDOWN = 30.0f;
+float Player::MAX_HIT_TRAIL_ANGLE = PI / 2.0f;
 float Player::HITSTUN_DURATION_MULTIPLIER = 0.8f;
 
 static const struct {

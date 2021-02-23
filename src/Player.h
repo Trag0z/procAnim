@@ -68,6 +68,7 @@ class Player : public Entity {
 
     static float HIT_SPEED_MULTIPLIER;
     static float MAX_HIT_COOLDOWN;
+    static float MAX_HIT_TRAIL_ANGLE;
     static float HITSTUN_DURATION_MULTIPLIER;
 
   public:

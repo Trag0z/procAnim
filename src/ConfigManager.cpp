@@ -58,6 +58,7 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
 
     items.emplace("hit_speed_multiplier", &Player::HIT_SPEED_MULTIPLIER);
     items.emplace("hit_cooldown", &Player::MAX_HIT_COOLDOWN);
+    items.emplace("max_hit_trail_angle", &Player::MAX_HIT_TRAIL_ANGLE);
     items.emplace("hitstun_duration_multiplier",
                   &Player::HITSTUN_DURATION_MULTIPLIER);
     objects.emplace("Player", std::move(items));
@@ -116,7 +117,7 @@ void ConfigManager::save_config() {
     SDL_assert(!save_path.empty());
     std::stringstream stream;
 
-    const size_t buf_size = 1024;
+    const size_t buf_size = 2048;
     char buf[buf_size];
 
     SaveVisitor::write_pos = buf;
