@@ -121,10 +121,6 @@ void Animator::update(float delta_time, float walking_speed,
                       glm::vec2 right_stick_input,
                       const std::list<AABB>& colliders) {
     // Weapon animation
-    if (!parent->is_facing_right()) {
-        right_stick_input.x *= -1.0f;
-    }
-
     float weapon_rotation =
         atan2f(right_stick_input.y, right_stick_input.x) - PI * 0.5f;
 

@@ -70,7 +70,6 @@ void Player::update(float delta_time, const std::list<AABB>& colliders) {
         if ((left_stick_input.x < 0.0f && facing_right) ||
             (left_stick_input.x > 0.0f && !facing_right)) {
             facing_right = !facing_right;
-            scale.x *= -1.0f;
         }
     }
 

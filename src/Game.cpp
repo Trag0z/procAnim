@@ -276,8 +276,17 @@ void Game::run() {
 
     if (renderer.draw_body) {
         renderer.textured_shader.use();
-        for (const auto& player : players) {
-            renderer.textured_shader.set_model(&player.model);
+        for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
+            const auto& player = players[n_player];
+
+            glm::mat3 flipped_model;
+            if (player.is_facing_right()) {
+                flipped_model = glm::scale(player.model, vec2(-1.0f, 1.0f));
+            } else {
+                flipped_model = player.model;
+            }
+
+            renderer.textured_shader.set_model(&flipped_model);
             renderer.textured_shader.set_texture(player.texture);
 
             player.body_mesh.vao.draw(GL_TRIANGLES);
@@ -296,6 +305,7 @@ void Game::run() {
             renderer.rigged_debug_shader.set_bone_transforms(
                 bone_transforms[n_player].data());
 
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             player.rigged_mesh.vao.draw(GL_TRIANGLES);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
@@ -305,6 +315,7 @@ void Game::run() {
         renderer.bone_shader.use();
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
+
             renderer.bone_shader.set_model(&player.model);
             renderer.bone_shader.set_color(Color::RED);
             renderer.bone_shader.set_bone_transforms(
