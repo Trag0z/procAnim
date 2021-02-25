@@ -167,7 +167,7 @@ void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
                  vertices, usage);
 
     // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebugShader::Vertex),
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(DebugShader::Vertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
 }
@@ -201,7 +201,7 @@ void VertexArray<TexturedShader::Vertex>::init(
                  usage);
 
     // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
                           sizeof(TexturedShader::Vertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
@@ -240,7 +240,7 @@ void VertexArray<RiggedShader::Vertex>::init(
                  vertices, usage);
 
     // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
                           sizeof(RiggedShader::Vertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
@@ -290,7 +290,7 @@ void VertexArray<BoneShader::Vertex>::init(const GLuint* indices,
                  vertices, usage);
 
     // position attribute
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(BoneShader::Vertex),
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(BoneShader::Vertex),
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
 }
