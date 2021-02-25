@@ -1,6 +1,8 @@
 #pragma once
-
 #include "Entity.h"
+#include <glm/glm.hpp>
+#include <glm/gtx/matrix_transform_2d.hpp>
+#include <sdl/SDL_assert.h>
 
 void Entity::update_model_matrix() {
     model = glm::translate(glm::mat3(1.0f), position_);
