@@ -298,8 +298,6 @@ void Game::run() {
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
 
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            // NEXT: Why does this not display anything?
             renderer.rigged_debug_shader.set_model(&player.model);
             renderer.rigged_debug_shader.set_color(Color::BLUE);
             renderer.rigged_debug_shader.set_bone_transforms(
