@@ -538,29 +538,34 @@ void Game::simulate_world(float delta_time) {
         weapons[1]->line() != glm::vec2(0.0f)) {
 
         // Weapon vs. weapon
-        float t;
-        Point collision_pos;
-        if (intersect_segment_segment(*weapons[0], *weapons[1], &t,
-                                      &collision_pos)) {
-            printf("Weapons colliding at t=%.2f, pos: %.2f, %.2f\n", t,
-                   collision_pos.x, collision_pos.y);
+        {
+            float t;
+            Point collision_pos;
+            if (intersect_segment_segment(*weapons[0], *weapons[1], &t,
+                                          &collision_pos)) {
+                printf("Weapons colliding at t=%.2f, pos: %.2f, %.2f\n", t,
+                       collision_pos.x, collision_pos.y);
 
 #ifdef _DEBUG
-            std::array<DebugShader::Vertex, 1> shader_vertex = {collision_pos};
-            collision_point.vao.update_vertex_data(shader_vertex);
-            collision_point.collision_happened = true;
-        } else {
-            collision_point.collision_happened = false;
+                std::array<DebugShader::Vertex, 1> shader_vertex = {
+                    collision_pos};
+                collision_point.vao.update_vertex_data(shader_vertex);
+                collision_point.collision_happened = true;
+            } else {
+                collision_point.collision_happened = false;
 #endif
+            }
         }
 
         // Weapon vs. ball
         for (size_t i = 0; i < NUM_PLAYERS; ++i) {
             auto& weapon = weapons[i];
             auto& player = players[i];
+
+            float t;
             if (player.hit_cooldown <= 0.0f &&
                 glm::length(weapon->line()) > player.body_collider().radius &&
-                intersect_segment_circle(*weapon, ball.collider())) {
+                intersect_segment_circle(*weapon, ball.collider(), &t)) {
 
                 // The ball was hit
                 vec2 hit_direction = glm::normalize(
@@ -570,8 +575,11 @@ void Game::simulate_world(float delta_time) {
                     player.weapon_trail.continuous_trail_length(
                         Player::MAX_HIT_TRAIL_ANGLE);
 
-                vec2 hit_velocity =
-                    hit_direction * trail_length * Player::HIT_SPEED_MULTIPLIER;
+                // TODO: intersect_segment_circle() returns wrong t values
+                t = 1.0f;
+
+                vec2 hit_velocity = hit_direction * trail_length *
+                                    Player::HIT_SPEED_MULTIPLIER * t;
 
                 ball.set_velocity(hit_velocity);
 
