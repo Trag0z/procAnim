@@ -95,9 +95,6 @@ void Game::init() {
 
     mouse_keyboard_input.init(&renderer);
 
-    gamepads[0].init(0);
-    // gamepads[1].init(1);
-
     background.init("../assets/background.png");
 
     // Level
@@ -146,6 +143,13 @@ void Game::run() {
                 is_running = false;
             } else if (event.type == SDL_MOUSEWHEEL) {
                 mouse_keyboard_input.mouse_wheel_scroll = event.wheel.y;
+            } else if (event.type == SDL_CONTROLLERDEVICEADDED) {
+                for (auto& pad : gamepads) {
+                    if (pad.sdl_ptr == nullptr) {
+                        pad.init(event.cdevice.which);
+                        break;
+                    }
+                }
             }
         }
     }

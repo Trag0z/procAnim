@@ -91,17 +91,19 @@ glm::ivec2 MouseKeyboardInput::mouse_move_screen() const noexcept {
     return mouse_pos - last_mouse_pos;
 }
 
-void Gamepad::init(size_t index) {
-    sdl_ptr = SDL_GameControllerOpen(static_cast<int>(index));
-    if (!sdl_ptr) {
-        printf("[Input] Error opening gamepad %zd: %s. Using dummy pad.\n",
-               index, SDL_GetError());
+Gamepad::Gamepad() {
+    sdl_ptr = nullptr;
 
-        for (auto& a : axes) {
-            a = 0.0f;
-        }
+    for (auto& axis : axes) {
+        axis = 0.0f;
         button_map = button_down_map = button_up_map = 0;
     }
+}
+
+void Gamepad::init(size_t index) {
+    sdl_ptr = SDL_GameControllerOpen(static_cast<int>(index));
+    SDL_assert(sdl_ptr);
+    printf("[Input] Gamepad %zd connected.\n", index);
 }
 
 void Gamepad::update() {

@@ -1,7 +1,7 @@
 TODO:
 - tune player acceleration/deceleration
 - player can be hit by ball
-- detect when controller is connected at runtime
+- detect when controllers are disconnected
 
 - intersect_segment_circle() returns wrong t values (and therefore also wrong p values)
 

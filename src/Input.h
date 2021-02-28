@@ -53,12 +53,13 @@ class Gamepad {
     static s16 STICK_DEADZONE_IN;
     static s16 STICK_DEADZONE_OUT;
 
-    SDL_GameController* sdl_ptr = nullptr;
-
     float axes[NUM_AXES];
     u32 button_map, button_down_map, button_up_map;
 
   public:
+    SDL_GameController* sdl_ptr;
+
+    Gamepad();
     void init(size_t index);
     void update();
 
