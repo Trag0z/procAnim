@@ -4,13 +4,13 @@
 #include <glm/gtx/vector_angle.hpp>
 
 void WeaponTrail::init() {
-    uint indices[NUM_VERTICES];
+    // uint indices[NUM_VERTICES];
     for (uint n_index = 0; n_index < NUM_VERTICES; ++n_index) {
-        indices[n_index] = n_index;
+        // indices[n_index] = n_index;
         weapon_positions.push_back({vec2(0.0f), 1.0f});
     }
 
-    vao.init(indices, NUM_VERTICES, nullptr, NUM_VERTICES, GL_DYNAMIC_DRAW);
+    vao.init(nullptr, NUM_VERTICES, GL_DYNAMIC_DRAW);
 }
 
 void WeaponTrail::update(vec2 new_position) {

@@ -598,7 +598,8 @@ void Game::simulate_world(float delta_time) {
         }
     }
 
-    ball.update(delta_time, level.colliders(), audio_manager);
+    ball.update(delta_time, level.colliders(), audio_manager,
+                renderer.draw_ball_trajectory);
     renderer.update(delta_time);
 }
 

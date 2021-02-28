@@ -17,6 +17,13 @@ class Ball : Entity {
 
     Texture texture;
 
+    struct Trajectory {
+        static const GLuint NUM_VERTICES = 120;
+        static const Color COLOR;
+        VertexArray<DebugShader::Vertex> vao;
+        std::array<DebugShader::Vertex, NUM_VERTICES> vertices;
+    } trajectory;
+
     static float REBOUND;
     static float RADIUS;
     static float ROLLING_FRICTION;
@@ -28,7 +35,7 @@ class Ball : Entity {
 
     void init(glm::vec2 position, const char* texture_path);
     void update(const float delta_time, const std::list<AABB>& level,
-                AudioManager& audio_manager);
+                AudioManager& audio_manager, bool trajectory);
     void render(const Renderer& renderer) const;
     bool display_debug_ui();
 

@@ -7,6 +7,8 @@
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
+const Color Ball::Trajectory::COLOR = Color::BLUE;
+
 float Ball::REBOUND = 1.0f;
 float Ball::RADIUS = 50.0f;
 float Ball::ROLLING_FRICTION = 1.5f;
@@ -17,10 +19,16 @@ void Ball::init(glm::vec2 position, const char* texture_path) {
     Entity::init(position, glm::vec2(RADIUS));
     collider_ = {glm::vec2(0.0f), 1.0f};
     texture.load_from_file(texture_path);
+
+    for (auto& vert : trajectory.vertices) {
+        vert = vec2(0.0f);
+    }
+    trajectory.vao.init(trajectory.vertices.data(), trajectory.NUM_VERTICES,
+                        GL_DYNAMIC_DRAW);
 }
 
 void Ball::update(const float delta_time, const std::list<AABB>& level,
-                  AudioManager& audio_manager) {
+                  AudioManager& audio_manager, bool draw_trajectory) {
     if (freeze_duration > 0.0f) {
         freeze_duration -= delta_time;
         return;
@@ -84,6 +92,16 @@ void Ball::update(const float delta_time, const std::list<AABB>& level,
     } else if (rotation < -2.0f * PI) {
         rotation += 2.0f * PI;
     }
+
+    if (draw_trajectory && !grounded) {
+        trajectory.vertices[0] = position_;
+        vec2 new_velocity = velocity;
+        for (size_t i = 1; i < Trajectory::NUM_VERTICES; ++i) {
+            new_velocity.y -= GRAVITY;
+            trajectory.vertices[i] = trajectory.vertices[i - 1] + new_velocity;
+        }
+        trajectory.vao.update_vertex_data(trajectory.vertices);
+    }
 }
 
 void Ball::render(const Renderer& renderer) const {
@@ -94,6 +112,13 @@ void Ball::render(const Renderer& renderer) const {
 
     renderer.textured_shader.set_texture(texture);
     renderer.textured_shader.DEFAULT_VAO.draw(GL_TRIANGLES);
+
+    if (renderer.draw_ball_trajectory && !grounded) {
+        glm::mat3 trajectory_model = glm::mat3(1.0f);
+        renderer.debug_shader.set_model(&trajectory_model);
+        renderer.debug_shader.set_color(trajectory.COLOR);
+        trajectory.vao.draw(GL_LINE_STRIP);
+    }
 }
 
 bool Ball::display_debug_ui() {
