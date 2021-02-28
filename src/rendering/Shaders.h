@@ -172,6 +172,35 @@ void VertexArray<DebugShader::Vertex>::init(const GLuint* indices,
     glEnableVertexAttribArray(0);
 }
 
+void VertexArray<DebugShader::Vertex>::init(const DebugShader::Vertex* vertices,
+                                            GLuint num_vertices, GLenum usage) {
+#ifdef SHADER_DEBUG
+    if (vertices)
+        vertex_data.assign(num_vertices, *vertices);
+#endif
+
+    num_indices_ = static_cast<GLuint>(-1);
+    ebo_id = static_cast<GLuint>(-1);
+
+    num_vertices_ = num_vertices;
+    usage_ = usage;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(DebugShader::Vertex) * num_vertices,
+                 vertices, usage);
+
+    // position attribute
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(DebugShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+}
+
 void VertexArray<TexturedShader::Vertex>::init(
     const GLuint* indices, GLuint num_indices,
     const TexturedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
@@ -192,6 +221,40 @@ void VertexArray<TexturedShader::Vertex>::init(
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * num_indices_,
                  indices, usage);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(TexturedShader::Vertex) * num_vertices_, vertices,
+                 usage);
+
+    // position attribute
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(TexturedShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+    // uvCoord attribute
+    glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedShader::Vertex),
+        reinterpret_cast<void*>(offsetof(TexturedShader::Vertex, uv_coord)));
+    glEnableVertexAttribArray(1);
+}
+void VertexArray<TexturedShader::Vertex>::init(
+    const TexturedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
+#ifdef SHADER_DEBUG
+    if (vertices)
+        vertex_data.assign(num_vertices, *vertices);
+#endif
+
+    num_indices_ = static_cast<GLuint>(-1);
+    ebo_id = static_cast<GLuint>(-1);
+
+    num_vertices_ = num_vertices;
+    usage_ = usage;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
 
     // Create vertex buffer
     glGenBuffers(1, &vbo_id);
@@ -260,6 +323,49 @@ void VertexArray<RiggedShader::Vertex>::init(
         reinterpret_cast<void*>(offsetof(RiggedShader::Vertex, bone_weights)));
     glEnableVertexAttribArray(3);
 }
+void VertexArray<RiggedShader::Vertex>::init(
+    const RiggedShader::Vertex* vertices, GLuint num_vertices, GLenum usage) {
+#ifdef SHADER_DEBUG
+    if (vertices)
+        vertex_data.assign(num_vertices, *vertices);
+#endif
+
+    num_indices_ = static_cast<GLuint>(-1);
+    ebo_id = static_cast<GLuint>(-1);
+
+    num_vertices_ = num_vertices;
+    usage_ = usage;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(RiggedShader::Vertex) * num_vertices_,
+                 vertices, usage);
+
+    // position attribute
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(RiggedShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+    // uvCoord attribute
+    glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE, sizeof(RiggedShader::Vertex),
+        reinterpret_cast<void*>(offsetof(RiggedShader::Vertex, uv_coord)));
+    glEnableVertexAttribArray(1);
+    // bone_indices attribute
+    glVertexAttribIPointer(
+        2, 2, GL_UNSIGNED_INT, sizeof(RiggedShader::Vertex),
+        reinterpret_cast<void*>(offsetof(RiggedShader::Vertex, bone_indices)));
+    glEnableVertexAttribArray(2);
+    // bone_weights attribute
+    glVertexAttribPointer(
+        3, 2, GL_FLOAT, GL_FALSE, sizeof(RiggedShader::Vertex),
+        reinterpret_cast<void*>(offsetof(RiggedShader::Vertex, bone_weights)));
+    glEnableVertexAttribArray(3);
+}
 
 void VertexArray<BoneShader::Vertex>::init(const GLuint* indices,
                                            GLuint num_indices,
@@ -294,11 +400,43 @@ void VertexArray<BoneShader::Vertex>::init(const GLuint* indices,
                           reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
 }
+void VertexArray<BoneShader::Vertex>::init(const BoneShader::Vertex* vertices,
+                                           GLuint num_vertices, GLenum usage) {
+#ifdef SHADER_DEBUG
+    if (vertices)
+        vertex_data.assign(num_vertices, *vertices);
+#endif
+
+    num_indices_ = static_cast<GLuint>(-1);
+    ebo_id = static_cast<GLuint>(-1);
+
+    num_vertices_ = num_vertices;
+    usage_ = usage;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(BoneShader::Vertex) * num_vertices_,
+                 vertices, usage);
+
+    // position attribute
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(BoneShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+}
 
 void VertexArray<TrailShader::Vertex>::init(const GLuint* indices,
                                             GLuint num_indices,
                                             const TrailShader::Vertex* vertices,
                                             GLuint num_vertices, GLenum usage) {
+#ifdef SHADER_DEBUG
+    if (vertices)
+        vertex_data.assign(num_vertices, *vertices);
+#endif
+
     num_indices_ = num_indices;
     num_vertices_ = num_vertices;
     usage_ = usage;
@@ -317,6 +455,39 @@ void VertexArray<TrailShader::Vertex>::init(const GLuint* indices,
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
     glBufferData(GL_ARRAY_BUFFER, sizeof(TrailShader::Vertex) * num_vertices,
+                 vertices, usage);
+
+    // position attribute
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(TrailShader::Vertex),
+                          reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+    // age attribute
+    glVertexAttribPointer(
+        1, 1, GL_FLOAT, GL_FALSE, sizeof(TrailShader::Vertex),
+        reinterpret_cast<void*>(offsetof(TrailShader::Vertex, age)));
+    glEnableVertexAttribArray(1);
+}
+void VertexArray<TrailShader::Vertex>::init(const TrailShader::Vertex* vertices,
+                                            GLuint num_vertices, GLenum usage) {
+#ifdef SHADER_DEBUG
+    if (vertices)
+        vertex_data.assign(num_vertices, *vertices);
+#endif
+
+    num_indices_ = static_cast<GLuint>(-1);
+    ebo_id = static_cast<GLuint>(-1);
+
+    num_vertices_ = num_vertices;
+    usage_ = usage;
+
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    // Create vertex buffer
+    glGenBuffers(1, &vbo_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(TrailShader::Vertex) * num_vertices_,
                  vertices, usage);
 
     // position attribute

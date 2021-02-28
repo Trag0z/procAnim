@@ -23,6 +23,15 @@ template <typename vertex_t> class VertexArray {
         SDL_TriggerBreakpoint();
     }
 
+    void init(const vertex_t* vertices, GLuint num_vertices, GLenum usage) {
+        // Template specifications for acceptable vertex types are defined
+        // in Shaders.h. If this function overload is called, something went
+        // wrong.
+        printf("[ERROR] Trying to initialize VertexArray of an unknown "
+               "vertex type!\n");
+        SDL_TriggerBreakpoint();
+    }
+
     void update_vertex_data(const std::vector<vertex_t> data) {
         SDL_assert(usage_ == GL_DYNAMIC_DRAW && data.size() <= num_vertices_);
 #ifdef SHADER_DEBUG
@@ -48,7 +57,12 @@ template <typename vertex_t> class VertexArray {
 
     void draw(GLenum mode) const {
         glBindVertexArray(vao_id);
-        glDrawElements(mode, num_indices_, GL_UNSIGNED_INT, 0);
+        if (ebo_id == static_cast<GLuint>(-1)) {
+            SDL_assert(num_indices_ == static_cast<GLuint>(-1));
+            glDrawArrays(mode, 0, num_vertices_);
+        } else {
+            glDrawElements(mode, num_indices_, GL_UNSIGNED_INT, 0);
+        }
     }
 
     // void draw(GLenum mode, const GLsizei num_indices,
