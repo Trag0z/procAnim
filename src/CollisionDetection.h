@@ -26,16 +26,6 @@ const CollisionData
 find_first_collision_moving_circle(const Circle& circle, const Vector move,
                                    const std::list<AABB>& level);
 
-// const CollisionData find_first_collision(const CircleCollider& circle,
-//                                          const glm::vec2 move,
-//                                          const std::list<BoxCollider>&
-//                                          level);
-
-// const CollisionData
-// find_first_collision_sweep_prune(const CircleCollider& circle,
-//                                  const glm::vec2 move,
-//                                  const std::list<BoxCollider>& boxes);
-
 struct BallisticMoveResult {
     glm::vec2 new_position;
     glm::vec2 new_velocity;

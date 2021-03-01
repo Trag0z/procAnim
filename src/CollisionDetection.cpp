@@ -84,21 +84,25 @@ bool intersect_segment_segment(const Segment& seg1, const Segment& seg2,
 
 bool intersect_ray_circle(const Ray& ray, const Circle& circle,
                           float* t = nullptr, Point* p = nullptr) {
-    Point m = ray.origin - circle.center;
+    Vector m = ray.origin - circle.center;
     float b = glm::dot(m, ray.direction);
     float c = glm::dot(m, m) - circle.radius * circle.radius;
+
     // Exit if ray's origin is outside the circle (c > 0) and the ray's
     // direction is pointing away from the circle (b > 0)
     if (c > 0.0f && b > 0.0f)
         return false;
+
     float discr = b * b - c;
     // A negative discriminant corresponds to the segment missing the circle
     if (discr < 0.0f)
         return false;
+
     // Ray now found to intersect sphere, compute smallest t value of
     // intersection
     if (t) {
         *t = -b - glm::sqrt(discr);
+
         // If t is negative, ray started inside circle so clamp t to zero
         if (*t < 0.0f)
             *t = 0.0f;
@@ -128,6 +132,8 @@ bool intersect_segment_circle(const Segment& seg, const Circle& circle,
     }
 
     if (intersect_ray_circle(ray, circle, t, p) && *t <= seg_length) {
+        *t /= seg_length;
+
         if (dir) {
             Vector circle_to_p = *p - circle.center;
             float angle = glm::atan(circle_to_p.y, circle_to_p.x);
