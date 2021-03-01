@@ -144,10 +144,23 @@ void Game::run() {
             } else if (event.type == SDL_MOUSEWHEEL) {
                 mouse_keyboard_input.mouse_wheel_scroll = event.wheel.y;
             } else if (event.type == SDL_CONTROLLERDEVICEADDED) {
+                printf_s("[INPUT] Controller %d connected.\n",
+                         event.cdevice.which);
+
                 for (auto& pad : gamepads) {
                     if (pad.sdl_ptr == nullptr) {
                         pad.init(event.cdevice.which);
                         break;
+                    }
+                }
+            } else if (event.type == SDL_CONTROLLERDEVICEREMOVED) {
+                SDL_GameController* controller_ptr =
+                    SDL_GameControllerFromInstanceID(event.cdevice.which);
+
+                for (size_t i = 0; i < NUM_PLAYERS; ++i) {
+                    if (gamepads[i].sdl_ptr == controller_ptr) {
+                        printf_s("[INPUT] Controller %zd discnnected.\n", i);
+                        gamepads[i].sdl_ptr = nullptr;
                     }
                 }
             }
@@ -578,9 +591,6 @@ void Game::simulate_world(float delta_time) {
                 float trail_length =
                     player.weapon_trail.continuous_trail_length(
                         Player::MAX_HIT_TRAIL_ANGLE);
-
-                // TODO: intersect_segment_circle() returns wrong t values
-                t = 1.0f;
 
                 vec2 hit_velocity = hit_direction * trail_length *
                                     Player::HIT_SPEED_MULTIPLIER * t;

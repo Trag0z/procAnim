@@ -103,7 +103,6 @@ Gamepad::Gamepad() {
 void Gamepad::init(size_t index) {
     sdl_ptr = SDL_GameControllerOpen(static_cast<int>(index));
     SDL_assert(sdl_ptr);
-    printf("[Input] Gamepad %zd connected.\n", index);
 }
 
 void Gamepad::update() {
