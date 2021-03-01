@@ -1,5 +1,10 @@
 TODO:
+- rename old_color/recent_color and age in trail shader
+- make the blending between colors in trail shader more smooth
+
+
 - player can be hit by ball
+- remove all unnecessary cases of indexed rendering and replace with non indexed version
 
 
 TODO LATER:

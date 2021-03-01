@@ -4,17 +4,20 @@
 #include <list>
 
 class WeaponTrail {
-    static const size_t NUM_SEGMENTS = 30;
-    static const size_t NUM_VERTICES = NUM_SEGMENTS + 1;
+    static const size_t MAX_VERTICES = 400;
 
     std::list<TrailShader::Vertex> weapon_positions;
-
     VertexArray<TrailShader::Vertex> vao;
 
+    const float* max_angle_between_segments;
+    const float* max_trail_length;
+    float min_new_segment_length;
+
   public:
-    void init();
+    float trail_length;
+
+    void init(const float* max_angle_between_segments_,
+              const float* max_trail_length_);
     void update(vec2 new_position);
     void render();
-
-    float continuous_trail_length(float max_angle_between_segments);
 };

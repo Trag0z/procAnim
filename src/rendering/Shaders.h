@@ -118,18 +118,18 @@ class BoneShader : public ShaderDetail::Shader {
 };
 
 class TrailShader : public ShaderDetail::Shader {
-    GLuint old_color_loc;
-    GLuint recent_color_loc;
+    GLuint first_color_loc;
+    GLuint last_color_loc;
 
   public:
     TrailShader() {}
     TrailShader(const char* vert_path, const char* frag_path);
 
-    void set_colors(const Color& old_color, const Color& recent_color);
+    void set_colors(const Color& first_color, const Color& last_color);
 
     struct Vertex {
         vec2 pos;
-        GLfloat age;
+        GLfloat strength;
     };
 };
 
@@ -464,7 +464,7 @@ void VertexArray<TrailShader::Vertex>::init(const GLuint* indices,
     // age attribute
     glVertexAttribPointer(
         1, 1, GL_FLOAT, GL_FALSE, sizeof(TrailShader::Vertex),
-        reinterpret_cast<void*>(offsetof(TrailShader::Vertex, age)));
+        reinterpret_cast<void*>(offsetof(TrailShader::Vertex, strength)));
     glEnableVertexAttribArray(1);
 }
 void VertexArray<TrailShader::Vertex>::init(const TrailShader::Vertex* vertices,
@@ -497,6 +497,6 @@ void VertexArray<TrailShader::Vertex>::init(const TrailShader::Vertex* vertices,
     // age attribute
     glVertexAttribPointer(
         1, 1, GL_FLOAT, GL_FALSE, sizeof(TrailShader::Vertex),
-        reinterpret_cast<void*>(offsetof(TrailShader::Vertex, age)));
+        reinterpret_cast<void*>(offsetof(TrailShader::Vertex, strength)));
     glEnableVertexAttribArray(1);
 }

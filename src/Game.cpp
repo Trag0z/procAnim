@@ -588,9 +588,7 @@ void Game::simulate_world(float delta_time) {
                 vec2 hit_direction = glm::normalize(
                     player.weapon_collider.b - player.last_weapon_collider.b);
 
-                float trail_length =
-                    player.weapon_trail.continuous_trail_length(
-                        Player::MAX_HIT_TRAIL_ANGLE);
+                const float& trail_length = player.weapon_trail.trail_length;
 
                 vec2 hit_velocity = hit_direction * trail_length *
                                     Player::HIT_SPEED_MULTIPLIER * t;

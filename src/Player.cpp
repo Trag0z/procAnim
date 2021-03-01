@@ -25,6 +25,7 @@ float Player::MAX_AIR_VELOCITY = 10.0f;
 float Player::HIT_SPEED_MULTIPLIER = 0.2f;
 float Player::MAX_HIT_COOLDOWN = 30.0f;
 float Player::MAX_HIT_TRAIL_ANGLE = PI / 2.0f;
+float Player::MAX_HIT_TRAIL_LENGTH = 200.0f;
 float Player::HITSTUN_DURATION_MULTIPLIER = 0.8f;
 
 static const struct {
@@ -42,7 +43,7 @@ void Player::init(glm::vec3 position, glm::vec3 scale_,
     SDL_assert(pad);
     gamepad = pad;
 
-    weapon_trail.init();
+    weapon_trail.init(&MAX_HIT_TRAIL_ANGLE, &MAX_HIT_TRAIL_LENGTH);
 }
 
 void Player::update(float delta_time, const std::list<AABB>& colliders) {

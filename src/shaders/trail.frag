@@ -8,5 +8,5 @@ out vec4 frag_color;
 
 void main()
 {
-    frag_color=age*old_color+(1.-age)*recent_color;
+    frag_color=(1-age)*old_color+age*recent_color;
 }

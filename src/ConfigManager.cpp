@@ -59,6 +59,7 @@ void ConfigManager::init(GameConfig& game_config, Renderer& renderer) {
     items.emplace("hit_speed_multiplier", &Player::HIT_SPEED_MULTIPLIER);
     items.emplace("hit_cooldown", &Player::MAX_HIT_COOLDOWN);
     items.emplace("max_hit_trail_angle", &Player::MAX_HIT_TRAIL_ANGLE);
+    items.emplace("max_hit_trail_length", &Player::MAX_HIT_TRAIL_LENGTH);
     items.emplace("hitstun_duration_multiplier",
                   &Player::HITSTUN_DURATION_MULTIPLIER);
     objects.emplace("Player", std::move(items));

@@ -55,6 +55,18 @@ template <typename vertex_t> class VertexArray {
                         data.data());
     }
 
+    void draw(GLenum mode, GLuint num_elements) const {
+        glBindVertexArray(vao_id);
+        if (ebo_id == static_cast<GLuint>(-1)) {
+            SDL_assert(num_indices_ == static_cast<GLuint>(-1));
+            SDL_assert(num_elements <= num_vertices_);
+            glDrawArrays(mode, 0, num_elements);
+        } else {
+            SDL_assert(num_elements <= num_indices_);
+            glDrawElements(mode, num_elements, GL_UNSIGNED_INT, 0);
+        }
+    }
+
     void draw(GLenum mode) const {
         glBindVertexArray(vao_id);
         if (ebo_id == static_cast<GLuint>(-1)) {
