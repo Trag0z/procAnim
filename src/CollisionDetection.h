@@ -8,11 +8,15 @@ bool test_point_AABB(const Point& p, const AABB& box);
 
 bool test_circle_AABB(const Circle& circle, const AABB& box);
 
-bool intersect_segment_segment(const Segment& seg1, const Segment& seg2,
-                               float* t = nullptr, Point* p = nullptr);
+bool intersect_segment_segment(const Segment& seg1,
+                               const Segment& seg2,
+                               float* t = nullptr,
+                               Point* p = nullptr);
 
-bool intersect_segment_circle(const Segment& seg, const Circle& circle,
-                              float* t = nullptr, Point* p = nullptr,
+bool intersect_segment_circle(const Segment& seg,
+                              const Circle& circle,
+                              float* t       = nullptr,
+                              Point* p       = nullptr,
                               Direction* dir = nullptr);
 
 struct CollisionData {
@@ -22,9 +26,8 @@ struct CollisionData {
     const AABB* hit_object;
 };
 
-const CollisionData
-find_first_collision_moving_circle(const Circle& circle, const Vector move,
-                                   const std::list<AABB>& level);
+const CollisionData find_first_collision_moving_circle(
+  const Circle& circle, const Vector move, const std::list<AABB>& level);
 
 struct BallisticMoveResult {
     glm::vec2 new_position;
@@ -34,7 +37,9 @@ struct BallisticMoveResult {
 };
 
 const BallisticMoveResult
-get_ballistic_move_result(const Circle& coll, const Vector velocity,
-                          const float delta_time, const std::list<AABB>& level,
-                          float rebound = 1.0f,
+get_ballistic_move_result(const Circle& coll,
+                          const Vector velocity,
+                          const float delta_time,
+                          const std::list<AABB>& level,
+                          float rebound                         = 1.0f,
                           const size_t max_collision_iterations = 5);

@@ -21,7 +21,7 @@ struct SplineSet {
 };
 
 struct Limb {
-    Spline spline; // In local space
+    Spline spline;  // In local space
 
     Bone* bones[2];
 
@@ -37,10 +37,13 @@ class Animator {
     // Indices of the limbs for the limbs member variable.
     enum LegIndex { LEFT_LEG = 0, RIGHT_LEG = 1 };
 
-    void init(const Player* parent_, RiggedMesh& mesh,
+    void init(const Player* parent_,
+              RiggedMesh& mesh,
               const std::list<AABB>& colliders);
-    void update(float delta_time, float walking_speed,
-                glm::vec2 right_stick_input, const std::list<AABB>& colliders);
+    void update(float delta_time,
+                float walking_speed,
+                glm::vec2 right_stick_input,
+                const std::list<AABB>& colliders);
 
     glm::vec2 tip_pos(LegIndex limb_index) const;
     const Bone* weapon() const noexcept;
@@ -70,7 +73,7 @@ class Animator {
         LEFT_LEG_UP,
         RIGHT_LEG_UP
     } leg_state,
-        last_leg_state;
+      last_leg_state;
 
     float step_distance_multiplier = 100.0f;
 

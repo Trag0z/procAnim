@@ -10,7 +10,7 @@ class ConfigManager;
 
 class Ball : Entity {
     glm::vec2 velocity;
-    float rotation = 0.0f;
+    float rotation       = 0.0f;
     float rotation_speed = 0.0f;
     Circle collider_;
     bool grounded = false;
@@ -34,8 +34,10 @@ class Ball : Entity {
     float freeze_duration = 0.0f;
 
     void init(glm::vec2 position, const char* texture_path);
-    void update(const float delta_time, const std::list<AABB>& level,
-                AudioManager& audio_manager, bool trajectory);
+    void update(const float delta_time,
+                const std::list<AABB>& level,
+                AudioManager& audio_manager,
+                bool trajectory);
     void render(const Renderer& renderer) const;
     bool display_debug_ui();
 

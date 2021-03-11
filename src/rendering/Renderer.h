@@ -7,9 +7,9 @@
 class Game;
 
 class Renderer {
-    glm::vec2 window_size_ = {1920.0f, 1080.0f};
-    glm::vec2 camera_center_ = {0.0f, 0.0f};
-    float zoom_factor_ = 1.0f;
+    glm::vec2 window_size_   = { 1920.0f, 1080.0f };
+    glm::vec2 camera_center_ = { 0.0f, 0.0f };
+    float zoom_factor_       = 1.0f;
 
     struct {
         float intensity;
@@ -17,9 +17,9 @@ class Renderer {
         float speed;
 
         float noise_pos = 0.0f;
-        const siv::BasicPerlinNoise<float> noise[2] = {
-            siv::BasicPerlinNoise<float>(1337),
-            siv::BasicPerlinNoise<float>(5345)};
+        const siv::BasicPerlinNoise<float> noise[2]
+          = { siv::BasicPerlinNoise<float>(1337),
+              siv::BasicPerlinNoise<float>(5345) };
     } screen_shake;
 
   public:
@@ -41,13 +41,13 @@ class Renderer {
 
     glm::vec2 screen_to_world_space(glm::vec2 screen_pos) const noexcept;
 
-    bool draw_body = false;
-    bool draw_limbs = true;
-    bool draw_bones = false;
-    bool draw_wireframes = false;
-    bool draw_colliders = true;
-    bool draw_leg_splines = true;
-    bool draw_weapon_trails = true;
+    bool draw_body            = false;
+    bool draw_limbs           = true;
+    bool draw_bones           = false;
+    bool draw_wireframes      = false;
+    bool draw_colliders       = true;
+    bool draw_leg_splines     = true;
+    bool draw_weapon_trails   = true;
     bool draw_ball_trajectory = true;
 
     friend ConfigManager;

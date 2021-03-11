@@ -5,7 +5,8 @@
 struct Mesh;
 struct RiggedMesh;
 
-void load_character_model_from_file(const char* path, Mesh& body_mesh,
+void load_character_model_from_file(const char* path,
+                                    Mesh& body_mesh,
                                     RiggedMesh& rigged_mesh);
 
 class Bone {
@@ -35,9 +36,9 @@ class Bone {
     std::string name_;
     const Bone* parent_;
 
-    glm::mat3 bind_pose_transform_; // Transforms from bone space to mesh space
-    glm::mat3 inverse_bind_pose_transform_; // Transforms from mesh space to
-                                            // bone space
+    glm::mat3 bind_pose_transform_;  // Transforms from bone space to mesh space
+    glm::mat3 inverse_bind_pose_transform_;  // Transforms from mesh space to
+                                             // bone space
 
     // Position of the tail in the bones local space
     glm::vec2 tail_;

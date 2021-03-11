@@ -5,8 +5,12 @@
 #include "Mesh.h"
 #include "../Util.h"
 
-const std::string& Bone::name() const noexcept { return name_; }
-const Bone* Bone::parent() const noexcept { return parent_; }
+const std::string& Bone::name() const noexcept {
+    return name_;
+}
+const Bone* Bone::parent() const noexcept {
+    return parent_;
+}
 const glm::mat3& Bone::bind_pose_transform() const {
     return bind_pose_transform_;
 }
@@ -15,24 +19,28 @@ const glm::mat3& Bone::inverse_bind_pose_transform() const {
 }
 
 glm::mat3 Bone::transform() const {
-    glm::mat3 scale =
-        glm::scale(glm::mat3(1.0f), glm::vec2(length / original_length,
-                                              length / original_length));
+    glm::mat3 scale = glm::scale(
+      glm::mat3(1.0f),
+      glm::vec2(length / original_length, length / original_length));
 
     if (parent_) {
         // Recurse until there's no parent
-        glm::mat3 this_transform = bind_pose_transform_ *
-                                   glm::rotate(glm::mat3(1.0f), rotation) *
-                                   scale * inverse_bind_pose_transform_;
+        glm::mat3 this_transform = bind_pose_transform_
+                                   * glm::rotate(glm::mat3(1.0f), rotation)
+                                   * scale * inverse_bind_pose_transform_;
         return parent_->transform() * this_transform;
     }
 
-    return bind_pose_transform_ * glm::rotate(glm::mat3(1.0f), rotation) *
-           scale * inverse_bind_pose_transform_;
+    return bind_pose_transform_ * glm::rotate(glm::mat3(1.0f), rotation) * scale
+           * inverse_bind_pose_transform_;
 }
 
-glm::vec2 Bone::head() const { return transform() * bind_pose_transform_[2]; }
-glm::vec2 Bone::tail() const { return transform() * glm::vec3(tail_, 1.0f); }
+glm::vec2 Bone::head() const {
+    return transform() * bind_pose_transform_[2];
+}
+glm::vec2 Bone::tail() const {
+    return transform() * glm::vec3(tail_, 1.0f);
+}
 
 glm::vec2 Bone::tail_bind_pose() const noexcept {
     return bind_pose_transform_ * glm::vec3(tail_, 1.0f);
@@ -40,24 +48,24 @@ glm::vec2 Bone::tail_bind_pose() const noexcept {
 
 Bone* RiggedMesh::find_bone(const char* str) {
     for (uint i = 0; i < bones.size(); ++i) {
-        if (bones[i].name().compare(str) == 0) {
-            return &bones[i];
-        }
+        if (bones[i].name().compare(str) == 0) { return &bones[i]; }
     }
     SDL_TriggerBreakpoint();
     return nullptr;
 }
 
-void load_character_model_from_file(const char* path, Mesh& body_mesh,
+void load_character_model_from_file(const char* path,
+                                    Mesh& body_mesh,
                                     RiggedMesh& rigged_mesh) {
     // Open file
     Assimp::Importer importer;
 
     const aiScene* scene = importer.ReadFile(
-        path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
+      path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
 
     if (!scene) {
-        printf("[ASSIMP] Error loading asset from %s: %s\n", path,
+        printf("[ASSIMP] Error loading asset from %s: %s\n",
+               path,
                importer.GetErrorString());
         SDL_assert(false);
     }
@@ -66,7 +74,7 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
     SDL_assert(scene->mNumMeshes == 2);
     SDL_assert(scene->mNumMaterials == 1);
 
-    { // Import rigged_mesh
+    {  // Import rigged_mesh
         aiMesh& mesh_data = *scene->mMeshes[0];
         SDL_assert(mesh_data.mName == aiString("RiggedPart"));
 
@@ -74,15 +82,15 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
         shader_vertices.reserve(mesh_data.mNumVertices);
 
         aiVector3D* vertex_data = mesh_data.mVertices;
-        aiVector3D* uv_coords = mesh_data.mTextureCoords[0];
+        aiVector3D* uv_coords   = mesh_data.mTextureCoords[0];
         SDL_assert(uv_coords);
 
         for (size_t i = 0; i < mesh_data.mNumVertices; ++i) {
             shader_vertices.push_back(
-                {glm::vec2(vertex_data[i].x, vertex_data[i].y),
-                 {uv_coords[i].x, 1.0f - uv_coords[i].y},
-                 {0, 0},
-                 {0.0f, 0.0f}});
+              { glm::vec2(vertex_data[i].x, vertex_data[i].y),
+                { uv_coords[i].x, 1.0f - uv_coords[i].y },
+                { 0, 0 },
+                { 0.0f, 0.0f } });
         }
 
         std::vector<GLuint> indices;
@@ -107,20 +115,26 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
             Bone bone;
 
             aiBone& ai_bone = *mesh_data.mBones[n_bone];
-            bone.name_ = ai_bone.mName.C_Str();
+            bone.name_      = ai_bone.mName.C_Str();
 
-            auto& matrix = ai_bone.mOffsetMatrix;
-            bone.inverse_bind_pose_transform_ =
-                glm::mat3(matrix.a1, matrix.b1, matrix.d1, matrix.a2, matrix.b2,
-                          matrix.d2, matrix.a4, matrix.b4, matrix.d4);
-            bone.bind_pose_transform_ =
-                glm::inverse(bone.inverse_bind_pose_transform_);
+            auto& matrix                      = ai_bone.mOffsetMatrix;
+            bone.inverse_bind_pose_transform_ = glm::mat3(matrix.a1,
+                                                          matrix.b1,
+                                                          matrix.d1,
+                                                          matrix.a2,
+                                                          matrix.b2,
+                                                          matrix.d2,
+                                                          matrix.a4,
+                                                          matrix.b4,
+                                                          matrix.d4);
+            bone.bind_pose_transform_
+              = glm::inverse(bone.inverse_bind_pose_transform_);
 
             for (uint n_weight = 0; n_weight < ai_bone.mNumWeights;
                  ++n_weight) {
-                weight_data.push_back({ai_bone.mWeights[n_weight].mVertexId,
-                                       n_bone,
-                                       ai_bone.mWeights[n_weight].mWeight});
+                weight_data.push_back({ ai_bone.mWeights[n_weight].mVertexId,
+                                        n_bone,
+                                        ai_bone.mWeights[n_weight].mWeight });
             }
 
             rigged_mesh.bones.push_back(bone);
@@ -153,13 +167,12 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
         for (auto this_weight : weight_data) {
             // Maximum 2 bones per vertex allowed, skip if there are 2 already
             size_t bone_count = vertex_bone_counts[this_weight.vert_index];
-            if (bone_count == RiggedShader::MAX_BONES_PER_VERTEX)
-                continue;
+            if (bone_count == RiggedShader::MAX_BONES_PER_VERTEX) continue;
 
-            shader_vertices[this_weight.vert_index].bone_indices[bone_count] =
-                static_cast<GLuint>(this_weight.bone_index);
-            shader_vertices[this_weight.vert_index].bone_weights[bone_count] =
-                this_weight.weight;
+            shader_vertices[this_weight.vert_index].bone_indices[bone_count]
+              = static_cast<GLuint>(this_weight.bone_index);
+            shader_vertices[this_weight.vert_index].bone_weights[bone_count]
+              = this_weight.weight;
             ++bone_count;
         }
         delete[] vertex_bone_counts;
@@ -173,10 +186,11 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
             SDL_assert(sum_of_weights == 1.0f || sum_of_weights == 0.0f);
         }
 #endif
-        rigged_mesh.vao.init(
-            indices.data(), static_cast<GLuint>(indices.size()),
-            shader_vertices.data(), static_cast<GLuint>(shader_vertices.size()),
-            GL_STATIC_DRAW);
+        rigged_mesh.vao.init(indices.data(),
+                             static_cast<GLuint>(indices.size()),
+                             shader_vertices.data(),
+                             static_cast<GLuint>(shader_vertices.size()),
+                             GL_STATIC_DRAW);
 
         // Create and upload bone render data to GPU
         const GLuint num_bone_vertices = mesh_data.mNumBones * 2;
@@ -189,17 +203,19 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
         std::vector<BoneShader::Vertex> bone_vertices;
         bone_vertices.reserve(mesh_data.mNumBones * 2);
         for (auto& bone : rigged_mesh.bones) {
-            bone_vertices.push_back({bone.bind_pose_transform_[2]});
+            bone_vertices.push_back({ bone.bind_pose_transform_[2] });
             bone_vertices.push_back(
-                {bone.bind_pose_transform_ * glm::vec3(bone.tail_, 1.0f)});
+              { bone.bind_pose_transform_ * glm::vec3(bone.tail_, 1.0f) });
         }
 
-        rigged_mesh.bones_vao.init(bone_indices.data(), num_bone_vertices,
-                                   bone_vertices.data(), num_bone_vertices,
+        rigged_mesh.bones_vao.init(bone_indices.data(),
+                                   num_bone_vertices,
+                                   bone_vertices.data(),
+                                   num_bone_vertices,
                                    GL_STATIC_DRAW);
     }
 
-    { // Import body_mesh
+    {  // Import body_mesh
         aiMesh& mesh_data = *scene->mMeshes[1];
         SDL_assert(mesh_data.mName == aiString("BodyPart"));
 
@@ -207,12 +223,12 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
         vertices.reserve(mesh_data.mNumVertices);
 
         aiVector3D* vertex_data = mesh_data.mVertices;
-        aiVector3D* uv_coords = mesh_data.mTextureCoords[0];
+        aiVector3D* uv_coords   = mesh_data.mTextureCoords[0];
         SDL_assert(uv_coords);
 
         for (size_t i = 0; i < mesh_data.mNumVertices; ++i) {
-            vertices.push_back({glm::vec2(vertex_data[i].x, vertex_data[i].y),
-                                {uv_coords[i].x, 1.0f - uv_coords[i].y}});
+            vertices.push_back({ glm::vec2(vertex_data[i].x, vertex_data[i].y),
+                                 { uv_coords[i].x, 1.0f - uv_coords[i].y } });
         }
 
         std::vector<GLuint> indices;
@@ -224,7 +240,8 @@ void load_character_model_from_file(const char* path, Mesh& body_mesh,
             indices.push_back(face.mIndices[2]);
         }
 
-        body_mesh.vao.init(indices.data(), static_cast<GLuint>(indices.size()),
+        body_mesh.vao.init(indices.data(),
+                           static_cast<GLuint>(indices.size()),
                            vertices.data(),
                            static_cast<GLuint>(vertices.size()),
                            GL_STATIC_DRAW);

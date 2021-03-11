@@ -3,24 +3,30 @@
 #include <codecvt>
 #include "Util.h"
 
-float length_squared(glm::vec2 v) { return v.x * v.x + v.y * v.y; }
+float length_squared(glm::vec2 v) {
+    return v.x * v.x + v.y * v.y;
+}
 
-bool get_save_path(std::string& out_path, cwstrptr_t filter_name,
-                   cwstrptr_t filter_pattern, cwstrptr_t default_extension) {
+bool get_save_path(std::string& out_path,
+                   cwstrptr_t filter_name,
+                   cwstrptr_t filter_pattern,
+                   cwstrptr_t default_extension) {
     HRESULT hr =
-        CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+      CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
     SDL_assert_always(SUCCEEDED(hr));
     IFileSaveDialog* pFileSave;
 
-    hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
+    hr = CoCreateInstance(CLSID_FileSaveDialog,
+                          NULL,
+                          CLSCTX_ALL,
                           IID_IFileSaveDialog,
                           reinterpret_cast<void**>(&pFileSave));
 
     SDL_assert_always(SUCCEEDED(hr));
 
     if (filter_name && filter_pattern) {
-        COMDLG_FILTERSPEC file_type = {filter_name, filter_pattern};
+        COMDLG_FILTERSPEC file_type = { filter_name, filter_pattern };
         pFileSave->SetFileTypes(1, &file_type);
     }
 
@@ -32,9 +38,7 @@ bool get_save_path(std::string& out_path, cwstrptr_t filter_name,
     hr = pFileSave->Show(NULL);
 
     // Get the file name from the dialog box.
-    if (!SUCCEEDED(hr)) {
-        return false;
-    }
+    if (!SUCCEEDED(hr)) { return false; }
 
     IShellItem* pItem;
     hr = pFileSave->GetResult(&pItem);
@@ -58,31 +62,32 @@ bool get_save_path(std::string& out_path, cwstrptr_t filter_name,
     return true;
 }
 
-bool get_load_path(std::string& out_path, cwstrptr_t filter_name,
+bool get_load_path(std::string& out_path,
+                   cwstrptr_t filter_name,
                    cwstrptr_t filter_pattern) {
     HRESULT hr =
-        CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+      CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
     SDL_assert_always(SUCCEEDED(hr));
     IFileOpenDialog* pFileOpen;
 
-    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+    hr = CoCreateInstance(CLSID_FileOpenDialog,
+                          NULL,
+                          CLSCTX_ALL,
                           IID_IFileOpenDialog,
                           reinterpret_cast<void**>(&pFileOpen));
 
     SDL_assert_always(SUCCEEDED(hr));
 
     if (filter_name && filter_pattern) {
-        COMDLG_FILTERSPEC file_type = {filter_name, filter_pattern};
+        COMDLG_FILTERSPEC file_type = { filter_name, filter_pattern };
         pFileOpen->SetFileTypes(1, &file_type);
     }
 
     // Show the Open dialog box.
     hr = pFileOpen->Show(NULL);
 
-    if (!SUCCEEDED(hr)) {
-        return false;
-    }
+    if (!SUCCEEDED(hr)) { return false; }
 
     // Get the file name from the dialog box.
     IShellItem* pItem;

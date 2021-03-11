@@ -9,26 +9,28 @@
 
 const Color Ball::Trajectory::COLOR = Color::BLUE;
 
-float Ball::REBOUND = 1.0f;
-float Ball::RADIUS = 50.0f;
-float Ball::ROLLING_FRICTION = 1.5f;
+float Ball::REBOUND                = 1.0f;
+float Ball::RADIUS                 = 50.0f;
+float Ball::ROLLING_FRICTION       = 1.5f;
 float Ball::ROLLING_ROTATION_SPEED = 1.0f;
-float Ball::GRAVITY = 1.0f;
+float Ball::GRAVITY                = 1.0f;
 
 void Ball::init(glm::vec2 position, const char* texture_path) {
     Entity::init(position, glm::vec2(RADIUS));
-    collider_ = {glm::vec2(0.0f), 1.0f};
+    collider_ = { glm::vec2(0.0f), 1.0f };
     texture.load_from_file(texture_path);
 
     for (auto& vert : trajectory.vertices) {
         vert = vec2(0.0f);
     }
-    trajectory.vao.init(trajectory.vertices.data(), trajectory.NUM_VERTICES,
-                        GL_DYNAMIC_DRAW);
+    trajectory.vao.init(
+      trajectory.vertices.data(), trajectory.NUM_VERTICES, GL_DYNAMIC_DRAW);
 }
 
-void Ball::update(const float delta_time, const std::list<AABB>& level,
-                  AudioManager& audio_manager, bool draw_trajectory) {
+void Ball::update(const float delta_time,
+                  const std::list<AABB>& level,
+                  AudioManager& audio_manager,
+                  bool draw_trajectory) {
     if (freeze_duration > 0.0f) {
         freeze_duration -= delta_time;
         return;
@@ -40,14 +42,17 @@ void Ball::update(const float delta_time, const std::list<AABB>& level,
     }
 
     BallisticMoveResult move_result =
-        get_ballistic_move_result(collider_.local_to_world_space(*this),
-                                  velocity, delta_time, level, REBOUND);
+      get_ballistic_move_result(collider_.local_to_world_space(*this),
+                                velocity,
+                                delta_time,
+                                level,
+                                REBOUND);
 
     position_ = move_result.new_position;
-    velocity = move_result.new_velocity;
+    velocity  = move_result.new_velocity;
 
-    if (move_result.last_hit_diretcion != Direction::NONE &&
-        move_result.last_hit_diretcion != Direction::DOWN) {
+    if (move_result.last_hit_diretcion != Direction::NONE
+        && move_result.last_hit_diretcion != Direction::DOWN) {
         audio_manager.play(Sound::WALL_BOUNCE);
     }
 
@@ -57,11 +62,11 @@ void Ball::update(const float delta_time, const std::list<AABB>& level,
 
         rotation_speed = -ROLLING_ROTATION_SPEED * velocity.x;
     } else {
-        if (move_result.last_hit_diretcion == Direction::DOWN &&
-            move_result.new_velocity.y <= GRAVITY * delta_time * 2.0f) {
+        if (move_result.last_hit_diretcion == Direction::DOWN
+            && move_result.new_velocity.y <= GRAVITY * delta_time * 2.0f) {
 
             velocity.y = 0.0f;
-            grounded = true;
+            grounded   = true;
 
 #if _DEBUG
             update_model_matrix();
@@ -76,11 +81,11 @@ void Ball::update(const float delta_time, const std::list<AABB>& level,
             velocity.y -= GRAVITY;
         }
 
-        if (move_result.last_hit_diretcion == Direction::UP ||
-            move_result.last_hit_diretcion == Direction::DOWN) {
+        if (move_result.last_hit_diretcion == Direction::UP
+            || move_result.last_hit_diretcion == Direction::DOWN) {
             rotation_speed = -ROLLING_ROTATION_SPEED * velocity.x;
-        } else if (move_result.last_hit_diretcion == Direction::RIGHT ||
-                   move_result.last_hit_diretcion == Direction::RIGHT) {
+        } else if (move_result.last_hit_diretcion == Direction::RIGHT
+                   || move_result.last_hit_diretcion == Direction::RIGHT) {
             rotation_speed = -ROLLING_ROTATION_SPEED * velocity.y;
         }
     }
@@ -95,7 +100,7 @@ void Ball::update(const float delta_time, const std::list<AABB>& level,
 
     if (draw_trajectory && !grounded) {
         trajectory.vertices[0] = position_;
-        vec2 new_velocity = velocity;
+        vec2 new_velocity      = velocity;
         for (size_t i = 1; i < Trajectory::NUM_VERTICES; ++i) {
             new_velocity.y -= GRAVITY;
             trajectory.vertices[i] = trajectory.vertices[i - 1] + new_velocity;

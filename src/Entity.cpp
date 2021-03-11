@@ -11,7 +11,7 @@ void Entity::update_model_matrix() {
 
 void Entity::init(glm::vec2 pos_, glm::vec2 scale_) {
     position_ = pos_;
-    scale = scale_;
+    scale     = scale_;
     update_model_matrix();
 }
 
@@ -23,10 +23,10 @@ glm::vec2 Entity::local_to_world_space(const glm::vec2& local_pos) const {
 }
 
 glm::vec2 Entity::world_to_world_scale(const glm::vec2& world_vec) const {
-    return {world_vec.x / scale.x, world_vec.y / scale.y};
+    return { world_vec.x / scale.x, world_vec.y / scale.y };
 }
 glm::vec2 Entity::local_to_world_scale(const glm::vec2& local_vec) const {
-    return {local_vec.x * scale.x, local_vec.y * scale.y};
+    return { local_vec.x * scale.x, local_vec.y * scale.y };
 }
 
 float Entity::world_to_world_scale(const float world) const {
@@ -38,6 +38,10 @@ float Entity::local_to_world_scale(const float local) const {
     return local * scale.x;
 }
 
-const glm::mat3& Entity::model_matrix() const { return model; }
+const glm::mat3& Entity::model_matrix() const {
+    return model;
+}
 
-glm::vec2 Entity::position() const { return position_; }
+glm::vec2 Entity::position() const {
+    return position_;
+}

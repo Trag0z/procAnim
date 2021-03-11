@@ -12,20 +12,22 @@ void Level::render(const Renderer& renderer) const {
 
     for (const auto& coll : colliders_) {
         glm::mat3 model = glm::translate(glm::mat3(1.0f), coll.center);
-        model = glm::scale(model, coll.half_ext);
+        model           = glm::scale(model, coll.half_ext);
         renderer.textured_shader.set_model(&model);
 
         renderer.textured_shader.DEFAULT_VAO.draw(GL_TRIANGLES);
     }
 }
 
-const std::list<AABB> Level::colliders() const noexcept { return colliders_; }
+const std::list<AABB> Level::colliders() const noexcept {
+    return colliders_;
+}
 
 const AABB* Level::find_ground_under(glm::vec2 position) const {
     const AABB* candidate = nullptr;
     for (const AABB& coll : colliders_) {
-        if (coll.min(0) <= position.x && coll.max(0) >= position.x &&
-            position.y > coll.max(1)) {
+        if (coll.min(0) <= position.x && coll.max(0) >= position.x
+            && position.y > coll.max(1)) {
 
             if (!candidate || coll.max(1) > candidate->max(1)) {
                 candidate = &coll;
@@ -65,12 +67,12 @@ void Level::load_from_file(const char* path) {
 }
 
 void Level::save_to_file(const char* path) const {
-    size_t num_colliders = colliders_.size();
+    size_t num_colliders             = colliders_.size();
     BoxColliderSaveFormat* save_data = new BoxColliderSaveFormat[num_colliders];
 
     size_t i = 0;
     for (auto& coll : colliders_) {
-        save_data[i].center = coll.center;
+        save_data[i].center   = coll.center;
         save_data[i].half_ext = coll.half_ext;
         ++i;
     }
@@ -85,47 +87,55 @@ void Level::save_to_file(const char* path) const {
 
 static constexpr float SCROLL_SPEED = 1.0f;
 
-void LevelEditor::init(Level* level_) { level = level_; }
+void LevelEditor::init(Level* level_) {
+    level = level_;
+}
 
 bool LevelEditor::update(const Renderer& renderer,
                          const MouseKeyboardInput& input) {
-    bool keep_open = true;
+    bool keep_open  = true;
     auto& colliders = level->colliders_;
 
-    { // UI
+    {  // UI
         using namespace ImGui;
         Begin("Level Editor", &keep_open);
-        if (Button("Open...")) {
-            load_from_file(true);
-        }
+        if (Button("Open...")) { load_from_file(true); }
         SameLine();
-        if (Button("Save")) {
-            save_to_file();
-        }
+        if (Button("Save")) { save_to_file(); }
         SameLine();
-        if (Button("Save as...")) {
-            save_to_file(true);
-        }
+        if (Button("Save as...")) { save_to_file(true); }
         Text("Opened file: %s", level->opened_path.c_str());
 
         NewLine();
 
         if (Button("New collider")) {
             colliders.emplace_front(
-                AABB{renderer.camera_center(), new_collider_dimensions});
+              AABB { renderer.camera_center(), new_collider_dimensions });
 
             selected_collider = &colliders.front();
         }
-        DragFloat2("Dimensions", value_ptr(new_collider_dimensions), 1.0f, 0.0f,
-                   0.0f, "% 6.1f");
+        DragFloat2("Dimensions",
+                   value_ptr(new_collider_dimensions),
+                   1.0f,
+                   0.0f,
+                   0.0f,
+                   "% 6.1f");
 
         NewLine();
         Text("Selected Collider");
         if (selected_collider) {
-            DragFloat2("Position", value_ptr(selected_collider->center), 1.0f,
-                       0.0f, 0.0f, "% 6.1f");
-            DragFloat2("Half ext.", value_ptr(selected_collider->half_ext),
-                       0.1f, 0.0f, 0.0f, "% 6.1f");
+            DragFloat2("Position",
+                       value_ptr(selected_collider->center),
+                       1.0f,
+                       0.0f,
+                       0.0f,
+                       "% 6.1f");
+            DragFloat2("Half ext.",
+                       value_ptr(selected_collider->half_ext),
+                       0.1f,
+                       0.0f,
+                       0.0f,
+                       "% 6.1f");
 
         } else {
             Text("None");
@@ -146,9 +156,7 @@ bool LevelEditor::update(const Renderer& renderer,
             }
         }
     }
-    if (input.mouse_button_up(MouseButton::LEFT)) {
-        dragging_collider = false;
-    }
+    if (input.mouse_button_up(MouseButton::LEFT)) { dragging_collider = false; }
 
     // Deselect collider
     if (input.mouse_button_down(MouseButton::RIGHT)) {
@@ -186,7 +194,7 @@ void LevelEditor::render(const Renderer& renderer) {
 void LevelEditor::save_to_file(bool new_file_name) {
     if (new_file_name || !level->opened_path.empty()) {
         bool success =
-            get_save_path(level->opened_path, L".level", L"*.level", L"level");
+          get_save_path(level->opened_path, L".level", L"*.level", L"level");
         SDL_assert_always(success);
     }
 
@@ -196,9 +204,7 @@ void LevelEditor::save_to_file(bool new_file_name) {
 void LevelEditor::load_from_file(bool new_file_name) {
     std::string new_path;
     if (new_file_name || !level->opened_path.empty()) {
-        if (!get_load_path(new_path, L".level", L"*.level")) {
-            return;
-        }
+        if (!get_load_path(new_path, L".level", L"*.level")) { return; }
     }
 
     SDL_assert(level);

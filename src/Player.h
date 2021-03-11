@@ -19,27 +19,27 @@ class Player : public Entity {
     Animator animator;
     const Gamepad* gamepad;
 
-    Circle body_collider_ = {glm::vec2(0.0f), 1.0f};
+    Circle body_collider_ = { glm::vec2(0.0f), 1.0f };
 
-    glm::vec2 velocity = glm::vec2(0.0f); // In world space
+    glm::vec2 velocity = glm::vec2(0.0f);  // In world space
 
-    bool grounded = false;
+    bool grounded     = false;
     bool facing_right = true;
 
-    float hit_cooldown = 0.0f;
+    float hit_cooldown     = 0.0f;
     float hitstun_duration = 0.0f;
 
     float freeze_duration = 0.0f;
 
-    bool can_double_jump = false;
-    Direction wall_direction = Direction::NONE;
+    bool can_double_jump         = false;
+    Direction wall_direction     = Direction::NONE;
     float wall_jump_cotyote_time = 0.0f;
 
     enum State {
-        STANDING = 0,
-        WALKING = 1,
-        FALLING = 2,
-        HITSTUN = 3,
+        STANDING   = 0,
+        WALKING    = 1,
+        FALLING    = 2,
+        HITSTUN    = 3,
         WALL_CLING = 4
     } state = FALLING;
 
@@ -73,9 +73,12 @@ class Player : public Entity {
     static float HITSTUN_DURATION_MULTIPLIER;
 
   public:
-    void init(glm::vec3 position, glm::vec3 scale_factor,
-              const char* texture_path, const char* mesh_path,
-              const Gamepad* pad, const std::list<AABB>& colliders);
+    void init(glm::vec3 position,
+              glm::vec3 scale_factor,
+              const char* texture_path,
+              const char* mesh_path,
+              const Gamepad* pad,
+              const std::list<AABB>& colliders);
 
     void update(float delta_time, const std::list<AABB>& colliders);
 

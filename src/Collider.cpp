@@ -4,7 +4,9 @@
 #include "Util.h"
 #include "CollisionDetection.h"
 
-Vector Segment::line() const noexcept { return b - a; }
+Vector Segment::line() const noexcept {
+    return b - a;
+}
 
 float AABB::min(int axis) const noexcept {
     SDL_assert(half_ext.x > 0.0f && half_ext.y > 0.0f);
@@ -23,6 +25,6 @@ glm::mat3 AABB::calculate_model_matrix() const noexcept {
 }
 
 Circle Circle::local_to_world_space(const Entity& entity) const noexcept {
-    return {entity.local_to_world_space(center),
-            entity.local_to_world_scale(radius)};
+    return { entity.local_to_world_space(center),
+             entity.local_to_world_scale(radius) };
 }

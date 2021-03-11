@@ -5,11 +5,11 @@
 class Entity {
   protected:
     glm::vec2 position_ = glm::vec2(0.0f);
-    glm::vec2 scale = glm::vec2(1.0f);
-    glm::mat3 model = glm::mat3(1.0f);
+    glm::vec2 scale     = glm::vec2(1.0f);
+    glm::mat3 model     = glm::mat3(1.0f);
 
     void update_model_matrix();
-    void init(glm::vec2 pos_ = glm::vec2(0.0f),
+    void init(glm::vec2 pos_   = glm::vec2(0.0f),
               glm::vec2 scale_ = glm::vec2(1.0f));
 
   public:

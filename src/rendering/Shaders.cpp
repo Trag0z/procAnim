@@ -83,10 +83,12 @@ Shader::Shader(const char* vert_path, const char* frag_path) {
     id = load_and_compile_shader_from_file(vert_path, frag_path);
 
     camera_loc = glGetUniformLocation(id, "camera");
-    model_loc = glGetUniformLocation(id, "model");
+    model_loc  = glGetUniformLocation(id, "model");
 }
 
-void Shader::use() const { glUseProgram(id); };
+void Shader::use() const {
+    glUseProgram(id);
+};
 
 void Shader::set_camera(const glm::mat3* mat) const {
     use();
@@ -97,17 +99,17 @@ void Shader::set_model(const glm::mat3* mat) const {
     use();
     glUniformMatrix3fv(model_loc, 1, 0, (const GLfloat*)mat);
 };
-} // namespace ShaderDetail
+}  // namespace ShaderDetail
 
 //                  DebugShader                     //
 VertexArray<DebugShader::Vertex> DebugShader::SQUARE_VAO;
 VertexArray<DebugShader::Vertex> DebugShader::CIRCLE_VAO;
 
-DebugShader::DebugShader(const char* vert_path, const char* frag_path)
-    : Shader(vert_path, frag_path) {
+DebugShader::DebugShader(const char* vert_path, const char* frag_path) :
+    Shader(vert_path, frag_path) {
     color_loc = glGetUniformLocation(id, "color");
 
-    GLuint indices[6] = {0, 1, 2, 2, 3, 0};
+    GLuint indices[6] = { 0, 1, 2, 2, 3, 0 };
 
     Vertex vertices[4];
     vertices[0] = glm::vec2(-1.0f, 1.0f);
@@ -126,14 +128,17 @@ DebugShader::DebugShader(const char* vert_path, const char* frag_path)
     for (size_t i = 0; i < CIRCLE_SEGMENTS; ++i) {
         circle_indices[i] = static_cast<GLuint>(i);
 
-        float theta = static_cast<float>(i) /
-                      static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
+        float theta = static_cast<float>(i)
+                    / static_cast<float>(CIRCLE_SEGMENTS) * 2.0f * PI;
 
         circle_vertices[i] = glm::vec2(cosf(theta), sinf(theta));
     }
 
-    CIRCLE_VAO.init(circle_indices, CIRCLE_SEGMENTS, circle_vertices,
-                    CIRCLE_SEGMENTS, GL_STATIC_DRAW);
+    CIRCLE_VAO.init(circle_indices,
+                    CIRCLE_SEGMENTS,
+                    circle_vertices,
+                    CIRCLE_SEGMENTS,
+                    GL_STATIC_DRAW);
 }
 
 void DebugShader::set_color(const Color& color) const {
@@ -144,15 +149,15 @@ void DebugShader::set_color(const Color& color) const {
 //                  TexturedShader                  //
 VertexArray<TexturedShader::Vertex> TexturedShader::DEFAULT_VAO;
 
-TexturedShader::TexturedShader(const char* vert_path, const char* frag_path)
-    : Shader(vert_path, frag_path) {
-    GLuint indices[6] = {0, 1, 2, 2, 3, 0};
+TexturedShader::TexturedShader(const char* vert_path, const char* frag_path) :
+    Shader(vert_path, frag_path) {
+    GLuint indices[6] = { 0, 1, 2, 2, 3, 0 };
 
     Vertex vertices[4];
-    vertices[0] = {{-1.0f, 1.0f}, {0.0f, 0.0f}};
-    vertices[1] = {{-1.0f, -1.0f}, {0.0f, 1.0f}};
-    vertices[2] = {{1.0f, -1.0f}, {1.0f, 1.0f}};
-    vertices[3] = {{1.0f, 1.0f}, {1.0f, 0.0f}};
+    vertices[0] = { { -1.0f, 1.0f }, { 0.0f, 0.0f } };
+    vertices[1] = { { -1.0f, -1.0f }, { 0.0f, 1.0f } };
+    vertices[2] = { { 1.0f, -1.0f }, { 1.0f, 1.0f } };
+    vertices[3] = { { 1.0f, 1.0f }, { 1.0f, 0.0f } };
 
     DEFAULT_VAO.init(indices, 6, vertices, 4, GL_STATIC_DRAW);
 }
@@ -163,8 +168,8 @@ void TexturedShader::set_texture(const Texture& texture) const {
 }
 
 //                  RiggedShader                    //
-RiggedShader::RiggedShader(const char* vert_path, const char* frag_path)
-    : Shader(vert_path, frag_path) {
+RiggedShader::RiggedShader(const char* vert_path, const char* frag_path) :
+    Shader(vert_path, frag_path) {
     bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
 }
 
@@ -175,16 +180,16 @@ void RiggedShader::set_texture(const Texture& texture) const {
 
 void RiggedShader::set_bone_transforms(const glm::mat3* transforms) const {
     use();
-    glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
-                       (const GLfloat*)transforms);
+    glUniformMatrix3fv(
+      bone_transforms_loc, NUMBER_OF_BONES, 0, (const GLfloat*)transforms);
 }
 
 //                  RiggedDebugShader               //
 RiggedDebugShader::RiggedDebugShader(const char* vert_path,
-                                     const char* frag_path)
-    : Shader(vert_path, frag_path) {
+                                     const char* frag_path) :
+    Shader(vert_path, frag_path) {
     bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
-    color_loc = glGetUniformLocation(id, "color");
+    color_loc           = glGetUniformLocation(id, "color");
 }
 
 void RiggedDebugShader::set_color(const Color& color) const {
@@ -194,14 +199,14 @@ void RiggedDebugShader::set_color(const Color& color) const {
 
 void RiggedDebugShader::set_bone_transforms(const glm::mat3* transforms) const {
     use();
-    glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
-                       (const GLfloat*)transforms);
+    glUniformMatrix3fv(
+      bone_transforms_loc, NUMBER_OF_BONES, 0, (const GLfloat*)transforms);
 }
 
 //                  BoneShader                      //
-BoneShader::BoneShader(const char* vert_path, const char* frag_path)
-    : Shader(vert_path, frag_path) {
-    color_loc = glGetUniformLocation(id, "color");
+BoneShader::BoneShader(const char* vert_path, const char* frag_path) :
+    Shader(vert_path, frag_path) {
+    color_loc           = glGetUniformLocation(id, "color");
     bone_transforms_loc = glGetUniformLocation(id, "bone_transforms[0]");
 }
 
@@ -212,15 +217,15 @@ void BoneShader::set_color(const Color& color) const {
 
 void BoneShader::set_bone_transforms(const glm::mat3* transforms) const {
     use();
-    glUniformMatrix3fv(bone_transforms_loc, NUMBER_OF_BONES, 0,
-                       (const GLfloat*)transforms);
+    glUniformMatrix3fv(
+      bone_transforms_loc, NUMBER_OF_BONES, 0, (const GLfloat*)transforms);
 }
 
 //                  TrailShader                     //
-TrailShader::TrailShader(const char* vert_path, const char* frag_path)
-    : Shader(vert_path, frag_path) {
+TrailShader::TrailShader(const char* vert_path, const char* frag_path) :
+    Shader(vert_path, frag_path) {
     first_color_loc = glGetUniformLocation(id, "old_color");
-    last_color_loc = glGetUniformLocation(id, "recent_color");
+    last_color_loc  = glGetUniformLocation(id, "recent_color");
 }
 
 void TrailShader::set_colors(const Color& old_color,

@@ -17,7 +17,7 @@ class ConfigManager {
 
   private:
     typedef std::variant<bool*, float*, s16*, s32*, glm::ivec2*, glm::vec2*>
-        property_value;
+      property_value;
     typedef std::map<std::string, property_value> property_map;
 
     std::string save_path;

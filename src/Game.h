@@ -15,30 +15,30 @@
 #include <sdl\SDL.h>
 
 namespace Keybinds {
-constexpr SDL_Scancode DRAW_BONES = SDL_SCANCODE_F1;
+constexpr SDL_Scancode DRAW_BONES   = SDL_SCANCODE_F1;
 constexpr SDL_Scancode DRAW_SPLINES = SDL_SCANCODE_F2;
-constexpr SDL_Scancode STEP_MODE = SDL_SCANCODE_P;
-constexpr SDL_Scancode NEXT_STEP = SDL_SCANCODE_N;
+constexpr SDL_Scancode STEP_MODE    = SDL_SCANCODE_P;
+constexpr SDL_Scancode NEXT_STEP    = SDL_SCANCODE_N;
 constexpr SDL_Scancode HOLD_TO_STEP = SDL_SCANCODE_M;
-constexpr SDL_Scancode SPEED_UP = SDL_SCANCODE_B;
-constexpr SDL_Scancode SPEED_DOWN = SDL_SCANCODE_V;
-constexpr SDL_Scancode QUIT = SDL_SCANCODE_ESCAPE;
-}; // namespace Keybinds
+constexpr SDL_Scancode SPEED_UP     = SDL_SCANCODE_B;
+constexpr SDL_Scancode SPEED_DOWN   = SDL_SCANCODE_V;
+constexpr SDL_Scancode QUIT         = SDL_SCANCODE_ESCAPE;
+};  // namespace Keybinds
 
 struct GameConfig {
-    const u32 window_flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
-    glm::ivec2 window_position = {0, 0};
+    const u32 window_flags     = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
+    glm::ivec2 window_position = { 0, 0 };
 
-    const u32 fps = 60;
+    const u32 fps         = 60;
     const u32 frame_delay = 1000 / fps;
 
-    float speed = 1.0f;
-    bool step_mode = false;
+    float speed               = 1.0f;
+    bool step_mode            = false;
     bool use_const_delta_time = true;
 
     float hit_screen_shake_intensity = 5.0f;
-    float hit_screen_shake_duration = 30.0f;
-    float hit_screen_shake_speed = 0.5f;
+    float hit_screen_shake_duration  = 30.0f;
+    float hit_screen_shake_speed     = 0.5f;
 };
 
 class Game {

@@ -55,7 +55,9 @@ class Spline {
 
 class SplineEditor {
   public:
-    void init(const Entity* parent_, SplineSet* splines_, Limb* limbs_,
+    void init(const Entity* parent_,
+              SplineSet* splines_,
+              Limb* limbs_,
               const char* spline_path);
     bool update(const MouseKeyboardInput& input);
     void render(const Renderer& renderer, bool spline_edit_mode);
@@ -63,7 +65,7 @@ class SplineEditor {
   private:
     const Entity* parent;
 
-    static const size_t NUM_ANIMATIONS = 3;
+    static const size_t NUM_ANIMATIONS            = 3;
     static const size_t NUM_SPLINES_PER_ANIMATION = 2;
 
     SplineSet* spline_set;
@@ -71,18 +73,18 @@ class SplineEditor {
 
     enum SelectedAnimation {
         WALK = 0,
-        RUN = 1,
+        RUN  = 1,
         IDLE = 2,
         NONE = 3
     } selected_animation;
 
     size_t selected_spline_index = static_cast<size_t>(-1);
-    size_t selected_point_index = static_cast<size_t>(-1);
+    size_t selected_point_index  = static_cast<size_t>(-1);
 
     bool creating_new_spline = false;
-    bool first_point_set = false;
+    bool first_point_set     = false;
 
-    bool connect_point_pairs = true;
+    bool connect_point_pairs   = true;
     bool connect_tangent_pairs = false;
 
     std::string save_path;
@@ -101,8 +103,8 @@ class SplineEditor {
     // relative to either P1 or P2. If absolute_tangent_pos is false, it just
     // uses the value of p.
     void set_spline_point(glm::vec2 p,
-                          size_t point_index = static_cast<size_t>(-1),
-                          size_t spline_index = static_cast<size_t>(-1),
+                          size_t point_index        = static_cast<size_t>(-1),
+                          size_t spline_index       = static_cast<size_t>(-1),
                           bool absolute_tangent_pos = true);
 
     bool update_gui();

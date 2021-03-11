@@ -93,10 +93,8 @@ void ConfigManager::load_config(const char* path) {
 
     property_map* current_property = nullptr;
     for (std::string line; std::getline(file_stream, line);) {
-        if (line.empty()) {
-            continue;
-        }
-        std::stringstream stream{line};
+        if (line.empty()) { continue; }
+        std::stringstream stream { line };
 
         std::string word;
         std::getline(stream, word, ' ');
@@ -108,7 +106,7 @@ void ConfigManager::load_config(const char* path) {
         }
 
         SDL_assert(current_property);
-        std::visit(ParseVisitor{stream}, (*current_property)[word]);
+        std::visit(ParseVisitor { stream }, (*current_property)[word]);
     }
 
     file_stream.close();
@@ -122,13 +120,13 @@ void ConfigManager::save_config() {
     char buf[buf_size];
 
     SaveVisitor::write_pos = buf;
-    SaveVisitor::buf_end = buf + buf_size;
+    SaveVisitor::buf_end   = buf + buf_size;
 
     for (const auto& obj : objects) {
         SaveVisitor::write_comment(obj.first);
 
         for (const auto& property : obj.second) {
-            std::visit(SaveVisitor{property.first}, property.second);
+            std::visit(SaveVisitor { property.first }, property.second);
         }
     }
 
@@ -136,7 +134,7 @@ void ConfigManager::save_config() {
 
     size_t num_bytes_to_write = SaveVisitor::write_pos - buf;
     size_t num_bytes_written =
-        SDL_RWwrite(file, buf, sizeof(char), num_bytes_to_write);
+      SDL_RWwrite(file, buf, sizeof(char), num_bytes_to_write);
 
     SDL_assert(num_bytes_written == num_bytes_to_write);
 
@@ -148,20 +146,16 @@ bool ConfigManager::display_ui_window() {
     bool keep_open = true;
 
     Begin("Config Editor", &keep_open);
-    if (Button("Save")) {
-        save_config();
-    }
+    if (Button("Save")) { save_config(); }
     SameLine();
-    if (Button("Load")) {
-        load_config();
-    }
+    if (Button("Load")) { load_config(); }
 
     PushItemWidth(150);
     for (auto& obj : objects) {
         if (CollapsingHeader(obj.first.c_str())) {
 
             for (auto& property : obj.second) {
-                std::visit(UIVisitor{property.first}, property.second);
+                std::visit(UIVisitor { property.first }, property.second);
             }
         }
     }
@@ -220,49 +214,65 @@ void ConfigManager::ParseVisitor::operator()(glm::ivec2* val) {
     val->y = static_cast<glm::i32>(std::stod(word));
 }
 
-char* ConfigManager::SaveVisitor::write_pos = nullptr;
+char* ConfigManager::SaveVisitor::write_pos     = nullptr;
 const char* ConfigManager::SaveVisitor::buf_end = nullptr;
 
 void ConfigManager::SaveVisitor::operator()(bool* val) {
-    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d\n",
-                                item_name.c_str(), static_cast<int>(*val));
+    int num_written = sprintf_s(write_pos,
+                                buf_end - write_pos,
+                                "%s %d\n",
+                                item_name.c_str(),
+                                static_cast<int>(*val));
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }
 void ConfigManager::SaveVisitor::operator()(float* val) {
-    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %f\n",
-                                item_name.c_str(), *val);
+    int num_written = sprintf_s(
+      write_pos, buf_end - write_pos, "%s %f\n", item_name.c_str(), *val);
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }
 void ConfigManager::SaveVisitor::operator()(s16* val) {
-    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d\n",
-                                item_name.c_str(), static_cast<int>(*val));
+    int num_written = sprintf_s(write_pos,
+                                buf_end - write_pos,
+                                "%s %d\n",
+                                item_name.c_str(),
+                                static_cast<int>(*val));
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }
 void ConfigManager::SaveVisitor::operator()(s32* val) {
-    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d\n",
-                                item_name.c_str(), static_cast<int>(*val));
+    int num_written = sprintf_s(write_pos,
+                                buf_end - write_pos,
+                                "%s %d\n",
+                                item_name.c_str(),
+                                static_cast<int>(*val));
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }
 void ConfigManager::SaveVisitor::operator()(glm::vec2* val) {
-    int num_written =
-        sprintf_s(write_pos, buf_end - write_pos, "%s %.2f,%.2f\n",
-                  item_name.c_str(), val->x, val->y);
+    int num_written = sprintf_s(write_pos,
+                                buf_end - write_pos,
+                                "%s %.2f,%.2f\n",
+                                item_name.c_str(),
+                                val->x,
+                                val->y);
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }
 void ConfigManager::SaveVisitor::operator()(glm::ivec2* val) {
-    int num_written = sprintf_s(write_pos, buf_end - write_pos, "%s %d,%d\n",
-                                item_name.c_str(), val->x, val->y);
+    int num_written = sprintf_s(write_pos,
+                                buf_end - write_pos,
+                                "%s %d,%d\n",
+                                item_name.c_str(),
+                                val->x,
+                                val->y);
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }
 void ConfigManager::SaveVisitor::write_comment(const std::string& str) {
     int num_written =
-        sprintf_s(write_pos, buf_end - write_pos, "# %s\n", str.c_str());
+      sprintf_s(write_pos, buf_end - write_pos, "# %s\n", str.c_str());
     SDL_assert(num_written != -1);
     write_pos += num_written;
 }

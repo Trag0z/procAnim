@@ -20,9 +20,12 @@ void Game::init() {
 
     glm::ivec2 window_size = static_cast<glm::ivec2>(renderer.window_size());
 
-    window = SDL_CreateWindow("procAnim", game_config.window_position.x,
-                              game_config.window_position.y, window_size.x,
-                              window_size.y, game_config.window_flags);
+    window = SDL_CreateWindow("procAnim",
+                              game_config.window_position.x,
+                              game_config.window_position.y,
+                              window_size.x,
+                              window_size.y,
+                              game_config.window_flags);
     SDL_assert_always(window);
 
     sdl_renderer = SDL_CreateRenderer(window, -1, 0);
@@ -63,8 +66,8 @@ void Game::init() {
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(handle_gl_debug_output, nullptr);
-    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
-                          GL_TRUE);
+    glDebugMessageControl(
+      GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 #endif
 
     // Setup ImGui context
@@ -76,8 +79,8 @@ void Game::init() {
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Initialize SDL_mixer
-    if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096) ==
-        -1) {
+    if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096)
+        == -1) {
         printf("Error initializing SDL_Mixer: %s", Mix_GetError());
         SDL_TriggerBreakpoint();
     }
@@ -102,26 +105,32 @@ void Game::init() {
     level_editor.init(&level);
 
     // Player
-    glm::vec3 position = {960.0f, 271.0f, 0.0f};
-    players[0].init(position, glm::vec3(100.0f, 100.0f, 1.0f),
-                    "../assets/playerTexture.png", "../assets/guy.fbx",
-                    &gamepads[0], level.colliders());
+    glm::vec3 position = { 960.0f, 271.0f, 0.0f };
+    players[0].init(position,
+                    glm::vec3(100.0f, 100.0f, 1.0f),
+                    "../assets/playerTexture.png",
+                    "../assets/guy.fbx",
+                    &gamepads[0],
+                    level.colliders());
 
     position.x += 50.0f;
-    players[1].init(position, glm::vec3(100.0f, 100.0f, 1.0f),
-                    "../assets/playerTexture.png", "../assets/guy.fbx",
-                    &gamepads[1], level.colliders());
+    players[1].init(position,
+                    glm::vec3(100.0f, 100.0f, 1.0f),
+                    "../assets/playerTexture.png",
+                    "../assets/guy.fbx",
+                    &gamepads[1],
+                    level.colliders());
 
     // Ball
     ball.init(renderer.camera_center(), "../assets/ball.png");
 
     frame_start = SDL_GetTicks();
-    is_running = true;
+    is_running  = true;
 };
 
 void Game::run() {
     last_frame_start = frame_start;
-    frame_start = SDL_GetTicks();
+    frame_start      = SDL_GetTicks();
 
     SDL_PumpEvents();
 
@@ -132,14 +141,14 @@ void Game::run() {
         pad.update();
     }
 
-    { // Process events
+    {  // Process events
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT ||
-                (event.type == SDL_WINDOWEVENT &&
-                 event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                 event.window.windowID == SDL_GetWindowID(window))) {
+            if (event.type == SDL_QUIT
+                || (event.type == SDL_WINDOWEVENT
+                    && event.window.event == SDL_WINDOWEVENT_CLOSE
+                    && event.window.windowID == SDL_GetWindowID(window))) {
                 is_running = false;
             } else if (event.type == SDL_MOUSEWHEEL) {
                 mouse_keyboard_input.mouse_wheel_scroll = event.wheel.y;
@@ -155,7 +164,7 @@ void Game::run() {
                 }
             } else if (event.type == SDL_CONTROLLERDEVICEREMOVED) {
                 SDL_GameController* controller_ptr =
-                    SDL_GameControllerFromInstanceID(event.cdevice.which);
+                  SDL_GameControllerFromInstanceID(event.cdevice.which);
 
                 for (size_t i = 0; i < NUM_PLAYERS; ++i) {
                     if (gamepads[i].sdl_ptr == controller_ptr) {
@@ -194,7 +203,7 @@ void Game::run() {
     // Move/zoom camera
     if (mouse_keyboard_input.mouse_button(MouseButton::MIDDLE)) {
         vec2 mouse_move =
-            static_cast<glm::vec2>(mouse_keyboard_input.mouse_move_screen());
+          static_cast<glm::vec2>(mouse_keyboard_input.mouse_move_screen());
         mouse_move.x *= -1.0f;
 
         renderer.camera_center_ += mouse_move;
@@ -218,7 +227,7 @@ void Game::run() {
     update_gui();
 
     float last_frame_duration =
-        static_cast<float>(frame_start - last_frame_start);
+      static_cast<float>(frame_start - last_frame_start);
     float frame_delay = static_cast<float>(game_config.frame_delay);
 
     // Update components based on the current game_mode
@@ -231,10 +240,10 @@ void Game::run() {
             delta_time = last_frame_duration / frame_delay * game_config.speed;
         }
 
-        if (!game_config.step_mode ||
-            (game_config.step_mode &&
-             (mouse_keyboard_input.key_down(Keybinds::NEXT_STEP) ||
-              mouse_keyboard_input.key(Keybinds::HOLD_TO_STEP)))) {
+        if (!game_config.step_mode
+            || (game_config.step_mode
+                && (mouse_keyboard_input.key_down(Keybinds::NEXT_STEP)
+                    || mouse_keyboard_input.key(Keybinds::HOLD_TO_STEP)))) {
             simulate_world(delta_time);
         }
 
@@ -261,18 +270,18 @@ void Game::run() {
 
     // Players
     std::array<glm::mat3, RiggedShader::NUMBER_OF_BONES>
-        bone_transforms[NUM_PLAYERS];
+      bone_transforms[NUM_PLAYERS];
     if (renderer.draw_limbs || renderer.draw_wireframes) {
         for (size_t n_player = 0; n_player < NUM_PLAYERS; ++n_player) {
             const auto& player = players[n_player];
 
-            SDL_assert(player.rigged_mesh.bones.size() <=
-                       RiggedShader::NUMBER_OF_BONES);
+            SDL_assert(player.rigged_mesh.bones.size()
+                       <= RiggedShader::NUMBER_OF_BONES);
 
             for (size_t n_bone = 0; n_bone < player.rigged_mesh.bones.size();
                  ++n_bone) {
                 bone_transforms[n_player][n_bone] =
-                    player.rigged_mesh.bones[n_bone].transform();
+                  player.rigged_mesh.bones[n_bone].transform();
             }
         }
     }
@@ -284,7 +293,7 @@ void Game::run() {
 
             renderer.rigged_shader.set_model(&player.model);
             renderer.rigged_shader.set_bone_transforms(
-                bone_transforms[n_player].data());
+              bone_transforms[n_player].data());
             renderer.rigged_shader.set_texture(player.texture);
 
             player.rigged_mesh.vao.draw(GL_TRIANGLES);
@@ -318,7 +327,7 @@ void Game::run() {
             renderer.rigged_debug_shader.set_model(&player.model);
             renderer.rigged_debug_shader.set_color(Color::BLUE);
             renderer.rigged_debug_shader.set_bone_transforms(
-                bone_transforms[n_player].data());
+              bone_transforms[n_player].data());
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             player.rigged_mesh.vao.draw(GL_TRIANGLES);
@@ -334,7 +343,7 @@ void Game::run() {
             renderer.bone_shader.set_model(&player.model);
             renderer.bone_shader.set_color(Color::RED);
             renderer.bone_shader.set_bone_transforms(
-                bone_transforms[n_player].data());
+              bone_transforms[n_player].data());
 
             glLineWidth(2.0f);
             player.rigged_mesh.bones_vao.draw(GL_LINES);
@@ -350,7 +359,7 @@ void Game::run() {
 
             const auto collider = player.body_collider();
             glm::mat3 model = glm::translate(glm::mat3(1.0f), collider.center);
-            model = glm::scale(model, glm::vec2(collider.radius));
+            model           = glm::scale(model, glm::vec2(collider.radius));
 
             renderer.debug_shader.set_model(&model);
             renderer.debug_shader.CIRCLE_VAO.draw(GL_LINE_LOOP);
@@ -427,9 +436,11 @@ void Game::simulate_world(float delta_time) {
 
         // Body collisions with level
         if (player.state == Player::HITSTUN) {
-            BallisticMoveResult result = get_ballistic_move_result(
-                player.body_collider(), player.velocity, delta_time,
-                level.colliders());
+            BallisticMoveResult result =
+              get_ballistic_move_result(player.body_collider(),
+                                        player.velocity,
+                                        delta_time,
+                                        level.colliders());
 
             new_player_position = result.new_position;
             new_player_velocity = result.new_velocity;
@@ -438,36 +449,37 @@ void Game::simulate_world(float delta_time) {
                 audio_manager.play(Sound::WALL_BOUNCE);
             }
 
-        } else { // player.state != Player::HITSTUN
-            vec2 player_move = player.velocity * delta_time;
+        } else {  // player.state != Player::HITSTUN
+            vec2 player_move              = player.velocity * delta_time;
             CollisionData first_collision = find_first_collision_moving_circle(
-                player.body_collider(), player_move, level.colliders());
+              player.body_collider(), player_move, level.colliders());
 
             if (first_collision.direction == Direction::NONE) {
                 new_player_position = player.position() + player_move;
 
             } else {
                 vec2 remaining_player_move;
-                if (first_collision.direction == Direction::DOWN ||
-                    first_collision.direction == Direction::UP) {
+                if (first_collision.direction == Direction::DOWN
+                    || first_collision.direction == Direction::UP) {
 
                     new_player_velocity.y = 0.0f;
 
                     remaining_player_move =
-                        vec2(player_move.x * (1.0f - first_collision.t), 0.0f);
+                      vec2(player_move.x * (1.0f - first_collision.t), 0.0f);
 
                 } else {
-                    SDL_assert(first_collision.direction == Direction::LEFT ||
-                               first_collision.direction == Direction::RIGHT);
+                    SDL_assert(first_collision.direction == Direction::LEFT
+                               || first_collision.direction
+                                    == Direction::RIGHT);
                     new_player_velocity.x = 0.0f;
 
                     remaining_player_move =
-                        vec2(0.0f, player_move.y - (1.0f - first_collision.t));
+                      vec2(0.0f, player_move.y - (1.0f - first_collision.t));
 
                     if (!player.grounded) {
                         player.wall_direction = first_collision.direction;
-                        player.state = Player::WALL_CLING;
-                        player.velocity.y = 0.0f;
+                        player.state          = Player::WALL_CLING;
+                        player.velocity.y     = 0.0f;
                     }
                 }
 
@@ -475,21 +487,20 @@ void Game::simulate_world(float delta_time) {
                 body_collider.center = first_collision.position;
 
                 CollisionData second_collision =
-                    find_first_collision_moving_circle(body_collider,
-                                                       remaining_player_move,
-                                                       level.colliders());
+                  find_first_collision_moving_circle(
+                    body_collider, remaining_player_move, level.colliders());
 
-                SDL_assert(second_collision.direction !=
-                           first_collision.direction);
+                SDL_assert(second_collision.direction
+                           != first_collision.direction);
 
                 if (second_collision.direction != Direction::NONE) {
                     // The player hit a corner, can't move any further
                     new_player_velocity = vec2(0.0f);
-                } else if (second_collision.direction == Direction::LEFT ||
-                           second_collision.direction == Direction::RIGHT) {
+                } else if (second_collision.direction == Direction::LEFT
+                           || second_collision.direction == Direction::RIGHT) {
                     if (!player.grounded) {
                         player.wall_direction = second_collision.direction;
-                        player.state = Player::WALL_CLING;
+                        player.state          = Player::WALL_CLING;
                         SDL_assert(player.velocity.y == 0.0f);
                     }
                 }
@@ -498,25 +509,25 @@ void Game::simulate_world(float delta_time) {
             }
         }
 
-        if (player.state != Player::HITSTUN &&
-            player.state != Player::WALL_CLING) {
+        if (player.state != Player::HITSTUN
+            && player.state != Player::WALL_CLING) {
             // Keep player above ground, check grounded status
             auto ground_under_player =
-                level.find_ground_under(new_player_position);
-            if (!ground_under_player ||
-                new_player_position.y - ground_under_player->max(1) >
-                    Player::GROUND_HOVER_DISTANCE +
-                        2.0f /* small tolerance */) {
+              level.find_ground_under(new_player_position);
+            if (!ground_under_player
+                || new_player_position.y - ground_under_player->max(1)
+                     > Player::GROUND_HOVER_DISTANCE
+                         + 2.0f /* small tolerance */) {
 
                 player.grounded = false;
-                player.state = Player::FALLING;
+                player.state    = Player::FALLING;
 
             } else {
                 new_player_velocity.y = std::max(new_player_velocity.y, 0.0f);
                 new_player_position.y =
-                    ground_under_player->max(1) + Player::GROUND_HOVER_DISTANCE;
+                  ground_under_player->max(1) + Player::GROUND_HOVER_DISTANCE;
 
-                player.grounded = true;
+                player.grounded        = true;
                 player.can_double_jump = true;
                 if (player.state == Player::FALLING) {
                     player.state = Player::STANDING;
@@ -528,17 +539,17 @@ void Game::simulate_world(float delta_time) {
             new_player_velocity.y -= Player::GRAVITY;
         }
 
-        player.velocity = new_player_velocity;
+        player.velocity  = new_player_velocity;
         player.position_ = new_player_position;
-    } // End for each player
+    }  // End for each player
 
-    { // Player/Player Collisions // TODO
+    {  // Player/Player Collisions // TODO
         Circle colliders[2];
         colliders[0] = players[0].body_collider();
         colliders[1] = players[1].body_collider();
 
         glm::vec2 between_colliders = colliders[0].center - colliders[1].center;
-        float distance = glm::length(between_colliders);
+        float distance              = glm::length(between_colliders);
 
         if (distance < colliders[0].radius + colliders[1].radius) {
             // players[0].velocity +=
@@ -551,21 +562,24 @@ void Game::simulate_world(float delta_time) {
         weapons[i] = &players[i].weapon_collider;
     }
 
-    if (weapons[0]->line() != glm::vec2(0.0f) ||
-        weapons[1]->line() != glm::vec2(0.0f)) {
+    if (weapons[0]->line() != glm::vec2(0.0f)
+        || weapons[1]->line() != glm::vec2(0.0f)) {
 
         // Weapon vs. weapon
         {
             float t;
             Point collision_pos;
-            if (intersect_segment_segment(*weapons[0], *weapons[1], &t,
-                                          &collision_pos)) {
-                printf("Weapons colliding at t=%.2f, pos: %.2f, %.2f\n", t,
-                       collision_pos.x, collision_pos.y);
+            if (intersect_segment_segment(
+                  *weapons[0], *weapons[1], &t, &collision_pos)) {
+                printf("Weapons colliding at t=%.2f, pos: %.2f, %.2f\n",
+                       t,
+                       collision_pos.x,
+                       collision_pos.y);
 
 #ifdef _DEBUG
                 std::array<DebugShader::Vertex, 1> shader_vertex = {
-                    collision_pos};
+                    collision_pos
+                };
                 collision_point.vao.update_vertex_data(shader_vertex);
                 collision_point.collision_happened = true;
             } else {
@@ -580,37 +594,40 @@ void Game::simulate_world(float delta_time) {
             auto& player = players[i];
 
             float t;
-            if (player.hit_cooldown <= 0.0f &&
-                glm::length(weapon->line()) > player.body_collider().radius &&
-                intersect_segment_circle(*weapon, ball.collider(), &t)) {
+            if (player.hit_cooldown <= 0.0f
+                && glm::length(weapon->line()) > player.body_collider().radius
+                && intersect_segment_circle(*weapon, ball.collider(), &t)) {
 
                 // The ball was hit
                 vec2 hit_direction = glm::normalize(
-                    player.weapon_collider.b - player.last_weapon_collider.b);
+                  player.weapon_collider.b - player.last_weapon_collider.b);
 
                 const float& trail_length = player.weapon_trail.trail_length;
 
-                vec2 hit_velocity = hit_direction * trail_length *
-                                    Player::HIT_SPEED_MULTIPLIER * t;
+                vec2 hit_velocity = hit_direction * trail_length
+                                  * Player::HIT_SPEED_MULTIPLIER * t;
 
                 ball.set_velocity(hit_velocity);
 
                 player.hit_cooldown = Player::MAX_HIT_COOLDOWN;
 
                 const float screen_shake_duration =
-                    game_config.hit_screen_shake_duration * trail_length;
+                  game_config.hit_screen_shake_duration * trail_length;
 
                 player.freeze_duration = screen_shake_duration;
-                ball.freeze_duration = screen_shake_duration;
-                renderer.shake_screen(
-                    game_config.hit_screen_shake_intensity * trail_length,
-                    screen_shake_duration, game_config.hit_screen_shake_speed);
+                ball.freeze_duration   = screen_shake_duration;
+                renderer.shake_screen(game_config.hit_screen_shake_intensity
+                                        * trail_length,
+                                      screen_shake_duration,
+                                      game_config.hit_screen_shake_speed);
                 audio_manager.play(Sound::HIT_2);
             }
         }
     }
 
-    ball.update(delta_time, level.colliders(), audio_manager,
+    ball.update(delta_time,
+                level.colliders(),
+                audio_manager,
                 renderer.draw_ball_trajectory);
     renderer.update(delta_time);
 }
@@ -636,9 +653,10 @@ void Game::update_gui() {
 
     Separator();
     Text("Display debug windows");
-    { // Player windows
+    {  // Player windows
         static bool player_window_open[2] = {
-            true, true}; // NOTE: This is not saved in config file
+            true, true
+        };  // NOTE: This is not saved in config file
         for (size_t i = 0; i < NUM_PLAYERS; ++i) {
             char label[10];
             sprintf_s(label, "Player %zd", i);
@@ -651,19 +669,21 @@ void Game::update_gui() {
     {
         static bool ball_window_open = true;
         Checkbox("Ball", &ball_window_open);
-        if (ball_window_open) {
-            ball.display_debug_ui();
-        }
+        if (ball_window_open) { ball.display_debug_ui(); }
     }
 
     Separator();
     Text("Animation controls");
     PushItemWidth(100);
     DragFloat("Step distance multiplier",
-              &players[0].animator.step_distance_multiplier, 1.0f, 0.0f, 0.0f,
+              &players[0].animator.step_distance_multiplier,
+              1.0f,
+              0.0f,
+              0.0f,
               "%.1f");
     DragFloat2("Interpolation speed min/max",
-               &players[0].animator.interpolation_speed_multiplier.min, 0.01f);
+               &players[0].animator.interpolation_speed_multiplier.min,
+               0.01f);
     PopItemWidth();
 
     End();
