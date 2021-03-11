@@ -223,14 +223,4 @@ void BoneShader::set_bone_transforms(const glm::mat3* transforms) const {
 
 //                  TrailShader                     //
 TrailShader::TrailShader(const char* vert_path, const char* frag_path) :
-    Shader(vert_path, frag_path) {
-    first_color_loc = glGetUniformLocation(id, "old_color");
-    last_color_loc  = glGetUniformLocation(id, "recent_color");
-}
-
-void TrailShader::set_colors(const Color& old_color,
-                             const Color& recent_color) {
-    use();
-    glUniform4fv(first_color_loc, 1, (const GLfloat*)&old_color);
-    glUniform4fv(last_color_loc, 1, (const GLfloat*)&recent_color);
-}
+    Shader(vert_path, frag_path) {}

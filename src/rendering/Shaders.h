@@ -118,14 +118,9 @@ class BoneShader : public ShaderDetail::Shader {
 };
 
 class TrailShader : public ShaderDetail::Shader {
-    GLuint first_color_loc;
-    GLuint last_color_loc;
-
   public:
     TrailShader() {}
     TrailShader(const char* vert_path, const char* frag_path);
-
-    void set_colors(const Color& first_color, const Color& last_color);
 
     struct Vertex {
         vec2 pos;
