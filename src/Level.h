@@ -14,9 +14,16 @@ class Level {
     // allow for deletion of random elements which the LevelEditor uses
     // frequently.
     std::list<AABB> colliders_;
+    Texture wall_texture;
+
+    static const size_t NUM_GOALS = 2;
+    struct {
+        std::list<AABB> colliders;
+        Texture texture;
+    } goals[NUM_GOALS];
+
     std::string opened_path;
 
-    Texture wall_texture;
 
   public:
     void render(const Renderer& renderer) const;
@@ -39,6 +46,8 @@ class LevelEditor {
     glm::vec2 new_collider_dimensions = glm::vec2(100.0f);
 
     bool dragging_collider = false;
+
+    int selected_team = 0;
 
   public:
     void init(Level* level_);

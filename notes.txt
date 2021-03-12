@@ -1,6 +1,4 @@
 TODO:
-- rename old_color/recent_color and age in trail shader
-- make the blending between colors in trail shader more smooth
 
 
 TODO LATER:
@@ -8,6 +6,9 @@ TODO LATER:
     > check everything that deals with Player::HITSTUN
 
 - some version of goals
+    > level editor
+        + save/load new level format
+        + rendering
     > count points
     > reset ball on score
 
