@@ -10,13 +10,15 @@ struct AABB;
 class LevelEditor;
 
 class Level {
+  public:
+    static const size_t NUM_GOALS = 2;
+
     // Linked lists are probably a bad choice for performance here, but they
     // allow for deletion of random elements which the LevelEditor uses
     // frequently.
-    std::list<AABB> colliders_;
+    std::list<AABB> colliders;
     Texture wall_texture;
 
-    static const size_t NUM_GOALS = 2;
     struct {
         std::list<AABB> colliders;
         Texture texture;
@@ -24,11 +26,7 @@ class Level {
 
     std::string opened_path;
 
-
-  public:
     void render(const Renderer& renderer) const;
-
-    const std::list<AABB> colliders() const noexcept;
 
     const AABB* find_ground_under(glm::vec2 position) const;
 

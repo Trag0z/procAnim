@@ -10,7 +10,7 @@
 void Level::render(const Renderer& renderer) const {
     renderer.textured_shader.set_texture(wall_texture);
 
-    for (const auto& coll : colliders_) {
+    for (const auto& coll : colliders) {
         glm::mat3 model = glm::translate(glm::mat3(1.0f), coll.center);
         model           = glm::scale(model, coll.half_ext);
         renderer.textured_shader.set_model(&model);
@@ -31,13 +31,9 @@ void Level::render(const Renderer& renderer) const {
     }
 }
 
-const std::list<AABB> Level::colliders() const noexcept {
-    return colliders_;
-}
-
 const AABB* Level::find_ground_under(glm::vec2 position) const {
     const AABB* candidate = nullptr;
-    for (const AABB& coll : colliders_) {
+    for (const AABB& coll : colliders) {
         if (coll.min(0) <= position.x && coll.max(0) >= position.x
             && position.y > coll.max(1)) {
 
@@ -64,7 +60,7 @@ void Level::load_from_file(const char* path) {
 
     opened_path = std::string(path);
 
-    colliders_.clear();
+    colliders.clear();
 
     // Read data from file
     SDL_RWops* file = SDL_RWFromFile(path, "rb");
@@ -95,7 +91,7 @@ void Level::load_from_file(const char* path) {
 
     // Create list of colliders from data
     for (size_t i = 0; i < num_colliders; ++i) {
-        colliders_.emplace_back(collider_data[i]);
+        colliders.emplace_back(collider_data[i]);
     }
 
     for (size_t n_goal = 0; n_goal < NUM_GOALS; ++n_goal) {
@@ -116,14 +112,14 @@ void Level::load_from_file(const char* path) {
 }
 
 void Level::save_to_file(const char* path) const {
-    size_t num_colliders                 = colliders_.size();
+    size_t num_colliders                 = colliders.size();
     size_t num_goal_colliders[NUM_GOALS] = { goals[0].colliders.size(),
                                              goals[1].colliders.size() };
 
     AABB* collider_data = new AABB[num_colliders];
 
     size_t i = 0;
-    for (const auto& coll : colliders_) {
+    for (const auto& coll : colliders) {
         collider_data[i].center   = coll.center;
         collider_data[i].half_ext = coll.half_ext;
         ++i;
@@ -176,7 +172,7 @@ void LevelEditor::init(Level* level_) {
 bool LevelEditor::update(const Renderer& renderer,
                          const MouseKeyboardInput& input) {
     bool keep_open  = true;
-    auto& colliders = level->colliders_;
+    auto& colliders = level->colliders;
 
     {  // UI
         using namespace ImGui;

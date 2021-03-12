@@ -16,6 +16,8 @@ float Ball::ROLLING_ROTATION_SPEED = 1.0f;
 float Ball::GRAVITY                = 1.0f;
 
 void Ball::init(glm::vec2 position, const char* texture_path) {
+    starting_position = position;
+
     Entity::init(position, glm::vec2(RADIUS));
     collider_ = { glm::vec2(0.0f), 1.0f };
     texture.load_from_file(texture_path);
@@ -84,7 +86,7 @@ void Ball::update(const float delta_time,
         if (move_result.last_hit_diretcion == Direction::UP
             || move_result.last_hit_diretcion == Direction::DOWN) {
             rotation_speed = -ROLLING_ROTATION_SPEED * velocity.x;
-        } else if (move_result.last_hit_diretcion == Direction::RIGHT
+        } else if (move_result.last_hit_diretcion == Direction::LEFT
                    || move_result.last_hit_diretcion == Direction::RIGHT) {
             rotation_speed = -ROLLING_ROTATION_SPEED * velocity.y;
         }
@@ -141,6 +143,15 @@ bool Ball::display_debug_ui() {
     End();
 
     return keep_open;
+}
+
+void Ball::reset() {
+    position_      = starting_position;
+    velocity       = vec2(0.0f);
+    rotation       = 0.0f;
+    rotation_speed = 0.0f;
+    grounded       = false;
+    update_model_matrix();
 }
 
 void Ball::set_velocity(glm::vec2 velo) {

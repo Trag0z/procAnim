@@ -76,6 +76,8 @@ class Game {
 
     ConfigManager config_loader;
 
+    uint score[2] = { 0, 0 };
+
 #ifdef _DEBUG
     struct {
         bool collision_happened;

@@ -1,16 +1,10 @@
 TODO:
+- display score
 
 
 TODO LATER:
 - player can be hit by ball
     > check everything that deals with Player::HITSTUN
-
-- some version of goals
-    > level editor
-        + save/load new level format
-        + rendering
-    > count points
-    > reset ball on score
 
 - tune player acceleration/deceleration
 - handle jump inputs in step mode better

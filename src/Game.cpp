@@ -111,7 +111,7 @@ void Game::init() {
                     "../assets/playerTexture.png",
                     "../assets/guy.fbx",
                     &gamepads[0],
-                    level.colliders());
+                    level.colliders);
 
     position.x += 50.0f;
     players[1].init(position,
@@ -119,7 +119,7 @@ void Game::init() {
                     "../assets/playerTexture.png",
                     "../assets/guy.fbx",
                     &gamepads[1],
-                    level.colliders());
+                    level.colliders);
 
     // Ball
     ball.init(renderer.camera_center(), "../assets/ball.png");
@@ -427,7 +427,7 @@ void Game::simulate_world(float delta_time) {
             continue;
         }
 
-        player.update(delta_time, level.colliders());
+        player.update(delta_time, level.colliders);
 
         //              Resolve collisions              //
         Point new_player_position;
@@ -439,7 +439,7 @@ void Game::simulate_world(float delta_time) {
               get_ballistic_move_result(player.body_collider(),
                                         player.velocity,
                                         delta_time,
-                                        level.colliders());
+                                        level.colliders);
 
             new_player_position = result.new_position;
             new_player_velocity = result.new_velocity;
@@ -451,7 +451,7 @@ void Game::simulate_world(float delta_time) {
         } else {  // player.state != Player::HITSTUN
             vec2 player_move              = player.velocity * delta_time;
             CollisionData first_collision = find_first_collision_moving_circle(
-              player.body_collider(), player_move, level.colliders());
+              player.body_collider(), player_move, level.colliders);
 
             if (first_collision.direction == Direction::NONE) {
                 new_player_position = player.position() + player_move;
@@ -487,7 +487,7 @@ void Game::simulate_world(float delta_time) {
 
                 CollisionData second_collision =
                   find_first_collision_moving_circle(
-                    body_collider, remaining_player_move, level.colliders());
+                    body_collider, remaining_player_move, level.colliders);
 
                 SDL_assert(second_collision.direction
                            != first_collision.direction);
@@ -624,8 +624,24 @@ void Game::simulate_world(float delta_time) {
         }
     }
 
+    // Ball vs. goal
+    {
+        bool goal_hit = false;
+        for (uint i = 0; i < 2; ++i) {
+            for (const auto& coll : level.goals[i].colliders) {
+                if (test_circle_AABB(ball.collider(), coll)) {
+                    ball.reset();
+                    score[i] += 1;
+                    goal_hit = true;
+                    break;
+                }
+            }
+            if (goal_hit) break;
+        }
+    }
+
     ball.update(delta_time,
-                level.colliders(),
+                level.colliders,
                 audio_manager,
                 renderer.draw_ball_trajectory);
     renderer.update(delta_time);
